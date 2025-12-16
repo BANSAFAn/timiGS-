@@ -215,6 +215,13 @@ body {
   overflow-y: auto;
   padding: 40px 60px;
   background: var(--bg-primary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.page {
+  width: 100%;
 }
 
 .page-container {
@@ -848,7 +855,7 @@ body {
   .grid-3 {
     grid-template-columns: repeat(2, 1fr);
   }
-  
+
   .main-content {
     padding: 32px 40px;
   }
@@ -878,7 +885,7 @@ body {
   .grid-3 {
     grid-template-columns: 1fr;
   }
-  
+
   .main-content {
     padding: 24px;
   }
@@ -991,7 +998,11 @@ body {
   width: 56px;
   height: 56px;
   border-radius: var(--radius-lg);
-  background: linear-gradient(135deg, var(--color-primary), var(--color-accent-1));
+  background: linear-gradient(
+    135deg,
+    var(--color-primary),
+    var(--color-accent-1)
+  );
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1056,4 +1067,3 @@ body {
   background: var(--color-success);
   box-shadow: 0 0 8px var(--color-success);
 }
-
