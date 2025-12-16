@@ -1,0 +1,83 @@
+{
+  "app": {
+    "name": "TimiGS",
+    "tagline": "تتبع وقتك بذكاء"
+  },
+  "nav": {
+    "dashboard": "لوحة القيادة",
+    "timeline": "الجدول الزمني",
+    "analytics": "التحليلات",
+    "settings": "الإعدادات"
+  },
+  "dashboard": {
+    "title": "لوحة القيادة",
+    "activeNow": "نشط الآن",
+    "idle": "لم يتم اكتشاف أي نشاط",
+    "todaySummary": "ملخص اليوم",
+    "totalTime": "إجمالي الوقت",
+    "appsUsed": "التطبيقات المستخدمة",
+    "sessions": "الجلسات",
+    "topApps": "أهم التطبيقات",
+    "noData": "لم يتم تسجيل أي نشاط اليوم",
+    "hours": "ساعات",
+    "minutes": "دقيقة",
+    "seconds": "ثواني"
+  },
+  "timeline": {
+    "title": "الجدول الزمني للنشاط",
+    "today": "اليوم",
+    "yesterday": "أمس",
+    "selectDate": "اختر التاريخ",
+    "duration": "المدة",
+    "startTime": "وقت البدء",
+    "endTime": "وقت النهاية",
+    "noSessions": "لا توجد جلسات لهذا التاريخ"
+  },
+  "analytics": {
+    "title": "التحليلات",
+    "weeklyOverview": "نظرة عامة أسبوعية",
+    "dailyAverage": "المعدل اليومي",
+    "mostUsed": "التطبيقات الأكثر استخداما",
+    "totalWeek": "المجموع هذا الأسبوع",
+    "trend": "مقارنة بالأسبوع الماضي",
+    "productiveTime": "الوقت المنتج",
+    "breakdownByApp": "الاستخدام حسب التطبيق"
+  },
+  "settings": {
+    "title": "الإعدادات",
+    "language": "اللغة",
+    "theme": "المظهر",
+    "themeDark": "داكن",
+    "themeLight": "فاتح",
+    "autostart": "ابدأ مع Windows",
+    "minimizeToTray": "تصغير إلى علبة النظام",
+    "tracking": "التتبع",
+    "startTracking": "بدء التتبع",
+    "stopTracking": "إيقاف التتبع",
+    "trackingActive": "التتبع نشط",
+    "trackingInactive": "التتبع متوقف مؤقتا",
+    "dataManagement": "إدارة البيانات",
+    "exportData": "تصدير البيانات",
+    "clearData": "مسح جميع البيانات",
+    "about": "حول",
+    "version": "الإصدار",
+    "saved": "تم حفظ الإعدادات!",
+    "dataSync": "مزامنة البيانات",
+    "syncGoogle": "مزامنة حساب Google",
+    "syncGoogleDesc": "مزامنة بيانات نشاطك مع Google Drive",
+    "connectGoogle": "ربط Google",
+    "connected": "متصل",
+    "localStorage": "التخزين المحلي",
+    "localStorageDesc": "تصدير أو استيراد بياناتك محليا",
+    "import": "استيراد"
+  },
+  "common": {
+    "loading": "جار التحميل...",
+    "error": "حدث خطأ",
+    "retry": "إعادة المحاولة",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "confirm": "تأكيد",
+    "close": "إغلاق"
+  }
+}

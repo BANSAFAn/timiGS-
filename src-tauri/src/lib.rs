@@ -99,6 +99,7 @@ pub fn run() {
             commands::get_google_user,
             commands::backup_data,
             commands::restore_data,
+            commands::shutdown_pc,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

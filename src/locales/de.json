@@ -1,0 +1,83 @@
+{
+  "app": {
+    "name": "TimiGS",
+    "tagline": "Verfolgen Sie Ihre Zeit intelligent"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "timeline": "Zeitachse",
+    "analytics": "Analytik",
+    "settings": "Einstellungen"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "activeNow": "Jetzt aktiv",
+    "idle": "Keine Aktivität erkannt",
+    "todaySummary": "Zusammenfassung für heute",
+    "totalTime": "Gesamtzeit",
+    "appsUsed": "Verwendete Apps",
+    "sessions": "Sitzungen",
+    "topApps": "Top-Anwendungen",
+    "noData": "Heute noch keine Aktivität aufgezeichnet",
+    "hours": "Stunden",
+    "minutes": "Minuten",
+    "seconds": "Sekunden"
+  },
+  "timeline": {
+    "title": "Aktivitätszeitachse",
+    "today": "Heute",
+    "yesterday": "Gestern",
+    "selectDate": "Datum auswählen",
+    "duration": "Dauer",
+    "startTime": "Startzeit",
+    "endTime": "Endzeit",
+    "noSessions": "Keine Sitzungen für dieses Datum"
+  },
+  "analytics": {
+    "title": "Analytik",
+    "weeklyOverview": "Wochenübersicht",
+    "dailyAverage": "Tagesdurchschnitt",
+    "mostUsed": "Meistgenutzte Apps",
+    "totalWeek": "Gesamt diese Woche",
+    "trend": "Im Vergleich zur letzten Woche",
+    "productiveTime": "Produktive Zeit",
+    "breakdownByApp": "Nutzung nach Anwendung"
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "language": "Sprache",
+    "theme": "Thema",
+    "themeDark": "Dunkel",
+    "themeLight": "Hell",
+    "autostart": "Mit Windows starten",
+    "minimizeToTray": "In System-Tray minimieren",
+    "tracking": "Verfolgung",
+    "startTracking": "Verfolgung starten",
+    "stopTracking": "Verfolgung stoppen",
+    "trackingActive": "Verfolgung ist aktiv",
+    "trackingInactive": "Verfolgung ist pausiert",
+    "dataManagement": "Datenverwaltung",
+    "exportData": "Daten exportieren",
+    "clearData": "Alle Daten löschen",
+    "about": "Über",
+    "version": "Version",
+    "saved": "Einstellungen gespeichert!",
+    "dataSync": "Datensynchronisierung",
+    "syncGoogle": "Google-Konto-Sync",
+    "syncGoogleDesc": "Synchronisieren Sie Ihre Aktivitätsdaten mit Google Drive",
+    "connectGoogle": "Google verbinden",
+    "connected": "Verbunden",
+    "localStorage": "Lokaler Speicher",
+    "localStorageDesc": "Exportieren oder importieren Sie Ihre Daten lokal",
+    "import": "Importieren"
+  },
+  "common": {
+    "loading": "Wird geladen...",
+    "error": "Ein Fehler ist aufgetreten",
+    "retry": "Wiederholen",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "confirm": "Bestätigen",
+    "close": "Schließen"
+  }
+}
