@@ -3,7 +3,6 @@ name: release-please
 on:
   push:
     branches:
-    branches:
       - nexting
 
 permissions:
