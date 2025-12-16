@@ -1,0 +1,83 @@
+{
+  "app": {
+    "name": "TimiGS",
+    "tagline": "Track your time intelligently"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "timeline": "Timeline",
+    "analytics": "Analytics",
+    "settings": "Settings"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "activeNow": "Active Now",
+    "idle": "No activity detected",
+    "todaySummary": "Today's Summary",
+    "totalTime": "Total Time",
+    "appsUsed": "Apps Used",
+    "sessions": "Sessions",
+    "topApps": "Top Applications",
+    "noData": "No activity recorded yet today",
+    "hours": "hours",
+    "minutes": "minutes",
+    "seconds": "seconds"
+  },
+  "timeline": {
+    "title": "Activity Timeline",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "selectDate": "Select Date",
+    "duration": "Duration",
+    "startTime": "Start Time",
+    "endTime": "End Time",
+    "noSessions": "No sessions for this date"
+  },
+  "analytics": {
+    "title": "Analytics",
+    "weeklyOverview": "Weekly Overview",
+    "dailyAverage": "Daily Average",
+    "mostUsed": "Most Used Apps",
+    "totalWeek": "Total This Week",
+    "trend": "Compared to last week",
+    "productiveTime": "Productive Time",
+    "breakdownByApp": "Usage by Application"
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "theme": "Theme",
+    "themeDark": "Dark",
+    "themeLight": "Light",
+    "autostart": "Start with Windows",
+    "minimizeToTray": "Minimize to system tray",
+    "tracking": "Tracking",
+    "startTracking": "Start Tracking",
+    "stopTracking": "Stop Tracking",
+    "trackingActive": "Tracking is active",
+    "trackingInactive": "Tracking is paused",
+    "dataManagement": "Data Management",
+    "exportData": "Export Data",
+    "clearData": "Clear All Data",
+    "about": "About",
+    "version": "Version",
+    "saved": "Settings saved!",
+    "dataSync": "Data Sync",
+    "syncGoogle": "Google Account Sync",
+    "syncGoogleDesc": "Sync your activity data to Google Drive",
+    "connectGoogle": "Connect Google",
+    "connected": "Connected",
+    "localStorage": "Local Storage",
+    "localStorageDesc": "Export or import your data locally",
+    "import": "Import"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "retry": "Retry",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "close": "Close"
+  }
+}

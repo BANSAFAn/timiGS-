@@ -1,0 +1,62 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "TimiGS",
+  "version": "1.0.0",
+  "identifier": "com.timigs.app",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "devUrl": "http://localhost:1420",
+    "beforeBuildCommand": "npm run build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "TimiGS - Activity Tracker",
+        "width": 1200,
+        "height": 800,
+        "minWidth": 900,
+        "minHeight": 600,
+        "center": true,
+        "resizable": true,
+        "decorations": true,
+        "transparent": false
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["nsis", "msi"],
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "windows": {
+      "nsis": {
+        "installMode": "currentUser",
+        "displayLanguageSelector": true,
+        "languages": ["English", "Ukrainian"],
+        "installerIcon": "icons/icon.ico",
+        "headerImage": "icons/nsis-header.bmp",
+        "sidebarImage": "icons/nsis-sidebar.bmp"
+      }
+    },
+    "shortDescription": "Track your PC activity",
+    "longDescription": "TimiGS is a lightweight activity tracker that monitors which programs you use and provides detailed analytics about your computer usage.",
+    "copyright": "© 2024 TimiGS",
+    "category": "Utility",
+    "publisher": "TimiGS"
+  },
+  "plugins": {
+    "autostart": {
+      "macosExtraArgs": ["--minimized"],
+      "args": ["--minimized"]
+    }
+  }
+}

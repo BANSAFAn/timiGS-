@@ -1,0 +1,83 @@
+{
+  "app": {
+    "name": "TimiGS",
+    "tagline": "Відстежуй свій час розумно"
+  },
+  "nav": {
+    "dashboard": "Головна",
+    "timeline": "Історія",
+    "analytics": "Аналітика",
+    "settings": "Налаштування"
+  },
+  "dashboard": {
+    "title": "Головна",
+    "activeNow": "Активно зараз",
+    "idle": "Активність не виявлено",
+    "todaySummary": "Підсумок за сьогодні",
+    "totalTime": "Загальний час",
+    "appsUsed": "Програм використано",
+    "sessions": "Сесій",
+    "topApps": "Топ програм",
+    "noData": "Сьогодні активність ще не записана",
+    "hours": "годин",
+    "minutes": "хвилин",
+    "seconds": "секунд"
+  },
+  "timeline": {
+    "title": "Історія активності",
+    "today": "Сьогодні",
+    "yesterday": "Вчора",
+    "selectDate": "Обрати дату",
+    "duration": "Тривалість",
+    "startTime": "Початок",
+    "endTime": "Кінець",
+    "noSessions": "Немає сесій за цю дату"
+  },
+  "analytics": {
+    "title": "Аналітика",
+    "weeklyOverview": "Огляд за тиждень",
+    "dailyAverage": "Середнє за день",
+    "mostUsed": "Найчастіше використовувані",
+    "totalWeek": "Всього за тиждень",
+    "trend": "Порівняно з минулим тижнем",
+    "productiveTime": "Продуктивний час",
+    "breakdownByApp": "Використання за програмами"
+  },
+  "settings": {
+    "title": "Налаштування",
+    "language": "Мова",
+    "theme": "Тема",
+    "themeDark": "Темна",
+    "themeLight": "Світла",
+    "autostart": "Запускати з Windows",
+    "minimizeToTray": "Згортати в системний трей",
+    "tracking": "Відстеження",
+    "startTracking": "Почати відстеження",
+    "stopTracking": "Зупинити відстеження",
+    "trackingActive": "Відстеження активне",
+    "trackingInactive": "Відстеження призупинено",
+    "dataManagement": "Керування даними",
+    "exportData": "Експортувати дані",
+    "clearData": "Очистити всі дані",
+    "about": "Про програму",
+    "version": "Версія",
+    "saved": "Налаштування збережено!",
+    "dataSync": "Синхронізація даних",
+    "syncGoogle": "Синхронізація з Google",
+    "syncGoogleDesc": "Синхронізуйте дані активності на Google Drive",
+    "connectGoogle": "Підключити Google",
+    "connected": "Підключено",
+    "localStorage": "Локальне сховище",
+    "localStorageDesc": "Експортуйте або імпортуйте дані локально",
+    "import": "Імпортувати"
+  },
+  "common": {
+    "loading": "Завантаження...",
+    "error": "Сталася помилка",
+    "retry": "Повторити",
+    "save": "Зберегти",
+    "cancel": "Скасувати",
+    "confirm": "Підтвердити",
+    "close": "Закрити"
+  }
+}
