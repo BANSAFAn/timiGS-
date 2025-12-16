@@ -1,0 +1,38 @@
+name: Build Check
+
+on:
+  push:
+    branches:
+      - nexting
+  pull_request:
+    branches:
+      - nexting
+
+jobs:
+  check-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf libssl-dev
+
+      - name: setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+
+      - name: setup rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: install frontend dependencies
+        run: npm install
+
+      - name: build frontend
+        run: npm run build
+
+      - name: check rust compilation
+        run: cargo check --verbose
+        working-directory: src-tauri
