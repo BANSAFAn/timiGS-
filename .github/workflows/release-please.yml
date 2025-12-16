@@ -3,7 +3,8 @@ name: release-please
 on:
   push:
     branches:
-      - main
+    branches:
+      - nexting
 
 permissions:
   contents: write
@@ -17,3 +18,4 @@ jobs:
         with:
           # This assumes you are releasing a single package
           release-type: node
+          target-branch: nexting

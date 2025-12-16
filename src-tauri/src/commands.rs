@@ -116,3 +116,20 @@ pub async fn restore_data() -> Result<String, String> {
         crate::drive::restore_data()
     }).await.map_err(|e| e.to_string())?
 }
+
+#[command]
+pub fn shutdown_pc() -> Result<(), String> {
+    #[cfg(target_os = "windows")]
+    {
+        use std::process::Command;
+        Command::new("shutdown")
+            .args(["/s", "/t", "0"])
+            .spawn()
+            .map_err(|e| e.to_string())?;
+        Ok(())
+    }
+    #[cfg(not(target_os = "windows"))]
+    {
+        Err("Shutdown not supported on this OS".to_string())
+    }
+}

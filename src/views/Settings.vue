@@ -17,6 +17,8 @@
               <select class="select" v-model="localSettings.language" @change="updateSettings">
                 <option value="en">English</option>
                 <option value="uk">Українська</option>
+                <option value="de">Deutsch</option>
+                <option value="ar">العربية</option>
               </select>
             </div>
           </div>
@@ -138,6 +140,12 @@
           </div>
         </div>
 
+        <!-- Tools Section -->
+        <div class="settings-section">
+          <div class="settings-section-title">{{ t('settings.tools', 'Tools') }}</div>
+          <ShutdownTimer />
+        </div>
+
         <!-- About Section -->
         <div class="settings-section">
           <div class="settings-section-title">{{ $t('settings.about') }}</div>
@@ -164,6 +172,7 @@ import { useI18n } from 'vue-i18n';
 import { useActivityStore, type Settings } from '../stores/activity';
 import { setLanguage } from '../i18n';
 import { invoke } from '@tauri-apps/api/core';
+import ShutdownTimer from '../components/ShutdownTimer.vue';
 
 const { t } = useI18n();
 const store = useActivityStore();
