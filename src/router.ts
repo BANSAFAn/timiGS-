@@ -24,6 +24,11 @@ const routes = [
     path: '/settings',
     name: 'Settings',
     component: Settings
+  },
+  {
+    path: '/tools',
+    name: 'Tools',
+    component: () => import('./views/Tools.vue')
   }
 ];
 
