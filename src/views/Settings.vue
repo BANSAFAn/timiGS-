@@ -140,11 +140,7 @@
           </div>
         </div>
 
-        <!-- Tools Section -->
-        <div class="settings-section">
-          <div class="settings-section-title">{{ t('settings.tools', 'Tools') }}</div>
-          <ShutdownTimer />
-        </div>
+
 
         <!-- About Section -->
         <div class="settings-section">
@@ -172,7 +168,7 @@ import { useI18n } from 'vue-i18n';
 import { useActivityStore, type Settings } from '../stores/activity';
 import { setLanguage } from '../i18n';
 import { invoke } from '@tauri-apps/api/core';
-import ShutdownTimer from '../components/ShutdownTimer.vue';
+
 
 const { t } = useI18n();
 const store = useActivityStore();
