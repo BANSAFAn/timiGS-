@@ -45,6 +45,7 @@
   },
   "settings": {
     "title": "Налаштування",
+    "appearance": "Вигляд",
     "language": "Мова",
     "theme": "Тема",
     "themeDark": "Темна",

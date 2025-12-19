@@ -46,6 +46,7 @@
   },
   "settings": {
     "title": "Settings",
+    "appearance": "Appearance",
     "language": "Language",
     "theme": "Theme",
     "themeDark": "Dark",

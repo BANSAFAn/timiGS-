@@ -45,6 +45,7 @@
   },
   "settings": {
     "title": "الإعدادات",
+    "appearance": "المظهر",
     "language": "اللغة",
     "theme": "المظهر",
     "themeDark": "داكن",

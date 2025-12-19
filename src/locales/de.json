@@ -45,6 +45,7 @@
   },
   "settings": {
     "title": "Einstellungen",
+    "appearance": "Aussehen",
     "language": "Sprache",
     "theme": "Thema",
     "themeDark": "Dunkel",
