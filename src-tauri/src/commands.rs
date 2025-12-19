@@ -54,7 +54,7 @@ pub fn get_settings() -> db::Settings {
     db::get_settings()
 }
 
-use tauri_plugin_autostart::ManagerExt;
+
 
 #[command]
 pub fn save_settings(app: tauri::AppHandle, settings: db::Settings) -> Result<(), String> {
