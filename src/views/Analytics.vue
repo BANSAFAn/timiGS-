@@ -41,14 +41,13 @@
 
 <script setup lang="ts">
 import { computed, onMounted } from 'vue';
-import { useI18n } from 'vue-i18n';
+
 import { useActivityStore } from '../stores/activity';
 import { Bar, Pie } from 'vue-chartjs';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, ArcElement, Tooltip, Legend } from 'chart.js';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Tooltip, Legend);
 
-const { t } = useI18n();
 const store = useActivityStore();
 const weeklyStats = computed(() => store.weeklyStats);
 

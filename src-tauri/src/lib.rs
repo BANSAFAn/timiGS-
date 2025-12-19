@@ -12,7 +12,7 @@ use tauri::{
     tray::TrayIconBuilder,
     Manager, WindowEvent,
 };
-use tauri_plugin_autostart::MacosLauncher;
+
 // removed unused ManagerExt
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]

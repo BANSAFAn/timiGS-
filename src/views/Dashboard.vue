@@ -105,14 +105,13 @@
 
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue';
-import { useI18n } from 'vue-i18n';
+
 import { useActivityStore } from '../stores/activity';
 import { Doughnut, Pie, Bar } from 'vue-chartjs';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement } from 'chart.js';
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement);
 
-const { t } = useI18n();
 const store = useActivityStore();
 const currentActivity = ref(store.currentActivity);
 const selectedChartType = ref('doughnut');

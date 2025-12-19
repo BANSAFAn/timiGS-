@@ -2,7 +2,7 @@
 use crate::auth;
 use reqwest::blocking::Client;
 use std::fs;
-use std::path::PathBuf;
+
 use serde_json::Value;
 
 // Upload local DB file to Google Drive

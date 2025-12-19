@@ -8,7 +8,7 @@ use oauth2::{
 use std::sync::{Arc, Mutex};
 use tiny_http::{Server, Response};
 use crate::db;
-use std::thread;
+
 
 // TODO: User must replace these with their own credentials from Google Cloud Console
 const GOOGLE_CLIENT_ID: &str = "YOUR_CLIENT_ID_HERE";
@@ -51,8 +51,7 @@ pub fn start_auth_flow() -> Result<String, String> {
         return Err(format!("Failed to open browser: {}", e));
     }
 
-    let guard = Arc::new(Mutex::new(None));
-    let result_guard = guard.clone();
+
 
     // This is a simplified blocking wait for demo purposes. 
     // In a real app, you might want a timeout.
@@ -61,7 +60,7 @@ pub fn start_auth_flow() -> Result<String, String> {
     // Actually, tauri commands are async or run on thread pool.
     
     // Handle ONE request
-    if let Ok(Some(request)) = server.recv() {
+    if let Ok(request) = server.recv() {
         let url = request.url().to_string();
         
         // Parse code (very primitive parsing)
@@ -82,9 +81,9 @@ pub fn start_auth_flow() -> Result<String, String> {
             let access = token_result.access_token().secret();
             let refresh = token_result.refresh_token().map(|t| t.secret().clone()).unwrap_or_default();
             
-            db::save_setting("google_access_token", access)?;
+            db::save_setting("google_access_token", access).map_err(|e| e.to_string())?;
             if !refresh.is_empty() {
-                db::save_setting("google_refresh_token", &refresh)?;
+                db::save_setting("google_refresh_token", &refresh).map_err(|e| e.to_string())?;
             }
             
             return Ok("Successfully authenticated".to_string());
