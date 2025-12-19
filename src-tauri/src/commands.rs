@@ -4,11 +4,7 @@ use crate::{db, tracker};
 use serde::{Deserialize, Serialize};
 use tauri::command;
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct DateRange {
-    pub from: String,
-    pub to: String,
-}
+
 
 #[command]
 pub fn get_current_activity() -> Option<tracker::ActiveWindow> {
