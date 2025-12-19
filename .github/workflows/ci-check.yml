@@ -43,12 +43,29 @@ jobs:
       - name: build tauri
         run: npm run tauri build
         env:
-          # If you use code signing, add secrets here. For now, default build.
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: debug list files (ubuntu)
+        if: matrix.platform == 'ubuntu-22.04' && always()
+        run: |
+          echo "Listing src-tauri/target:"
+          find src-tauri/target -maxdepth 4 -not -path '*/.*'
+
+      - name: debug list files (windows)
+        if: matrix.platform == 'windows-latest' && always()
+        run: |
+          echo "Listing src-tauri/target:"
+          Get-ChildItem -Path src-tauri/target -Recurse -Depth 4
 
       - name: upload artifacts
         uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: timigs-${{ matrix.platform }}-artifacts
-          path: src-tauri/target/release/bundle/**
+          # Upload the entire bundle directory to verify structure, and also specific installers
+          path: |
+            src-tauri/target/release/bundle/nsis/*.exe
+            src-tauri/target/release/bundle/msi/*.msi
+            src-tauri/target/release/bundle/deb/*.deb
+            src-tauri/target/release/bundle/appimage/*.AppImage
           if-no-files-found: warn
