@@ -57,6 +57,26 @@
     "autostart": {
       "macosExtraArgs": ["--minimized"],
       "args": ["--minimized"]
+    },
+    "cli": {
+      "description": "TimiGS Activity Tracker CLI",
+      "args": [
+        {
+          "name": "minimized",
+          "short": "m",
+          "description": "Start the application minimized to tray"
+        },
+        {
+          "name": "help",
+          "short": "h",
+          "description": "Show help information"
+        },
+        {
+          "name": "version",
+          "short": "v",
+          "description": "Show version information"
+        }
+      ]
     }
   }
 }
