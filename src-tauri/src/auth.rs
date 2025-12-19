@@ -51,8 +51,7 @@ pub fn start_auth_flow() -> Result<String, String> {
         return Err(format!("Failed to open browser: {}", e));
     }
 
-    let guard = Arc::new(Mutex::new(None));
-    let result_guard = guard.clone();
+
 
     // This is a simplified blocking wait for demo purposes. 
     // In a real app, you might want a timeout.
