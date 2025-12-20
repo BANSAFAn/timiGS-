@@ -26,7 +26,7 @@
        </div>
     </div>
 
-    <div class="grid-2">
+    <div class="charts-grid">
       <div class="card">
         <div class="card-header">
           <h3 class="card-title">{{ $t('analytics.weeklyOverview') }}</h3>
@@ -218,5 +218,11 @@ onMounted(async () => { await store.fetchTodayData(); await store.fetchWeeklySta
   color: var(--text-muted);
   font-weight: 500;
   font-size: 0.875rem;
+}
+
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 24px;
 }
 </style>

@@ -6,23 +6,27 @@
       </div>
 
     <div class="timeline-controls">
-      <div class="date-nav">
-        <button class="btn btn-secondary" @click="goToPreviousDay">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M15 18l-6-6 6-6"/>
-          </svg>
+      <div class="calendar-nav">
+        <button class="nav-btn" @click="goToPreviousDay">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
         </button>
-        <div class="current-date">
-          <span class="date-label">{{ getDateLabel() }}</span>
-          <span class="date-value">{{ formatDate(selectedDate) }}</span>
+        
+        <div class="date-display">
+          <div class="date-main">{{ formatDate(selectedDate) }}</div>
+          <div class="date-sub" v-if="getDateLabel()">{{ getDateLabel() }}</div>
         </div>
-        <button class="btn btn-secondary" @click="goToNextDay" :disabled="isToday">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M9 18l6-6-6-6"/>
-          </svg>
+
+        <button class="nav-btn" @click="goToNextDay" :disabled="isToday">
+           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
         </button>
+
+        <div class="date-picker-wrapper">
+          <input type="date" class="date-input-hidden" v-model="dateInput" @change="onDateChange" ref="dateInputRef" />
+          <button class="nav-btn calendar-btn" @click="openDatePicker">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+          </button>
+        </div>
       </div>
-      <input type="date" class="form-control date-picker" v-model="dateInput" @change="onDateChange" />
     </div>
 
     <div class="timeline-container">
@@ -68,7 +72,12 @@ const store = useActivityStore();
 
 const selectedDate = ref(new Date());
 const dateInput = ref(formatDateForInput(new Date()));
+const dateInputRef = ref<HTMLInputElement | null>(null);
 const sessions = ref<ActivitySession[]>([]);
+
+function openDatePicker() {
+  dateInputRef.value?.showPicker();
+}
 
 const appColors: Record<string, string> = {};
 const colorPalette = ['#6366f1', '#06b6d4', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981'];
@@ -161,39 +170,78 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+
 .timeline-controls {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 32px;
-  gap: 16px;
+  margin-bottom: 24px;
 }
 
-.date-nav {
+.calendar-nav {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 16px;
+  background: var(--bg-secondary);
+  padding: 12px 24px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
-.current-date {
+.nav-btn {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.nav-btn:hover:not(:disabled) {
+  background: var(--bg-hover);
+  color: var(--primary);
+  border-color: var(--primary-dark);
+}
+
+.nav-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.date-display {
   text-align: center;
+  min-width: 200px;
 }
 
-.date-label {
-  display: block;
-  font-size: 0.875rem;
-  color: var(--color-primary);
-  font-weight: 600;
-}
-
-.date-value {
+.date-main {
   font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.date-sub {
+  font-size: 0.875rem;
+  color: var(--primary);
   font-weight: 500;
 }
 
-.date-picker {
-  width: auto;
-  max-width: 180px;
+.date-picker-wrapper {
+  position: relative;
+}
+
+.date-input-hidden {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  z-index: -1;
 }
 
 .timeline-container {
