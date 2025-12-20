@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - nexting
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -25,7 +26,7 @@ jobs:
 
   build:
     needs: release-please
-    if: ${{ needs.release-please.outputs.release_created }}
+    if: ${{ needs.release-please.outputs.release_created || github.event_name == 'workflow_dispatch' }}
     permissions:
       contents: write
     strategy:
