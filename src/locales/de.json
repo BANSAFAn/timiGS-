@@ -46,7 +46,8 @@
     "detailedUsage": "Detaillierte Nutzung",
     "application": "Anwendung",
     "timeSpent": "Zeitaufwand",
-    "percentage": "%"
+    "percentage": "%",
+    "topWebsites": "Top-Websites"
   },
   "settings": {
     "title": "Einstellungen",

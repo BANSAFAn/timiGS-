@@ -213,7 +213,7 @@ body {
 .main-content {
   flex: 1;
   overflow-y: auto;
-  padding: 20px;
+  padding: 24px 32px;
   background: var(--bg-primary);
   display: flex;
   flex-direction: column;
@@ -222,12 +222,11 @@ body {
 
 .page {
   width: 100%;
-  max-width: 100% !important;
+  flex: 1;
 }
 
 .page-container {
   width: 100%;
-  max-width: 100% !important;
 }
 
 .page-header {

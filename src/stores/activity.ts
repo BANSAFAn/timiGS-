@@ -67,7 +67,58 @@ export const useActivityStore = defineStore('activity', {
     },
     
     topApps: (state) => {
-      return [...state.todaySummary].slice(0, 5);
+      // Sort by time descending
+      return [...state.todaySummary].sort((a, b) => b.total_seconds - a.total_seconds).slice(0, 5);
+    },
+
+    websiteUsage: (state) => {
+      const BROWSERS = ['chrome', 'msedge', 'firefox', 'opera', 'brave', 'vivaldi'];
+      const SITE_USAGE: Record<string, number> = {};
+
+      state.todaySessions.forEach(session => {
+        const appNameLower = session.app_name.toLowerCase();
+        // Check if app is a browser
+        if (BROWSERS.some(b => appNameLower.includes(b))) {
+          let site = 'Unknown';
+          const title = session.window_title;
+          
+          // Pattern 1: "Page Title - Site Name - Browser" or "Page Title - Site Name"
+          // We assume the Site Name is the last meaningful part before the browser suffix
+          
+          // Remove browser suffix if present
+          let cleanTitle = title
+            .replace(/ - Google Chrome$/i, '')
+            .replace(/ - Microsoft Edge$/i, '')
+            .replace(/ - Mozilla Firefox$/i, '')
+            .replace(/ - Opera$/i, '')
+            .replace(/ - Brave$/i, '')
+            .replace(/ - Vivaldi$/i, '');
+
+          // Split by " - " or " | "
+          const parts = cleanTitle.split(/ - | \| /);
+
+          if (parts.length > 1) {
+            // Usually the site name is the last part, e.g. "Video - YouTube"
+            site = parts[parts.length - 1].trim();
+          } else {
+            // If no separator, use the whole title, or try to detect domains
+            site = cleanTitle.trim();
+          }
+          
+          // Grouping common sites cleanup
+          if (site === 'New Tab') return; // Skip new tabs
+          if (site.endsWith('.com') || site.endsWith('.org')) site = site; 
+
+          if (!SITE_USAGE[site]) SITE_USAGE[site] = 0;
+          SITE_USAGE[site] += session.duration_seconds;
+        }
+      });
+
+      // Convert to array and sort
+      return Object.entries(SITE_USAGE)
+        .map(([name, seconds]) => ({ name, seconds }))
+        .sort((a, b) => b.seconds - a.seconds)
+        .slice(0, 5); // Top 5 websites
     },
 
     appCount: (state) => {

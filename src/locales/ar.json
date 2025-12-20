@@ -46,7 +46,8 @@
     "detailedUsage": "استخدام التطبيق بالتفصيل",
     "application": "تطبيق",
     "timeSpent": "الوقت المستغرق",
-    "percentage": "%"
+    "percentage": "%",
+    "topWebsites": "أفضل المواقع"
   },
   "settings": {
     "title": "الإعدادات",

@@ -47,7 +47,8 @@
     "detailedUsage": "Детальне використання",
     "application": "Програма",
     "timeSpent": "Витрачений час",
-    "percentage": "%"
+    "percentage": "%",
+    "topWebsites": "Топ сайтів"
   },
   "settings": {
     "title": "Налаштування",

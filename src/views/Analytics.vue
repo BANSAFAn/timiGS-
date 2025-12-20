@@ -45,6 +45,28 @@
           <Pie v-if="store.topApps.length > 0" :data="appChartData" :options="pieChartOptions" />
         </div>
       </div>
+
+      <div class="card" v-if="store.websiteUsage.length > 0">
+        <div class="card-header">
+          <h3 class="card-title">{{ $t('analytics.topWebsites') }}</h3>
+        </div>
+        <div class="chart-container" style="overflow-y: auto;">
+           <ul class="app-list">
+            <li v-for="site in store.websiteUsage" :key="site.name">
+              <div class="app-info">
+                <span class="app-name">{{ site.name }}</span>
+                <span class="app-time">{{ formatDuration(site.seconds) }}</span>
+              </div>
+              <div class="progress-bar">
+                <div
+                  class="progress-fill"
+                  :style="{ width: calculatePercentage(site.seconds) + '%' }"
+                ></div>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
     </div>
     </div>
 
@@ -222,7 +244,50 @@ onMounted(async () => { await store.fetchTodayData(); await store.fetchWeeklySta
 
 .charts-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 24px;
+}
+
+@media (max-width: 800px) {
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.app-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.app-list li {
+  margin-bottom: 2px;
+  padding: 8px 0;
+}
+.app-info {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  font-size: 0.875rem;
+}
+.app-name {
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 70%;
+}
+.app-time {
+  color: var(--text-muted);
+}
+.progress-bar {
+  height: 6px;
+  background: var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.progress-fill {
+  background: var(--primary);
+  height: 100%;
+  border-radius: 3px;
 }
 </style>

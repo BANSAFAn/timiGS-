@@ -63,6 +63,10 @@ jobs:
       - name: install frontend dependencies
         run: npm install
 
+      - name: patch version
+        run: |
+          node -e "const fs = require('fs'); const conf = JSON.parse(fs.readFileSync('src-tauri/tauri.conf.json')); conf.version = '${{ needs.release-please.outputs.tag_name }}'.replace(/^v/, ''); fs.writeFileSync('src-tauri/tauri.conf.json', JSON.stringify(conf, null, 2));"
+
       - name: build tauri
         uses: tauri-apps/tauri-action@v0
         env:

@@ -47,7 +47,8 @@
     "detailedUsage": "Detailed App Usage",
     "application": "Application",
     "timeSpent": "Time Spent",
-    "percentage": "%"
+    "percentage": "%",
+    "topWebsites": "Top Websites"
   },
   "settings": {
     "title": "Settings",
