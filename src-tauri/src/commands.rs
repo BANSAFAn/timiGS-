@@ -1,7 +1,7 @@
 //! Tauri IPC commands
 
 use crate::{db, tracker};
-use serde::{Deserialize, Serialize};
+use tauri::command;
 use tauri::command;
 
 

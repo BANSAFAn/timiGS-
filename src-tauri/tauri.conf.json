@@ -51,7 +51,7 @@
     "longDescription": "TimiGS is a lightweight activity tracker that monitors which programs you use and provides detailed analytics about your computer usage.",
     "copyright": "© 2024 TimiGS",
     "category": "Utility",
-    "publisher": "Baneronetwo & Love cockie :3"
+    "publisher": "Baneronetwo"
   },
   "plugins": {
     "autostart": {
