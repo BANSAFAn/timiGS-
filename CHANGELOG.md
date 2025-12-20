@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.8.0](https://github.com/BANSAFAn/timiGS-/compare/v1.7.0...v1.8.0) (2025-12-20)
+
+
+### Features
+
+* consolidate release and build workflows ([6b24454](https://github.com/BANSAFAn/timiGS-/commit/6b2445417deb424d39eb17deca5903f771ead27d))
+
 ## [1.7.0](https://github.com/BANSAFAn/timiGS-/compare/v1.6.0...v1.7.0) (2025-12-20)
 
 
