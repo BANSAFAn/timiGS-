@@ -155,6 +155,25 @@
                 </button>
               </div>
             </div>
+
+            <!-- Email Reports -->
+            <div class="settings-row">
+              <div class="settings-info">
+                <h4>{{ $t('settings.emailReports') || 'Email Reports' }}</h4>
+                <p>{{ $t('settings.emailReportsDesc') || 'Send weekly activity report to your email' }}</p>
+              </div>
+              <div class="email-report-section">
+                <input 
+                  type="email" 
+                  v-model="reportEmail" 
+                  :placeholder="$t('settings.emailPlaceholder') || 'your@email.com'"
+                  class="input email-input"
+                />
+                <button class="btn-primary" @click="sendEmailReport">
+                  📧 {{ $t('settings.sendReport') || 'Send Report' }}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -196,6 +215,7 @@ const store = useActivityStore();
 const showToast = ref(false);
 const toastMessage = ref('');
 const isGoogleConnected = ref(false);
+const reportEmail = ref('');
 
 const localSettings = reactive<Settings>({
   language: 'en',
@@ -329,6 +349,25 @@ async function fetchLatestVersion() {
   }
 }
 
+async function sendEmailReport() {
+  if (!reportEmail.value || !reportEmail.value.includes('@')) {
+    showNotification('Please enter a valid email address');
+    return;
+  }
+  
+  // Fetch latest data
+  await store.fetchTodayData();
+  await store.fetchWeeklyStats();
+  
+  const report = store.generateWeeklyReport();
+  const subject = encodeURIComponent('TimiGS Weekly Activity Report');
+  const body = encodeURIComponent(report);
+  
+  // Open mailto link
+  window.open(`mailto:${reportEmail.value}?subject=${subject}&body=${body}`, '_blank');
+  showNotification('Email client opened with report!');
+}
+
 onMounted(async () => {
   await store.fetchSettings();
   await store.fetchTrackingStatus();
@@ -375,5 +414,15 @@ onMounted(async () => {
   .settings-grid {
     grid-template-columns: 1fr;
   }
+}
+
+.email-report-section {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.email-input {
+  width: 200px;
 }
 </style>

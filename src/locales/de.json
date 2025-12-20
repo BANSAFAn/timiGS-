@@ -76,7 +76,11 @@
     "connected": "Verbunden",
     "localStorage": "Lokaler Speicher",
     "localStorageDesc": "Exportieren oder importieren Sie Ihre Daten lokal",
-    "import": "Importieren"
+    "import": "Importieren",
+    "emailReports": "E-Mail-Berichte",
+    "emailReportsDesc": "Senden Sie einen wöchentlichen Aktivitätsbericht an Ihre E-Mail",
+    "emailPlaceholder": "ihre@email.de",
+    "sendReport": "Bericht senden"
   },
   "common": {
     "loading": "Wird geladen...",

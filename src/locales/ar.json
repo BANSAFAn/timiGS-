@@ -76,7 +76,11 @@
     "connected": "متصل",
     "localStorage": "التخزين المحلي",
     "localStorageDesc": "تصدير أو استيراد بياناتك محليا",
-    "import": "استيراد"
+    "import": "استيراد",
+    "emailReports": "تقارير البريد الإلكتروني",
+    "emailReportsDesc": "إرسال تقرير النشاط الأسبوعي إلى بريدك الإلكتروني",
+    "emailPlaceholder": "بريدك@email.com",
+    "sendReport": "إرسال التقرير"
   },
   "common": {
     "loading": "جار التحميل...",

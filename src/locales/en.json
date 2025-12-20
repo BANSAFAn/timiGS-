@@ -77,7 +77,11 @@
     "connected": "Connected",
     "localStorage": "Local Storage",
     "localStorageDesc": "Export or import your data locally",
-    "import": "Import"
+    "import": "Import",
+    "emailReports": "Email Reports",
+    "emailReportsDesc": "Send weekly activity report to your email",
+    "emailPlaceholder": "your@email.com",
+    "sendReport": "Send Report"
   },
   "common": {
     "loading": "Loading...",

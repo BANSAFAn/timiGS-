@@ -77,7 +77,11 @@
     "connected": "Підключено",
     "localStorage": "Локальне сховище",
     "localStorageDesc": "Експортуйте або імпортуйте дані локально",
-    "import": "Імпортувати"
+    "import": "Імпортувати",
+    "emailReports": "Email звіти",
+    "emailReportsDesc": "Надіслати щотижневий звіт на вашу пошту",
+    "emailPlaceholder": "ваша@пошта.com",
+    "sendReport": "Надіслати звіт"
   },
   "common": {
     "loading": "Завантаження...",
