@@ -39,7 +39,7 @@
       <div class="card">
         <div class="card-header flex-between">
           <h3 class="card-title">{{ $t('analytics.breakdownByApp') }}</h3>
-          <button class="btn-text small" @click="showDetailModal = true">View Details</button>
+          <button class="btn-text small" @click="showDetailModal = true">{{ $t('analytics.viewDetails') }}</button>
         </div>
         <div class="chart-container">
           <Pie v-if="store.topApps.length > 0" :data="appChartData" :options="pieChartOptions" />
@@ -52,16 +52,16 @@
     <div v-if="showDetailModal" class="modal-overlay" @click.self="showDetailModal = false">
       <div class="modal-content">
         <div class="modal-header">
-          <h3>Detailed App Usage</h3>
+          <h3>{{ $t('analytics.detailedUsage') }}</h3>
           <button class="close-btn" @click="showDetailModal = false">×</button>
         </div>
         <div class="modal-body">
            <table class="data-table">
              <thead>
                <tr>
-                 <th>Application</th>
-                 <th>Time Spent</th>
-                 <th>%</th>
+                 <th>{{ $t('analytics.application') }}</th>
+                 <th>{{ $t('analytics.timeSpent') }}</th>
+                 <th>{{ $t('analytics.percentage') }}</th>
                </tr>
              </thead>
              <tbody>

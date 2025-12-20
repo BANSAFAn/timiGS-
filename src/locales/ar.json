@@ -40,8 +40,13 @@
     "mostUsed": "التطبيقات الأكثر استخداما",
     "totalWeek": "المجموع هذا الأسبوع",
     "trend": "مقارنة بالأسبوع الماضي",
-    "productiveTime": "الوقت المنتج",
-    "breakdownByApp": "الاستخدام حسب التطبيق"
+    "productiveTime": "الوقت الإنتاجي",
+    "breakdownByApp": "الاستخدام حسب التطبيق",
+    "viewDetails": "عرض التفاصيل",
+    "detailedUsage": "استخدام التطبيق بالتفصيل",
+    "application": "تطبيق",
+    "timeSpent": "الوقت المستغرق",
+    "percentage": "%"
   },
   "settings": {
     "title": "الإعدادات",

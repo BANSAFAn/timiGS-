@@ -42,7 +42,12 @@
     "totalWeek": "Всього за тиждень",
     "trend": "Порівняно з минулим тижнем",
     "productiveTime": "Продуктивний час",
-    "breakdownByApp": "Використання за програмами"
+    "breakdownByApp": "Використання за програмами",
+    "viewDetails": "Детальніше",
+    "detailedUsage": "Детальне використання",
+    "application": "Програма",
+    "timeSpent": "Витрачений час",
+    "percentage": "%"
   },
   "settings": {
     "title": "Налаштування",

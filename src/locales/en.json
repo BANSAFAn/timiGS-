@@ -42,7 +42,12 @@
     "totalWeek": "Total This Week",
     "trend": "Compared to last week",
     "productiveTime": "Productive Time",
-    "breakdownByApp": "Usage by Application"
+    "breakdownByApp": "Usage by Application",
+    "viewDetails": "View Details",
+    "detailedUsage": "Detailed App Usage",
+    "application": "Application",
+    "timeSpent": "Time Spent",
+    "percentage": "%"
   },
   "settings": {
     "title": "Settings",
