@@ -5,7 +5,7 @@ use oauth2::{
     AuthUrl, AuthorizationCode, ClientId, ClientSecret, CsrfToken,
     PkceCodeChallenge, RedirectUrl, Scope, TokenResponse, TokenUrl,
 };
-use std::sync::{Arc, Mutex};
+
 use tiny_http::{Server, Response};
 use crate::db;
 

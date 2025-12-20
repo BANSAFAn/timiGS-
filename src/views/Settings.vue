@@ -169,7 +169,7 @@
                 <h4>{{ $t('settings.version') }}</h4>
                 <p>TimiGS Application</p>
               </div>
-              <span class="version-badge">1.1.0</span>
+              <span class="version-badge">{{ latestVersion }}</span>
             </div>
           </div>
         </div>
@@ -315,11 +315,26 @@ function importData() {
   input.click();
 }
 
+const latestVersion = ref('1.1.0');
+
+async function fetchLatestVersion() {
+  try {
+    const response = await fetch('https://api.github.com/repos/baneronetwo/timiGS-/releases/latest');
+    if (response.ok) {
+      const data = await response.json();
+      latestVersion.value = data.tag_name || '1.1.0';
+    }
+  } catch (e) {
+    console.error('Failed to fetch version:', e);
+  }
+}
+
 onMounted(async () => {
   await store.fetchSettings();
   await store.fetchTrackingStatus();
   Object.assign(localSettings, store.settings);
   await checkGoogleUser();
+  fetchLatestVersion();
 });
 </script>
 
