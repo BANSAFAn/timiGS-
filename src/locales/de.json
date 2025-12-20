@@ -7,7 +7,20 @@
     "dashboard": "Dashboard",
     "timeline": "Zeitachse",
     "analytics": "Analytik",
+    "tools": "Werkzeuge",
+    "github": "GitHub",
     "settings": "Einstellungen"
+  },
+  "github": {
+    "connection": "GitHub-Verbindung",
+    "connectDesc": "Verbinden Sie Ihr GitHub-Konto, um Ihre Coding-Aktivität zu verfolgen",
+    "tokenPlaceholder": "Geben Sie Ihren Personal Access Token ein",
+    "connect": "GitHub verbinden",
+    "getToken": "Token hier erhalten",
+    "disconnect": "Trennen",
+    "recentActivity": "Letzte Aktivität",
+    "refresh": "Aktualisieren",
+    "noActivity": "Keine Aktivität gefunden"
   },
   "dashboard": {
     "title": "Dashboard",

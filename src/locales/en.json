@@ -8,7 +8,19 @@
     "timeline": "Timeline",
     "analytics": "Analytics",
     "tools": "Tools",
+    "github": "GitHub",
     "settings": "Settings"
+  },
+  "github": {
+    "connection": "GitHub Connection",
+    "connectDesc": "Connect your GitHub account to track your coding activity",
+    "tokenPlaceholder": "Enter your Personal Access Token",
+    "connect": "Connect GitHub",
+    "getToken": "Get your token here",
+    "disconnect": "Disconnect",
+    "recentActivity": "Recent Activity",
+    "refresh": "Refresh",
+    "noActivity": "No recent activity found"
   },
   "dashboard": {
     "title": "Dashboard",

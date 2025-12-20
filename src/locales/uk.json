@@ -7,8 +7,20 @@
     "dashboard": "Головна",
     "timeline": "Історія",
     "analytics": "Аналітика",
-    "settings": "Налаштування",
-    "tools": "Інструменти"
+    "tools": "Інструменти",
+    "github": "GitHub",
+    "settings": "Налаштування"
+  },
+  "github": {
+    "connection": "Підключення GitHub",
+    "connectDesc": "Підключіть свій GitHub акаунт для відстеження активності коду",
+    "tokenPlaceholder": "Введіть ваш Personal Access Token",
+    "connect": "Підключити GitHub",
+    "getToken": "Отримати токен тут",
+    "disconnect": "Відключити",
+    "recentActivity": "Остання активність",
+    "refresh": "Оновити",
+    "noActivity": "Активність не знайдено"
   },
   "dashboard": {
     "title": "Головна",
