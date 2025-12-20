@@ -243,15 +243,9 @@ onMounted(async () => { await store.fetchTodayData(); await store.fetchWeeklySta
 }
 
 .charts-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  display: flex;
+  flex-direction: column;
   gap: 24px;
-}
-
-@media (max-width: 800px) {
-  .charts-grid {
-    grid-template-columns: 1fr;
-  }
 }
 
 .app-list {

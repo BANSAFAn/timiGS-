@@ -169,7 +169,7 @@
                   :placeholder="$t('settings.emailPlaceholder') || 'your@email.com'"
                   class="input email-input"
                 />
-                <button class="btn-primary" @click="sendEmailReport">
+                <button class="btn-send-report" @click="sendEmailReport">
                   📧 {{ $t('settings.sendReport') || 'Send Report' }}
                 </button>
               </div>
@@ -423,6 +423,43 @@ onMounted(async () => {
 }
 
 .email-input {
-  width: 200px;
+  width: 220px;
+  padding: 10px 14px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  transition: all var(--transition-fast);
+}
+
+.email-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+
+.email-input::placeholder {
+  color: var(--text-muted);
+}
+
+.btn-send-report {
+  padding: 10px 20px;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent-1));
+  border: none;
+  border-radius: var(--radius-md);
+  color: white;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-send-report:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
 }
 </style>
