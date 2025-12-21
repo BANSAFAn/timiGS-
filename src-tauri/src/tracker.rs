@@ -115,11 +115,12 @@ pub fn start_tracking() {
     
     thread::spawn(|| {
         let mut last_app = String::new();
+        let mut last_title = String::new();
         
         while RUNNING.load(Ordering::SeqCst) {
             if let Some(active) = get_foreground_window_info() {
-                // Only create new session if app changed
-                if active.exe_path != last_app {
+                // Create new session if app OR window title changed
+                if active.exe_path != last_app || active.window_title != last_title {
                     // End previous session
                     if let Some(session) = CURRENT_SESSION.lock().take() {
                         let _ = db::end_session(session.id);
@@ -136,6 +137,7 @@ pub fn start_tracking() {
                     }
                     
                     last_app = active.exe_path;
+                    last_title = active.window_title;
                 }
             }
             

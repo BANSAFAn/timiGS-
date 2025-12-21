@@ -42,7 +42,9 @@
         "installMode": "currentUser",
         "displayLanguageSelector": true,
         "languages": ["English", "Ukrainian"],
-        "installerIcon": "icons/icon.ico"
+        "installerIcon": "icons/icon.ico",
+        "headerImage": "icons/nsis-header.bmp",
+        "sidebarImage": "icons/nsis-sidebar.bmp"
       }
     },
     "shortDescription": "Track your PC activity",
