@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.16.0](https://github.com/BANSAFAn/timiGS-/compare/v1.15.0...v1.16.0) (2025-12-21)
+
+
+### Features
+
+* add French and Simplified Chinese localization ([65a2113](https://github.com/BANSAFAn/timiGS-/commit/65a21135a80bf6d4f6c2ff3eafb13f6cefb8d525))
+* improve timeline, browser tracking, and installer design ([9d01da5](https://github.com/BANSAFAn/timiGS-/commit/9d01da589c3aec67b0cc703f5e7069d8f9dbaa44))
+
 ## [1.15.0](https://github.com/BANSAFAn/timiGS-/compare/v1.14.0...v1.15.0) (2025-12-21)
 
 
