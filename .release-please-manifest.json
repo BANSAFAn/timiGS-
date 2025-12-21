@@ -1,0 +1,8 @@
+{
+  ".": {
+    "release-type": "node",
+    "package-name": "timigs",
+    "component": "timigs"
+  },
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/manifest.json"
+}
