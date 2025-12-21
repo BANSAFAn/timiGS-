@@ -41,7 +41,7 @@
       "nsis": {
         "installMode": "currentUser",
         "displayLanguageSelector": true,
-        "languages": ["English", "Ukrainian"],
+        "languages": ["English", "Ukrainian", "German", "French", "SimpChinese", "Arabic"],
         "installerIcon": "icons/icon.ico",
         "headerImage": "icons/nsis-header.bmp",
         "sidebarImage": "icons/nsis-sidebar.bmp"

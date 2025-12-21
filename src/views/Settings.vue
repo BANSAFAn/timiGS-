@@ -21,8 +21,10 @@
               <div class="select-wrapper">
                 <select class="select" v-model="localSettings.language" @change="updateSettings">
                   <option value="en">English</option>
-                  <option value="uk">Українська</option>
+                  <option value="fr">Français</option>
                   <option value="de">Deutsch</option>
+                  <option value="uk">Українська</option>
+                  <option value="zh">简体中文</option>
                   <option value="ar">العربية</option>
                 </select>
               </div>
