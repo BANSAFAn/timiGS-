@@ -7,7 +7,20 @@
     "dashboard": "Dashboard",
     "timeline": "Zeitachse",
     "analytics": "Analytik",
+    "tools": "Werkzeuge",
+    "github": "GitHub",
     "settings": "Einstellungen"
+  },
+  "github": {
+    "connection": "GitHub-Verbindung",
+    "connectDesc": "Verbinden Sie Ihr GitHub-Konto, um Ihre Coding-Aktivität zu verfolgen",
+    "tokenPlaceholder": "Geben Sie Ihren Personal Access Token ein",
+    "connect": "GitHub verbinden",
+    "getToken": "Token hier erhalten",
+    "disconnect": "Trennen",
+    "recentActivity": "Letzte Aktivität",
+    "refresh": "Aktualisieren",
+    "noActivity": "Keine Aktivität gefunden"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -41,7 +54,13 @@
     "totalWeek": "Gesamt diese Woche",
     "trend": "Im Vergleich zur letzten Woche",
     "productiveTime": "Produktive Zeit",
-    "breakdownByApp": "Nutzung nach Anwendung"
+    "breakdownByApp": "Nutzung nach Anwendung",
+    "viewDetails": "Details anzeigen",
+    "detailedUsage": "Detaillierte Nutzung",
+    "application": "Anwendung",
+    "timeSpent": "Zeitaufwand",
+    "percentage": "%",
+    "topWebsites": "Top-Websites"
   },
   "settings": {
     "title": "Einstellungen",
@@ -70,7 +89,11 @@
     "connected": "Verbunden",
     "localStorage": "Lokaler Speicher",
     "localStorageDesc": "Exportieren oder importieren Sie Ihre Daten lokal",
-    "import": "Importieren"
+    "import": "Importieren",
+    "emailReports": "E-Mail-Berichte",
+    "emailReportsDesc": "Senden Sie einen wöchentlichen Aktivitätsbericht an Ihre E-Mail",
+    "emailPlaceholder": "ihre@email.de",
+    "sendReport": "Bericht senden"
   },
   "common": {
     "loading": "Wird geladen...",

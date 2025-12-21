@@ -8,7 +8,19 @@
     "timeline": "Timeline",
     "analytics": "Analytics",
     "tools": "Tools",
+    "github": "GitHub",
     "settings": "Settings"
+  },
+  "github": {
+    "connection": "GitHub Connection",
+    "connectDesc": "Connect your GitHub account to track your coding activity",
+    "tokenPlaceholder": "Enter your Personal Access Token",
+    "connect": "Connect GitHub",
+    "getToken": "Get your token here",
+    "disconnect": "Disconnect",
+    "recentActivity": "Recent Activity",
+    "refresh": "Refresh",
+    "noActivity": "No recent activity found"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -42,7 +54,13 @@
     "totalWeek": "Total This Week",
     "trend": "Compared to last week",
     "productiveTime": "Productive Time",
-    "breakdownByApp": "Usage by Application"
+    "breakdownByApp": "Usage by Application",
+    "viewDetails": "View Details",
+    "detailedUsage": "Detailed App Usage",
+    "application": "Application",
+    "timeSpent": "Time Spent",
+    "percentage": "%",
+    "topWebsites": "Top Websites"
   },
   "settings": {
     "title": "Settings",
@@ -71,7 +89,11 @@
     "connected": "Connected",
     "localStorage": "Local Storage",
     "localStorageDesc": "Export or import your data locally",
-    "import": "Import"
+    "import": "Import",
+    "emailReports": "Email Reports",
+    "emailReportsDesc": "Send weekly activity report to your email",
+    "emailPlaceholder": "your@email.com",
+    "sendReport": "Send Report"
   },
   "common": {
     "loading": "Loading...",

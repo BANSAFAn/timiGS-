@@ -7,7 +7,20 @@
     "dashboard": "لوحة القيادة",
     "timeline": "الجدول الزمني",
     "analytics": "التحليلات",
+    "tools": "الأدوات",
+    "github": "GitHub",
     "settings": "الإعدادات"
+  },
+  "github": {
+    "connection": "اتصال GitHub",
+    "connectDesc": "اربط حساب GitHub الخاص بك لتتبع نشاط البرمجة",
+    "tokenPlaceholder": "أدخل رمز الوصول الشخصي الخاص بك",
+    "connect": "ربط GitHub",
+    "getToken": "احصل على الرمز هنا",
+    "disconnect": "قطع الاتصال",
+    "recentActivity": "النشاط الأخير",
+    "refresh": "تحديث",
+    "noActivity": "لم يتم العثور على نشاط"
   },
   "dashboard": {
     "title": "لوحة القيادة",
@@ -40,8 +53,14 @@
     "mostUsed": "التطبيقات الأكثر استخداما",
     "totalWeek": "المجموع هذا الأسبوع",
     "trend": "مقارنة بالأسبوع الماضي",
-    "productiveTime": "الوقت المنتج",
-    "breakdownByApp": "الاستخدام حسب التطبيق"
+    "productiveTime": "الوقت الإنتاجي",
+    "breakdownByApp": "الاستخدام حسب التطبيق",
+    "viewDetails": "عرض التفاصيل",
+    "detailedUsage": "استخدام التطبيق بالتفصيل",
+    "application": "تطبيق",
+    "timeSpent": "الوقت المستغرق",
+    "percentage": "%",
+    "topWebsites": "أفضل المواقع"
   },
   "settings": {
     "title": "الإعدادات",
@@ -70,7 +89,11 @@
     "connected": "متصل",
     "localStorage": "التخزين المحلي",
     "localStorageDesc": "تصدير أو استيراد بياناتك محليا",
-    "import": "استيراد"
+    "import": "استيراد",
+    "emailReports": "تقارير البريد الإلكتروني",
+    "emailReportsDesc": "إرسال تقرير النشاط الأسبوعي إلى بريدك الإلكتروني",
+    "emailPlaceholder": "بريدك@email.com",
+    "sendReport": "إرسال التقرير"
   },
   "common": {
     "loading": "جار التحميل...",

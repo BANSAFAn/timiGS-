@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - nexting
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -12,9 +13,69 @@ permissions:
 jobs:
   release-please:
     runs-on: ubuntu-latest
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
     steps:
+      - uses: actions/checkout@v4
       - uses: google-github-actions/release-please-action@v4
+        id: release
         with:
-          # This assumes you are releasing a single package
-          release-type: node
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
           target-branch: nexting
+
+  build:
+    needs: release-please
+    if: ${{ needs.release-please.outputs.release_created || github.event_name == 'workflow_dispatch' }}
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: "macos-latest"
+            args: "--target universal-apple-darwin"
+          - platform: "ubuntu-22.04"
+            args: ""
+          - platform: "windows-latest"
+            args: ""
+
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: install dependencies (ubuntu only)
+        if: matrix.platform == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+
+      - name: setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+
+      - name: setup rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+
+      - name: install frontend dependencies
+        run: npm install
+
+      - name: patch version
+        run: |
+          node -e "const fs = require('fs'); const conf = JSON.parse(fs.readFileSync('src-tauri/tauri.conf.json')); conf.version = '${{ needs.release-please.outputs.tag_name }}'.replace(/^v/, ''); fs.writeFileSync('src-tauri/tauri.conf.json', JSON.stringify(conf, null, 2));"
+
+      - name: build tauri
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: ${{ needs.release-please.outputs.tag_name }}
+          releaseName: "App ${{ needs.release-please.outputs.tag_name }}"
+          releaseBody: "See the assets to download this version and install."
+          releaseDraft: false
+          prerelease: false
+          args: ${{ matrix.args }}

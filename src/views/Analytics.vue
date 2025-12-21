@@ -26,7 +26,7 @@
        </div>
     </div>
 
-    <div class="grid-2">
+    <div class="charts-grid">
       <div class="card">
         <div class="card-header">
           <h3 class="card-title">{{ $t('analytics.weeklyOverview') }}</h3>
@@ -39,10 +39,32 @@
       <div class="card">
         <div class="card-header flex-between">
           <h3 class="card-title">{{ $t('analytics.breakdownByApp') }}</h3>
-          <button class="btn-text small" @click="showDetailModal = true">View Details</button>
+          <button class="btn-text small" @click="showDetailModal = true">{{ $t('analytics.viewDetails') }}</button>
         </div>
         <div class="chart-container">
           <Pie v-if="store.topApps.length > 0" :data="appChartData" :options="pieChartOptions" />
+        </div>
+      </div>
+
+      <div class="card" v-if="store.websiteUsage.length > 0">
+        <div class="card-header">
+          <h3 class="card-title">{{ $t('analytics.topWebsites') }}</h3>
+        </div>
+        <div class="chart-container" style="overflow-y: auto;">
+           <ul class="app-list">
+            <li v-for="site in store.websiteUsage" :key="site.name">
+              <div class="app-info">
+                <span class="app-name">{{ site.name }}</span>
+                <span class="app-time">{{ formatDuration(site.seconds) }}</span>
+              </div>
+              <div class="progress-bar">
+                <div
+                  class="progress-fill"
+                  :style="{ width: calculatePercentage(site.seconds) + '%' }"
+                ></div>
+              </div>
+            </li>
+          </ul>
         </div>
       </div>
     </div>
@@ -52,16 +74,16 @@
     <div v-if="showDetailModal" class="modal-overlay" @click.self="showDetailModal = false">
       <div class="modal-content">
         <div class="modal-header">
-          <h3>Detailed App Usage</h3>
+          <h3>{{ $t('analytics.detailedUsage') }}</h3>
           <button class="close-btn" @click="showDetailModal = false">×</button>
         </div>
         <div class="modal-body">
            <table class="data-table">
              <thead>
                <tr>
-                 <th>Application</th>
-                 <th>Time Spent</th>
-                 <th>%</th>
+                 <th>{{ $t('analytics.application') }}</th>
+                 <th>{{ $t('analytics.timeSpent') }}</th>
+                 <th>{{ $t('analytics.percentage') }}</th>
                </tr>
              </thead>
              <tbody>
@@ -218,5 +240,48 @@ onMounted(async () => { await store.fetchTodayData(); await store.fetchWeeklySta
   color: var(--text-muted);
   font-weight: 500;
   font-size: 0.875rem;
+}
+
+.charts-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.app-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.app-list li {
+  margin-bottom: 2px;
+  padding: 8px 0;
+}
+.app-info {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  font-size: 0.875rem;
+}
+.app-name {
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 70%;
+}
+.app-time {
+  color: var(--text-muted);
+}
+.progress-bar {
+  height: 6px;
+  background: var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.progress-fill {
+  background: var(--primary);
+  height: 100%;
+  border-radius: 3px;
 }
 </style>

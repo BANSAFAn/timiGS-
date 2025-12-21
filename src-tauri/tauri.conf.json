@@ -29,7 +29,7 @@
   },
   "bundle": {
     "active": true,
-    "targets": ["nsis", "msi", "deb", "appimage"],
+    "targets": "all",
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
@@ -41,7 +41,7 @@
       "nsis": {
         "installMode": "currentUser",
         "displayLanguageSelector": true,
-        "languages": ["English", "Ukrainian"],
+        "languages": ["English", "Ukrainian", "German", "French", "SimpChinese", "Arabic"],
         "installerIcon": "icons/icon.ico",
         "headerImage": "icons/nsis-header.bmp",
         "sidebarImage": "icons/nsis-sidebar.bmp"
@@ -51,7 +51,7 @@
     "longDescription": "TimiGS is a lightweight activity tracker that monitors which programs you use and provides detailed analytics about your computer usage.",
     "copyright": "© 2024 TimiGS",
     "category": "Utility",
-    "publisher": "TimiGS"
+    "publisher": "Baneronetwo"
   },
   "plugins": {
     "autostart": {

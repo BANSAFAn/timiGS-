@@ -7,7 +7,20 @@
     "dashboard": "Головна",
     "timeline": "Історія",
     "analytics": "Аналітика",
+    "tools": "Інструменти",
+    "github": "GitHub",
     "settings": "Налаштування"
+  },
+  "github": {
+    "connection": "Підключення GitHub",
+    "connectDesc": "Підключіть свій GitHub акаунт для відстеження активності коду",
+    "tokenPlaceholder": "Введіть ваш Personal Access Token",
+    "connect": "Підключити GitHub",
+    "getToken": "Отримати токен тут",
+    "disconnect": "Відключити",
+    "recentActivity": "Остання активність",
+    "refresh": "Оновити",
+    "noActivity": "Активність не знайдено"
   },
   "dashboard": {
     "title": "Головна",
@@ -41,7 +54,13 @@
     "totalWeek": "Всього за тиждень",
     "trend": "Порівняно з минулим тижнем",
     "productiveTime": "Продуктивний час",
-    "breakdownByApp": "Використання за програмами"
+    "breakdownByApp": "Використання за програмами",
+    "viewDetails": "Детальніше",
+    "detailedUsage": "Детальне використання",
+    "application": "Програма",
+    "timeSpent": "Витрачений час",
+    "percentage": "%",
+    "topWebsites": "Топ сайтів"
   },
   "settings": {
     "title": "Налаштування",
@@ -70,7 +89,11 @@
     "connected": "Підключено",
     "localStorage": "Локальне сховище",
     "localStorageDesc": "Експортуйте або імпортуйте дані локально",
-    "import": "Імпортувати"
+    "import": "Імпортувати",
+    "emailReports": "Email звіти",
+    "emailReportsDesc": "Надіслати щотижневий звіт на вашу пошту",
+    "emailPlaceholder": "ваша@пошта.com",
+    "sendReport": "Надіслати звіт"
   },
   "common": {
     "loading": "Завантаження...",
