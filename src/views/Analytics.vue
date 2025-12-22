@@ -374,15 +374,16 @@ onMounted(async () => { await store.fetchTodayData(); await store.fetchWeeklySta
 
 .stats-row {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 20px;
+  width: 100%;
 }
 
 .stat-card {
   background: var(--bg-secondary);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  padding: 20px;
+  padding: 24px;
   display: flex;
   align-items: center;
   gap: 16px;
@@ -434,6 +435,7 @@ onMounted(async () => { await store.fetchTodayData(); await store.fetchWeeklySta
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 24px;
+  width: 100%;
 }
 
 .chart-card {
