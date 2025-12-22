@@ -157,19 +157,20 @@ onMounted(() => {
 <style scoped>
 .tools-grid {
   display: grid;
-  grid-template-columns: 300px 1fr;
+  grid-template-columns: 1fr 2fr;
   gap: 24px;
-  min-height: 400px;
+  width: 100%;
 }
 
 .tool-card {
   background: var(--bg-secondary);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  padding: 20px;
+  padding: 24px;
   display: flex;
   flex-direction: column;
   transition: box-shadow 0.3s ease;
+  min-height: 450px;
 }
 
 .tool-card:hover {
@@ -224,15 +225,15 @@ onMounted(() => {
 
 .notepad-body {
   display: flex;
-  gap: 16px;
-  height: 300px;
+  gap: 20px;
+  min-height: 350px;
 }
 
 .notes-sidebar {
-  width: 160px;
+  width: 220px;
   background: var(--bg-tertiary);
   border-radius: var(--radius-md);
-  padding: 8px;
+  padding: 12px;
   overflow-y: auto;
   flex-shrink: 0;
 }
@@ -262,7 +263,7 @@ onMounted(() => {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 100px;
+  max-width: 160px;
 }
 
 .btn-delete {
