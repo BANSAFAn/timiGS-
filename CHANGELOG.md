@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.17.0](https://github.com/BANSAFAn/timiGS-/compare/v1.16.0...v1.17.0) (2025-12-22)
+
+
+### Features
+
+* multi-note Notepad, complete translations for all locales ([4b8ce67](https://github.com/BANSAFAn/timiGS-/commit/4b8ce6768d12be8a01de5a2613c00e70bd8f8554))
+* redesign Analytics/Tools, add Notepad and in-app updater ([ceb0a8a](https://github.com/BANSAFAn/timiGS-/commit/ceb0a8aed887c73838cc2e8d74e4d04384b2cc19))
+
+
+### Bug Fixes
+
+* Tools layout horizontal, add missing UK timeline translations ([3f1ae14](https://github.com/BANSAFAn/timiGS-/commit/3f1ae145209a3460eafe5a4ba2a96cfabadefcf7))
+
 ## [1.16.0](https://github.com/BANSAFAn/timiGS-/compare/v1.15.0...v1.16.0) (2025-12-21)
 
 
