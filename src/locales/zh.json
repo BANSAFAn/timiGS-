@@ -98,7 +98,20 @@
     "emailReports": "电子邮件报告",
     "emailReportsDesc": "每周将活动报告发送到您的电子邮件",
     "emailPlaceholder": "your@email.com",
-    "sendReport": "发送报告"
+    "sendReport": "发送报告",
+    "system": "系统",
+    "checkUpdates": "检查更新",
+    "checkNow": "立即检查",
+    "checking": "检查中..."
+  },
+  "tools": {
+    "timer": "关机定时器",
+    "notepad": "记事本",
+    "notepadPlaceholder": "在此输入您的笔记...",
+    "newNote": "新建笔记",
+    "deleteNote": "删除",
+    "noNotes": "暂无笔记",
+    "untitled": "无标题"
   },
   "common": {
     "loading": "加载中...",

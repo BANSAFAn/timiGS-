@@ -93,7 +93,20 @@
     "emailReports": "تقارير البريد الإلكتروني",
     "emailReportsDesc": "إرسال تقرير النشاط الأسبوعي إلى بريدك الإلكتروني",
     "emailPlaceholder": "بريدك@email.com",
-    "sendReport": "إرسال التقرير"
+    "sendReport": "إرسال التقرير",
+    "system": "النظام",
+    "checkUpdates": "البحث عن تحديثات",
+    "checkNow": "تحقق الآن",
+    "checking": "جاري التحقق..."
+  },
+  "tools": {
+    "timer": "مؤقت الإغلاق",
+    "notepad": "المفكرة",
+    "notepadPlaceholder": "اكتب ملاحظاتك هنا...",
+    "newNote": "ملاحظة جديدة",
+    "deleteNote": "حذف",
+    "noNotes": "لا توجد ملاحظات بعد",
+    "untitled": "بدون عنوان"
   },
   "common": {
     "loading": "جار التحميل...",

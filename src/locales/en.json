@@ -93,13 +93,28 @@
     "emailReports": "Email Reports",
     "emailReportsDesc": "Send weekly activity report to your email",
     "emailPlaceholder": "your@email.com",
-    "sendReport": "Send Report"
+    "sendReport": "Send Report",
+    "system": "System",
+    "checkUpdates": "Check for Updates",
+    "checkNow": "Check Now",
+    "checking": "Checking..."
+  },
+  "tools": {
+    "timer": "Shutdown Timer",
+    "notepad": "Notepad",
+    "notepadPlaceholder": "Type your notes here...",
+    "newNote": "New Note",
+    "deleteNote": "Delete",
+    "noNotes": "No notes yet",
+    "untitled": "Untitled Note"
   },
   "common": {
     "loading": "Loading...",
     "error": "An error occurred",
     "retry": "Retry",
     "save": "Save",
+    "saved": "Saved",
+    "saving": "Saving...",
     "cancel": "Cancel",
     "confirm": "Confirm",
     "close": "Close"

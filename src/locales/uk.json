@@ -98,13 +98,28 @@
     "emailReports": "Email звіти",
     "emailReportsDesc": "Надіслати щотижневий звіт на вашу пошту",
     "emailPlaceholder": "ваша@пошта.com",
-    "sendReport": "Надіслати звіт"
+    "sendReport": "Надіслати звіт",
+    "system": "Система",
+    "checkUpdates": "Перевірити оновлення",
+    "checkNow": "Перевірити",
+    "checking": "Перевірка..."
+  },
+  "tools": {
+    "timer": "Таймер вимкнення",
+    "notepad": "Нотатки",
+    "notepadPlaceholder": "Введіть текст...",
+    "newNote": "Нова нотатка",
+    "deleteNote": "Видалити",
+    "noNotes": "Нотаток ще немає",
+    "untitled": "Без назви"
   },
   "common": {
     "loading": "Завантаження...",
     "error": "Сталася помилка",
     "retry": "Повторити",
     "save": "Зберегти",
+    "saved": "Збережено",
+    "saving": "Збереження...",
     "cancel": "Скасувати",
     "confirm": "Підтвердити",
     "close": "Закрити"
