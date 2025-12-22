@@ -26,16 +26,19 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_cli::init())
+        .plugin(tauri_plugin_updater::Builder::new().build())
+        .plugin(tauri_plugin_process::init())
         //.plugin(tauri_plugin_autostart::init(MacosLauncher::LaunchAgent, Some(vec!["--minimized"])))
         .setup(|app| {
             // Start tracking on app launch
             tracker::start_tracking();
-            
+
             // Setup Tray Icon
             if let Ok(quit_i) = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>) {
-                if let Ok(show_i) = MenuItem::with_id(app, "show", "Show Window", true, None::<&str>) {
+                if let Ok(show_i) =
+                    MenuItem::with_id(app, "show", "Show Window", true, None::<&str>)
+                {
                     if let Ok(menu) = Menu::with_items(app, &[&show_i, &quit_i]) {
-                        
                         let mut tray_builder = TrayIconBuilder::new()
                             .menu(&menu)
                             .show_menu_on_left_click(true)

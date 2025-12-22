@@ -3,71 +3,90 @@
     <div class="page-container">
       <div class="page-header">
         <h2>{{ $t('analytics.title') }}</h2>
-      </div>
-
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-value">{{ formatDuration(totalWeekTime) }}</div>
-        <div class="stat-label">{{ $t('analytics.totalWeek') }}</div>
-      </div>
-      <div class="stat-card accent-1">
-        <div class="stat-value">{{ formatDuration(dailyAverage) }}</div>
-        <div class="stat-label">{{ $t('analytics.dailyAverage') }}</div>
-      </div>
-    </div>
-
-    <!-- Trend Chart -->
-    <div class="card full-width mb-4">
-      <div class="card-header">
-         <h3 class="card-title">{{ $t('analytics.trend') || 'Activity Trend' }}</h3>
-      </div>
-       <div class="chart-container" style="height: 250px;">
-          <Line v-if="weeklyStats.length > 0" :data="lineChartData" :options="lineChartOptions" />
-       </div>
-    </div>
-
-    <div class="charts-grid">
-      <div class="card">
-        <div class="card-header">
-          <h3 class="card-title">{{ $t('analytics.weeklyOverview') }}</h3>
-        </div>
-        <div class="chart-container">
-          <Bar v-if="weeklyStats.length > 0" :data="weeklyChartData" :options="barChartOptions" />
+        <div class="date-range">
+          <span class="range-badge">{{ $t('analytics.weeklyOverview') }}</span>
         </div>
       </div>
 
-      <div class="card">
-        <div class="card-header flex-between">
-          <h3 class="card-title">{{ $t('analytics.breakdownByApp') }}</h3>
-          <button class="btn-text small" @click="showDetailModal = true">{{ $t('analytics.viewDetails') }}</button>
+      <div class="analytics-dashboard">
+        <!-- Overview Stats Row -->
+        <div class="stats-row">
+          <div class="stat-card premium-card">
+            <div class="stat-icon">⏱️</div>
+            <div class="stat-content">
+              <span class="stat-label">{{ $t('analytics.totalWeek') }}</span>
+              <span class="stat-value">{{ formatDuration(totalWeekTime) }}</span>
+            </div>
+          </div>
+          <div class="stat-card premium-card">
+            <div class="stat-icon">📊</div>
+            <div class="stat-content">
+              <span class="stat-label">{{ $t('analytics.dailyAverage') }}</span>
+              <span class="stat-value">{{ formatDuration(dailyAverage) }}</span>
+            </div>
+          </div>
+          <div class="stat-card premium-card">
+            <div class="stat-icon">🔥</div>
+            <div class="stat-content">
+              <span class="stat-label">{{ $t('analytics.mostUsed') }}</span>
+              <span class="stat-value text-ellipsis">{{ store.topApps[0]?.app_name || '-' }}</span>
+            </div>
+          </div>
         </div>
-        <div class="chart-container">
-          <Pie v-if="store.topApps.length > 0" :data="appChartData" :options="pieChartOptions" />
-        </div>
-      </div>
 
-      <div class="card" v-if="store.websiteUsage.length > 0">
-        <div class="card-header">
-          <h3 class="card-title">{{ $t('analytics.topWebsites') }}</h3>
+        <!-- Main Charts Area -->
+        <div class="charts-section">
+          <!-- Activity Trend (Line Chart) -->
+          <div class="chart-card large-chart">
+            <div class="card-header">
+              <h3>{{ $t('analytics.trend') }}</h3>
+            </div>
+            <div class="chart-wrapper">
+              <Line v-if="weeklyStats.length > 0" :data="lineChartData" :options="lineChartOptions" />
+            </div>
+          </div>
+
+          <!-- Weekly Distribution (Bar Chart) -->
+          <div class="chart-card">
+            <div class="card-header">
+              <h3>{{ $t('analytics.weeklyOverview') }}</h3>
+            </div>
+            <div class="chart-wrapper">
+              <Bar v-if="weeklyStats.length > 0" :data="weeklyChartData" :options="barChartOptions" />
+            </div>
+          </div>
+
+          <!-- App Usage (Pie Chart + Detailed Button) -->
+          <div class="chart-card">
+            <div class="card-header">
+              <h3>{{ $t('analytics.breakdownByApp') }}</h3>
+              <button class="btn-icon" @click="showDetailModal = true" title="View Details">
+                ↗
+              </button>
+            </div>
+            <div class="chart-wrapper pie-wrapper">
+              <Pie v-if="store.topApps.length > 0" :data="appChartData" :options="pieChartOptions" />
+            </div>
+          </div>
         </div>
-        <div class="chart-container" style="overflow-y: auto;">
-           <ul class="app-list">
-            <li v-for="site in store.websiteUsage" :key="site.name">
-              <div class="app-info">
-                <span class="app-name">{{ site.name }}</span>
-                <span class="app-time">{{ formatDuration(site.seconds) }}</span>
-              </div>
-              <div class="progress-bar">
-                <div
-                  class="progress-fill"
-                  :style="{ width: calculatePercentage(site.seconds) + '%' }"
-                ></div>
-              </div>
-            </li>
-          </ul>
+
+        <!-- Top Websites List -->
+        <div class="section-card full-width" v-if="store.websiteUsage.length > 0">
+           <div class="card-header">
+             <h3>{{ $t('analytics.topWebsites') }}</h3>
+           </div>
+           <div class="website-grid">
+             <div v-for="site in store.websiteUsage.slice(0, 8)" :key="site.name" class="website-item">
+               <div class="site-icon">{{ site.name.charAt(0).toUpperCase() }}</div>
+               <div class="site-details">
+                 <span class="site-name">{{ site.name }}</span>
+                 <span class="site-time">{{ formatDuration(site.seconds) }}</span>
+               </div>
+               <div class="site-bar" :style="{ width: calculatePercentage(site.seconds) + '%' }"></div>
+             </div>
+           </div>
         </div>
       </div>
-    </div>
     </div>
 
     <!-- Detail Modal -->
@@ -88,7 +107,14 @@
              </thead>
              <tbody>
                <tr v-for="app in store.topApps" :key="app.app_name">
-                 <td>{{ app.app_name }}</td>
+                 <td>
+                   <div class="app-row">
+                     <span class="app-icon-mini" :style="{ background: getAppColor(app.app_name) }">
+                       {{ app.app_name.charAt(0) }}
+                     </span>
+                     {{ app.app_name }}
+                   </div>
+                 </td>
                  <td>{{ formatDuration(app.total_seconds) }}</td>
                  <td>{{ calculatePercentage(app.total_seconds) }}%</td>
                </tr>
@@ -105,13 +131,25 @@ import { computed, onMounted, ref } from 'vue';
 
 import { useActivityStore } from '../stores/activity';
 import { Bar, Pie, Line } from 'vue-chartjs';
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, ArcElement, PointElement, LineElement, Tooltip, Legend } from 'chart.js';
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, ArcElement, PointElement, LineElement, Tooltip, Legend, Filler } from 'chart.js';
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, PointElement, LineElement, Tooltip, Legend);
+ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, PointElement, LineElement, Tooltip, Legend, Filler);
 
 const store = useActivityStore();
 const weeklyStats = computed(() => store.weeklyStats);
 const showDetailModal = ref(false);
+
+const appColors: Record<string, string> = {};
+const colorPalette = ['#6366f1', '#06b6d4', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981'];
+let colorIndex = 0;
+
+function getAppColor(appName: string): string {
+  if (!appColors[appName]) {
+    appColors[appName] = colorPalette[colorIndex % colorPalette.length];
+    colorIndex++;
+  }
+  return appColors[appName];
+}
 
 function formatDuration(seconds: number): string {
   if (seconds < 60) return `${seconds}s`;
@@ -130,30 +168,65 @@ const dailyAverage = computed(() => weeklyStats.value.length ? Math.round(totalW
 
 const weeklyChartData = computed(() => ({
   labels: weeklyStats.value.map(d => new Date(d.date).toLocaleDateString(undefined, { weekday: 'short' })).reverse(),
-  datasets: [{ data: weeklyStats.value.map(d => Math.round(d.total_seconds / 60)).reverse(), backgroundColor: '#6366f1', borderRadius: 8 }]
+  datasets: [{ 
+    label: 'Hours',
+    data: weeklyStats.value.map(d => Number((d.total_seconds / 3600).toFixed(1))).reverse(), 
+    backgroundColor: '#6366f1', 
+    borderRadius: 6,
+    hoverBackgroundColor: '#818cf8'
+  }]
 }));
 
 const lineChartData = computed(() => ({
   labels: weeklyStats.value.map(d => new Date(d.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })).reverse(),
   datasets: [{
-    label: 'Activity (minutes)',
-    data: weeklyStats.value.map(d => Math.round(d.total_seconds / 60)).reverse(),
+    label: 'Activity (hours)',
+    data: weeklyStats.value.map(d => Number((d.total_seconds / 3600).toFixed(1))).reverse(),
     borderColor: '#10b981',
-    backgroundColor: 'rgba(16, 185, 129, 0.2)',
+    backgroundColor: (ctx: any) => {
+      const gradient = ctx.chart.ctx.createLinearGradient(0, 0, 0, 300);
+      gradient.addColorStop(0, 'rgba(16, 185, 129, 0.4)');
+      gradient.addColorStop(1, 'rgba(16, 185, 129, 0.0)');
+      return gradient;
+    },
     tension: 0.4,
-    fill: true
+    fill: true,
+    pointBackgroundColor: '#10b981',
+    pointBorderColor: '#fff',
+    pointHoverBackgroundColor: '#fff',
+    pointHoverBorderColor: '#10b981'
   }]
 }));
 
-const barChartOptions = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } };
-const lineChartOptions = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } };
+const commonOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: { legend: { display: false } },
+  scales: {
+    x: { grid: { display: false, color: '#333' }, ticks: { color: '#9ca3af' } },
+    y: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#9ca3af' }, beginAtZero: true }
+  }
+};
+
+const barChartOptions = { ...commonOptions };
+const lineChartOptions = { ...commonOptions };
 
 const appChartData = computed(() => ({
   labels: store.topApps.map(a => a.app_name),
-  datasets: [{ data: store.topApps.map(a => a.total_seconds), backgroundColor: ['#6366f1', '#06b6d4', '#8b5cf6', '#ec4899', '#f59e0b'] }]
+  datasets: [{ 
+    data: store.topApps.map(a => a.total_seconds), 
+    backgroundColor: ['#6366f1', '#06b6d4', '#8b5cf6', '#ec4899', '#f59e0b'],
+    borderWidth: 0
+  }]
 }));
 
-const pieChartOptions = { responsive: true, maintainAspectRatio: false };
+const pieChartOptions = { 
+  responsive: true, 
+  maintainAspectRatio: false,
+  plugins: { 
+    legend: { position: 'right' as const, labels: { color: '#9ca3af', boxWidth: 12 } } 
+  }
+};
 
 onMounted(async () => { await store.fetchTodayData(); await store.fetchWeeklyStats(); });
 </script>
@@ -283,5 +356,293 @@ onMounted(async () => { await store.fetchTodayData(); await store.fetchWeeklySta
   background: var(--primary);
   height: 100%;
   border-radius: 3px;
+}
+.analytics-dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.range-badge {
+  background: var(--bg-tertiary);
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+}
+
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+}
+
+.stat-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  border-color: var(--primary);
+}
+
+.stat-icon {
+  font-size: 2rem;
+  background: var(--bg-tertiary);
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.stat-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-label {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.text-ellipsis {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    max-width: 150px;
+}
+
+.charts-section {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+.chart-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.card-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.large-chart {
+  grid-column: span 2;
+}
+
+.chart-wrapper {
+  position: relative;
+  height: 250px;
+  width: 100%;
+}
+
+.pie-wrapper {
+  height: 220px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.section-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+}
+
+.website-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.website-item {
+  background: var(--bg-tertiary);
+  padding: 12px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+  overflow: hidden;
+}
+
+.site-icon {
+  width: 32px;
+  height: 32px;
+  background: var(--primary);
+  color: white;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 14px;
+  flex-shrink: 0;
+  z-index: 2;
+}
+
+.site-details {
+  display: flex;
+  flex-direction: column;
+  z-index: 2;
+  min-width: 0;
+}
+
+.site-name {
+  font-weight: 500;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.site-time {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.site-bar {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 3px;
+  background: var(--primary);
+  opacity: 0.5;
+  transition: width 0.3s;
+}
+
+.btn-icon {
+  background: var(--bg-tertiary);
+  border: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  color: var(--text-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+.btn-icon:hover {
+  background: var(--border);
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: var(--bg-secondary);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  width: 90%;
+  max-width: 600px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+}
+
+.modal-header {
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-body {
+  padding: 0;
+  overflow-y: auto;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table th, .data-table td {
+  padding: 16px 24px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.data-table th {
+  background: var(--bg-tertiary);
+  color: var(--text-muted);
+  font-weight: 500;
+  font-size: 0.85rem;
+  position: sticky;
+  top: 0;
+}
+
+.app-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.app-icon-mini {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+@media (max-width: 900px) {
+  .charts-section {
+    grid-template-columns: 1fr;
+  }
+  .large-chart {
+    grid-column: span 1;
+  }
 }
 </style>
