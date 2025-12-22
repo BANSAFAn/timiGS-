@@ -93,7 +93,20 @@
     "emailReports": "E-Mail-Berichte",
     "emailReportsDesc": "Senden Sie einen wöchentlichen Aktivitätsbericht an Ihre E-Mail",
     "emailPlaceholder": "ihre@email.de",
-    "sendReport": "Bericht senden"
+    "sendReport": "Bericht senden",
+    "system": "System",
+    "checkUpdates": "Nach Updates suchen",
+    "checkNow": "Jetzt prüfen",
+    "checking": "Prüfe..."
+  },
+  "tools": {
+    "timer": "Ausschalt-Timer",
+    "notepad": "Notizblock",
+    "notepadPlaceholder": "Geben Sie Ihre Notizen ein...",
+    "newNote": "Neue Notiz",
+    "deleteNote": "Löschen",
+    "noNotes": "Noch keine Notizen",
+    "untitled": "Ohne Titel"
   },
   "common": {
     "loading": "Wird geladen...",

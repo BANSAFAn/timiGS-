@@ -1,0 +1,89 @@
+---
+import { Language } from '../i18n/types';
+import { useTranslations } from '../i18n/utils';
+import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
+import CustomCursor from '../components/CustomCursor';
+import ParticleBackground from '../components/ParticleBackground';
+
+interface Props {
+	title: string;
+}
+
+const { title } = Astro.props;
+const { lang } = Astro.params; 
+const currentLang = (lang as Language) || Language.EN;
+const t = useTranslations(currentLang);
+const pathname = Astro.url.pathname;
+const dir = currentLang === Language.AR ? 'rtl' : 'ltr';
+---
+
+<!doctype html>
+<html lang={currentLang} dir={dir} class="scroll-smooth">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="description" content="TimiGS - Intelligent Activity Tracker" />
+		<meta name="viewport" content="width=device-width" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="generator" content={Astro.generator} />
+		<title>{title}</title>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+        <style is:global>
+            :root {
+                font-family: 'Inter', sans-serif;
+            }
+            body {
+                background-color: #020617; /* slate-950 */
+                color: #f8fafc; /* slate-50 */
+            }
+            /* Scrollbar styling */
+            ::-webkit-scrollbar {
+                width: 8px;
+            }
+            ::-webkit-scrollbar-track {
+                background: #0f172a; 
+            }
+            ::-webkit-scrollbar-thumb {
+                background: #334155; 
+                border-radius: 4px;
+            }
+            ::-webkit-scrollbar-thumb:hover {
+                background: #475569; 
+            }
+            
+            .glass-panel {
+                background: rgba(15, 23, 42, 0.6);
+                backdrop-filter: blur(12px);
+            }
+        </style>
+	</head>
+	<body class="min-h-screen flex flex-col font-sans selection:bg-sky-500/30 overflow-x-hidden relative">
+        
+        {/* Dynamic Backgrounds */}
+        <div class="fixed inset-0 -z-10 h-full w-full pointer-events-none overflow-hidden" aria-hidden="true">
+            <ParticleBackground client:only="react" />
+            
+            {/* Grid */}
+            <div class="absolute inset-0 bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:24px_24px] opacity-20"></div>
+            
+            {/* Radial Gradient */}
+            <div class="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(14,165,233,0.15),rgba(255,255,255,0))]"></div>
+            
+            {/* Animated Blobs */}
+            <div class="absolute top-0 -left-4 w-96 h-96 bg-purple-500/30 rounded-full mix-blend-screen filter blur-3xl opacity-30 animate-blob"></div>
+            <div class="absolute top-0 -right-4 w-96 h-96 bg-sky-500/30 rounded-full mix-blend-screen filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
+            <div class="absolute -bottom-32 left-20 w-96 h-96 bg-pink-500/30 rounded-full mix-blend-screen filter blur-3xl opacity-30 animate-blob animation-delay-4000"></div>
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-blue-500/10 rounded-full mix-blend-screen filter blur-[100px] opacity-20 animate-pulse"></div>
+        </div>
+
+        <CustomCursor client:load />
+
+		<Navbar client:load lang={currentLang} t={t} pathname={pathname} />
+        
+        <main class="flex-grow pt-24 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full z-10 transition-all duration-300">
+		    <slot />
+        </main>
+
+        <Footer t={t} />
+	</body>
+</html>

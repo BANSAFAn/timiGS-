@@ -58,6 +58,11 @@
       "macosExtraArgs": ["--minimized"],
       "args": ["--minimized"]
     },
+    "updater": {
+      "endpoints": [
+        "https://github.com/baneronetwo/timiGS-/releases/latest/download/latest.json"
+      ]
+    },
     "cli": {
       "description": "TimiGS Activity Tracker CLI",
       "args": [

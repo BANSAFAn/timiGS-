@@ -5,7 +5,15 @@
         <h2>{{ $t('settings.title') }}</h2>
       </div>
 
-      <div class="settings-grid">
+      <div v-if="error" class="error-state">
+        <p>{{ error }}</p>
+      </div>
+
+      <div v-else-if="!isReady" class="loading-state">
+        <p>{{ $t('common.loading') || 'Loading...' }}</p>
+      </div>
+
+      <div v-else class="settings-grid">
         <!-- Appearance Card -->
         <div class="card">
           <div class="card-header">
@@ -222,6 +230,17 @@
               </div>
               <span class="version-badge">{{ latestVersion }}</span>
             </div>
+            <div class="settings-row">
+              <div class="settings-info">
+                <h4>{{ $t('settings.checkUpdates') || 'Check for Updates' }}</h4>
+                <p>{{ updateStatus }}</p>
+              </div>
+              <button class="btn-update" @click="checkForUpdates" :disabled="isCheckingUpdate">
+                <span v-if="isCheckingUpdate">⏳</span>
+                <span v-else>🔄</span>
+                {{ isCheckingUpdate ? ($t('settings.checking') || 'Checking...') : ($t('settings.checkNow') || 'Check Now') }}
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -240,6 +259,8 @@ import { useI18n } from 'vue-i18n';
 import { useActivityStore, type Settings } from '../stores/activity';
 import { setLanguage } from '../i18n';
 import { invoke } from '@tauri-apps/api/core';
+import { check } from '@tauri-apps/plugin-updater';
+import { relaunch } from '@tauri-apps/plugin-process';
 
 
 const { t } = useI18n();
@@ -259,6 +280,35 @@ const localSettings = reactive<Settings>({
 // GitHub connection
 const githubToken = ref('');
 const isGitHubConnected = ref(false);
+
+// Updater
+const isCheckingUpdate = ref(false);
+const updateStatus = ref('Click to check for updates');
+
+async function checkForUpdates() {
+  isCheckingUpdate.value = true;
+  updateStatus.value = 'Checking...';
+  
+  try {
+    const update = await check();
+    if (update) {
+      updateStatus.value = `Update available: v${update.version}`;
+      showNotification(`New version ${update.version} available! Downloading...`);
+      await update.downloadAndInstall();
+      showNotification('Update installed! Restarting...');
+      await relaunch();
+    } else {
+      updateStatus.value = 'You are on the latest version';
+      showNotification('No updates available.');
+    }
+  } catch (e) {
+    console.error('Update check failed:', e);
+    updateStatus.value = 'Failed to check for updates';
+    showNotification('Update check failed');
+  } finally {
+    isCheckingUpdate.value = false;
+  }
+}
 
 async function connectGitHub() {
   if (!githubToken.value) return;
@@ -438,17 +488,45 @@ async function sendEmailReport() {
   showNotification('Email client opened with report!');
 }
 
+const isReady = ref(false);
+const error = ref('');
+
 onMounted(async () => {
-  await store.fetchSettings();
-  await store.fetchTrackingStatus();
-  Object.assign(localSettings, store.settings);
-  await checkGoogleUser();
-  checkGitHubStatus();
-  fetchLatestVersion();
+  try {
+    // Parallelize independent fetches for speed
+    await Promise.allSettled([
+      store.fetchSettings().then(() => Object.assign(localSettings, store.settings)),
+      store.fetchTrackingStatus(),
+      checkGoogleUser(),
+    ]);
+    
+    // Non-blocking calls
+    checkGitHubStatus();
+    fetchLatestVersion();
+    
+    isReady.value = true;
+  } catch (e) {
+    console.error('Settings initialization failed:', e);
+    error.value = 'Failed to load settings. Please restart the app.';
+    // Still show content even if some fetches fail
+    isReady.value = true;
+  }
 });
 </script>
 
 <style scoped>
+.loading-state, .error-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 400px;
+  text-align: center;
+}
+
+.error-state {
+  color: var(--color-danger);
+}
+
 .version-badge {
   background: var(--bg-tertiary);
   padding: 6px 12px;
@@ -585,5 +663,29 @@ onMounted(async () => {
 
 .token-link:hover {
   text-decoration: underline;
+}
+
+.btn-update {
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #10b981, #059669);
+  border: none;
+  border-radius: var(--radius-md);
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-update:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+}
+
+.btn-update:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
 }
 </style>

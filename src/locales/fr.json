@@ -98,7 +98,20 @@
     "emailReports": "Rapports par e-mail",
     "emailReportsDesc": "Recevoir un rapport d'activité hebdomadaire par e-mail",
     "emailPlaceholder": "votre@email.com",
-    "sendReport": "Envoyer le rapport"
+    "sendReport": "Envoyer le rapport",
+    "system": "Système",
+    "checkUpdates": "Vérifier les mises à jour",
+    "checkNow": "Vérifier maintenant",
+    "checking": "Vérification..."
+  },
+  "tools": {
+    "timer": "Minuterie d'arrêt",
+    "notepad": "Bloc-notes",
+    "notepadPlaceholder": "Tapez vos notes ici...",
+    "newNote": "Nouvelle note",
+    "deleteNote": "Supprimer",
+    "noNotes": "Aucune note pour le moment",
+    "untitled": "Sans titre"
   },
   "common": {
     "loading": "Chargement...",

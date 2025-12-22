@@ -18,6 +18,8 @@ tauri-plugin-opener = "2"
 tauri-plugin-autostart = "2"
 tauri-plugin-shell = "2"
 tauri-plugin-cli = "2"
+tauri-plugin-updater = "2"
+tauri-plugin-process = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 rusqlite = { version = "0.32", features = ["bundled"] }
@@ -31,6 +33,11 @@ tokio = { version = "1", features = ["full"] }
 once_cell = "1.19"
 parking_lot = "0.12"
 opener = "0.7"
+
+[target.'cfg(target_os = "linux")'.dependencies]
+glib = "0.20.0"
+
+[dev-dependencies]
 
 [target.'cfg(windows)'.dependencies]
 windows = { version = "0.58", features = [

@@ -1,0 +1,17 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import DownloadPage from '../../components/react-pages/Download';
+import { useTranslations } from '../../i18n/utils';
+import { Language } from '../../i18n/types';
+
+export function getStaticPaths() {
+   return Object.values(Language).map(lang => ({ params: { lang } }));
+}
+
+const { lang } = Astro.params;
+const t = useTranslations(lang as Language);
+---
+
+<Layout title={`TimiGS - ${t.nav.download}`}>
+  <DownloadPage client:load lang={lang as Language} t={t} />
+</Layout>

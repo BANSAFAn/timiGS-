@@ -1,0 +1,17 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import TermsPage from '../../components/react-pages/Terms';
+import { useTranslations } from '../../i18n/utils';
+import { Language } from '../../i18n/types';
+
+export function getStaticPaths() {
+   return Object.values(Language).map(lang => ({ params: { lang } }));
+}
+
+const { lang } = Astro.params;
+const t = useTranslations(lang as Language);
+---
+
+<Layout title={`TimiGS - ${t.nav.terms}`}>
+  <TermsPage t={t} />
+</Layout>
