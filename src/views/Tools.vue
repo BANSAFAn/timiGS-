@@ -71,9 +71,9 @@ onMounted(() => {
 <style scoped>
 .tools-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: 1fr 1fr;
   gap: 24px;
-  height: calc(100vh - 180px); /* Fill remaining height */
+  max-height: 400px;
 }
 
 .tool-card {
@@ -176,11 +176,11 @@ onMounted(() => {
 @media (max-width: 900px) {
   .tools-grid {
     grid-template-columns: 1fr;
-    height: auto;
+    max-height: none;
   }
   
   .tool-card {
-    min-height: 400px;
+    min-height: 300px;
   }
 }
 </style>

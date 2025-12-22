@@ -44,7 +44,12 @@
     "duration": "Тривалість",
     "startTime": "Початок",
     "endTime": "Кінець",
-    "noSessions": "Немає сесій за цю дату"
+    "noSessions": "Немає сесій за цю дату",
+    "searchPlaceholder": "Пошук програм...",
+    "noSearchResults": "Нічого не знайдено",
+    "websites": "Веб-сайти",
+    "noWebsites": "Немає даних про веб-сайти",
+    "websiteStats": "Статистика веб-сайтів"
   },
   "analytics": {
     "title": "Аналітика",
