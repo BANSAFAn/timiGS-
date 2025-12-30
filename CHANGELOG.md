@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.17.0](https://github.com/BANSAFAn/timiGS-/compare/v1.16.0...v1.17.0) (2025-12-22)
+
+
+### Features
+
+* multi-note Notepad, complete translations for all locales ([4b8ce67](https://github.com/BANSAFAn/timiGS-/commit/4b8ce6768d12be8a01de5a2613c00e70bd8f8554))
+* redesign Analytics/Tools, add Notepad and in-app updater ([ceb0a8a](https://github.com/BANSAFAn/timiGS-/commit/ceb0a8aed887c73838cc2e8d74e4d04384b2cc19))
+* **site:** migrate website from React to Astro ([360d237](https://github.com/BANSAFAn/timiGS-/commit/360d237806c101190cd1c2447438d3b49c8e95fd))
+
+
+### Bug Fixes
+
+* **build:** limit glib dependency to linux target only ([d3d7c18](https://github.com/BANSAFAn/timiGS-/commit/d3d7c18713bb780435d5ac7642199b8512b73c36))
+* global layout full width (remove max-width), fix Analytics/Tools grid filling ([f831b6a](https://github.com/BANSAFAn/timiGS-/commit/f831b6abd5cb252343d3f1f025221c556dad7c2f))
+* Tools layout horizontal, add missing UK timeline translations ([3f1ae14](https://github.com/BANSAFAn/timiGS-/commit/3f1ae145209a3460eafe5a4ba2a96cfabadefcf7))
+
 ## [1.16.0](https://github.com/BANSAFAn/timiGS-/compare/v1.15.0...v1.16.0) (2025-12-21)
 
 
