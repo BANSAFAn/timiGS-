@@ -7,14 +7,18 @@ mod db;
 mod drive;
 mod tracker;
 
+#[cfg(desktop)]
 use tauri::{
     menu::{Menu, MenuItem},
     tray::TrayIconBuilder,
     Manager, WindowEvent,
 };
+
+#[cfg(desktop)]
 use tauri_plugin_autostart::MacosLauncher;
 
-// removed unused ManagerExt
+#[cfg(mobile)]
+use tauri::Manager;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -23,21 +27,29 @@ pub fn run() {
         eprintln!("Failed to initialize database: {}", e);
     }
 
-    tauri::Builder::default()
+    let builder = tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_shell::init())
+        .plugin(tauri_plugin_process::init());
+
+    // Desktop-only plugins
+    #[cfg(desktop)]
+    let builder = builder
         .plugin(tauri_plugin_cli::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
-        .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_autostart::init(
             MacosLauncher::LaunchAgent,
             Some(vec!["--minimized"]),
-        ))
-        .setup(|app| {
-            // Start tracking on app launch
-            tracker::start_tracking();
+        ));
 
-            // Setup Tray Icon
+    let builder = builder.setup(|app| {
+        // Start tracking on app launch (only on desktop)
+        #[cfg(desktop)]
+        tracker::start_tracking();
+
+        // Setup Tray Icon (desktop only)
+        #[cfg(desktop)]
+        {
             if let Ok(quit_i) = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>) {
                 if let Ok(show_i) =
                     MenuItem::with_id(app, "show", "Show Window", true, None::<&str>)
@@ -77,20 +89,26 @@ pub fn run() {
                     }
                 }
             }
+        }
 
-            Ok(())
-        })
-        .on_window_event(|window, event| {
-            if let WindowEvent::CloseRequested { api, .. } = event {
-                // Check if we should minimize to tray
-                let should_minimize = db::get_settings().minimize_to_tray;
+        Ok(())
+    });
 
-                if should_minimize {
-                    api.prevent_close();
-                    let _ = window.hide();
-                }
+    // Desktop-only window event handling
+    #[cfg(desktop)]
+    let builder = builder.on_window_event(|window, event| {
+        if let WindowEvent::CloseRequested { api, .. } = event {
+            // Check if we should minimize to tray
+            let should_minimize = db::get_settings().minimize_to_tray;
+
+            if should_minimize {
+                api.prevent_close();
+                let _ = window.hide();
             }
-        })
+        }
+    });
+
+    builder
         .invoke_handler(tauri::generate_handler![
             commands::get_current_activity,
             commands::get_current_session,
