@@ -39,7 +39,7 @@ jobs:
           - platform: "ubuntu-22.04"
             args: ""
           - platform: "windows-latest"
-            args: ""
+            args: "--bundles nsis,zip"
 
     runs-on: ${{ matrix.platform }}
     steps:
