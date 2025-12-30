@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.17.1](https://github.com/BANSAFAn/timiGS-/compare/v1.17.0...v1.17.1) (2025-12-30)
+
+
+### Bug Fixes
+
+* **app:** enable autostart plugin and add portable ZIP bundle ([7361d43](https://github.com/BANSAFAn/timiGS-/commit/7361d43084ac0eab153e822b3732a5f7189b5f98))
+
 ## [1.17.0](https://github.com/BANSAFAn/timiGS-/compare/v1.16.0...v1.17.0) (2025-12-22)
 
 
