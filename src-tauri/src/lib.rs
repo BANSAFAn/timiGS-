@@ -20,11 +20,34 @@ use tauri_plugin_autostart::MacosLauncher;
 #[cfg(mobile)]
 use tauri::Manager;
 
+#[cfg(target_os = "windows")]
+use windows::core::PCWSTR;
+#[cfg(target_os = "windows")]
+use windows::Win32::UI::WindowsAndMessaging::{MessageBoxW, MB_ICONERROR, MB_OK};
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     // Initialize database
     if let Err(e) = db::init_database() {
         eprintln!("Failed to initialize database: {}", e);
+        #[cfg(target_os = "windows")]
+        unsafe {
+            let msg = format!(
+                "Failed to initialize database: {}\n\nPlease check permissions.",
+                e
+            );
+            let wide_msg: Vec<u16> = msg.encode_utf16().chain(std::iter::once(0)).collect();
+            let title: Vec<u16> = "TimiGS Error"
+                .encode_utf16()
+                .chain(std::iter::once(0))
+                .collect();
+            MessageBoxW(
+                None,
+                PCWSTR(wide_msg.as_ptr()),
+                PCWSTR(title.as_ptr()),
+                MB_OK | MB_ICONERROR,
+            );
+        }
     }
 
     let builder = tauri::Builder::default()

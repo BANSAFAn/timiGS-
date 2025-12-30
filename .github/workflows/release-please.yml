@@ -122,7 +122,7 @@ jobs:
         run: cargo tauri android init
 
       - name: build Android APK
-        run: cargo tauri android build --apk
+        run: cargo tauri android build --apk true
 
       - name: upload APK to release
         uses: softprops/action-gh-release@v2
