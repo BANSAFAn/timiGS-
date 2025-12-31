@@ -2,14 +2,13 @@ use base64::{engine::general_purpose, Engine as _};
 use image::{ImageBuffer, Rgba};
 use std::ffi::OsStr;
 use std::os::windows::ffi::OsStrExt;
-use std::path::Path;
 
 #[cfg(target_os = "windows")]
-use windows::Win32::Foundation::{HWND, RECT};
+use windows::Win32::Foundation::HWND;
 #[cfg(target_os = "windows")]
 use windows::Win32::Graphics::Gdi::{
     CreateCompatibleDC, DeleteDC, DeleteObject, GetDC, GetObjectW, ReleaseDC, SelectObject, BITMAP,
-    HBITMAP, HGDIOBJ,
+    HBITMAP, HBRUSH, HGDIOBJ,
 };
 #[cfg(target_os = "windows")]
 use windows::Win32::UI::Shell::{SHGetFileInfoW, SHFILEINFOW, SHGFI_ICON, SHGFI_LARGEICON};
@@ -17,6 +16,21 @@ use windows::Win32::UI::Shell::{SHGetFileInfoW, SHFILEINFOW, SHGFI_ICON, SHGFI_L
 use windows::Win32::UI::WindowsAndMessaging::{
     DestroyIcon, DrawIconEx, GetIconInfo, DI_NORMAL, HICON,
 };
+
+// Helper struct for Go-style defer is not native, implemented manually via scope guard or just manual cleanup
+macro_rules! defer {
+    ($($body:tt)*) => {
+        struct _Defer<F: FnOnce()>(Option<F>);
+        impl<F: FnOnce()> Drop for _Defer<F> {
+            fn drop(&mut self) {
+                if let Some(f) = self.0.take() {
+                    f();
+                }
+            }
+        }
+        let _defer = _Defer(Some(|| { $($body)* }));
+    }
+}
 
 pub fn get_app_icon(exe_path: &str) -> Option<String> {
     #[cfg(target_os = "windows")]
@@ -39,9 +53,10 @@ unsafe fn get_icon_windows(path: &str) -> Option<String> {
 
     let mut shfileinfo = SHFILEINFOW::default();
 
+    use windows::Win32::Storage::FileSystem::FILE_ATTRIBUTE_NORMAL;
     let result = SHGetFileInfoW(
         windows::core::PCWSTR(wide_path.as_ptr()),
-        0,
+        FILE_ATTRIBUTE_NORMAL,
         Some(&mut shfileinfo),
         std::mem::size_of::<SHFILEINFOW>() as u32,
         SHGFI_ICON | SHGFI_LARGEICON,
@@ -67,7 +82,10 @@ unsafe fn get_icon_windows(path: &str) -> Option<String> {
 unsafe fn hicon_to_base64(hicon: HICON) -> Option<String> {
     // 1. Get Icon Info to extract bitmap
     let mut icon_info = std::mem::zeroed();
-    if !GetIconInfo(hicon, &mut icon_info).as_bool() {
+    // GetIconInfo returns BOOL which is wrapped in Result in newer windows-rs versions, or just BOOL.
+    // Error said: no method named `as_bool` found for enum `Result`.
+    // So it returns Result.
+    if GetIconInfo(hicon, &mut icon_info).is_err() {
         return None;
     }
 
@@ -98,7 +116,7 @@ unsafe fn hicon_to_base64(hicon: HICON) -> Option<String> {
         width,
         height,
         0,
-        HGDIOBJ(std::ptr::null_mut()),
+        HBRUSH(std::ptr::null_mut()), // Fixed: HGDIOBJ -> HBRUSH
         DI_NORMAL,
     );
 
@@ -109,16 +127,6 @@ unsafe fn hicon_to_base64(hicon: HICON) -> Option<String> {
         std::mem::size_of::<BITMAP>() as i32,
         Some(&mut bitmap as *mut _ as *mut _),
     );
-
-    // For simplicity, using 'image' crate properly requires raw pixel data.
-    // This part is tricky in Rust without extensive boilerplate for GDI+ or manually reading DIB sections.
-    // However, since we added 'image', we can try to extract pixels if we had them.
-
-    // Fallback: This is getting too complex for a quick fix "get real icons".
-    // extracting HICON to PNG buffers correctly involves GetDIBits.
-
-    // simplified for now: return None if too complex, or try a simpler crate if possible?
-    // But since I am here, let's try to finish GetDIBits.
 
     use windows::Win32::Graphics::Gdi::{
         GetDIBits, BITMAPINFO, BITMAPINFOHEADER, BI_RGB, DIB_RGB_COLORS,
@@ -131,7 +139,7 @@ unsafe fn hicon_to_base64(hicon: HICON) -> Option<String> {
             biHeight: -height, // top-down
             biPlanes: 1,
             biBitCount: 32,
-            biCompression: BI_RGB,
+            biCompression: BI_RGB.0, // Fixed: BI_RGB -> BI_RGB.0 (u32 extraction from newtype)
             ..Default::default()
         },
         ..Default::default()
@@ -185,20 +193,5 @@ unsafe fn hicon_to_base64(hicon: HICON) -> Option<String> {
     match img.write_with_encoder(encoder) {
         Ok(_) => Some(general_purpose::STANDARD.encode(buf)),
         Err(_) => None,
-    }
-}
-
-// Helper struct for Go-style defer is not native, implemented manually via scope guard or just manual cleanup
-macro_rules! defer {
-    ($($body:tt)*) => {
-        struct _Defer<F: FnOnce()>(Option<F>);
-        impl<F: FnOnce()> Drop for _Defer<F> {
-            fn drop(&mut self) {
-                if let Some(f) = self.0.take() {
-                    f();
-                }
-            }
-        }
-        let _defer = _Defer(Some(|| { $($body)* }));
     }
 }

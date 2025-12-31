@@ -4,7 +4,7 @@
 mod auth;
 mod commands;
 mod db;
-mod db;
+
 #[cfg(desktop)]
 mod discord;
 mod drive;
@@ -158,4 +158,3 @@ pub fn run() {
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
-```
