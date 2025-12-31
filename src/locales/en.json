@@ -44,7 +44,9 @@
     "duration": "Duration",
     "startTime": "Start Time",
     "endTime": "End Time",
-    "noSessions": "No sessions for this date"
+    "noSessions": "No sessions for this date",
+    "websites": "Websites",
+    "noWebsites": "No website history found"
   },
   "analytics": {
     "title": "Analytics",
@@ -71,6 +73,8 @@
     "themeLight": "Light",
     "autostart": "Start with Windows",
     "minimizeToTray": "Minimize to system tray",
+    "discordRpc": "Discord Rich Presence",
+    "discordRpcDesc": "Show activity on Discord profile",
     "tracking": "Tracking",
     "startTracking": "Start Tracking",
     "stopTracking": "Stop Tracking",

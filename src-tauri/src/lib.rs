@@ -4,6 +4,7 @@
 mod auth;
 mod commands;
 mod db;
+mod discord;
 mod drive;
 mod tracker;
 

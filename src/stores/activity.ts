@@ -42,6 +42,7 @@ export interface Settings {
   theme: string;
   autostart: boolean;
   minimize_to_tray: boolean;
+  discord_rpc: boolean;
 }
 
 export const useActivityStore = defineStore('activity', {
@@ -55,7 +56,8 @@ export const useActivityStore = defineStore('activity', {
       language: 'en',
       theme: 'dark',
       autostart: true,
-      minimize_to_tray: true
+      minimize_to_tray: true,
+      discord_rpc: true
     } as Settings,
     isTracking: false,
     isLoading: false
