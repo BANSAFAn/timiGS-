@@ -263,15 +263,15 @@
   </div>
 </template>
 
+
 <script setup lang="ts">
-import { ref, reactive, onMounted, onErrorCaptured } from 'vue';
+import { ref, reactive, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useActivityStore, type Settings } from '../stores/activity';
 import { setLanguage } from '../i18n';
 import { invoke } from '@tauri-apps/api/core';
 import { check } from '@tauri-apps/plugin-updater';
 import { relaunch } from '@tauri-apps/plugin-process';
-
 
 const { t } = useI18n();
 const store = useActivityStore();
@@ -280,6 +280,7 @@ const toastMessage = ref('');
 const isGoogleConnected = ref(false);
 const reportEmail = ref('');
 
+// Initial default safe state
 const localSettings = reactive<Settings>({
   language: 'en',
   theme: 'dark',
@@ -288,41 +289,73 @@ const localSettings = reactive<Settings>({
   discord_rpc: true
 });
 
-// GitHub connection
 const githubToken = ref('');
 const isGitHubConnected = ref(false);
-
-// Updater
 const isCheckingUpdate = ref(false);
 const updateStatus = ref('Click to check for updates');
 
-// --- DEBUG INFO ---
-onErrorCaptured((err) => {
-  alert('Settings Render Error: ' + err);
-  return false;
+const isReady = ref(true); 
+const error = ref('');
+
+async function safeInvoke(name: string, args?: any) {
+  try {
+    return await invoke(name, args);
+  } catch (e) {
+    console.error(`Command ${name} failed:`, e);
+    return null;
+  }
+}
+
+async function initSettings() {
+  try {
+    // 1. Fetch settings (critical)
+    const settings = await safeInvoke('get_settings');
+    if (settings && typeof settings === 'object') {
+       Object.assign(localSettings, settings);
+    } else {
+       console.warn('Using default settings (fetch failed or empty)');
+    }
+
+    // 2. Fetch tracking status (optional)
+    await store.fetchTrackingStatus().catch(() => {});
+    
+    // 3. Check Google (optional)
+    checkGoogleUser();
+    
+    // 4. Check GitHub (optional)
+    checkGitHubStatus();
+    
+    // 5. Version (optional)
+    fetchLatestVersion();
+
+  } catch (e: any) {
+    console.error('Settings init fatal error:', e);
+    error.value = 'Failed to load settings: ' + (e.message || String(e));
+  }
+}
+
+onMounted(() => {
+  // Use timeout to let UI rendering start even if logic halts
+  setTimeout(initSettings, 10);
 });
-// ------------------
+
+// ... Actions refactored to be safe ...
 
 async function checkForUpdates() {
   isCheckingUpdate.value = true;
   updateStatus.value = 'Checking...';
-  
   try {
     const update = await check();
     if (update) {
       updateStatus.value = `Update available: v${update.version}`;
-      showNotification(`New version ${update.version} available! Downloading...`);
       await update.downloadAndInstall();
-      showNotification('Update installed! Restarting...');
       await relaunch();
     } else {
-      updateStatus.value = 'You are on the latest version';
-      showNotification('No updates available.');
+      updateStatus.value = 'Latest version';
     }
   } catch (e) {
     console.error('Update check failed:', e);
-    updateStatus.value = 'Failed to check for updates';
-    showNotification('Update check failed');
+    updateStatus.value = 'Check failed';
   } finally {
     isCheckingUpdate.value = false;
   }
@@ -330,23 +363,20 @@ async function checkForUpdates() {
 
 async function connectGitHub() {
   if (!githubToken.value) return;
-  
   try {
     const response = await fetch('https://api.github.com/user', {
       headers: { Authorization: `Bearer ${githubToken.value}` }
     });
-    
     if (response.ok) {
       localStorage.setItem('github_token', githubToken.value);
       isGitHubConnected.value = true;
-      // Trigger storage event for App.vue to update nav
       window.dispatchEvent(new Event('storage'));
-      showNotification('GitHub connected!');
+      showNotification('Connected!');
     } else {
       showNotification('Invalid token');
     }
-  } catch (e) {
-    showNotification('Connection failed');
+  } catch {
+    showNotification('Connection error');
   }
 }
 
@@ -355,7 +385,6 @@ function disconnectGitHub() {
   githubToken.value = '';
   isGitHubConnected.value = false;
   window.dispatchEvent(new Event('storage'));
-  showNotification('GitHub disconnected');
 }
 
 function checkGitHubStatus() {
@@ -370,78 +399,66 @@ function showNotification(message: string) {
 
 async function updateSettings() {
   setLanguage(localSettings.language);
-  document.documentElement.setAttribute('data-theme', localSettings.theme);
+  document.documentElement.setAttribute('data-theme', localSettings.theme || 'dark');
   await store.saveSettings({ ...localSettings });
   showNotification(t('settings.saved'));
 }
 
 async function connectGoogle() {
-  try {
-    showNotification('Starting Google login...');
-    const result = await invoke('login_google');
-    showNotification(result as string);
+  const result = await safeInvoke('login_google') as string;
+  if (result) {
+    showNotification(result);
     isGoogleConnected.value = true;
-    await checkGoogleUser();
-  } catch (e) {
-    showNotification(`Login failed: ${e}`);
   }
 }
 
 async function checkGoogleUser() {
+  const user = await safeInvoke('get_google_user');
+  if (user) isGoogleConnected.value = true;
+}
+
+async function startBackup() {
+  const res = await safeInvoke('backup_data') as string;
+  if(res) showNotification(res);
+}
+
+async function startRestore() {
+  const res = await safeInvoke('restore_data') as string;
+  if(res) showNotification(res);
+}
+
+function exportDataJSON() {
   try {
-      const user = await invoke<string | null>('get_google_user');
-      if (user) {
-        isGoogleConnected.value = true;
-      }
+    const data = {
+        sessions: store.todaySessions || [],
+        summary: store.todaySummary || [],
+        exportedAt: new Date().toISOString()
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    downloadFile(blob, 'timigs-data.json');
+    showNotification('Exported JSON');
   } catch(e) {
       console.error(e);
   }
 }
 
-async function startBackup() {
-  try {
-    showNotification('Backing up data...');
-    const result = await invoke('backup_data');
-    showNotification(result as string);
-  } catch (e) {
-    showNotification(`Backup failed: ${e}`);
-  }
-}
-
-async function startRestore() {
-  try {
-    showNotification('Restoring data...');
-    const result = await invoke('restore_data');
-    showNotification(result as string);
-  } catch (e) {
-    showNotification(`Restore failed: ${e}`);
-  }
-}
-
-function exportDataJSON() {
-  const data = {
-    sessions: store.todaySessions,
-    summary: store.todaySummary,
-    exportedAt: new Date().toISOString()
-  };
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-  downloadFile(blob, 'timigs-data.json');
-  showNotification('Data exported as JSON!');
-}
-
 function exportDataCSV() {
-  const headers = ['App Name', 'Window Title', 'Start Time', 'End Time', 'Duration (seconds)'];
-  const rows = store.todaySessions.map(s => [
-    s.app_name,
-    s.window_title.replace(/,/g, ';'),
-    s.start_time,
-    s.end_time || '',
-    s.duration_seconds
-  ]);
-  const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
-  const blob = new Blob([csv], { type: 'text/csv' });
-  downloadFile(blob, 'timigs-data.csv');
-  showNotification('Data exported as CSV!');
+  try {
+      const headers = ['App Name', 'Window Title', 'Start Time', 'End Time', 'Duration (seconds)'];
+      const rows = (store.todaySessions || []).map(s => [
+        s.app_name,
+        s.window_title.replace(/,/g, ';'),
+        s.start_time,
+        s.end_time || '',
+        s.duration_seconds
+      ]);
+      const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+      const blob = new Blob([csv], { type: 'text/csv' });
+      downloadFile(blob, 'timigs-data.csv');
+      showNotification('Exported CSV');
+  } catch(e) {
+      console.error(e);
+  }
 }
 
 function downloadFile(blob: Blob, filename: string) {
@@ -462,11 +479,10 @@ function importData() {
     if (file) {
       const text = await file.text();
       try {
-        const data = JSON.parse(text);
-        showNotification('Data imported successfully!');
-        console.log('Imported data:', data);
+        JSON.parse(text);
+        showNotification('Imported!');
       } catch {
-        showNotification('Failed to import data');
+        showNotification('Invalid file');
       }
     }
   };
@@ -482,52 +498,17 @@ async function fetchLatestVersion() {
       const data = await response.json();
       latestVersion.value = data.tag_name || '1.1.0';
     }
-  } catch (e) {
-    console.error('Failed to fetch version:', e);
-  }
+  } catch {}
 }
 
 async function sendEmailReport() {
-  if (!reportEmail.value || !reportEmail.value.includes('@')) {
-    showNotification('Please enter a valid email address');
-    return;
-  }
-  
-  // Fetch latest data
+  if (!reportEmail.value || !reportEmail.value.includes('@')) return;
   await store.fetchTodayData();
   await store.fetchWeeklyStats();
-  
   const report = store.generateWeeklyReport();
-  const subject = encodeURIComponent('TimiGS Weekly Activity Report');
-  const body = encodeURIComponent(report);
-  
-  // Open mailto link
-  window.open(`mailto:${reportEmail.value}?subject=${subject}&body=${body}`, '_blank');
-  showNotification('Email client opened with report!');
+  window.open(`mailto:${reportEmail.value}?subject=TimiGS Report&body=${encodeURIComponent(report)}`, '_blank');
 }
 
-const isReady = ref(true); // Always render immediately
-const error = ref('');
-
-onMounted(async () => {
-  try {
-    // Load settings independently
-    store.fetchSettings()
-      .then(() => Object.assign(localSettings, store.settings))
-      .catch(e => console.error('Failed to fetch settings:', e));
-
-    // Load other states independently
-    store.fetchTrackingStatus().catch(console.error);
-    checkGoogleUser().catch(console.error);
-    
-    // Non-blocking calls
-    checkGitHubStatus();
-    fetchLatestVersion();
-  } catch (e) {
-    console.error('Settings initialization error:', e);
-    // Don't block UI
-  }
-});
 </script>
 
 <style scoped>
