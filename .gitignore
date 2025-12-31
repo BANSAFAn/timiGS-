@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Security - Signing Keys
+*.key
+*.key.pub

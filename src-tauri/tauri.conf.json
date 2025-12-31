@@ -59,6 +59,7 @@
       "args": ["--minimized"]
     },
     "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDBGREMyQzIyQ0IwQTJEOEUKUldTT0xRckxJaXpjRHcrNnltak5wM0NIWGRBMHppU0JMdzY2eUlNNnpMS08xQ2JObVdqd05qY0UK",
       "endpoints": [
         "https://github.com/baneronetwo/timiGS-/releases/latest/download/latest.json"
       ]
