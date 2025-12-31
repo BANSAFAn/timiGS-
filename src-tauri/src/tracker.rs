@@ -1,6 +1,7 @@
 //! Windows activity tracker module
 
 use crate::db;
+#[cfg(desktop)]
 use crate::discord;
 use once_cell::sync::Lazy;
 use parking_lot::Mutex;
@@ -136,6 +137,7 @@ pub fn start_tracking() {
                         });
 
                         // Update Discord Presence
+                        #[cfg(desktop)]
                         if db::get_settings().discord_rpc {
                             discord::update_presence(&active.app_name, &active.window_title);
                         } else {

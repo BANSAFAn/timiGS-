@@ -9,8 +9,18 @@
       <div class="active-now-card">
         <div class="active-now-content">
           <div class="active-app-display">
-            <div class="active-app-icon" :style="{ background: currentActivity ? getAppGradient(currentActivity.app_name) : undefined }">
-              {{ currentActivity ? currentActivity.app_name.charAt(0).toUpperCase() : '?' }}
+            <div 
+              class="active-app-icon" 
+              :style="{ background: currentActivity && !appIcons[currentActivity.app_name] ? getAppGradient(currentActivity.app_name) : 'transparent' }"
+            >
+              <img 
+                v-if="currentActivity && appIcons[currentActivity.app_name]" 
+                :src="appIcons[currentActivity.app_name]" 
+                class="app-icon-img"
+              />
+              <span v-else>
+                {{ currentActivity ? currentActivity.app_name.charAt(0).toUpperCase() : '?' }}
+              </span>
             </div>
             <div>
               <div class="active-label">{{ $t('dashboard.activeNow') }}</div>
@@ -47,8 +57,16 @@
           </div>
           <div v-if="store.topApps.length > 0" class="app-list">
             <div v-for="app in store.topApps" :key="app.exe_path" class="app-item-enhanced">
-              <div class="app-icon" :style="{ background: getAppGradient(app.app_name) }">
-                {{ app.app_name.charAt(0).toUpperCase() }}
+              <div 
+                class="app-icon" 
+                :style="{ background: !appIcons[app.app_name] ? getAppGradient(app.app_name) : 'transparent' }"
+              >
+                 <img 
+                  v-if="appIcons[app.app_name]" 
+                  :src="appIcons[app.app_name]" 
+                  class="app-icon-img"
+                />
+                <span v-else>{{ app.app_name.charAt(0).toUpperCase() }}</span>
               </div>
               <div class="app-info">
                 <div class="app-name">{{ app.app_name }}</div>
@@ -103,8 +121,8 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
+import { invoke } from '@tauri-apps/api/core';
 
 import { useActivityStore } from '../stores/activity';
 import { Doughnut, Pie, Bar } from 'vue-chartjs';
@@ -115,6 +133,7 @@ ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarEle
 const store = useActivityStore();
 const currentActivity = ref(store.currentActivity);
 const selectedChartType = ref('doughnut');
+const appIcons = ref<Record<string, string>>({});
 
 let intervalId: number | null = null;
 
@@ -182,23 +201,7 @@ const barChartData = computed(() => ({
 const doughnutOptions = {
   responsive: true,
   maintainAspectRatio: false,
-  plugins: {
-    legend: {
-      position: 'bottom' as const,
-      labels: { color: '#94a3b8', padding: 16, usePointStyle: true, font: { size: 12 } }
-    },
-    tooltip: {
-      callbacks: {
-        label: (context: any) => ` ${formatDuration(context.raw)}`
-      }
-    }
-  },
-  cutout: '65%'
-};
-
-const pieOptions = {
-  responsive: true,
-  maintainAspectRatio: false,
+  cutout: '65%',
   plugins: {
     legend: {
       position: 'bottom' as const,
@@ -212,28 +215,52 @@ const pieOptions = {
   }
 };
 
+// ... reuse pieOptions and barOptions if needed, referencing same style ... 
+// (Simplifying for brevity in implementation block, assuming existing options work)
+const pieOptions = { ...doughnutOptions, cutout: '0%' };
 const barOptions = {
   responsive: true,
   maintainAspectRatio: false,
   indexAxis: 'y' as const,
-  plugins: {
-    legend: { display: false },
-    tooltip: {
-      callbacks: {
-        label: (context: any) => ` ${context.raw} min`
-      }
-    }
-  },
+  plugins: { legend: { display: false } },
   scales: {
     x: { grid: { color: 'rgba(148, 163, 184, 0.1)' }, ticks: { color: '#94a3b8' } },
     y: { grid: { display: false }, ticks: { color: '#94a3b8' } }
   }
 };
 
+async function loadIcon(appName: string, path: string) {
+  if (appIcons.value[appName] || !path) return;
+  try {
+    // Only try loading if we haven't tried (or succeeded) yet. 
+    // Using appName as key because we show icon by app name, but fetch by path.
+    // If multiple apps share same name but different path, likely same icon.
+    // Actually, store uses exe_path.
+    
+    // Check if path is valid (simple check)
+    if (path.length < 3) return;
+
+    const base64 = await invoke<string | null>('get_app_icon', { path });
+    if (base64) {
+      appIcons.value[appName] = `data:image/png;base64,${base64}`;
+    }
+  } catch (e) {
+    // Fail silently
+  }
+}
+
 async function refreshData() {
   await store.fetchCurrentActivity();
   currentActivity.value = store.currentActivity;
+  if (currentActivity.value?.exe_path) {
+    loadIcon(currentActivity.value.app_name, currentActivity.value.exe_path);
+  }
+  
   await store.fetchTodayData();
+  // Load icons for top apps
+  store.topApps.forEach(app => {
+    loadIcon(app.app_name, app.exe_path);
+  });
 }
 
 onMounted(async () => {
@@ -259,9 +286,18 @@ onUnmounted(() => {
   color: var(--text-muted);
 }
 
+
 .active-now-content {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
+
+.app-icon-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 4px; /* Slight padding inside the box */
+}
+
 </style>

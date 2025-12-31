@@ -506,31 +506,26 @@ async function sendEmailReport() {
   showNotification('Email client opened with report!');
 }
 
-const isReady = ref(false);
+const isReady = ref(true); // Always render immediately
 const error = ref('');
 
 onMounted(async () => {
   try {
-    // Parallelize independent fetches for speed
-    await Promise.allSettled([
-      store.fetchSettings().then(() => Object.assign(localSettings, store.settings)),
-      store.fetchTrackingStatus(),
-      checkGoogleUser(),
-    ]);
+    // Load settings independently
+    store.fetchSettings()
+      .then(() => Object.assign(localSettings, store.settings))
+      .catch(e => console.error('Failed to fetch settings:', e));
+
+    // Load other states independently
+    store.fetchTrackingStatus().catch(console.error);
+    checkGoogleUser().catch(console.error);
     
     // Non-blocking calls
     checkGitHubStatus();
     fetchLatestVersion();
-    
-    isReady.value = true;
   } catch (e) {
-    console.error('Settings initialization failed:', e);
-    error.value = 'Failed to load settings. Please restart the app.';
-    // --- DEBUG INFO ---
-    alert('Settings Init Error: ' + e);
-     // ------------------
-    // Still show content even if some fetches fail
-    isReady.value = true;
+    console.error('Settings initialization error:', e);
+    // Don't block UI
   }
 });
 </script>

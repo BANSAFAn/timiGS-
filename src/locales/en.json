@@ -40,6 +40,7 @@
     "title": "Activity Timeline",
     "today": "Today",
     "yesterday": "Yesterday",
+    "searchPlaceholder": "Search apps...",
     "selectDate": "Select Date",
     "duration": "Duration",
     "startTime": "Start Time",
@@ -121,6 +122,10 @@
     "saving": "Saving...",
     "cancel": "Cancel",
     "confirm": "Confirm",
-    "close": "Close"
+    "confirm": "Confirm",
+    "close": "Close",
+    "hours": "Hours",
+    "minutes": "Minutes",
+    "seconds": "Seconds"
   }
 }

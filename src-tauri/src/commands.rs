@@ -116,6 +116,11 @@ pub async fn restore_data() -> Result<String, String> {
 }
 
 #[command]
+pub fn get_app_icon(path: String) -> Option<String> {
+    crate::icons::get_app_icon(&path)
+}
+
+#[command]
 pub fn shutdown_pc() -> Result<(), String> {
     #[cfg(target_os = "windows")]
     {

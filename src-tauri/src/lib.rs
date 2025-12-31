@@ -4,8 +4,11 @@
 mod auth;
 mod commands;
 mod db;
+mod db;
+#[cfg(desktop)]
 mod discord;
 mod drive;
+mod icons;
 mod tracker;
 
 #[cfg(desktop)]
@@ -150,7 +153,9 @@ pub fn run() {
             commands::backup_data,
             commands::restore_data,
             commands::shutdown_pc,
+            commands::get_app_icon
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
+```
