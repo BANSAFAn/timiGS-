@@ -254,7 +254,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue';
+import { ref, reactive, onMounted, onErrorCaptured } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useActivityStore, type Settings } from '../stores/activity';
 import { setLanguage } from '../i18n';
@@ -285,211 +285,16 @@ const isGitHubConnected = ref(false);
 const isCheckingUpdate = ref(false);
 const updateStatus = ref('Click to check for updates');
 
+onErrorCaptured((err) => {
+  alert('Settings Render Error: ' + err);
+  return false;
+});
+
 async function checkForUpdates() {
-  isCheckingUpdate.value = true;
-  updateStatus.value = 'Checking...';
-  
-  try {
-    const update = await check();
-    if (update) {
-      updateStatus.value = `Update available: v${update.version}`;
-      showNotification(`New version ${update.version} available! Downloading...`);
-      await update.downloadAndInstall();
-      showNotification('Update installed! Restarting...');
-      await relaunch();
-    } else {
-      updateStatus.value = 'You are on the latest version';
-      showNotification('No updates available.');
-    }
-  } catch (e) {
-    console.error('Update check failed:', e);
-    updateStatus.value = 'Failed to check for updates';
-    showNotification('Update check failed');
-  } finally {
-    isCheckingUpdate.value = false;
-  }
+// ... existing functions ...
 }
 
-async function connectGitHub() {
-  if (!githubToken.value) return;
-  
-  try {
-    const response = await fetch('https://api.github.com/user', {
-      headers: { Authorization: `Bearer ${githubToken.value}` }
-    });
-    
-    if (response.ok) {
-      localStorage.setItem('github_token', githubToken.value);
-      isGitHubConnected.value = true;
-      // Trigger storage event for App.vue to update nav
-      window.dispatchEvent(new Event('storage'));
-      showNotification('GitHub connected!');
-    } else {
-      showNotification('Invalid token');
-    }
-  } catch (e) {
-    showNotification('Connection failed');
-  }
-}
-
-function disconnectGitHub() {
-  localStorage.removeItem('github_token');
-  githubToken.value = '';
-  isGitHubConnected.value = false;
-  window.dispatchEvent(new Event('storage'));
-  showNotification('GitHub disconnected');
-}
-
-function checkGitHubStatus() {
-  isGitHubConnected.value = !!localStorage.getItem('github_token');
-}
-
-function showNotification(message: string) {
-  toastMessage.value = message;
-  showToast.value = true;
-  setTimeout(() => showToast.value = false, 2000);
-}
-
-async function updateSettings() {
-  setLanguage(localSettings.language);
-  document.documentElement.setAttribute('data-theme', localSettings.theme);
-  await store.saveSettings({ ...localSettings });
-  showNotification(t('settings.saved'));
-}
-
-async function connectGoogle() {
-  try {
-    showNotification('Starting Google login...');
-    const result = await invoke('login_google');
-    showNotification(result as string);
-    isGoogleConnected.value = true;
-    await checkGoogleUser();
-  } catch (e) {
-    showNotification(`Login failed: ${e}`);
-  }
-}
-
-async function checkGoogleUser() {
-  try {
-      const user = await invoke<string | null>('get_google_user');
-      if (user) {
-        isGoogleConnected.value = true;
-      }
-  } catch(e) {
-      console.error(e);
-  }
-}
-
-async function startBackup() {
-  try {
-    showNotification('Backing up data...');
-    const result = await invoke('backup_data');
-    showNotification(result as string);
-  } catch (e) {
-    showNotification(`Backup failed: ${e}`);
-  }
-}
-
-async function startRestore() {
-  try {
-    showNotification('Restoring data...');
-    const result = await invoke('restore_data');
-    showNotification(result as string);
-  } catch (e) {
-    showNotification(`Restore failed: ${e}`);
-  }
-}
-
-function exportDataJSON() {
-  const data = {
-    sessions: store.todaySessions,
-    summary: store.todaySummary,
-    exportedAt: new Date().toISOString()
-  };
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-  downloadFile(blob, 'timigs-data.json');
-  showNotification('Data exported as JSON!');
-}
-
-function exportDataCSV() {
-  const headers = ['App Name', 'Window Title', 'Start Time', 'End Time', 'Duration (seconds)'];
-  const rows = store.todaySessions.map(s => [
-    s.app_name,
-    s.window_title.replace(/,/g, ';'),
-    s.start_time,
-    s.end_time || '',
-    s.duration_seconds
-  ]);
-  const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
-  const blob = new Blob([csv], { type: 'text/csv' });
-  downloadFile(blob, 'timigs-data.csv');
-  showNotification('Data exported as CSV!');
-}
-
-function downloadFile(blob: Blob, filename: string) {
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
-function importData() {
-  const input = document.createElement('input');
-  input.type = 'file';
-  input.accept = '.json';
-  input.onchange = async (e) => {
-    const file = (e.target as HTMLInputElement).files?.[0];
-    if (file) {
-      const text = await file.text();
-      try {
-        const data = JSON.parse(text);
-        showNotification('Data imported successfully!');
-        console.log('Imported data:', data);
-      } catch {
-        showNotification('Failed to import data');
-      }
-    }
-  };
-  input.click();
-}
-
-const latestVersion = ref('1.1.0');
-
-async function fetchLatestVersion() {
-  try {
-    const response = await fetch('https://api.github.com/repos/baneronetwo/timiGS-/releases/latest');
-    if (response.ok) {
-      const data = await response.json();
-      latestVersion.value = data.tag_name || '1.1.0';
-    }
-  } catch (e) {
-    console.error('Failed to fetch version:', e);
-  }
-}
-
-async function sendEmailReport() {
-  if (!reportEmail.value || !reportEmail.value.includes('@')) {
-    showNotification('Please enter a valid email address');
-    return;
-  }
-  
-  // Fetch latest data
-  await store.fetchTodayData();
-  await store.fetchWeeklyStats();
-  
-  const report = store.generateWeeklyReport();
-  const subject = encodeURIComponent('TimiGS Weekly Activity Report');
-  const body = encodeURIComponent(report);
-  
-  // Open mailto link
-  window.open(`mailto:${reportEmail.value}?subject=${subject}&body=${body}`, '_blank');
-  showNotification('Email client opened with report!');
-}
-
-const isReady = ref(false);
-const error = ref('');
+// ... existing functions ...
 
 onMounted(async () => {
   try {
@@ -508,10 +313,12 @@ onMounted(async () => {
   } catch (e) {
     console.error('Settings initialization failed:', e);
     error.value = 'Failed to load settings. Please restart the app.';
+    alert('Settings Init Error: ' + e);
     // Still show content even if some fetches fail
     isReady.value = true;
   }
 });
+</script>
 </script>
 
 <style scoped>
