@@ -29,7 +29,7 @@
   },
   "bundle": {
     "active": true,
-    "targets": "all",
+    "targets": ["nsis", "msi", "deb", "rpm", "appimage", "dmg", "app"],
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
@@ -54,11 +54,8 @@
     "publisher": "Baneronetwo"
   },
   "plugins": {
-    "autostart": {
-      "macosExtraArgs": ["--minimized"],
-      "args": ["--minimized"]
-    },
     "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDBGREMyQzIyQ0IwQTJEOEUKUldTT0xRckxJaXpjRHcrNnltak5wM0NIWGRBMHppU0JMdzY2eUlNNnpMS08xQ2JObVdqd05qY0UK",
       "endpoints": [
         "https://github.com/baneronetwo/timiGS-/releases/latest/download/latest.json"
       ]

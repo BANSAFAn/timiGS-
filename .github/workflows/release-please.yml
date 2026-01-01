@@ -39,7 +39,7 @@ jobs:
           - platform: "ubuntu-22.04"
             args: ""
           - platform: "windows-latest"
-            args: "--bundles nsis,zip"
+            args: ""
 
     runs-on: ${{ matrix.platform }}
     steps:
@@ -79,3 +79,65 @@ jobs:
           releaseDraft: false
           prerelease: false
           args: ${{ matrix.args }}
+
+  build-android:
+    needs: release-please
+    if: ${{ needs.release-please.outputs.release_created || github.event_name == 'workflow_dispatch' }}
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: aarch64-linux-android
+            abi: arm64-v8a
+          - target: x86_64-linux-android
+            abi: x86_64
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "17"
+
+      - name: setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+
+      - name: setup rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: install Tauri CLI
+        run: cargo install tauri-cli
+
+      - name: install frontend dependencies
+        run: npm install
+
+      - name: patch version
+        run: |
+          node -e "const fs = require('fs'); const conf = JSON.parse(fs.readFileSync('src-tauri/tauri.conf.json')); conf.version = '${{ needs.release-please.outputs.tag_name }}'.replace(/^v/, ''); fs.writeFileSync('src-tauri/tauri.conf.json', JSON.stringify(conf, null, 2));"
+
+      - name: init Android
+        run: cargo tauri android init
+
+      - name: build Android APK
+        run: cargo tauri android build --apk --target ${{ matrix.target }}
+
+      - name: upload APK to release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.release-please.outputs.tag_name }}
+          files: |
+            src-tauri/gen/android/app/build/outputs/apk/${{ matrix.abi }}/release/*.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+

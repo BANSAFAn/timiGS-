@@ -1,691 +1,388 @@
 <template>
-  <div class="page">
+  <div class="page page-shell">
     <div class="page-container">
       <div class="page-header">
         <h2>{{ $t('settings.title') }}</h2>
+        <p>{{ $t('settings.subtitle') || 'Manage your application preferences' }}</p>
       </div>
 
-      <div v-if="error" class="error-state">
-        <p>{{ error }}</p>
+      <!-- Live Debug (Hidden in Prod usually, but good for now) -->
+      <!-- <div v-if="globalError" class="glass-card" style="border-color: var(--color-danger); margin-bottom: 20px;">
+        <h4 style="color: var(--color-danger)">Debug Info</h4>
+        <pre style="font-size: 10px; overflow: auto; max-height: 100px;">{{ globalError }}</pre>
+      </div> -->
+
+      <!-- Loading State -->
+      <div v-if="!isReady" class="glass-card flex-center" style="min-height: 400px; display: flex; align-items: center; justify-content: center; flex-direction: column;">
+        <div class="spinner"></div>
+        <p class="text-muted" style="margin-top: 20px;">Loading settings...</p>
       </div>
 
-      <div v-else-if="!isReady" class="loading-state">
-        <p>{{ $t('common.loading') || 'Loading...' }}</p>
-      </div>
-
-      <div v-else class="settings-grid">
-        <!-- Appearance Card -->
-        <div class="card">
+      <!-- Settings Content -->
+      <div v-else class="settings-grid animate-enter">
+        
+        <!-- Appearance -->
+        <div class="glass-card">
           <div class="card-header">
-            <h3 class="card-title">{{ $t('settings.appearance') || 'Appearance' }}</h3>
+            <h3 class="card-title">{{ $t('settings.appearance') }}</h3>
           </div>
-          <!-- Language Section -->
-          <div class="settings-section">
-            <div class="settings-section-title">{{ $t('settings.language') }}</div>
-            <div class="settings-row">
-              <div class="settings-info">
-                <h4>{{ $t('settings.language') }}</h4>
-              </div>
-              <div class="select-wrapper">
-                <select class="select" v-model="localSettings.language" @change="updateSettings">
-                  <option value="en">English</option>
-                  <option value="fr">Français</option>
-                  <option value="de">Deutsch</option>
-                  <option value="uk">Українська</option>
-                  <option value="zh">简体中文</option>
-                  <option value="ar">العربية</option>
-                </select>
-              </div>
+          
+          <div class="setting-row">
+            <div class="setting-info">
+              <label>{{ $t('settings.language') }}</label>
+              <p class="setting-desc">Select your preferred language</p>
+            </div>
+            <div class="select-wrapper">
+              <select v-model="localSettings.language" @change="saveSettings" class="input-glass">
+                <option value="en">English</option>
+                <option value="uk">Українська</option>
+                <option value="de">Deutsch</option>
+                <option value="fr">Français</option>
+                <option value="zh-CN">中文 (简体)</option>
+                <option value="ar">العربية</option>
+              </select>
             </div>
           </div>
 
-          <!-- Theme Section -->
-          <div class="settings-section">
-            <div class="settings-section-title">{{ $t('settings.theme') }}</div>
-            <div class="settings-row">
-              <div class="settings-info">
-                <h4>{{ $t('settings.theme') }}</h4>
-              </div>
-              <div class="select-wrapper">
-                <select class="select" v-model="localSettings.theme" @change="updateSettings">
-                  <option value="dark">{{ $t('settings.themeDark') }}</option>
-                  <option value="light">{{ $t('settings.themeLight') }}</option>
-                </select>
-              </div>
+          <div class="setting-row">
+             <div class="setting-info">
+              <label>{{ $t('settings.theme') }}</label>
+              <p class="setting-desc">Toggle dark or light mode</p>
+            </div>
+            <div class="select-wrapper">
+              <select v-model="localSettings.theme" @change="saveSettings" class="input-glass">
+                <option value="dark">{{ $t('settings.dark') }}</option>
+                <option value="light">{{ $t('settings.light') }}</option>
+              </select>
             </div>
           </div>
         </div>
 
-        <!-- Tracking & System Card -->
-        <div class="card">
+        <!-- System -->
+        <div class="glass-card">
           <div class="card-header">
-            <h3 class="card-title">{{ $t('settings.system') || 'System' }}</h3>
+            <h3 class="card-title">{{ $t('settings.system') }}</h3>
           </div>
-          <!-- Tracking Section -->
-          <div class="settings-section">
-            <div class="settings-section-title">{{ $t('settings.tracking') }}</div>
-            <div class="settings-row">
-              <div class="settings-info">
-                 <h4>{{ store.isTracking ? $t('settings.trackingActive') : $t('settings.trackingInactive') }}</h4>
-              </div>
-              <button v-if="store.isTracking" class="btn btn-danger" @click="store.stopTracking">
-                {{ $t('settings.stopTracking') }}
-              </button>
-              <button v-else class="btn btn-success" @click="store.startTracking">
-                {{ $t('settings.startTracking') }}
-              </button>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <div class="setting-label">{{ $t('settings.tracking') }}</div>
+              <div class="setting-desc">{{ isTracking ? 'Active' : 'Paused' }}</div>
             </div>
-            <div class="settings-row">
-              <div class="settings-info">
-                <h4>{{ $t('settings.autostart') }}</h4>
-              </div>
-              <label class="toggle">
-                <input type="checkbox" v-model="localSettings.autostart" @change="updateSettings" />
-                <span class="toggle-slider"></span>
-              </label>
+            <button 
+              class="btn" 
+              :class="isTracking ? 'btn-danger' : 'btn-success'"
+              @click="toggleTracking"
+            >
+              {{ isTracking ? $t('settings.stopTracking') : $t('settings.startTracking') }}
+            </button>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <div class="setting-label">{{ $t('settings.autostart') }}</div>
+              <div class="setting-desc">Launch TimiGS on system startup</div>
             </div>
-            <div class="settings-row">
-              <div class="settings-info">
-                <h4>{{ $t('settings.minimizeToTray') }}</h4>
-              </div>
-              <label class="toggle">
-                <input type="checkbox" v-model="localSettings.minimize_to_tray" @change="updateSettings" />
-                <span class="toggle-slider"></span>
-              </label>
+            <div class="toggle-switch" :class="{ checked: localSettings.autostart }" @click="toggleAutostart">
+              <div class="toggle-thumb"></div>
+            </div>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <div class="setting-label">{{ $t('settings.minimizeToTray') }}</div>
+              <div class="setting-desc">Keep running in background</div>
+            </div>
+            <div class="toggle-switch" :class="{ checked: localSettings.minimize_to_tray }" @click="toggleMinimize">
+              <div class="toggle-thumb"></div>
+            </div>
+          </div>
+          
+          <div class="setting-row">
+            <div class="setting-info">
+              <div class="setting-label">{{ $t('settings.discordRpc') || 'Discord Rich Presence' }}</div>
+              <div class="setting-desc">{{ $t('settings.discordRpcDesc') || 'Show activity on Discord profile' }}</div>
+            </div>
+            <div class="toggle-switch" :class="{ checked: localSettings.discord_rpc }" @click="toggleDiscord">
+              <div class="toggle-thumb"></div>
             </div>
           </div>
         </div>
 
-        <!-- Data Card -->
-        <div class="card">
+        <!-- Cloud & Data -->
+        <div class="glass-card">
           <div class="card-header">
-            <h3 class="card-title">{{ $t('settings.dataManagement') }}</h3>
+            <h3 class="card-title">Cloud & Data</h3>
           </div>
-          <!-- Data Sync Section -->
-          <div class="settings-section">
-            <div class="settings-section-title">{{ $t('settings.dataSync') || 'Data Sync' }}</div>
-            
-            <!-- Google Drive Sync -->
-            <div class="settings-row">
-              <div class="settings-info">
-                <h4>{{ $t('settings.syncGoogle') || 'Google Account Sync' }}</h4>
-                <p>{{ $t('settings.syncGoogleDesc') || 'Sync your activity data to Google Drive' }}</p>
-              </div>
-              <div v-if="!isGoogleConnected" class="export-section">
-                <button class="btn-google" @click="connectGoogle">
-                  <svg viewBox="0 0 24 24" width="18" height="18">
-                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                  </svg>
-                  {{ $t('settings.connectGoogle') || 'Connect Google' }}
-                </button>
-              </div>
-              <div v-else class="sync-actions">
-                 <div class="sync-status synced">
-                   <span class="sync-indicator synced"></span>
-                   {{ $t('settings.connected') || 'Connected' }}
-                 </div>
-                 <div class="sync-buttons">
-                    <button class="btn-outline small" @click="startBackup" title="Upload to Drive">
-                      ↑ Backup
-                    </button>
-                    <button class="btn-outline small" @click="startRestore" title="Download from Drive">
-                      ↓ Restore
-                    </button>
-                 </div>
-              </div>
-            </div>
 
-            <!-- GitHub Connection -->
-            <div class="settings-row">
-              <div class="settings-info">
-                <h4>{{ $t('github.connection') || 'GitHub Connection' }}</h4>
-                <p>{{ $t('github.connectDesc') || 'Connect your GitHub account to track your coding activity' }}</p>
-              </div>
-              <div v-if="!isGitHubConnected" class="github-connect">
-                <input 
-                  type="password" 
-                  v-model="githubToken" 
-                  :placeholder="$t('github.tokenPlaceholder') || 'Enter your Personal Access Token'"
-                  class="input token-input"
-                />
-                <button class="btn-github-connect" @click="connectGitHub">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
-                    <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
-                  </svg>
-                  {{ $t('github.connect') || 'Connect GitHub' }}
-                </button>
-                <a class="token-link" href="https://github.com/settings/tokens" target="_blank">{{ $t('github.getToken') || 'Get your token here' }} →</a>
-              </div>
-              <div v-else class="sync-actions">
-                <div class="sync-status synced">
-                  <span class="sync-indicator synced"></span>
-                  {{ $t('settings.connected') || 'Connected' }}
-                </div>
-                <button class="btn-outline small" @click="disconnectGitHub">{{ $t('github.disconnect') || 'Disconnect' }}</button>
-              </div>
+          <!-- Google Drive -->
+          <div class="setting-row">
+            <div class="setting-info">
+              <div class="setting-label">Google Drive</div>
+              <div class="setting-desc" v-if="googleUser">Connected as {{ googleUser.name }}</div>
+              <div class="setting-desc" v-else>Sync your data to the cloud</div>
             </div>
+            <button class="btn btn-secondary" @click="handleGoogleAuth">
+              {{ googleUser ? 'Sync Now' : 'Connect' }}
+            </button>
+          </div>
 
-            <!-- Local Storage -->
-            <div class="settings-row">
-              <div class="settings-info">
-                <h4>{{ $t('settings.localStorage') || 'Local Storage' }}</h4>
-                <p>{{ $t('settings.localStorageDesc') || 'Export or import your data locally' }}</p>
-              </div>
-              <div class="export-section">
-                <button class="btn-outline" @click="exportDataJSON">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                  </svg>
-                  JSON
-                </button>
-                <button class="btn-outline" @click="exportDataCSV">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                  </svg>
-                  CSV
-                </button>
-                <button class="btn-outline" @click="importData">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                  </svg>
-                  {{ $t('settings.import') || 'Import' }}
-                </button>
-              </div>
+          <!-- GitHub -->
+           <div class="setting-row">
+            <div class="setting-info">
+               <div class="setting-label">GitHub</div>
+               <div class="setting-desc">{{ isGitHubConnected ? 'Connected' : 'Track coding activity' }}</div>
             </div>
+             <button class="btn btn-secondary" @click="openGitHubLogin">
+              {{ isGitHubConnected ? 'Reconnect' : 'Connect' }}
+            </button>
+          </div>
+          
+          <div class="divider"></div>
 
-            <!-- Email Reports -->
-            <div class="settings-row">
-              <div class="settings-info">
-                <h4>{{ $t('settings.emailReports') || 'Email Reports' }}</h4>
-                <p>{{ $t('settings.emailReportsDesc') || 'Send weekly activity report to your email' }}</p>
-              </div>
-              <div class="email-report-section">
-                <input 
-                  type="email" 
-                  v-model="reportEmail" 
-                  :placeholder="$t('settings.emailPlaceholder') || 'your@email.com'"
-                  class="input email-input"
-                />
-                <button class="btn-send-report" @click="sendEmailReport">
-                  📧 {{ $t('settings.sendReport') || 'Send Report' }}
-                </button>
-              </div>
-            </div>
+          <div class="data-actions">
+            <button class="btn btn-secondary" @click="exportData">{{ $t('settings.exportData') }}</button>
+            <button class="btn btn-secondary" @click="importData">{{ $t('settings.importData') }}</button>
           </div>
         </div>
 
-        <!-- About Card -->
-        <div class="card">
-          <div class="card-header">
-            <h3 class="card-title">{{ $t('settings.about') }}</h3>
+        <!-- Updates -->
+        <div class="glass-card">
+           <div class="card-header">
+            <h3 class="card-title">{{ $t('settings.updates') }}</h3>
+            <span class="text-muted sm">v{{ appVersion }}</span>
           </div>
-          <div class="settings-section">
-            <div class="settings-row">
-              <div class="settings-info">
-                <h4>{{ $t('settings.version') }}</h4>
-                <p>TimiGS Application</p>
-              </div>
-              <span class="version-badge">{{ latestVersion }}</span>
-            </div>
-            <div class="settings-row">
-              <div class="settings-info">
-                <h4>{{ $t('settings.checkUpdates') || 'Check for Updates' }}</h4>
-                <p>{{ updateStatus }}</p>
-              </div>
-              <button class="btn-update" @click="checkForUpdates" :disabled="isCheckingUpdate">
-                <span v-if="isCheckingUpdate">⏳</span>
-                <span v-else>🔄</span>
-                {{ isCheckingUpdate ? ($t('settings.checking') || 'Checking...') : ($t('settings.checkNow') || 'Check Now') }}
-              </button>
-            </div>
-          </div>
+          <p class="text-muted sm" style="margin-bottom: 16px;">Check for the latest features and improvements.</p>
+          <button class="btn btn-primary full-width" @click="checkForUpdates">
+            {{ $t('settings.checkForUpdates') }}
+          </button>
         </div>
-      </div>
 
-      <div v-if="showToast" class="toast success">
-        <span>✓</span>
-        {{ toastMessage }}
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue';
+import { ref, onMounted, reactive, onErrorCaptured } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useActivityStore, type Settings } from '../stores/activity';
-import { setLanguage } from '../i18n';
 import { invoke } from '@tauri-apps/api/core';
+import { useActivityStore } from '../stores/activity';
 import { check } from '@tauri-apps/plugin-updater';
 import { relaunch } from '@tauri-apps/plugin-process';
 
-
-const { t } = useI18n();
+const { locale } = useI18n();
 const store = useActivityStore();
-const showToast = ref(false);
-const toastMessage = ref('');
-const isGoogleConnected = ref(false);
-const reportEmail = ref('');
 
-const localSettings = reactive<Settings>({
+// State
+const isReady = ref(false);
+const globalError = ref('');
+const isTracking = ref(false);
+const appVersion = ref('1.1.0'); // TODO: Fetch real version
+const googleUser = ref<any>(null);
+const isGitHubConnected = ref(false);
+
+const localSettings = reactive({
   language: 'en',
   theme: 'dark',
   autostart: true,
-  minimize_to_tray: true
+  minimize_to_tray: true,
+  discord_rpc: true
 });
 
-// GitHub connection
-const githubToken = ref('');
-const isGitHubConnected = ref(false);
+// Error Boundary
+onErrorCaptured((err) => {
+  console.error("Vue Error Captured:", err);
+  globalError.value = String(err);
+  return false; // propagate
+});
 
-// Updater
-const isCheckingUpdate = ref(false);
-const updateStatus = ref('Click to check for updates');
-
-async function checkForUpdates() {
-  isCheckingUpdate.value = true;
-  updateStatus.value = 'Checking...';
-  
+// Helper for safe invokes
+async function safeInvoke(cmd: string, args: any = {}) {
   try {
-    const update = await check();
-    if (update) {
-      updateStatus.value = `Update available: v${update.version}`;
-      showNotification(`New version ${update.version} available! Downloading...`);
-      await update.downloadAndInstall();
-      showNotification('Update installed! Restarting...');
-      await relaunch();
-    } else {
-      updateStatus.value = 'You are on the latest version';
-      showNotification('No updates available.');
-    }
+    return await invoke(cmd, args);
   } catch (e) {
-    console.error('Update check failed:', e);
-    updateStatus.value = 'Failed to check for updates';
-    showNotification('Update check failed');
-  } finally {
-    isCheckingUpdate.value = false;
+    console.warn(`Cmd ${cmd} failed (non-critical):`, e);
+    return null;
   }
 }
 
-async function connectGitHub() {
-  if (!githubToken.value) return;
-  
+async function initSettings() {
+  globalError.value = '';
   try {
-    const response = await fetch('https://api.github.com/user', {
-      headers: { Authorization: `Bearer ${githubToken.value}` }
-    });
+    // 1. Fetch backend settings
+    const settings: any = await safeInvoke('get_settings');
+    if (settings && typeof settings === 'object') {
+      Object.assign(localSettings, settings);
+      
+      // Sync frontend state
+      locale.value = settings.language || 'en';
+      document.documentElement.setAttribute('data-theme', settings.theme || 'dark');
+    }
     
-    if (response.ok) {
-      localStorage.setItem('github_token', githubToken.value);
-      isGitHubConnected.value = true;
-      // Trigger storage event for App.vue to update nav
-      window.dispatchEvent(new Event('storage'));
-      showNotification('GitHub connected!');
-    } else {
-      showNotification('Invalid token');
-    }
-  } catch (e) {
-    showNotification('Connection failed');
+    // 2. Fetch system state
+    await store.fetchTrackingStatus().catch(() => {});
+    isTracking.value = store.isTracking;
+    
+    // 3. Status checks
+    checkGoogleUser();
+    checkGitHubStatus();
+
+  } catch (e: any) {
+    console.error("Init Settings Error:", e);
+    globalError.value = e.toString();
+  } finally {
+    // ALWAYS render UI
+    isReady.value = true;
   }
 }
 
-function disconnectGitHub() {
-  localStorage.removeItem('github_token');
-  githubToken.value = '';
-  isGitHubConnected.value = false;
-  window.dispatchEvent(new Event('storage'));
-  showNotification('GitHub disconnected');
+// Actions
+async function saveSettings() {
+  locale.value = localSettings.language;
+  document.documentElement.setAttribute('data-theme', localSettings.theme);
+  await safeInvoke('save_settings', { settings: localSettings });
+  await store.fetchSettings(); 
 }
 
+function toggleTracking() {
+  if (isTracking.value) {
+    safeInvoke('stop_tracking');
+    isTracking.value = false;
+  } else {
+    safeInvoke('start_tracking');
+    isTracking.value = true;
+  }
+}
+
+function toggleAutostart() {
+  localSettings.autostart = !localSettings.autostart;
+  saveSettings();
+}
+
+function toggleMinimize() {
+  localSettings.minimize_to_tray = !localSettings.minimize_to_tray;
+  saveSettings();
+}
+
+function toggleDiscord() {
+  localSettings.discord_rpc = !localSettings.discord_rpc;
+  saveSettings();
+}
+
+// Google Drive
+async function checkGoogleUser() {
+  const user = await safeInvoke('get_google_user');
+  if (user) googleUser.value = user;
+}
+
+async function handleGoogleAuth() {
+  await safeInvoke('login_google');
+  setTimeout(checkGoogleUser, 2000);
+}
+
+// GitHub
 function checkGitHubStatus() {
   isGitHubConnected.value = !!localStorage.getItem('github_token');
 }
 
-function showNotification(message: string) {
-  toastMessage.value = message;
-  showToast.value = true;
-  setTimeout(() => showToast.value = false, 2000);
+function openGitHubLogin() {
+  window.location.href = `https://github.com/login/oauth/authorize?client_id=Ov23liz6B42y1Xal3O8g&scope=repo`;
 }
 
-async function updateSettings() {
-  setLanguage(localSettings.language);
-  document.documentElement.setAttribute('data-theme', localSettings.theme);
-  await store.saveSettings({ ...localSettings });
-  showNotification(t('settings.saved'));
-}
-
-async function connectGoogle() {
+async function checkForUpdates() {
   try {
-    showNotification('Starting Google login...');
-    const result = await invoke('login_google');
-    showNotification(result as string);
-    isGoogleConnected.value = true;
-    await checkGoogleUser();
-  } catch (e) {
-    showNotification(`Login failed: ${e}`);
-  }
-}
-
-async function checkGoogleUser() {
-  try {
-      const user = await invoke<string | null>('get_google_user');
-      if (user) {
-        isGoogleConnected.value = true;
+    const update = await check();
+    if (update?.available) {
+      const yes = confirm(`Update available: ${update.version}\\nDownload now?`);
+      if (yes) {
+        await update.downloadAndInstall();
+        await relaunch();
       }
-  } catch(e) {
-      console.error(e);
-  }
-}
-
-async function startBackup() {
-  try {
-    showNotification('Backing up data...');
-    const result = await invoke('backup_data');
-    showNotification(result as string);
-  } catch (e) {
-    showNotification(`Backup failed: ${e}`);
-  }
-}
-
-async function startRestore() {
-  try {
-    showNotification('Restoring data...');
-    const result = await invoke('restore_data');
-    showNotification(result as string);
-  } catch (e) {
-    showNotification(`Restore failed: ${e}`);
-  }
-}
-
-function exportDataJSON() {
-  const data = {
-    sessions: store.todaySessions,
-    summary: store.todaySummary,
-    exportedAt: new Date().toISOString()
-  };
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-  downloadFile(blob, 'timigs-data.json');
-  showNotification('Data exported as JSON!');
-}
-
-function exportDataCSV() {
-  const headers = ['App Name', 'Window Title', 'Start Time', 'End Time', 'Duration (seconds)'];
-  const rows = store.todaySessions.map(s => [
-    s.app_name,
-    s.window_title.replace(/,/g, ';'),
-    s.start_time,
-    s.end_time || '',
-    s.duration_seconds
-  ]);
-  const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
-  const blob = new Blob([csv], { type: 'text/csv' });
-  downloadFile(blob, 'timigs-data.csv');
-  showNotification('Data exported as CSV!');
-}
-
-function downloadFile(blob: Blob, filename: string) {
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
-function importData() {
-  const input = document.createElement('input');
-  input.type = 'file';
-  input.accept = '.json';
-  input.onchange = async (e) => {
-    const file = (e.target as HTMLInputElement).files?.[0];
-    if (file) {
-      const text = await file.text();
-      try {
-        const data = JSON.parse(text);
-        showNotification('Data imported successfully!');
-        console.log('Imported data:', data);
-      } catch {
-        showNotification('Failed to import data');
-      }
+    } else {
+      alert('You are on the latest version.');
     }
-  };
-  input.click();
-}
-
-const latestVersion = ref('1.1.0');
-
-async function fetchLatestVersion() {
-  try {
-    const response = await fetch('https://api.github.com/repos/baneronetwo/timiGS-/releases/latest');
-    if (response.ok) {
-      const data = await response.json();
-      latestVersion.value = data.tag_name || '1.1.0';
-    }
-  } catch (e) {
-    console.error('Failed to fetch version:', e);
+  } catch (error) {
+    alert(`Update check failed: ${error}`);
   }
 }
 
-async function sendEmailReport() {
-  if (!reportEmail.value || !reportEmail.value.includes('@')) {
-    showNotification('Please enter a valid email address');
-    return;
-  }
-  
-  // Fetch latest data
-  await store.fetchTodayData();
-  await store.fetchWeeklyStats();
-  
-  const report = store.generateWeeklyReport();
-  const subject = encodeURIComponent('TimiGS Weekly Activity Report');
-  const body = encodeURIComponent(report);
-  
-  // Open mailto link
-  window.open(`mailto:${reportEmail.value}?subject=${subject}&body=${body}`, '_blank');
-  showNotification('Email client opened with report!');
-}
+const exportData = () => safeInvoke('backup_data').then(() => alert('Exported!'));
+const importData = () => safeInvoke('restore_data').then(() => alert('Imported!'));
 
-const isReady = ref(false);
-const error = ref('');
-
-onMounted(async () => {
-  try {
-    // Parallelize independent fetches for speed
-    await Promise.allSettled([
-      store.fetchSettings().then(() => Object.assign(localSettings, store.settings)),
-      store.fetchTrackingStatus(),
-      checkGoogleUser(),
-    ]);
-    
-    // Non-blocking calls
-    checkGitHubStatus();
-    fetchLatestVersion();
-    
-    isReady.value = true;
-  } catch (e) {
-    console.error('Settings initialization failed:', e);
-    error.value = 'Failed to load settings. Please restart the app.';
-    // Still show content even if some fetches fail
-    isReady.value = true;
-  }
+onMounted(() => {
+  // Delay slightly to allow transition
+  setTimeout(initSettings, 100);
 });
 </script>
 
 <style scoped>
-.loading-state, .error-state {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 400px;
-  text-align: center;
-}
-
-.error-state {
-  color: var(--color-danger);
-}
-
-.version-badge {
-  background: var(--bg-tertiary);
-  padding: 6px 12px;
-  border-radius: var(--radius-sm);
-  font-size: 0.875rem;
-  color: var(--text-muted);
-}
-
-.sync-actions {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    flex-wrap: wrap;
-}
-
-.sync-buttons {
-    display: flex;
-    gap: 8px;
-}
-
-.btn-outline.small {
-    padding: 6px 12px;
-    font-size: 0.8rem;
-    height: auto;
+.page-shell {
+  padding-bottom: 80px; /* Space for mobile nav */
 }
 
 .settings-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 24px;
 }
 
-@media (max-width: 800px) {
-  .settings-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-.email-report-section {
+.setting-row {
   display: flex;
-  gap: 12px;
   align-items: center;
+  justify-content: space-between;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border-color);
 }
 
-.email-input {
-  width: 220px;
-  padding: 10px 14px;
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  color: var(--text-primary);
-  font-size: 0.875rem;
-  transition: all var(--transition-fast);
+.setting-row:last-child {
+  border-bottom: none;
 }
 
-.email-input:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+.setting-label {
+  font-weight: 600;
+  margin-bottom: 4px;
 }
 
-.email-input::placeholder {
+.setting-desc {
+  font-size: 0.85rem;
   color: var(--text-muted);
 }
 
-.btn-send-report {
-  padding: 10px 20px;
-  background: linear-gradient(135deg, var(--color-primary), var(--color-accent-1));
-  border: none;
-  border-radius: var(--radius-md);
-  color: white;
-  font-weight: 600;
-  font-size: 0.875rem;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.divider {
+  height: 1px;
+  background: var(--border-color);
+  margin: 20px 0;
 }
 
-.btn-send-report:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
-}
-
-.github-connect {
+.data-actions {
   display: flex;
   gap: 12px;
-  align-items: center;
-  flex-wrap: wrap;
 }
 
-.token-input {
-  width: 250px;
-  padding: 10px 14px;
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  color: var(--text-primary);
-  transition: all var(--transition-fast);
+.full-width {
+  width: 100%;
 }
 
-.token-input:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid var(--bg-hover);
+  border-top: 4px solid var(--color-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
 }
 
-.btn-github-connect {
-  padding: 10px 20px;
-  background: #24292e;
-  border: none;
-  border-radius: var(--radius-md);
-  color: white;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  display: flex;
-  align-items: center;
-  gap: 8px;
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
-.btn-github-connect:hover {
-  background: #1a1e22;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+.text-muted {
+  color: var(--text-muted);
 }
 
-.token-link {
-  color: var(--color-primary);
-  text-decoration: none;
-  font-size: 0.875rem;
-}
-
-.token-link:hover {
-  text-decoration: underline;
-}
-
-.btn-update {
-  padding: 10px 20px;
-  background: linear-gradient(135deg, #10b981, #059669);
-  border: none;
-  border-radius: var(--radius-md);
-  color: white;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.btn-update:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
-}
-
-.btn-update:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
+.sm {
+  font-size: 0.8rem;
 }
 </style>

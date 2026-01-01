@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.18.0](https://github.com/BANSAFAn/timiGS-/compare/v1.17.1...v1.18.0) (2025-12-30)
+
+
+### Features
+
+* add Android build support and fix Windows CI ([5b07565](https://github.com/BANSAFAn/timiGS-/commit/5b0756512fe9993adcaca9dd18986aa76b8b8106))
+* **ci:** add security audit and lint checks to PR workflow ([d0cc889](https://github.com/BANSAFAn/timiGS-/commit/d0cc889881a1b519654635ff5fa7f2d6bef1a0d9))
+
+## [1.17.1](https://github.com/BANSAFAn/timiGS-/compare/v1.17.0...v1.17.1) (2025-12-30)
+
+
+### Bug Fixes
+
+* **app:** enable autostart plugin and add portable ZIP bundle ([7361d43](https://github.com/BANSAFAn/timiGS-/commit/7361d43084ac0eab153e822b3732a5f7189b5f98))
+
 ## [1.17.0](https://github.com/BANSAFAn/timiGS-/compare/v1.16.0...v1.17.0) (2025-12-22)
 
 
