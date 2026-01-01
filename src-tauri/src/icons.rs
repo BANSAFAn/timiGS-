@@ -1,6 +1,11 @@
+
+#[cfg(target_os = "windows")]
 use base64::{engine::general_purpose, Engine as _};
+#[cfg(target_os = "windows")]
 use image::{ImageBuffer, Rgba};
+#[cfg(target_os = "windows")]
 use std::ffi::OsStr;
+#[cfg(target_os = "windows")]
 use std::os::windows::ffi::OsStrExt;
 
 #[cfg(target_os = "windows")]
@@ -8,7 +13,7 @@ use windows::Win32::Foundation::HWND;
 #[cfg(target_os = "windows")]
 use windows::Win32::Graphics::Gdi::{
     CreateCompatibleDC, DeleteDC, DeleteObject, GetDC, GetObjectW, ReleaseDC, SelectObject, BITMAP,
-    HBITMAP, HBRUSH, HGDIOBJ,
+    HBRUSH, HGDIOBJ,
 };
 #[cfg(target_os = "windows")]
 use windows::Win32::UI::Shell::{SHGetFileInfoW, SHFILEINFOW, SHGFI_ICON, SHGFI_LARGEICON};
@@ -160,8 +165,8 @@ unsafe fn hicon_to_base64(hicon: HICON) -> Option<String> {
 
     // Cleanup GDI
     SelectObject(hdc_mem, hold);
-    DeleteObject(hbitmap);
-    DeleteDC(hdc_mem);
+    let _ = DeleteObject(hbitmap);
+    let _ = DeleteDC(hdc_mem);
     ReleaseDC(HWND(std::ptr::null_mut()), hdc_screen);
 
     // Convert pixels (BGRA) to RgbaImage

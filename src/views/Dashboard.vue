@@ -1,199 +1,147 @@
 <template>
-  <div class="page">
+  <div class="page page-shell">
     <div class="page-container">
       <div class="page-header">
         <h2>{{ $t("dashboard.title") }}</h2>
+        <p class="text-muted">{{ currentDate }}</p>
       </div>
 
       <!-- Active Now Card -->
-      <div class="active-now-card">
+      <div class="glass-card active-now-card animate-enter">
+        <div class="active-now-bg"></div>
         <div class="active-now-content">
-          <div class="active-app-display">
-            <div
-              class="active-app-icon"
-              :style="{
-                background:
-                  currentActivity && !appIcons[currentActivity.app_name]
-                    ? getAppGradient(currentActivity.app_name)
-                    : 'transparent',
-              }"
-            >
-              <img
-                v-if="currentActivity && appIcons[currentActivity.app_name]"
-                :src="appIcons[currentActivity.app_name]"
-                class="app-icon-img"
-              />
-              <span v-else>
-                {{
-                  currentActivity
-                    ? currentActivity.app_name.charAt(0).toUpperCase()
-                    : "?"
-                }}
-              </span>
-            </div>
-            <div>
-              <div class="active-label">{{ $t("dashboard.activeNow") }}</div>
-              <div v-if="currentActivity" class="active-app-name">
-                {{ currentActivity.app_name }}
-              </div>
-              <div v-else class="active-app-name idle">
-                {{ $t("dashboard.idle") }}
-              </div>
-              <div v-if="currentActivity" class="active-window-title">
-                {{ currentActivity.window_title }}
-              </div>
-            </div>
+          <div class="active-icon-wrapper">
+             <img 
+               v-if="currentActivity?.app_name && appIcons[currentActivity.app_name]" 
+               :src="appIcons[currentActivity.app_name]" 
+               class="app-icon-img"
+             />
+             <div v-else class="app-icon-placeholder">
+               {{ currentActivity?.app_name?.charAt(0) || '?' }}
+             </div>
           </div>
-          <div :class="['active-indicator', { idle: !currentActivity }]"></div>
+          <div class="active-details">
+            <span class="status-badge">
+              <span class="status-dot"></span>
+              {{ $t("dashboard.activeNow") }}
+            </span>
+            <h2 class="active-app-title">
+              {{ currentActivity ? currentActivity.app_name : $t("dashboard.idle") }}
+            </h2>
+            <p class="active-window-title" v-if="currentActivity">
+              {{ currentActivity.window_title }}
+            </p>
+          </div>
         </div>
       </div>
 
       <!-- Stats Grid -->
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-value">
-            {{ formatDuration(store.totalTimeToday) }}
+      <div class="stats-grid animate-enter" style="animation-delay: 0.1s">
+        <!-- Total Time -->
+        <div class="glass-card stat-card">
+          <div class="stat-icon primary">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
           </div>
-          <div class="stat-label">{{ $t("dashboard.totalTime") }}</div>
+          <div class="stat-info">
+            <span class="stat-label">{{ $t("dashboard.totalTime") }}</span>
+            <div class="stat-value">{{ formatDuration(store.totalTimeToday) }}</div>
+          </div>
         </div>
-        <div class="stat-card accent-1">
-          <div class="stat-value">{{ store.appCount }}</div>
-          <div class="stat-label">{{ $t("dashboard.appsUsed") }}</div>
+
+        <!-- Apps Used -->
+        <div class="glass-card stat-card">
+          <div class="stat-icon accent">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect><rect x="9" y="9" width="6" height="6"></rect><line x1="9" y1="1" x2="9" y2="4"></line><line x1="15" y1="1" x2="15" y2="4"></line><line x1="9" y1="20" x2="9" y2="23"></line><line x1="15" y1="20" x2="15" y2="23"></line><line x1="20" y1="9" x2="23" y2="9"></line><line x1="20" y1="14" x2="23" y2="14"></line><line x1="1" y1="9" x2="4" y2="9"></line><line x1="1" y1="14" x2="4" y2="14"></line></svg>
+          </div>
+          <div class="stat-info">
+            <span class="stat-label">{{ $t("dashboard.appsUsed") }}</span>
+            <div class="stat-value">{{ store.appCount }}</div>
+          </div>
         </div>
-        <div class="stat-card accent-2">
-          <div class="stat-value">{{ store.sessionCount }}</div>
-          <div class="stat-label">{{ $t("dashboard.sessions") }}</div>
+
+        <!-- Sessions -->
+        <div class="glass-card stat-card">
+          <div class="stat-icon success">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+          </div>
+          <div class="stat-info">
+            <span class="stat-label">{{ $t("dashboard.sessions") }}</span>
+            <div class="stat-value">{{ store.sessionCount }}</div>
+          </div>
         </div>
       </div>
 
-      <!-- Today's Summary -->
-      <div class="grid-2">
-        <div class="card">
+      <!-- Main Content Grid -->
+      <div class="dashboard-grid animate-enter" style="animation-delay: 0.2s">
+        
+        <!-- Top Apps List -->
+        <div class="glass-card">
           <div class="card-header">
             <h3 class="card-title">{{ $t("dashboard.topApps") }}</h3>
           </div>
-          <div v-if="store.topApps.length > 0" class="app-list">
-            <div
-              v-for="app in store.topApps"
-              :key="app.exe_path"
-              class="app-item-enhanced"
-            >
-              <div
-                class="app-icon"
-                :style="{
-                  background: !appIcons[app.app_name]
-                    ? getAppGradient(app.app_name)
-                    : 'transparent',
-                }"
-              >
-                <img
-                  v-if="appIcons[app.app_name]"
-                  :src="appIcons[app.app_name]"
-                  class="app-icon-img"
-                />
-                <span v-else>{{ app.app_name.charAt(0).toUpperCase() }}</span>
+
+          <div class="app-list" v-if="store.topApps.length > 0">
+            <div v-for="(app, index) in store.topApps.slice(0, 5)" :key="app.app_name" class="app-row">
+              <div class="app-rank">{{ index + 1 }}</div>
+              <div class="app-icon-small">
+                 <img v-if="appIcons[app.app_name]" :src="appIcons[app.app_name]" />
+                 <span v-else>{{ app.app_name.charAt(0) }}</span>
               </div>
-              <div class="app-info">
-                <div class="app-name">{{ app.app_name }}</div>
-                <div class="app-time">
-                  {{ formatDuration(app.total_seconds) }} ·
-                  {{ app.session_count }}
-                  {{ $t("dashboard.sessions").toLowerCase() }}
+              <div class="app-details">
+                <span class="app-name">{{ app.app_name }}</span>
+                <span class="app-sessions">{{ app.session_count }} sessions</span>
+              </div>
+              <div class="app-meta">
+                <span class="app-duration">{{ formatDuration(app.total_seconds) }}</span>
+                <div class="progress-bg">
+                  <div class="progress-fill" :style="{ width: getProgressWidth(app.total_seconds) + '%' }"></div>
                 </div>
-              </div>
-              <div class="app-progress">
-                <div
-                  class="app-progress-bar"
-                  :style="{
-                    width: getProgressWidth(app.total_seconds) + '%',
-                    background: getAppGradient(app.app_name),
-                  }"
-                ></div>
               </div>
             </div>
           </div>
           <div v-else class="empty-state">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-              />
-            </svg>
-            <p>{{ $t("dashboard.noData") }}</p>
+            <p>No activity recorded today.</p>
           </div>
         </div>
 
-        <div class="card">
+        <!-- Charts -->
+        <div class="glass-card">
           <div class="card-header">
-            <h3 class="card-title">{{ $t("dashboard.todaySummary") }}</h3>
-            <div class="chart-type-switcher">
-              <button
-                v-for="type in chartTypes"
-                :key="type.id"
-                :class="[
-                  'chart-type-btn',
-                  { active: selectedChartType === type.id },
-                ]"
-                @click="selectedChartType = type.id"
-              >
-                <span v-html="type.icon"></span>
-                {{ type.label }}
-              </button>
-            </div>
+             <h3 class="card-title">{{ $t("dashboard.todaySummary") }}</h3>
+             <div class="chart-toggles">
+               <button 
+                 @click="selectedChartType = 'doughnut'" 
+                 :class="{ active: selectedChartType === 'doughnut' }"
+                 class="icon-btn"
+               >
+                 ◕
+               </button>
+               <button 
+                  @click="selectedChartType = 'bar'" 
+                  :class="{ active: selectedChartType === 'bar' }"
+                  class="icon-btn"
+               >
+                 llı
+               </button>
+             </div>
           </div>
-          <div class="chart-container">
-            <Doughnut
-              v-if="
-                chartData.labels.length > 0 && selectedChartType === 'doughnut'
-              "
+          <div class="chart-wrapper">
+             <Doughnut
+              v-if="selectedChartType === 'doughnut' && chartData.labels.length"
               :data="chartData"
               :options="doughnutOptions"
             />
-            <Pie
-              v-else-if="
-                chartData.labels.length > 0 && selectedChartType === 'pie'
-              "
-              :data="chartData"
-              :options="pieOptions"
-            />
             <Bar
-              v-else-if="
-                chartData.labels.length > 0 && selectedChartType === 'bar'
-              "
+              v-else-if="selectedChartType === 'bar' && chartData.labels.length"
               :data="barChartData"
               :options="barOptions"
             />
-            <div v-else class="empty-state">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"
-                />
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"
-                />
-              </svg>
-              <p>{{ $t("dashboard.noData") }}</p>
-            </div>
+             <div v-else class="empty-chart">
+               <p>Not enough data to graph.</p>
+             </div>
           </div>
         </div>
+
       </div>
     </div>
   </div>
@@ -202,9 +150,8 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from "vue";
 import { invoke } from "@tauri-apps/api/core";
-
 import { useActivityStore } from "../stores/activity";
-import { Doughnut, Pie, Bar } from "vue-chartjs";
+import { Doughnut, Bar } from "vue-chartjs";
 import {
   Chart as ChartJS,
   ArcElement,
@@ -215,172 +162,91 @@ import {
   BarElement,
 } from "chart.js";
 
-ChartJS.register(
-  ArcElement,
-  Tooltip,
-  Legend,
-  CategoryScale,
-  LinearScale,
-  BarElement
-);
+ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement);
 
 const store = useActivityStore();
-const currentActivity = ref(store.currentActivity);
+const currentActivity = computed(() => store.currentActivity);
 const selectedChartType = ref("doughnut");
 const appIcons = ref<Record<string, string>>({});
+const currentDate = new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
 
 let intervalId: number | null = null;
 
-const chartTypes = [
-  { id: "doughnut", label: "Donut", icon: "○" },
-  { id: "pie", label: "Pie", icon: "◐" },
-  { id: "bar", label: "Bar", icon: "▮" },
-];
-
-const appGradients: Record<string, string> = {};
-const gradientPalette = [
-  "linear-gradient(135deg, #6366f1, #4f46e5)",
-  "linear-gradient(135deg, #06b6d4, #0891b2)",
-  "linear-gradient(135deg, #8b5cf6, #7c3aed)",
-  "linear-gradient(135deg, #ec4899, #db2777)",
-  "linear-gradient(135deg, #f59e0b, #d97706)",
-  "linear-gradient(135deg, #10b981, #059669)",
-  "linear-gradient(135deg, #f97316, #ea580c)",
-];
-let gradientIndex = 0;
-
-function getAppGradient(appName: string): string {
-  if (!appGradients[appName]) {
-    appGradients[appName] =
-      gradientPalette[gradientIndex % gradientPalette.length];
-    gradientIndex++;
-  }
-  return appGradients[appName];
-}
-
 const chartColors = [
-  "#6366f1",
-  "#06b6d4",
-  "#8b5cf6",
-  "#ec4899",
-  "#f59e0b",
-  "#10b981",
-  "#f97316",
+  "#6366f1", "#06b6d4", "#8b5cf6", "#ec4899", "#f59e0b", "#10b981", "#f97316"
 ];
 
 function formatDuration(seconds: number): string {
   if (seconds < 60) return `${seconds}s`;
   if (seconds < 3600) return `${Math.floor(seconds / 60)}m`;
-  const hours = Math.floor(seconds / 3600);
-  const mins = Math.floor((seconds % 3600) / 60);
-  return `${hours}h ${mins}m`;
+  return `${Math.floor(seconds / 3600)}h ${Math.floor((seconds % 3600) / 60)}m`;
 }
 
 function getProgressWidth(seconds: number): number {
   if (store.totalTimeToday === 0) return 0;
-  return Math.round((seconds / store.totalTimeToday) * 100);
+  return Math.min(100, Math.round((seconds / store.totalTimeToday) * 100));
 }
 
+// Chart Data
 const chartData = computed(() => ({
-  labels: store.topApps.map((app) => app.app_name),
-  datasets: [
-    {
-      data: store.topApps.map((app) => app.total_seconds),
-      backgroundColor: chartColors.slice(0, store.topApps.length),
-      borderWidth: 0,
-      hoverOffset: 10,
-    },
-  ],
+  labels: store.topApps.slice(0, 5).map(app => app.app_name),
+  datasets: [{
+    data: store.topApps.slice(0, 5).map(app => app.total_seconds),
+    backgroundColor: chartColors,
+    borderWidth: 0,
+    hoverOffset: 10
+  }]
 }));
 
 const barChartData = computed(() => ({
-  labels: store.topApps.map((app) => app.app_name),
-  datasets: [
-    {
-      data: store.topApps.map((app) => Math.round(app.total_seconds / 60)),
-      backgroundColor: chartColors.slice(0, store.topApps.length),
-      borderRadius: 8,
-      borderSkipped: false,
-    },
-  ],
+  labels: store.topApps.slice(0, 5).map(app => app.app_name),
+  datasets: [{
+    data: store.topApps.slice(0, 5).map(app => Math.round(app.total_seconds / 60)),
+    backgroundColor: chartColors,
+    borderRadius: 6
+  }]
 }));
 
 const doughnutOptions = {
   responsive: true,
   maintainAspectRatio: false,
-  cutout: "65%",
+  cutout: '75%',
   plugins: {
-    legend: {
-      position: "bottom" as const,
-      labels: {
-        color: "#94a3b8",
-        padding: 16,
-        usePointStyle: true,
-        font: { size: 12 },
-      },
-    },
-    tooltip: {
-      callbacks: {
-        label: (context: any) => ` ${formatDuration(context.raw)}`,
-      },
-    },
-  },
+    legend: { position: 'bottom' as const, labels: { color: '#94a3b8', usePointStyle: true, boxWidth: 8 } }
+  }
 };
 
-// ... reuse pieOptions and barOptions if needed, referencing same style ...
-// (Simplifying for brevity in implementation block, assuming existing options work)
-const pieOptions = { ...doughnutOptions, cutout: "0%" };
 const barOptions = {
   responsive: true,
   maintainAspectRatio: false,
-  indexAxis: "y" as const,
   plugins: { legend: { display: false } },
   scales: {
-    x: {
-      grid: { color: "rgba(148, 163, 184, 0.1)" },
-      ticks: { color: "#94a3b8" },
-    },
-    y: { grid: { display: false }, ticks: { color: "#94a3b8" } },
-  },
+    x: { grid: { display: false }, ticks: { color: '#94a3b8' } },
+    y: { display: false }
+  }
 };
 
+// Icons
 async function loadIcon(appName: string, path: string) {
   if (appIcons.value[appName] || !path) return;
   try {
-    // Only try loading if we haven't tried (or succeeded) yet.
-    // Using appName as key because we show icon by app name, but fetch by path.
-    // If multiple apps share same name but different path, likely same icon.
-    // Actually, store uses exe_path.
-
-    // Check if path is valid (simple check)
-    if (path.length < 3) return;
-
-    const base64 = await invoke<string | null>("get_app_icon", { path });
-    if (base64) {
-      appIcons.value[appName] = `data:image/png;base64,${base64}`;
-    }
-  } catch (e) {
-    // Fail silently
-  }
+     const base64 = await invoke<string | null>("get_app_icon", { path });
+     if (base64) appIcons.value[appName] = `data:image/png;base64,${base64}`;
+  } catch {}
 }
 
 async function refreshData() {
   await store.fetchCurrentActivity();
-  currentActivity.value = store.currentActivity;
-  if (currentActivity.value?.exe_path) {
-    loadIcon(currentActivity.value.app_name, currentActivity.value.exe_path);
+  if (store.currentActivity?.exe_path) {
+    loadIcon(store.currentActivity.app_name, store.currentActivity.exe_path);
   }
-
   await store.fetchTodayData();
-  // Load icons for top apps
-  store.topApps.forEach((app) => {
-    loadIcon(app.app_name, app.exe_path);
-  });
+  store.topApps.forEach(app => loadIcon(app.app_name, app.exe_path));
 }
 
-onMounted(async () => {
-  await refreshData();
-  intervalId = window.setInterval(refreshData, 2000);
+onMounted(() => {
+  refreshData();
+  intervalId = window.setInterval(refreshData, 5000);
 });
 
 onUnmounted(() => {
@@ -389,28 +255,146 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-.active-label {
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 4px;
+.page-container {
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
-.active-app-name.idle {
-  color: var(--text-muted);
+.text-muted { color: var(--text-muted); }
+
+/* Active Now Card */
+.active-now-card {
+  position: relative;
+  overflow: hidden;
+  padding: 32px;
+  margin-bottom: 32px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.active-now-bg {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: radial-gradient(circle at top right, rgba(99, 102, 241, 0.15), transparent 60%);
+  z-index: 0;
 }
 
 .active-now-content {
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 24px;
+  width: 100%;
 }
 
-.app-icon-img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  padding: 4px; /* Slight padding inside the box */
+.active-icon-wrapper {
+  width: 64px;
+  height: 64px;
+  background: var(--bg-hover);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-glass);
+}
+
+.app-icon-img { width: 48px; height: 48px; object-fit: contain; }
+.app-icon-placeholder { font-size: 24px; font-weight: bold; color: var(--color-primary); }
+
+.active-details { flex: 1; }
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.status-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--color-success);
+  box-shadow: 0 0 8px var(--color-success);
+  animation: pulse 2s infinite;
+}
+
+.active-app-title { font-size: 2rem; font-weight: 700; margin-bottom: 4px; line-height: 1.1; }
+.active-window-title { color: var(--text-muted); font-size: 0.9rem; max-width: 600px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Stats Grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-bottom: 32px;
+}
+
+.stat-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+}
+
+.stat-icon {
+  width: 48px; height: 48px;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--bg-hover);
+}
+
+.stat-icon.primary { color: var(--color-primary); background: rgba(99,102,241,0.1); }
+.stat-icon.accent { color: var(--color-accent); background: rgba(6,182,212,0.1); }
+.stat-icon.success { color: var(--color-success); background: rgba(16,185,129,0.1); }
+
+.stat-label { font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 4px; }
+.stat-value { font-size: 1.5rem; font-weight: 700; }
+
+/* Dashboard Grid */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 24px;
+}
+
+/* App List */
+.app-row {
+  display: flex;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-color);
+}
+.app-row:last-child { border-bottom: none; }
+
+.app-rank { width: 24px; font-weight: bold; color: var(--text-muted); font-size: 0.9rem; text-align: center; margin-right: 8px; }
+.app-icon-small { width: 32px; height: 32px; border-radius: 8px; background: var(--bg-hover); display: flex; align-items: center; justify-content: center; margin-right: 12px; }
+.app-icon-small img { width: 24px; height: 24px; object-fit: contain; }
+.app-details { flex: 1; }
+.app-name { display: block; font-weight: 600; font-size: 0.95rem; }
+.app-sessions { font-size: 0.8rem; color: var(--text-muted); }
+.app-meta { text-align: right; }
+.app-duration { font-weight: 600; font-size: 0.9rem; display: block; margin-bottom: 4px; }
+.progress-bg { width: 80px; height: 4px; background: var(--bg-hover); border-radius: 2px; overflow: hidden; }
+.progress-fill { height: 100%; background: var(--color-primary); border-radius: 2px; }
+
+/* Chart Toggles */
+.chart-toggles { display: flex; gap: 8px; }
+.icon-btn { padding: 4px 8px; border: none; background: transparent; color: var(--text-muted); cursor: pointer; border-radius: 4px; font-size: 1.2rem; }
+.icon-btn.active { background: var(--bg-hover); color: var(--color-primary); }
+.chart-wrapper { height: 250px; position: relative; }
+
+/* Mobile */
+@media (max-width: 900px) {
+  .stats-grid { grid-template-columns: 1fr; }
+  .dashboard-grid { grid-template-columns: 1fr; }
+  .active-now-card { flex-direction: column; text-align: center; }
+  .active-now-content { flex-direction: column; }
 }
 </style>
