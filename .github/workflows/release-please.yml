@@ -86,6 +86,14 @@ jobs:
     permissions:
       contents: write
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: aarch64-linux-android
+            abi: arm64-v8a
+          - target: x86_64-linux-android
+            abi: x86_64
     steps:
       - uses: actions/checkout@v4
 
@@ -106,7 +114,7 @@ jobs:
       - name: setup rust
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: aarch64-linux-android,armv7-linux-androideabi,i686-linux-android,x86_64-linux-android
+          targets: ${{ matrix.target }}
 
       - name: install Tauri CLI
         run: cargo install tauri-cli
@@ -122,14 +130,14 @@ jobs:
         run: cargo tauri android init
 
       - name: build Android APK
-        run: cargo tauri android build --apk true
+        run: cargo tauri android build --apk --target ${{ matrix.target }}
 
       - name: upload APK to release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ needs.release-please.outputs.tag_name }}
           files: |
-            src-tauri/gen/android/app/build/outputs/apk/universal/release/*.apk
-            src-tauri/gen/android/app/build/outputs/apk/debug/*.apk
+            src-tauri/gen/android/app/build/outputs/apk/${{ matrix.abi }}/release/*.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
