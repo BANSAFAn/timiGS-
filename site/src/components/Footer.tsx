@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Github, Heart, Star, ExternalLink, Mail, Twitter } from 'lucide-react';
+import { Github, Heart, Star, ExternalLink } from 'lucide-react';
 import type { Translation } from '../i18n/types';
 
 interface FooterProps {
@@ -9,12 +9,18 @@ interface FooterProps {
 const Footer: React.FC<FooterProps> = ({ t }) => {
   const currentYear = new Date().getFullYear();
   const [stars, setStars] = useState<number | null>(null);
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     fetch('https://api.github.com/repos/BANSAFAn/timiGS-')
       .then(res => res.json())
-      .then(data => setStars(data.stargazers_count))
-      .catch(() => {});
+      .then(data => {
+        if (data.stargazers_count !== undefined) {
+          setStars(data.stargazers_count);
+        }
+        setLoaded(true);
+      })
+      .catch(() => setLoaded(true));
   }, []);
 
   return (
@@ -54,18 +60,18 @@ const Footer: React.FC<FooterProps> = ({ t }) => {
               >
                 <Github className="w-5 h-5 text-slate-400 group-hover:text-white transition-colors" />
               </a>
-              <a 
-                href="https://github.com/BANSAFAn/timiGS-" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="group flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-800/50 border border-slate-700/50 hover:border-yellow-500/30 transition-all hover:bg-slate-800"
-              >
-                <Star className="w-4 h-4 text-yellow-400 fill-yellow-400 group-hover:animate-wiggle" />
-                <span className="text-sm font-bold text-white">
-                  {stars !== null ? stars.toLocaleString() : '...'}
-                </span>
-                <span className="text-xs text-slate-500">stars</span>
-              </a>
+              {loaded && stars !== null && (
+                <a 
+                  href="https://github.com/BANSAFAn/timiGS-" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="group flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-800/50 border border-slate-700/50 hover:border-yellow-500/30 transition-all hover:bg-slate-800"
+                >
+                  <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+                  <span className="text-sm font-bold text-white">{stars.toLocaleString()}</span>
+                  <span className="text-xs text-slate-500">stars</span>
+                </a>
+              )}
             </div>
           </div>
 

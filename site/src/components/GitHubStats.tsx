@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Star, GitFork, Eye, GitPullRequest, AlertCircle, CheckCircle2, Clock } from 'lucide-react';
+import { Star, GitFork, Eye, Clock, CheckCircle2, AlertCircle } from 'lucide-react';
 
 interface GitHubStatsProps {
   owner?: string;
@@ -12,8 +12,6 @@ interface RepoData {
   stars: number;
   forks: number;
   watchers: number;
-  openIssues: number;
-  openPRs: number;
   lastCommit: string;
   status: 'active' | 'moderate' | 'inactive';
 }
@@ -26,20 +24,16 @@ const GitHubStats: React.FC<GitHubStatsProps> = ({
 }) => {
   const [data, setData] = useState<RepoData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [repoRes, prsRes] = await Promise.all([
-          fetch(`https://api.github.com/repos/${owner}/${repo}`),
-          fetch(`https://api.github.com/repos/${owner}/${repo}/pulls?state=open&per_page=1`)
-        ]);
+        const repoRes = await fetch(`https://api.github.com/repos/${owner}/${repo}`);
 
         if (repoRes.ok) {
           const repoData = await repoRes.json();
-          const prsData = prsRes.ok ? await prsRes.json() : [];
           
-          // Calculate activity status based on last push
           const lastPush = new Date(repoData.pushed_at);
           const daysSinceLastPush = Math.floor((Date.now() - lastPush.getTime()) / (1000 * 60 * 60 * 24));
           
@@ -48,38 +42,26 @@ const GitHubStats: React.FC<GitHubStatsProps> = ({
           else if (daysSinceLastPush > 7) status = 'moderate';
 
           setData({
-            stars: repoData.stargazers_count,
-            forks: repoData.forks_count,
-            watchers: repoData.subscribers_count,
-            openIssues: repoData.open_issues_count,
-            openPRs: Array.isArray(prsData) ? prsData.length : 0,
+            stars: repoData.stargazers_count || 0,
+            forks: repoData.forks_count || 0,
+            watchers: repoData.subscribers_count || 0,
             lastCommit: repoData.pushed_at,
             status
           });
+          setError(false);
+        } else {
+          setError(true);
         }
       } catch (e) {
         console.error('Failed to fetch GitHub stats', e);
+        setError(true);
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-    // Refresh every 5 minutes
-    const interval = setInterval(fetchData, 5 * 60 * 1000);
-    return () => clearInterval(interval);
   }, [owner, repo]);
-
-  if (loading) {
-    return (
-      <div className={`flex items-center gap-2 ${className}`}>
-        <div className="w-4 h-4 border-2 border-sky-400 border-t-transparent rounded-full animate-spin" />
-        <span className="text-slate-400 text-sm">Loading stats...</span>
-      </div>
-    );
-  }
-
-  if (!data) return null;
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
@@ -99,6 +81,47 @@ const GitHubStats: React.FC<GitHubStatsProps> = ({
     moderate: { icon: Clock, color: 'text-yellow-400', bg: 'bg-yellow-500/10', label: 'Moderate' },
     inactive: { icon: AlertCircle, color: 'text-red-400', bg: 'bg-red-500/10', label: 'Inactive' }
   };
+
+  // Show nothing if loading or error for minimal/compact
+  if ((loading || error) && variant !== 'full') {
+    return null;
+  }
+
+  // Loading state for full variant
+  if (loading && variant === 'full') {
+    return (
+      <div className={`rounded-2xl glass-panel border border-slate-800/50 p-6 ${className}`}>
+        <div className="flex items-center justify-center py-8">
+          <div className="flex items-center gap-3 text-slate-400">
+            <div className="w-5 h-5 border-2 border-sky-400 border-t-transparent rounded-full animate-spin" />
+            <span>Loading repository stats...</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state for full variant
+  if (error && variant === 'full') {
+    return (
+      <div className={`rounded-2xl glass-panel border border-slate-800/50 p-6 ${className}`}>
+        <div className="flex flex-col items-center justify-center py-8 text-center">
+          <AlertCircle className="w-10 h-10 text-slate-600 mb-3" />
+          <p className="text-slate-500 text-sm">Could not load repository stats</p>
+          <a 
+            href={`https://github.com/${owner}/${repo}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-3 text-sky-400 hover:text-sky-300 text-sm transition-colors"
+          >
+            View on GitHub →
+          </a>
+        </div>
+      </div>
+    );
+  }
+
+  if (!data) return null;
 
   const StatusIcon = statusConfig[data.status].icon;
 
@@ -158,7 +181,7 @@ const GitHubStats: React.FC<GitHubStatsProps> = ({
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="group p-4 rounded-xl bg-slate-800/30 border border-slate-700/50 hover:border-yellow-500/30 transition-all hover:scale-105">
           <div className="flex items-center gap-2 mb-2">
-            <Star className="w-5 h-5 text-yellow-400 fill-yellow-400 group-hover:animate-pulse" />
+            <Star className="w-5 h-5 text-yellow-400 fill-yellow-400" />
             <span className="text-slate-400 text-sm">Stars</span>
           </div>
           <p className="text-2xl font-bold text-white">{data.stars.toLocaleString()}</p>
@@ -189,13 +212,7 @@ const GitHubStats: React.FC<GitHubStatsProps> = ({
         </div>
       </div>
 
-      <div className="mt-4 pt-4 border-t border-slate-700/50 flex items-center justify-between">
-        <div className="flex items-center gap-4 text-sm">
-          <span className="text-slate-400">
-            <AlertCircle className="w-4 h-4 inline mr-1" />
-            {data.openIssues} open issues
-          </span>
-        </div>
+      <div className="mt-4 pt-4 border-t border-slate-700/50 flex items-center justify-end">
         <a 
           href={`https://github.com/${owner}/${repo}`}
           target="_blank"

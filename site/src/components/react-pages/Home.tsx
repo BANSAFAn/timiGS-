@@ -26,38 +26,43 @@ const FeatureCard: React.FC<{
   desc: string;
   delay?: number;
 }> = ({ icon, title, desc, delay = 0 }) => {
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(true); // Start visible
+  const [hasAnimated, setHasAnimated] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // Only run animation if IntersectionObserver is supported
+    if (typeof IntersectionObserver === 'undefined') {
+      setHasAnimated(true);
+      return;
+    }
+
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
-          setTimeout(() => setIsVisible(true), delay);
+        if (entry.isIntersecting && !hasAnimated) {
+          setTimeout(() => {
+            setHasAnimated(true);
+          }, delay);
         }
       },
-      { threshold: 0.1 }
+      { threshold: 0.1, rootMargin: '50px' }
     );
 
     if (ref.current) observer.observe(ref.current);
     return () => observer.disconnect();
-  }, [delay]);
+  }, [delay, hasAnimated]);
 
   return (
     <div
       ref={ref}
-      className={`p-6 rounded-2xl glass-panel hover:bg-slate-800/60 transition-all duration-500 border border-slate-800/50 group hover:border-sky-500/30 relative overflow-hidden ${
-        isVisible ? 'animate-scale-in opacity-100' : 'opacity-0'
+      className={`p-6 rounded-2xl glass-panel hover:bg-slate-800/60 transition-all duration-500 border border-slate-800/50 group hover:border-sky-500/30 relative overflow-hidden transform ${
+        hasAnimated ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-70'
       }`}
+      style={{ transitionDelay: `${delay}ms` }}
     >
       {/* Glow effect on hover */}
       <div className="absolute inset-0 bg-gradient-to-br from-sky-500/10 via-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
       
-      {/* Animated border gradient */}
-      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-        <div className="absolute inset-[-1px] bg-gradient-to-r from-sky-500/20 via-purple-500/20 to-sky-500/20 rounded-2xl animate-gradient-x bg-300%" />
-      </div>
-
       <div className="relative z-10">
         <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-sky-500/20 to-purple-500/10 flex items-center justify-center mb-4 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-lg shadow-sky-500/10">
           <div className="text-sky-400 group-hover:text-sky-300 transition-colors">{icon}</div>
