@@ -93,6 +93,18 @@ pub fn init_database() -> Result<()> {
         [],
     )?;
 
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS tasks (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            app_name TEXT NOT NULL,
+            description TEXT,
+            goal_seconds INTEGER NOT NULL,
+            created_at TEXT NOT NULL,
+            status TEXT DEFAULT 'active'
+        )",
+        [],
+    )?;
+
     *DB.lock() = Some(conn);
     Ok(())
 }
@@ -365,4 +377,87 @@ pub fn save_setting(key: &str, value: &str) -> Result<()> {
     )?;
 
     Ok(())
+}
+
+// Tasks
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Task {
+    pub id: i64,
+    pub app_name: String,
+    pub description: Option<String>,
+    pub goal_seconds: i64,
+    pub created_at: DateTime<Local>,
+    pub status: String, // "active", "completed", "paused"
+}
+
+pub fn create_task(app_name: &str, description: Option<String>, goal_seconds: i64) -> Result<i64> {
+    let guard = DB.lock();
+    let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
+
+    let now = Local::now();
+    conn.execute(
+        "INSERT INTO tasks (app_name, description, goal_seconds, created_at, status) VALUES (?1, ?2, ?3, ?4, 'active')",
+        params![app_name, description, goal_seconds, now.to_rfc3339()],
+    )?;
+
+    Ok(conn.last_insert_rowid())
+}
+
+pub fn get_tasks() -> Result<Vec<Task>> {
+    let guard = DB.lock();
+    let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
+
+    let mut stmt = conn.prepare(
+        "SELECT id, app_name, description, goal_seconds, created_at, status FROM tasks ORDER BY created_at DESC"
+    )?;
+
+    let tasks = stmt
+        .query_map([], |row| {
+            Ok(Task {
+                id: row.get(0)?,
+                app_name: row.get(1)?,
+                description: row.get(2)?,
+                goal_seconds: row.get(3)?,
+                created_at: DateTime::parse_from_rfc3339(&row.get::<_, String>(4)?)
+                    .map(|dt| dt.with_timezone(&Local))
+                    .unwrap_or_else(|_| Local::now()),
+                status: row.get(5)?,
+            })
+        })?
+        .collect::<Result<Vec<_>>>()?;
+
+    Ok(tasks)
+}
+
+pub fn update_task_status(id: i64, status: &str) -> Result<()> {
+    let guard = DB.lock();
+    let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
+
+    conn.execute(
+        "UPDATE tasks SET status = ?1 WHERE id = ?2",
+        params![status, id],
+    )?;
+    Ok(())
+}
+
+pub fn delete_task(id: i64) -> Result<()> {
+    let guard = DB.lock();
+    let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
+
+    conn.execute("DELETE FROM tasks WHERE id = ?1", [id])?;
+    Ok(())
+}
+
+pub fn get_app_usage_since(app_name: &str, since: DateTime<Local>) -> Result<i64> {
+    let guard = DB.lock();
+    let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
+
+    let total: Option<i64> = conn.query_row(
+        "SELECT SUM(duration_seconds) FROM activity_sessions WHERE app_name = ?1 AND start_time >= ?2",
+        params![app_name, since.to_rfc3339()],
+        |row| row.get(0)
+    ).ok();
+
+    Ok(total.unwrap_or(0))
 }

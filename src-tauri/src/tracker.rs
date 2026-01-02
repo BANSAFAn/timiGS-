@@ -112,9 +112,10 @@ pub fn start_tracking() {
 
     RUNNING.store(true, Ordering::SeqCst);
 
-    thread::spawn(|| {
+    let _ = thread::spawn(|| {
         let mut last_app = String::new();
         let mut last_title = String::new();
+        let mut ticker = 0;
 
         while RUNNING.load(Ordering::SeqCst) {
             if let Some(active) = get_foreground_window_info() {
@@ -151,6 +152,14 @@ pub fn start_tracking() {
             }
 
             thread::sleep(Duration::from_secs(1));
+
+            ticker += 1;
+            if ticker >= 60 {
+                ticker = 0;
+                if let Some(session) = CURRENT_SESSION.lock().as_ref() {
+                    let _ = crate::tasks::check_goals(&session.app_name);
+                }
+            }
         }
 
         // End final session when stopping

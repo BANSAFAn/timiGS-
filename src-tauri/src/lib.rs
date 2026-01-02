@@ -9,6 +9,7 @@ mod db;
 mod discord;
 mod drive;
 mod icons;
+mod tasks;
 mod tracker;
 
 #[cfg(desktop)]
@@ -153,7 +154,12 @@ pub fn run() {
             commands::backup_data,
             commands::restore_data,
             commands::shutdown_pc,
-            commands::get_app_icon
+            commands::shutdown_pc,
+            commands::get_app_icon,
+            tasks::create_task_cmd,
+            tasks::get_tasks_cmd,
+            tasks::update_task_status_cmd,
+            tasks::delete_task_cmd
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
