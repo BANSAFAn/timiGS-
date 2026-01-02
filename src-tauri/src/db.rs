@@ -100,10 +100,14 @@ pub fn init_database() -> Result<()> {
             description TEXT,
             goal_seconds INTEGER NOT NULL,
             created_at TEXT NOT NULL,
-            status TEXT DEFAULT 'active'
+            status TEXT DEFAULT 'active',
+            title_filter TEXT
         )",
         [],
     )?;
+
+    // Migration for existing table
+    let _ = conn.execute("ALTER TABLE tasks ADD COLUMN title_filter TEXT", []);
 
     *DB.lock() = Some(conn);
     Ok(())
@@ -389,16 +393,22 @@ pub struct Task {
     pub goal_seconds: i64,
     pub created_at: DateTime<Local>,
     pub status: String, // "active", "completed", "paused"
+    pub title_filter: Option<String>,
 }
 
-pub fn create_task(app_name: &str, description: Option<String>, goal_seconds: i64) -> Result<i64> {
+pub fn create_task(
+    app_name: &str,
+    description: Option<String>,
+    goal_seconds: i64,
+    title_filter: Option<String>,
+) -> Result<i64> {
     let guard = DB.lock();
     let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
 
     let now = Local::now();
     conn.execute(
-        "INSERT INTO tasks (app_name, description, goal_seconds, created_at, status) VALUES (?1, ?2, ?3, ?4, 'active')",
-        params![app_name, description, goal_seconds, now.to_rfc3339()],
+        "INSERT INTO tasks (app_name, description, goal_seconds, created_at, status, title_filter) VALUES (?1, ?2, ?3, ?4, 'active', ?5)",
+        params![app_name, description, goal_seconds, now.to_rfc3339(), title_filter],
     )?;
 
     Ok(conn.last_insert_rowid())
@@ -409,7 +419,7 @@ pub fn get_tasks() -> Result<Vec<Task>> {
     let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
 
     let mut stmt = conn.prepare(
-        "SELECT id, app_name, description, goal_seconds, created_at, status FROM tasks ORDER BY created_at DESC"
+        "SELECT id, app_name, description, goal_seconds, created_at, status, title_filter FROM tasks ORDER BY created_at DESC"
     )?;
 
     let tasks = stmt
@@ -423,6 +433,7 @@ pub fn get_tasks() -> Result<Vec<Task>> {
                     .map(|dt| dt.with_timezone(&Local))
                     .unwrap_or_else(|_| Local::now()),
                 status: row.get(5)?,
+                title_filter: row.get(6).ok(),
             })
         })?
         .collect::<Result<Vec<_>>>()?;
@@ -449,15 +460,49 @@ pub fn delete_task(id: i64) -> Result<()> {
     Ok(())
 }
 
-pub fn get_app_usage_since(app_name: &str, since: DateTime<Local>) -> Result<i64> {
+pub fn get_app_usage_since(
+    app_name: &str,
+    since: DateTime<Local>,
+    title_filter: Option<&String>,
+) -> Result<i64> {
     let guard = DB.lock();
     let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
 
-    let total: Option<i64> = conn.query_row(
-        "SELECT SUM(duration_seconds) FROM activity_sessions WHERE app_name = ?1 AND start_time >= ?2",
-        params![app_name, since.to_rfc3339()],
-        |row| row.get(0)
-    ).ok();
+    let query = if let Some(_filter) = title_filter {
+        "SELECT SUM(duration_seconds) FROM activity_sessions WHERE app_name = ?1 AND start_time >= ?2 AND window_title LIKE ?"
+    } else {
+        "SELECT SUM(duration_seconds) FROM activity_sessions WHERE app_name = ?1 AND start_time >= ?2"
+    };
+
+    let total: Option<i64> = if let Some(filter) = title_filter {
+        let pattern = format!("%{}%", filter);
+        conn.query_row(
+            query,
+            params![app_name, since.to_rfc3339(), pattern],
+            |row| row.get(0),
+        )
+        .ok()
+    } else {
+        conn.query_row(query, params![app_name, since.to_rfc3339()], |row| {
+            row.get(0)
+        })
+        .ok()
+    };
 
     Ok(total.unwrap_or(0))
+}
+
+pub fn get_recent_apps() -> Result<Vec<String>> {
+    let guard = DB.lock();
+    let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
+
+    let mut stmt = conn.prepare(
+        "SELECT DISTINCT app_name FROM activity_sessions ORDER BY start_time DESC LIMIT 50",
+    )?;
+
+    let apps = stmt
+        .query_map([], |row| row.get(0))?
+        .collect::<Result<Vec<String>>>()?;
+
+    Ok(apps)
 }

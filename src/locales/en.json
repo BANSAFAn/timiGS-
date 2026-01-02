@@ -112,6 +112,10 @@
   },
   "tools": {
     "timer": "Shutdown Timer",
+    "shutdownTimer": {
+      "title": "PC Shutdown Timer",
+      "start": "Start Timer"
+    },
     "notepad": "Notepad",
     "notepadPlaceholder": "Type your notes here...",
     "newNote": "New Note",

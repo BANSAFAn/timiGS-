@@ -7,21 +7,33 @@ use crate::db;
 use tiny_http::{Response, Server};
 
 // TODO: User must replace these with their own credentials from Google Cloud Console
-const GOOGLE_CLIENT_ID: &str = "YOUR_CLIENT_ID_HERE";
-const GOOGLE_CLIENT_SECRET: &str = "YOUR_CLIENT_SECRET_HERE";
+// Removed consts to prevent hardcoding secrets
 const AUTH_URL: &str = "https://accounts.google.com/o/oauth2/v2/auth";
 const TOKEN_URL: &str = "https://www.googleapis.com/oauth2/v3/token";
 const REDIRECT_URL: &str = "http://localhost:8000";
 
+// Fallback to compile-time env vars (injected by CI) if DB settings are missing
+const COMPILE_CLIENT_ID: Option<&str> = option_env!("GOOGLE_CLIENT_ID");
+const COMPILE_CLIENT_SECRET: Option<&str> = option_env!("GOOGLE_CLIENT_SECRET");
+
 pub fn start_auth_flow() -> Result<String, String> {
-    // Check if placeholders are still present
-    if GOOGLE_CLIENT_ID == "YOUR_CLIENT_ID_HERE" {
-        return Err("Missing Google Credentials. Please configure them in auth.rs".to_string());
-    }
+    // 1. Try DB Settings
+    let db_client_id = db::get_setting("google_client_id");
+    let db_client_secret = db::get_setting("google_client_secret");
+
+    // 2. Fallback to Compiled-in Defaults
+    let client_id = db_client_id
+        .or(COMPILE_CLIENT_ID.map(|s| s.to_string()))
+        .ok_or(
+        "Missing Google Client ID. Configure in Settings (Cloud & Data) or build with env vars.",
+    )?;
+
+    let client_secret = db_client_secret.or(COMPILE_CLIENT_SECRET.map(|s| s.to_string()))
+        .ok_or("Missing Google Client Secret. Configure in Settings (Cloud & Data) or build with env vars.")?;
 
     let client = BasicClient::new(
-        ClientId::new(GOOGLE_CLIENT_ID.to_string()),
-        Some(ClientSecret::new(GOOGLE_CLIENT_SECRET.to_string())),
+        ClientId::new(client_id),
+        Some(ClientSecret::new(client_secret)),
         AuthUrl::new(AUTH_URL.to_string()).map_err(|e| e.to_string())?,
         Some(TokenUrl::new(TOKEN_URL.to_string()).map_err(|e| e.to_string())?),
     )
