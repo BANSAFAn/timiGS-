@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.19.0](https://github.com/BANSAFAn/timiGS-/compare/v1.18.0...v1.19.0) (2026-01-02)
+
+
+### Features
+
+* add discord rpc and refine timeline ([8686548](https://github.com/BANSAFAn/timiGS-/commit/86865488ce86c0025aebf30c0fbdfa3991a14527))
+
+
+### Bug Fixes
+
+* add debug dialogs for windows crash ([360e8ab](https://github.com/BANSAFAn/timiGS-/commit/360e8abe683e7b5ead9ba8db7068a53374307e76))
+* remove invalid autostart config to resolve crash ([db32c63](https://github.com/BANSAFAn/timiGS-/commit/db32c6302482d08d87d729217ecbb3e6ddc99005))
+
 ## [1.18.0](https://github.com/BANSAFAn/timiGS-/compare/v1.17.1...v1.18.0) (2025-12-30)
 
 
