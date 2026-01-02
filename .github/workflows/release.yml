@@ -72,18 +72,29 @@ jobs:
 
       - name: Patch version
         run: |
-          node -e "const fs = require('fs'); const conf = JSON.parse(fs.readFileSync('src-tauri/tauri.conf.json')); conf.version = '${{ needs.release-please.outputs.tag_name }}'.replace(/^v/, '') || conf.version; fs.writeFileSync('src-tauri/tauri.conf.json', JSON.stringify(conf, null, 2));"
+          node -e "
+            const fs = require('fs');
+            const conf = JSON.parse(fs.readFileSync('src-tauri/tauri.conf.json'));
+            const tag = '${{ needs.release-please.outputs.tag_name }}'.replace(/^v/, '');
+            if (tag && /^\d+\.\d+\.\d+/.test(tag)) {
+              conf.version = tag;
+              fs.writeFileSync('src-tauri/tauri.conf.json', JSON.stringify(conf, null, 2));
+              console.log('Version patched to:', tag);
+            } else {
+              console.log('Using existing version:', conf.version);
+            }
+          "
 
       - name: Build Tauri app
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tagName: ${{ needs.release-please.outputs.tag_name }}
-          releaseName: "TimiGS ${{ needs.release-please.outputs.tag_name }}"
+          tagName: ${{ needs.release-please.outputs.tag_name || 'dev' }}
+          releaseName: "TimiGS ${{ needs.release-please.outputs.tag_name || 'Development Build' }}"
           releaseBody: "See the assets to download this version and install."
-          releaseDraft: false
-          prerelease: false
+          releaseDraft: ${{ !needs.release-please.outputs.release_created }}
+          prerelease: ${{ !needs.release-please.outputs.release_created }}
           args: ${{ matrix.args }}
 
   # Build Android APKs
@@ -124,7 +135,18 @@ jobs:
 
       - name: Patch version
         run: |
-          node -e "const fs = require('fs'); const conf = JSON.parse(fs.readFileSync('src-tauri/tauri.conf.json')); conf.version = '${{ needs.release-please.outputs.tag_name }}'.replace(/^v/, '') || conf.version; fs.writeFileSync('src-tauri/tauri.conf.json', JSON.stringify(conf, null, 2));"
+          node -e "
+            const fs = require('fs');
+            const conf = JSON.parse(fs.readFileSync('src-tauri/tauri.conf.json'));
+            const tag = '${{ needs.release-please.outputs.tag_name }}'.replace(/^v/, '');
+            if (tag && /^\d+\.\d+\.\d+/.test(tag)) {
+              conf.version = tag;
+              fs.writeFileSync('src-tauri/tauri.conf.json', JSON.stringify(conf, null, 2));
+              console.log('Version patched to:', tag);
+            } else {
+              console.log('Using existing version:', conf.version);
+            }
+          "
 
       - name: Init Android
         run: cargo tauri android init
@@ -164,9 +186,19 @@ jobs:
         run: ls -la artifacts/
 
       - name: Upload APKs to Release
+        if: ${{ needs.release-please.outputs.release_created }}
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ needs.release-please.outputs.tag_name }}
           files: artifacts/*.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload APKs as Artifacts (for manual builds)
+        if: ${{ !needs.release-please.outputs.release_created }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-apks
+          path: artifacts/*.apk
+          if-no-files-found: warn
+
