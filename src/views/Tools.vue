@@ -17,6 +17,17 @@
           </div>
         </div>
 
+        <!-- Tasks Card -->
+        <div class="tool-card">
+          <div class="card-header">
+            <div class="header-icon task-icon">✅</div>
+            <h3>Tasks & Goals</h3>
+          </div>
+          <div class="card-body">
+            <TasksWidget />
+          </div>
+        </div>
+
         <!-- Notepad Card -->
         <div class="tool-card notepad-card">
           <div class="card-header flex-between">
@@ -81,6 +92,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import ShutdownTimer from '../components/ShutdownTimer.vue';
+import TasksWidget from '../components/TasksWidget.vue';
 import { useDebounceFn } from '@vueuse/core';
 
 interface Note {
@@ -211,6 +223,10 @@ onMounted(() => {
 
 .note-icon {
   background: rgba(245, 158, 11, 0.1);
+}
+
+.task-icon {
+  background: rgba(59, 130, 246, 0.1);
 }
 
 .card-header h3 {

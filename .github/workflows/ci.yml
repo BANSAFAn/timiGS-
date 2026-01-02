@@ -1,11 +1,10 @@
-name: PR Build & Security Check
+name: CI
 
 on:
+  push:
+    branches: [nexting]
   pull_request:
-    branches:
-      - nexting
-      - main
-      - master
+    branches: [nexting, main, master]
 
 permissions:
   contents: read
@@ -14,7 +13,7 @@ permissions:
 jobs:
   # Security audit for Rust dependencies
   security-audit:
-    name: Security Audit
+    name: 🔒 Security Audit
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -28,11 +27,10 @@ jobs:
       - name: Run security audit
         working-directory: src-tauri
         run: cargo audit --ignore RUSTSEC-2024-0375 || true
-        # Note: --ignore can be removed once dependencies are updated
 
-  # Lint checks
+  # Lint and format checks
   lint:
-    name: Lint & Format Check
+    name: 🔍 Lint & Format
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -59,27 +57,26 @@ jobs:
         working-directory: src-tauri
         run: cargo fmt --check
 
-      - name: Run Clippy (Rust linter)
+      - name: Run Clippy
         working-directory: src-tauri
         run: cargo clippy -- -D warnings || true
-        # Note: Using || true to not fail on warnings initially
 
   # Build verification on all platforms
-  build:
-    name: Build (${{ matrix.name }})
+  build-check:
+    name: 🔨 Build (${{ matrix.name }})
     strategy:
       fail-fast: false
       matrix:
         include:
-          - platform: "macos-latest"
+          - platform: macos-latest
             args: "--target universal-apple-darwin"
-            name: "macOS"
-          - platform: "ubuntu-22.04"
+            name: macOS
+          - platform: ubuntu-22.04
             args: ""
-            name: "Linux"
-          - platform: "windows-latest"
+            name: Linux
+          - platform: windows-latest
             args: ""
-            name: "Windows"
+            name: Windows
 
     runs-on: ${{ matrix.platform }}
     steps:

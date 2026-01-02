@@ -68,6 +68,16 @@ pub fn save_settings(app: tauri::AppHandle, settings: db::Settings) -> Result<()
 }
 
 #[command]
+pub fn get_setting_cmd(key: String) -> Option<String> {
+    db::get_setting(&key)
+}
+
+#[command]
+pub fn save_setting_cmd(key: String, value: String) -> Result<(), String> {
+    db::save_setting(&key, &value).map_err(|e| e.to_string())
+}
+
+#[command]
 pub fn start_tracking() {
     tracker::start_tracking();
 }

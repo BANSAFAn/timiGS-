@@ -100,18 +100,39 @@
     "emailPlaceholder": "your@email.com",
     "sendReport": "Send Report",
     "system": "System",
+    "subtitle": "Manage your application preferences",
+    "dark": "Dark",
+    "light": "Light",
+    "importData": "Import Data",
+    "updates": "Updates",
+    "checkForUpdates": "Check for Updates",
     "checkUpdates": "Check for Updates",
     "checkNow": "Check Now",
     "checking": "Checking..."
   },
   "tools": {
     "timer": "Shutdown Timer",
+    "shutdownTimer": {
+      "title": "PC Shutdown Timer",
+      "start": "Start Timer"
+    },
     "notepad": "Notepad",
     "notepadPlaceholder": "Type your notes here...",
     "newNote": "New Note",
     "deleteNote": "Delete",
     "noNotes": "No notes yet",
     "untitled": "Untitled Note"
+  },
+  "tasks": {
+      "title": "Tasks & Goals",
+      "addTask": "Add Task",
+      "noTasks": "No active tasks",
+      "appName": "App Name",
+      "description": "Description",
+      "hours": "Hours",
+      "create": "Create",
+      "cancel": "Cancel",
+      "goal": "Goal"
   },
   "common": {
     "loading": "Loading...",

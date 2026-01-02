@@ -1,7 +1,7 @@
 use discord_rich_presence::{activity, DiscordIpc, DiscordIpcClient};
+use once_cell::sync::Lazy;
 use std::sync::{Arc, Mutex};
 use std::time::{SystemTime, UNIX_EPOCH};
-use once_cell::sync::Lazy;
 
 const CLIENT_ID: &str = "1323605963499831346"; // Generic Client ID or specific app ID
 
@@ -52,7 +52,11 @@ impl DiscordClient {
             let payload = activity::Activity::new()
                 .details(&details)
                 .state(&state)
-                .assets(activity::Assets::new().large_image("icon").large_text("TimiGS Activity Tracker")) // Make sure you upload 'logo' to Discord Dev Portal or use a generic one
+                .assets(
+                    activity::Assets::new()
+                        .large_image("icon")
+                        .large_text("TimiGS Activity Tracker"),
+                ) // Make sure you upload 'logo' to Discord Dev Portal or use a generic one
                 .timestamps(activity::Timestamps::new().start(start_time));
 
             let _ = client.set_activity(payload);
@@ -67,17 +71,19 @@ impl DiscordClient {
 }
 
 // Global Discord Client Instance
-pub static DISCORD: Lazy<Arc<Mutex<DiscordClient>>> = Lazy::new(|| {
-    Arc::new(Mutex::new(DiscordClient::new()))
-});
+pub static DISCORD: Lazy<Arc<Mutex<DiscordClient>>> =
+    Lazy::new(|| Arc::new(Mutex::new(DiscordClient::new())));
 
 pub fn update_presence(app_name: &str, window_title: &str) {
-    let now = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs() as i64;
-    
+    let now = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap()
+        .as_secs() as i64;
+
     // Run in a separate thread to avoid blocking main thread
     let app_name = app_name.to_string();
     let window_title = window_title.to_string();
-    
+
     std::thread::spawn(move || {
         if let Ok(mut client) = DISCORD.lock() {
             client.set_activity(&app_name, &window_title, now);

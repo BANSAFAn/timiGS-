@@ -54,21 +54,31 @@ const Terms: React.FC<TermsProps> = ({ t }) => {
           </div>
         </div>
 
-         {/* License Section */}
-         <div className="p-8 rounded-2xl glass-panel border border-slate-800 bg-slate-900/50 relative overflow-hidden group hover:border-purple-500/30 transition-all">
-           <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
-            <FileText className="w-32 h-32 text-purple-500" />
+          {/* License Section */}
+          <div class="p-8 rounded-2xl glass-panel border border-slate-800 bg-slate-900/50 relative overflow-hidden group hover:border-purple-500/30 transition-all">
+            <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
+              <FileText className="w-32 h-32 text-purple-500" />
+            </div>
+            <div className="relative z-10">
+              <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-3">
+                <FileText className="w-6 h-6 text-purple-400" />
+                {t.terms.license_title}
+              </h2>
+              <div className="text-slate-300 leading-relaxed text-lg space-y-4">
+                <p>{t.terms.license_content}</p>
+                
+                <div className="p-4 rounded-xl bg-slate-800/50 border border-slate-700/50 mt-4">
+                  <h4 className="text-white font-bold mb-2">Mandatory Attribution</h4>
+                  <p className="text-sm text-slate-400 mb-2">
+                    Original Software developed by <a href="https://github.com/BANSAFAn" target="_blank" rel="noopener noreferrer" className="text-sky-400 hover:text-sky-300 font-medium">BANSAFAn</a>.
+                  </p>
+                  <p className="text-xs text-slate-500">
+                    The name "TimiGS" must be preserved in all forks and distributions.
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="relative z-10">
-            <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-3">
-              <FileText className="w-6 h-6 text-purple-400" />
-              {t.terms.license_title}
-            </h2>
-            <p className="text-slate-300 leading-relaxed text-lg">
-              {t.terms.license_content}
-            </p>
-          </div>
-        </div>
       </div>
     </div>
   );
