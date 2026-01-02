@@ -121,18 +121,55 @@ jobs:
       - name: init Android
         run: cargo tauri android init
 
-      - name: build Android APKs (split per ABI)
+      # Build 1: Universal APK (all architectures in one file)
+      - name: build Universal APK
+        run: cargo tauri android build --apk --target aarch64 --target x86_64
+
+      - name: debug - find all APKs after universal build
+        run: |
+          echo "=== All APK files after universal build ==="
+          find src-tauri/gen/android -name "*.apk" -type f 2>/dev/null || echo "No APKs found"
+
+      - name: collect universal APK
+        run: |
+          mkdir -p artifacts
+          # Find and copy universal APK
+          find src-tauri/gen/android -path "*/universal/release/*.apk" -type f -exec cp {} artifacts/timigs-universal-release.apk \; 2>/dev/null || true
+          # If universal not found, try copying any release APK
+          if [ ! -f artifacts/timigs-universal-release.apk ]; then
+            find src-tauri/gen/android -path "*/release/*.apk" -type f | head -1 | xargs -I {} cp {} artifacts/timigs-universal-release.apk 2>/dev/null || true
+          fi
+
+      # Build 2: Split per ABI (separate APKs for each architecture)
+      - name: build Split APKs (per ABI)
         run: cargo tauri android build --apk --split-per-abi --target aarch64 --target x86_64
 
-      - name: list APK outputs
-        run: find src-tauri/gen/android -name "*.apk" -type f
+      - name: debug - find all APKs after split build
+        run: |
+          echo "=== All APK files after split build ==="
+          find src-tauri/gen/android -name "*.apk" -type f 2>/dev/null || echo "No APKs found"
+          echo "=== Directory structure ==="
+          find src-tauri/gen/android/app/build/outputs -type d 2>/dev/null || echo "No outputs dir"
+
+      - name: collect split APKs
+        run: |
+          # Try different possible paths for arm64
+          find src-tauri/gen/android -path "*arm64*release*.apk" -type f -exec cp {} artifacts/timigs-arm64-v8a-release.apk \; 2>/dev/null || true
+          find src-tauri/gen/android -path "*aarch64*release*.apk" -type f -exec cp {} artifacts/timigs-arm64-v8a-release.apk \; 2>/dev/null || true
+          
+          # Try different possible paths for x86_64
+          find src-tauri/gen/android -path "*x86_64*release*.apk" -type f -exec cp {} artifacts/timigs-x86_64-release.apk \; 2>/dev/null || true
+
+      - name: list all collected APKs
+        run: |
+          echo "=== Artifacts to upload ==="
+          ls -la artifacts/ || echo "No artifacts found"
 
       - name: upload APKs to release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ needs.release-please.outputs.tag_name }}
-          files: |
-            src-tauri/gen/android/app/build/outputs/apk/*/release/*.apk
+          files: artifacts/*.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
