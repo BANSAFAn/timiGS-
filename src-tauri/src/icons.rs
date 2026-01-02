@@ -1,4 +1,3 @@
-
 #[cfg(target_os = "windows")]
 use base64::{engine::general_purpose, Engine as _};
 #[cfg(target_os = "windows")]
