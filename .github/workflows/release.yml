@@ -139,7 +139,7 @@ jobs:
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: aarch64-linux-android,x86_64-linux-android
+          targets: aarch64-linux-android,x86_64-linux-android,armv7-linux-androideabi,i686-linux-android
 
       - name: Install Tauri CLI
         run: cargo install tauri-cli
@@ -167,7 +167,7 @@ jobs:
 
       # Build Universal APK
       - name: Build Universal APK
-        run: cargo tauri android build --apk true --target aarch64 --target x86_64
+        run: cargo tauri android build --apk true --target aarch64 --target x86_64 --target armv7 --target i686
 
       - name: Collect APKs
         run: |
@@ -188,6 +188,13 @@ jobs:
       - name: Collect ARM64 APK
         run: |
           find src-tauri/gen/android -path "*arm64*release*.apk" -type f -exec cp {} artifacts/TimiGS-arm64-v8a.apk \; 2>/dev/null || true
+
+      - name: Build ARMv7 APK
+        run: cargo tauri android build --apk true --split-per-abi --target armv7
+
+      - name: Collect ARMv7 APK
+        run: |
+          find src-tauri/gen/android -path "*armeabi*release*.apk" -type f -exec cp {} artifacts/TimiGS-armeabi-v7a.apk \; 2>/dev/null || true
 
       - name: Build x86_64 APK
         run: cargo tauri android build --apk true --split-per-abi --target x86_64
