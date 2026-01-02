@@ -158,6 +158,24 @@
           </button>
         </div>
 
+        <!-- About & License (Mandatory Attribution) -->
+        <div class="glass-card">
+          <div class="card-header">
+            <h3 class="card-title">About & License</h3>
+          </div>
+          <div class="setting-info" style="text-align: center; padding: 10px 0;">
+             <p class="setting-desc" style="font-size: 0.9rem; color: var(--text-color);">
+               Original Software developed by <a href="https://github.com/BANSAFAn" target="_blank" style="color: var(--color-primary); font-weight: bold;">BANSAFAn</a>
+             </p>
+             <p class="setting-desc" style="font-size: 0.8rem; margin-top: 5px;">
+               Licensed under TimiGS Public License.
+             </p>
+             <p class="setting-desc" style="font-size: 0.75rem; margin-top: 10px; opacity: 0.7;">
+               Protected by Copyright (c) 2026. The name "TimiGS" is reserved.
+             </p>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
