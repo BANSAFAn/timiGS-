@@ -1,0 +1,34 @@
+TIMIGS PUBLIC LICENSE (TPL)
+Version 1.0, January 2026
+
+Copyright (c) 2026 BANSAFAn
+
+1. PREAMBLE
+The TimiGS project was created to provide a transparent, efficient, and privacy-focused activity tracker. The goal of this license is to ensure that the software remains open and free for everyone to inspect, learn from, and improve, while strictly protecting the identity, reputation, and branding of the original project. We believe in open source, but we also believe in credit where credit is due and preventing confusion for end-users.
+
+TERMS AND CONDITIONS
+
+2. PERMISSIONS
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, subject to the conditions strictly set forth below.
+
+3. MANDATORY ATTRIBUTION
+The above copyright notice, this permission notice, and the following statement must be included in all copies or substantial portions of the Software:
+"Original Software developed by BANSAFAn (https://github.com/BANSAFAn)."
+
+Explicit credit to the original author (BANSAFAn) must be clearly visible in the Software's "About", "Settings", or "Credits" section, and in any accompanying documentation or repository descriptions.
+
+4. BRAND IDENTITY AND NAME PRESERVATION
+The name "TimiGS" is a reserved identifier for this specific software project. 
+
+a. Forks and Derivatives: You may fork this repository for contribution or personal modification. However, if you distribute a modified version, you must PRESERVE the name "TimiGS" unless explicit written permission is granted by the author.
+b. Anti-Impersonation: You may not use the name "TimiGS" in a way that suggests your derivative work is the "official" version if it contains changes not approved by the original author.
+c. Logo and Assets: The official TimiGS logo and branding assets may be used ONLY in the context of referencing this specific software.
+
+5. RESTRICTION ON RE-BRANDING ("NO-RENAME" CLAUSE)
+Renaming this application (e.g., changing "TimiGS" to "MyTracker") for the purpose of redistributing it as a competing product or claiming it as your own original work is STRICTLY PROHIBITED. This software must remain identifiable as "TimiGS" or a "TimiGS Fork".
+
+6. TERMINATION
+This license and the rights granted hereunder will terminate automatically upon any breach by you of the terms of this license. Failure to comply with the attribution or naming clauses results in the immediate revocation of your right to use, modify, or distribute the Software.
+
+7. DISCLAIMER OF WARRANTY
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
