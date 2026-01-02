@@ -123,7 +123,7 @@ jobs:
 
       # Build 1: Universal APK (all architectures in one file)
       - name: build Universal APK
-        run: cargo tauri android build --apk --target aarch64 --target x86_64
+        run: cargo tauri android build --apk true --target aarch64 --target x86_64
 
       - name: debug - find all APKs after universal build
         run: |
@@ -142,7 +142,7 @@ jobs:
 
       # Build 2: Split per ABI (separate APKs for each architecture)
       - name: build Split APKs (per ABI)
-        run: cargo tauri android build --apk --split-per-abi --target aarch64 --target x86_64
+        run: cargo tauri android build --apk true --split-per-abi --target aarch64 --target x86_64
 
       - name: debug - find all APKs after split build
         run: |
