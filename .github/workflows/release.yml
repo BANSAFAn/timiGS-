@@ -33,7 +33,6 @@ jobs:
   build-desktop:
     name: 🖥️ Desktop (${{ matrix.name }})
     needs: release-please
-    if: ${{ needs.release-please.outputs.release_created || github.event_name == 'workflow_dispatch' }}
     permissions:
       contents: write
     strategy:
@@ -104,7 +103,6 @@ jobs:
   build-android:
     name: 📱 Android
     needs: release-please
-    if: ${{ needs.release-please.outputs.release_created || github.event_name == 'workflow_dispatch' }}
     permissions:
       contents: write
     runs-on: ubuntu-latest
