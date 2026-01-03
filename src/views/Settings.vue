@@ -249,7 +249,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, reactive, onErrorCaptured } from "vue";
+import { ref, onMounted, reactive } from "vue";
 import { useI18n } from "vue-i18n";
 import { invoke } from "@tauri-apps/api/core";
 import { useActivityStore } from "../stores/activity";
