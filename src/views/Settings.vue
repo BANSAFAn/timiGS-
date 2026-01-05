@@ -43,19 +43,27 @@
               <label>{{ $t("settings.language") }}</label>
               <p class="setting-desc">Select your preferred language</p>
             </div>
-            <div class="select-wrapper">
-              <select
-                v-model="localSettings.language"
-                @change="saveSettings"
-                class="input-glass"
-              >
-                <option value="en">English</option>
-                <option value="uk">Українська</option>
-                <option value="de">Deutsch</option>
-                <option value="fr">Français</option>
-                <option value="zh-CN">中文 (简体)</option>
-                <option value="ar">العربية</option>
-              </select>
+            <div
+              class="custom-select"
+              :class="{ open: langOpen }"
+              @click="langOpen = !langOpen"
+            >
+              <div class="selected-option">
+                <span class="flag-icon">{{ currentLangFlag }}</span>
+                <span class="lang-name">{{ currentLangName }}</span>
+                <span class="chevron">▼</span>
+              </div>
+              <div class="options-list" v-show="langOpen">
+                <div
+                  v-for="lang in availableLanguages"
+                  :key="lang.code"
+                  class="option-item"
+                  @click.stop="changeLanguage(lang.code)"
+                >
+                  <span class="flag-icon">{{ lang.flag }}</span>
+                  {{ lang.name }}
+                </div>
+              </div>
             </div>
           </div>
 
@@ -161,42 +169,107 @@
             <h3 class="card-title">Cloud & Data</h3>
           </div>
 
-          <!-- Google Drive -->
           <div class="setting-row">
             <div class="setting-info">
-              <div class="setting-label">Google Drive</div>
-              <div class="setting-desc" v-if="googleUser">
-                Connected as {{ googleUser.name }}
+              <div class="setting-label">Auto Sync</div>
+              <div class="setting-desc">
+                Automatically backup data every 30 minutes
               </div>
-              <div class="setting-desc" v-else>Sync your data to the cloud</div>
             </div>
-            <button class="btn btn-secondary" @click="handleGoogleAuth">
-              {{ googleUser ? "Sync Now" : "Connect" }}
+            <div
+              class="toggle-switch"
+              :class="{ checked: localSettings.auto_sync }"
+              @click="toggleAutoSync"
+            >
+              <div class="toggle-thumb"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Google Drive (Multi-Account) -->
+        <div class="glass-card">
+          <div class="card-header">
+            <h3 class="card-title">{{ $t("settings.googleDrive") }}</h3>
+            <button class="btn btn-primary btn-sm" @click="handleGoogleAuth">
+              <span v-if="isConnecting" class="spinner-sm"></span>
+              {{ $t("Connect Account") }}
             </button>
           </div>
 
-          <!-- GitHub -->
-          <div class="setting-row">
-            <div class="setting-info">
-              <div class="setting-label">GitHub</div>
-              <div class="setting-desc">
-                {{ isGitHubConnected ? "Connected" : "Track coding activity" }}
+          <div class="accounts-list">
+            <div v-if="cloudAccounts.length === 0" class="empty-accounts">
+              <p>No accounts connected.</p>
+            </div>
+
+            <div
+              v-for="acc in cloudAccounts"
+              :key="acc.id"
+              class="account-card"
+            >
+              <div class="account-info">
+                <div class="account-email">{{ acc.email }}</div>
+                <div class="account-date">
+                  Connected: {{ new Date(acc.created_at).toLocaleDateString() }}
+                </div>
+                <div
+                  class="account-folder"
+                  v-if="selectedFolders[acc.id]"
+                  style="font-size: 0.75rem; color: var(--color-primary)"
+                >
+                  📁 Target: {{ selectedFolders[acc.id].name }}
+                </div>
+              </div>
+              <div class="account-actions">
+                <button
+                  class="btn-icon-action"
+                  @click="browseFolders(acc.id)"
+                  title="Browse Folders"
+                >
+                  📂
+                </button>
+                <button
+                  class="btn-icon-action"
+                  @click="promptCreateFolder(acc.id)"
+                  title="Create Folder"
+                >
+                  ➕
+                </button>
+                <button
+                  class="btn-icon-action"
+                  @click="backupToAccount(acc.id)"
+                  title="Export Here"
+                >
+                  ⬆️
+                </button>
+                <button
+                  class="btn-icon-action"
+                  @click="restoreFromAccount(acc.id)"
+                  title="Import Here"
+                >
+                  ⬇️
+                </button>
+                <button
+                  class="btn-icon-action btn-danger"
+                  @click="unlinkAccount(acc.id)"
+                  title="Unlink Account"
+                >
+                  🗑️
+                </button>
               </div>
             </div>
-            <button class="btn btn-secondary" @click="openGitHubLogin">
+          </div>
+        </div>
+
+        <!-- GitHub -->
+        <div class="glass-card">
+          <div class="card-header">
+            <h3 class="card-title">GitHub</h3>
+            <button class="btn btn-secondary btn-sm" @click="openGitHubLogin">
               {{ isGitHubConnected ? "Reconnect" : "Connect" }}
             </button>
           </div>
-
-          <div class="divider"></div>
-
-          <div class="data-actions">
-            <button class="btn btn-secondary" @click="exportData">
-              {{ $t("settings.exportData") }}
-            </button>
-            <button class="btn btn-secondary" @click="importData">
-              {{ $t("settings.importData") }}
-            </button>
+          <div class="setting-desc">
+            {{ isGitHubConnected ? "Connected" : "Track coding activity" }}
           </div>
         </div>
 
@@ -245,11 +318,88 @@
         </div>
       </div>
     </div>
+
+    <!-- Update Modal -->
+    <Teleport to="body">
+      <div
+        v-if="showUpdateModal"
+        class="update-modal-overlay"
+        @click.self="showUpdateModal = false"
+      >
+        <div class="update-modal">
+          <div class="update-modal-header">
+            <div class="update-icon">🚀</div>
+            <h2>Update Available!</h2>
+          </div>
+          <div class="update-modal-body">
+            <p class="update-version">
+              Version <strong>{{ updateVersion }}</strong> is ready
+            </p>
+            <p class="update-desc">
+              A new version of TimiGS is available with new features and
+              improvements.
+            </p>
+          </div>
+          <div class="update-modal-actions">
+            <button class="btn btn-secondary" @click="showUpdateModal = false">
+              Later
+            </button>
+            <button class="btn btn-primary" @click="installUpdate">
+              <span v-if="isUpdating" class="updating-spinner"></span>
+              {{ isUpdating ? "Installing..." : "Update Now" }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </Teleport>
+
+    <!-- Folder Modal -->
+    <Teleport to="body">
+      <div
+        v-if="showFolderModal"
+        class="update-modal-overlay"
+        @click.self="showFolderModal = false"
+      >
+        <div class="update-modal" style="text-align: left; max-width: 500px">
+          <div
+            class="update-modal-header"
+            style="
+              justify-content: space-between;
+              display: flex;
+              align-items: center;
+            "
+          >
+            <h2 style="margin: 0">Select Folder</h2>
+            <button class="btn-icon" @click="showFolderModal = false">✕</button>
+          </div>
+          <div
+            class="update-modal-body"
+            style="max-height: 400px; overflow-y: auto; text-align: left"
+          >
+            <div
+              v-if="availableFolders.length === 0"
+              class="text-muted"
+              style="padding: 20px; text-align: center"
+            >
+              Loading folders or empty...
+            </div>
+            <div
+              v-for="folder in availableFolders"
+              :key="folder.id"
+              class="folder-item"
+              @click="selectFolder(folder)"
+            >
+              <span class="folder-icon">📁</span> {{ folder.name }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </Teleport>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, reactive, onErrorCaptured } from "vue";
+import { ref, onMounted, reactive, onErrorCaptured, computed } from "vue";
 import { useI18n } from "vue-i18n";
 import { invoke } from "@tauri-apps/api/core";
 import { useActivityStore } from "../stores/activity";
@@ -261,7 +411,34 @@ const { locale } = useI18n();
 const router = useRouter();
 const store = useActivityStore();
 
-// State
+// Language State
+const langOpen = ref(false);
+const availableLanguages = [
+  { code: "en", name: "English", flag: "🇺🇸" },
+  { code: "ru", name: "Русский", flag: "🇷🇺" },
+  { code: "uk", name: "Українська", flag: "🇺🇦" },
+  { code: "de", name: "Deutsch", flag: "🇩🇪" },
+  { code: "fr", name: "Français", flag: "🇫🇷" },
+  { code: "zh-CN", name: "中文 (简体)", flag: "🇨🇳" },
+  { code: "ar", name: "العربية", flag: "🇸🇦" },
+];
+
+const currentLangFlag = computed(
+  () =>
+    availableLanguages.find((l) => l.code === localSettings.language)?.flag ||
+    "🌐"
+);
+const currentLangName = computed(
+  () =>
+    availableLanguages.find((l) => l.code === localSettings.language)?.name ||
+    "Language"
+);
+
+function changeLanguage(code: string) {
+  localSettings.language = code;
+  saveSettings();
+  langOpen.value = false;
+}
 const isReady = ref(false);
 const globalError = ref("");
 const isTracking = ref(false);
@@ -275,7 +452,24 @@ const localSettings = reactive({
   autostart: true,
   minimize_to_tray: true,
   discord_rpc: true,
+  auto_sync: false,
 });
+
+// Auto Sync Interval
+let syncInterval: any = null;
+
+function startAutoSync() {
+  if (syncInterval) clearInterval(syncInterval);
+  syncInterval = setInterval(() => {
+    const githubToken = localStorage.getItem("github_token");
+    safeInvoke("backup_data", { githubToken });
+  }, 30 * 60 * 1000);
+}
+
+function stopAutoSync() {
+  if (syncInterval) clearInterval(syncInterval);
+  syncInterval = null;
+}
 
 // Helper for safe invokes
 async function safeInvoke(cmd: string, args: any = {}) {
@@ -295,6 +489,10 @@ async function initSettings() {
     if (settings && typeof settings === "object") {
       Object.assign(localSettings, settings);
 
+      if (localSettings.auto_sync) {
+        startAutoSync();
+      }
+
       // Sync frontend state
       locale.value = settings.language || "en";
       document.documentElement.setAttribute(
@@ -308,7 +506,7 @@ async function initSettings() {
     isTracking.value = store.isTracking;
 
     // 3. Status checks
-    checkGoogleUser();
+    fetchCloudAccounts();
     checkGitHubStatus();
   } catch (e: any) {
     console.error("Init Settings Error:", e);
@@ -340,6 +538,16 @@ function toggleAutostart() {
   saveSettings();
 }
 
+function toggleAutoSync() {
+  localSettings.auto_sync = !localSettings.auto_sync;
+  saveSettings();
+  if (localSettings.auto_sync) {
+    startAutoSync();
+  } else {
+    stopAutoSync();
+  }
+}
+
 function toggleMinimize() {
   localSettings.minimize_to_tray = !localSettings.minimize_to_tray;
   saveSettings();
@@ -350,15 +558,112 @@ function toggleDiscord() {
   saveSettings();
 }
 
-// Google Drive
-async function checkGoogleUser() {
-  const user = await safeInvoke("get_google_user");
-  if (user) googleUser.value = user;
+// Google Drive & Cloud
+const cloudAccounts = ref<any[]>([]);
+const isConnecting = ref(false);
+
+// Folder Selection State
+const showFolderModal = ref(false);
+const availableFolders = ref<any[]>([]);
+const currentBrowsingAccount = ref<number | null>(null);
+const selectedFolders = reactive<Record<number, { id: string; name: string }>>(
+  {}
+);
+
+async function fetchCloudAccounts() {
+  const accounts: any = await safeInvoke("get_cloud_accounts");
+  if (Array.isArray(accounts)) {
+    cloudAccounts.value = accounts;
+  }
 }
 
 async function handleGoogleAuth() {
-  await safeInvoke("login_google");
-  setTimeout(checkGoogleUser, 2000);
+  isConnecting.value = true;
+  try {
+    await safeInvoke("login_google");
+    // Wait a bit for DB update then refresh list
+    setTimeout(fetchCloudAccounts, 2000);
+  } finally {
+    isConnecting.value = false;
+  }
+}
+
+async function unlinkAccount(id: number) {
+  if (confirm("Are you sure you want to unlink this account?")) {
+    await safeInvoke("remove_cloud_account", { id });
+    await fetchCloudAccounts();
+    delete selectedFolders[id];
+  }
+}
+
+async function promptCreateFolder(accountId: number) {
+  const name = prompt("Enter folder name:");
+  if (name) {
+    try {
+      await safeInvoke("create_drive_folder", { accountId, name });
+      alert(`Folder '${name}' created successfully!`);
+    } catch (e) {
+      alert("Failed to create folder: " + e);
+    }
+  }
+}
+
+async function browseFolders(accountId: number) {
+  currentBrowsingAccount.value = accountId;
+  availableFolders.value = [];
+  showFolderModal.value = true;
+
+  try {
+    const folders: any = await safeInvoke("list_drive_folders", { accountId });
+    if (Array.isArray(folders)) {
+      availableFolders.value = folders;
+    }
+  } catch (e) {
+    alert("Failed to load folders: " + e);
+    showFolderModal.value = false;
+  }
+}
+
+function selectFolder(folder: any) {
+  if (currentBrowsingAccount.value !== null) {
+    selectedFolders[currentBrowsingAccount.value] = folder;
+    showFolderModal.value = false;
+  }
+}
+
+async function backupToAccount(accountId: number) {
+  const folder = selectedFolders[accountId];
+  const folderName = folder ? folder.name : "Default (TimiGS Logs)";
+  const folderId = folder ? folder.id : null;
+
+  if (confirm(`Export data to this account?\nTarget Folder: ${folderName}`)) {
+    try {
+      const githubToken = localStorage.getItem("github_token");
+      await safeInvoke("backup_data", { accountId, githubToken, folderId });
+      alert("Export successful!");
+    } catch (e) {
+      alert("Export failed: " + e);
+    }
+  }
+}
+
+async function restoreFromAccount(accountId: number) {
+  const folder = selectedFolders[accountId];
+  const folderName = folder ? folder.name : "Default (Global Search)";
+  const folderId = folder ? folder.id : null;
+
+  if (
+    confirm(
+      `Import data from this account?\nSource Folder: ${folderName}\nWARNING: Current local data will be replaced!`
+    )
+  ) {
+    try {
+      await safeInvoke("restore_data", { accountId, folderId });
+      alert("Import successful! Please restart the app.");
+    } catch (e) {
+      alert("Import failed: " + e);
+    }
+  }
 }
 
 // GitHub
@@ -370,27 +675,47 @@ function openGitHubLogin() {
   router.push("/github");
 }
 
+// Update modal state
+const showUpdateModal = ref(false);
+const updateVersion = ref("");
+const isUpdating = ref(false);
+let pendingUpdate: any = null;
+
 async function checkForUpdates() {
   try {
     const update = await check();
     if (update?.available) {
-      const yes = confirm(
-        `Update available: ${update.version}\\nDownload now?`
-      );
-      if (yes) {
-        await update.downloadAndInstall();
-        await relaunch();
-      }
+      updateVersion.value = update.version;
+      pendingUpdate = update;
+      showUpdateModal.value = true;
     } else {
+      // No update available - show toast or subtle message
       alert("You are on the latest version.");
     }
   } catch (error) {
+    console.error("Update check failed:", error);
     alert(`Update check failed: ${error}`);
   }
 }
 
-const exportData = () =>
-  safeInvoke("backup_data").then(() => alert("Exported!"));
+async function installUpdate() {
+  if (!pendingUpdate) return;
+
+  isUpdating.value = true;
+  try {
+    await pendingUpdate.downloadAndInstall();
+    await relaunch();
+  } catch (e) {
+    console.error("Update failed:", e);
+    alert("Update failed: " + e);
+    isUpdating.value = false;
+  }
+}
+
+const exportData = () => {
+  const githubToken = localStorage.getItem("github_token");
+  safeInvoke("backup_data", { githubToken }).then(() => alert("Exported!"));
+};
 const importData = () =>
   safeInvoke("restore_data").then(() => alert("Imported!"));
 
@@ -472,5 +797,247 @@ onMounted(() => {
 
 .sm {
   font-size: 0.8rem;
+}
+
+/* Multi-Account Styles */
+.accounts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.account-card {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  padding: 16px;
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.account-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.account-email {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  word-break: break-all;
+}
+
+.account-date {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.account-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.account-actions .btn {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.75rem;
+  padding: 6px 8px;
+  white-space: nowrap;
+}
+
+.account-actions .btn-icon {
+  flex: 0 0 auto;
+  padding: 6px;
+}
+
+.btn-icon.danger {
+  color: #ff4d4f;
+  background: rgba(255, 77, 79, 0.1);
+}
+
+.btn-icon.danger:hover {
+  background: rgba(255, 77, 79, 0.2);
+}
+
+.spinner-sm {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: spin 1s ease-in-out infinite;
+  margin-right: 8px;
+}
+
+/* Custom Select */
+.custom-select {
+  position: relative;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  cursor: pointer;
+  min-width: 200px;
+  user-select: none;
+}
+.selected-option {
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.chevron {
+  margin-left: auto;
+  font-size: 0.8rem;
+  opacity: 0.7;
+  transition: transform 0.2s;
+}
+.custom-select.open .chevron {
+  transform: rotate(180deg);
+}
+.options-list {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  background: rgba(30, 30, 35, 0.95);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  overflow: hidden;
+  z-index: 100;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(12px);
+  padding: 6px;
+}
+.option-item {
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.2s;
+  border-radius: 8px;
+  margin-bottom: 2px;
+  font-weight: 500;
+}
+.option-item:hover {
+  background: var(--bg-hover);
+}
+.flag-icon {
+  font-size: 1.2rem;
+}
+
+/* Account Actions */
+.account-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+.btn-icon-action {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: transparent;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 1.1rem;
+}
+.btn-icon-action:hover {
+  background: var(--bg-hover);
+  transform: translateY(-2px);
+}
+.btn-icon-action.btn-danger:hover {
+  background: rgba(255, 69, 58, 0.2);
+  border-color: #ff453a;
+}
+
+/* Update Modal */
+.update-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.update-modal {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 32px;
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+.update-icon {
+  font-size: 3rem;
+  margin-bottom: 16px;
+}
+
+.update-modal-header h2 {
+  margin: 0 0 16px;
+  color: var(--text-primary);
+}
+
+.update-version {
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+  color: var(--color-primary);
+}
+
+.update-desc {
+  color: var(--text-muted);
+  margin-bottom: 24px;
+}
+
+.update-modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.updating-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: spin 1s ease-in-out infinite;
+  margin-right: 8px;
+}
+
+.folder-item {
+  padding: 12px;
+  border-bottom: 1px solid var(--border-color);
+  cursor: pointer;
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.folder-item:hover {
+  background: var(--bg-hover);
+}
+.folder-item:last-child {
+  border-bottom: none;
+}
+.folder-icon {
+  font-size: 1.2rem;
 }
 </style>

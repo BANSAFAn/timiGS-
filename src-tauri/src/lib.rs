@@ -163,7 +163,11 @@ pub fn run() {
             tasks::update_task_status_cmd,
             tasks::delete_task_cmd,
             tasks::get_recent_apps_cmd,
-            tasks::get_task_progress_cmd
+            tasks::get_task_progress_cmd,
+            // Multi-Account
+            commands::get_cloud_accounts,
+            commands::remove_cloud_account,
+            commands::create_drive_folder,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

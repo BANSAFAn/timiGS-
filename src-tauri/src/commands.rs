@@ -101,26 +101,62 @@ pub async fn login_google() -> Result<String, String> {
         .map_err(|e| e.to_string())?
 }
 
+// Old method for backward compatibility / single account check
 #[command]
 pub fn get_google_user() -> Option<String> {
-    // Returns dummy user info if token exists, since we haven't implemented userinfo endpoint fetching yet
-    if crate::db::get_setting("google_access_token").is_some() {
-        Some("Authorized User".to_string())
-    } else {
-        None
+    // Primarily used for "Connected" status.
+    // We can check if ANY account exists.
+    if let Ok(accounts) = crate::db::get_cloud_accounts() {
+        if !accounts.is_empty() {
+            return Some("Connected".to_string());
+        }
     }
+    None
 }
 
 #[command]
-pub async fn backup_data() -> Result<String, String> {
-    tokio::task::spawn_blocking(|| crate::drive::backup_data())
+pub fn get_cloud_accounts() -> Vec<crate::db::CloudAccount> {
+    crate::db::get_cloud_accounts().unwrap_or_default()
+}
+
+#[command]
+pub fn remove_cloud_account(id: i64) -> Result<(), String> {
+    crate::db::remove_cloud_account(id).map_err(|e| e.to_string())
+}
+
+#[command]
+pub async fn create_drive_folder(account_id: i64, name: String) -> Result<String, String> {
+    tokio::task::spawn_blocking(move || crate::drive::create_folder(account_id, name))
         .await
         .map_err(|e| e.to_string())?
 }
 
 #[command]
-pub async fn restore_data() -> Result<String, String> {
-    tokio::task::spawn_blocking(|| crate::drive::restore_data())
+pub async fn list_drive_folders(account_id: i64) -> Result<Vec<crate::drive::DriveFolder>, String> {
+    tokio::task::spawn_blocking(move || crate::drive::list_folders(account_id))
+        .await
+        .map_err(|e| e.to_string())?
+}
+
+#[command]
+pub async fn backup_data(
+    account_id: Option<i64>,
+    github_token: Option<String>,
+    folder_id: Option<String>,
+) -> Result<String, String> {
+    tokio::task::spawn_blocking(move || {
+        crate::drive::backup_data(account_id, github_token, folder_id)
+    })
+    .await
+    .map_err(|e| e.to_string())?
+}
+
+#[command]
+pub async fn restore_data(
+    account_id: Option<i64>,
+    folder_id: Option<String>,
+) -> Result<String, String> {
+    tokio::task::spawn_blocking(move || crate::drive::restore_data(account_id, folder_id))
         .await
         .map_err(|e| e.to_string())?
 }

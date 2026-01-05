@@ -11,6 +11,7 @@
     "github": "GitHub",
     "settings": "Settings"
   },
+
   "github": {
     "connection": "GitHub Connection",
     "connectDesc": "Connect your GitHub account to track your coding activity",
@@ -90,6 +91,7 @@
     "dataSync": "Data Sync",
     "syncGoogle": "Google Account Sync",
     "syncGoogleDesc": "Sync your activity data to Google Drive",
+    "googleDrive": "Google Drive",
     "connectGoogle": "Connect Google",
     "connected": "Connected",
     "localStorage": "Local Storage",
@@ -142,7 +144,6 @@
     "saved": "Saved",
     "saving": "Saving...",
     "cancel": "Cancel",
-    "confirm": "Confirm",
     "confirm": "Confirm",
     "close": "Close",
     "hours": "Hours",
