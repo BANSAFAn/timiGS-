@@ -33,7 +33,7 @@
       <!-- Settings Content -->
       <div v-else class="settings-grid animate-enter">
         <!-- Appearance -->
-        <div class="glass-card">
+        <div class="glass-card" style="z-index: 20">
           <div class="card-header">
             <h3 class="card-title">{{ $t("settings.appearance") }}</h3>
           </div>
@@ -564,20 +564,22 @@ import { useActivityStore } from "../stores/activity";
 import { check } from "@tauri-apps/plugin-updater";
 import { relaunch } from "@tauri-apps/plugin-process";
 import { useRouter } from "vue-router";
+import { useNotificationStore } from "../stores/notifications";
 
 const { locale } = useI18n();
 const router = useRouter();
 const store = useActivityStore();
+const notifications = useNotificationStore();
 
 // Language State
 const langOpen = ref(false);
 const availableLanguages = [
-  { code: "en", name: "English", flag: "🇺🇸" },
-  { code: "uk", name: "Українська", flag: "🇺🇦" },
-  { code: "de", name: "Deutsch", flag: "🇩🇪" },
-  { code: "fr", name: "Français", flag: "🇫🇷" },
-  { code: "zh-CN", name: "中文 (简体)", flag: "🇨🇳" },
-  { code: "ar", name: "العربية", flag: "🇸🇦" },
+  { code: "en", name: "English", flag: "" },
+  { code: "uk", name: "Українська", flag: "" },
+  { code: "de", name: "Deutsch", flag: "" },
+  { code: "fr", name: "Français", flag: "" },
+  { code: "zh-CN", name: "中文 (简体)", flag: "" },
+  { code: "ar", name: "العربية", flag: "" },
 ];
 
 const currentLangFlag = computed(
@@ -758,9 +760,9 @@ async function promptCreateFolder(accountId: number) {
   if (name) {
     try {
       await safeInvoke("create_drive_folder", { accountId, name });
-      alert(`Folder '${name}' created successfully!`);
+      notifications.success(`Folder '${name}' created successfully!`);
     } catch (e) {
-      alert("Failed to create folder: " + e);
+      notifications.error("Failed to create folder: " + e);
     }
   }
 }
@@ -776,7 +778,7 @@ async function browseFolders(accountId: number) {
       availableFolders.value = folders;
     }
   } catch (e) {
-    alert("Failed to load folders: " + e);
+    notifications.error("Failed to load folders: " + e);
     showFolderModal.value = false;
   }
 }
@@ -797,9 +799,9 @@ async function backupToAccount(accountId: number) {
     try {
       const githubToken = localStorage.getItem("github_token");
       await safeInvoke("backup_data", { accountId, githubToken, folderId });
-      alert("Export successful!");
+      notifications.success("Export successful!");
     } catch (e) {
-      alert("Export failed: " + e);
+      notifications.error("Export failed: " + e);
     }
   }
 }
@@ -816,9 +818,9 @@ async function restoreFromAccount(accountId: number) {
   ) {
     try {
       await safeInvoke("restore_data", { accountId, folderId });
-      alert("Import successful! Please restart the app.");
+      notifications.success("Import successful! Please restart the app.");
     } catch (e) {
-      alert("Import failed: " + e);
+      notifications.error("Import failed: " + e);
     }
   }
 }
@@ -855,7 +857,7 @@ async function refreshTransferFiles(accountId: number, folderId: String) {
       transferFiles.value = files;
     }
   } catch (e) {
-    alert("Failed to list files: " + e);
+    notifications.error("Failed to list files: " + e);
   } finally {
     isTransferLoading.value = false;
   }
@@ -891,8 +893,9 @@ async function onFileSelected(event: Event) {
           data: bytes,
         });
         await refreshTransferFiles(accountId, folderId);
+        notifications.success("Upload successful!");
       } catch (err) {
-        alert("Upload failed: " + err);
+        notifications.error("Upload failed: " + err);
         isTransferLoading.value = false;
       }
     }
@@ -923,7 +926,7 @@ async function downloadFile(file: any) {
   // No, I defined `dest_path`.
   // I'll assume for now I can't easily download without dialog.
   // I'll alert "Download not fully implemented without Dialog plugin" or try something clever.
-  alert("Downloading... (Check your app folder or Downloads)");
+  notifications.info("Downloading... (Check your app folder or Downloads)");
 
   // Hack: Use `download_file` with a relative path?
   // "downloads/filename" -> relative to CWD.
@@ -932,8 +935,8 @@ async function downloadFile(file: any) {
     fileId: file.id,
     destPath: file.name, // Saves in app directory?
   })
-    .then(() => alert("Saved to App Directory: " + file.name))
-    .catch((e) => alert("Download failed: " + e));
+    .then(() => notifications.success("Saved to App Directory: " + file.name))
+    .catch((e) => notifications.error("Download failed: " + e));
 }
 
 // GitHub
@@ -960,11 +963,11 @@ async function checkForUpdates() {
       showUpdateModal.value = true;
     } else {
       // No update available - show toast or subtle message
-      alert("You are on the latest version.");
+      notifications.info("You are on the latest version.");
     }
   } catch (error) {
     console.error("Update check failed:", error);
-    alert(`Update check failed: ${error}`);
+    notifications.error(`Update check failed: ${error}`);
   }
 }
 
@@ -977,17 +980,17 @@ async function installUpdate() {
     await relaunch();
   } catch (e) {
     console.error("Update failed:", e);
-    alert("Update failed: " + e);
+    notifications.error("Update failed: " + e);
     isUpdating.value = false;
   }
 }
 
 const exportData = () => {
   const githubToken = localStorage.getItem("github_token");
-  safeInvoke("backup_data", { githubToken }).then(() => alert("Exported!"));
+  safeInvoke("backup_data", { githubToken }).then(() => notifications.success("Exported!"));
 };
 const importData = () =>
-  safeInvoke("restore_data").then(() => alert("Imported!"));
+  safeInvoke("restore_data").then(() => notifications.success("Imported!"));
 
 onMounted(() => {
   // Delay slightly to allow transition
@@ -1180,7 +1183,7 @@ onMounted(() => {
   border: 1px solid var(--border-color);
   border-radius: 12px;
   overflow: hidden;
-  z-index: 100;
+  z-index: 9999;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(12px);
   padding: 6px;

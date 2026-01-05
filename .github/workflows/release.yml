@@ -2,7 +2,7 @@ name: Release
 
 on:
   push:
-    branches: [nexting]
+    branches: ["**"]
   workflow_dispatch:
 
 permissions:
@@ -27,7 +27,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
-          target-branch: nexting
+
 
   # Build desktop apps for Windows, Linux, macOS
   build-desktop:

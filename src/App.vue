@@ -215,11 +215,13 @@
       </router-link>
     </nav>
   </div>
+  <NotificationToast />
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import { useActivityStore } from "./stores/activity";
+import NotificationToast from "./components/NotificationToast.vue";
 
 const store = useActivityStore();
 const isGitHubConnected = ref(false);

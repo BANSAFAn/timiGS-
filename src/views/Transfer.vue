@@ -149,6 +149,30 @@
           <div v-if="transferStatus" class="success-msg">
             {{ transferStatus }}
           </div>
+          
+          <!-- PENDING CONFIRMATION -->
+          <div v-if="pendingFile" class="confirmation-card fade-in">
+             <h3>Incoming File!</h3>
+             <p><strong>{{ pendingFile.name }}</strong> ({{ (pendingFile.size / 1024 / 1024).toFixed(2) }} MB)</p>
+             <div class="actions">
+               <button class="btn btn-secondary" @click="rejectTransfer">Reject</button>
+               <button class="btn btn-success" @click="acceptTransfer">Accept</button>
+             </div>
+          </div>
+          
+          <!-- HISTORY -->
+          <div class="history-section" v-if="transferHistory.length > 0">
+            <h3>History</h3>
+            <div class="history-list">
+              <div v-for="item in transferHistory" :key="item.id" class="history-item">
+                <span class="icon">{{ item.type === 'sent' ? '📤' : '📥' }}</span>
+                <div class="details">
+                  <div class="name">{{ item.name }}</div>
+                  <div class="meta">{{ item.status }} • {{ new Date(item.date).toLocaleTimeString() }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -159,6 +183,9 @@
 import { ref, onMounted, onUnmounted } from "vue";
 import Peer from "peerjs";
 import { invoke } from "@tauri-apps/api/core";
+import { useNotificationStore } from "../stores/notifications";
+
+const notifications = useNotificationStore();
 
 // State
 const activeTab = ref("send");
@@ -175,6 +202,18 @@ const savePath = ref("");
 const selectedFile = ref<File | null>(null);
 const fileInput = ref<HTMLInputElement | null>(null);
 const incomingFile = ref<{ name: string; size: number } | null>(null);
+const pendingFile = ref<{ name: string; size: number } | null>(null);
+
+// History & Task Manager
+interface TransferRecord {
+  id: string;
+  name: string;
+  type: 'sent' | 'received';
+  size: number;
+  date: Date;
+  status: 'completed' | 'failed' | 'rejected';
+}
+const transferHistory = ref<TransferRecord[]>([]);
 
 // P2P Objects
 let peer: Peer | null = null;
@@ -227,7 +266,7 @@ function initPeer() {
 function copyToken() {
   if (myPeerId.value) {
     navigator.clipboard.writeText(myPeerId.value);
-    alert("Token copied!");
+    notifications.success("Token copied!");
   }
 }
 
@@ -249,6 +288,16 @@ function connectToPeer() {
     isConnected.value = false;
   });
   
+  conn.on('data', (data: any) => {
+    if (data.type === 'accept') {
+      beginChunkTransfer();
+    } else if (data.type === 'reject') {
+      transferStatus.value = "Transfer rejected by peer.";
+      isTransferring.value = false;
+      notifications.error("Transfer rejected.");
+    }
+  });
+
   conn.on('close', () => {
     isConnected.value = false;
     transferStatus.value = "Connection closed.";
@@ -280,12 +329,19 @@ function startTransfer() {
   transferProgress.value = 0;
   transferStatus.value = "Starting transfer...";
 
-  // 1. Send Metadata
+  // 1. Send Offer
   conn.send({
-    type: 'meta',
+    type: 'offer',
     name: file.name,
     size: file.size
   });
+  transferStatus.value = "Waiting for acceptance...";
+}
+
+function beginChunkTransfer() {
+  if (!selectedFile.value || !conn) return;
+  const file = selectedFile.value;
+  transferStatus.value = "Sending data...";
 
   // 2. Read and Send Chunks
   const chunkSize = 16384 * 4; // 64KB chunks might be better
@@ -315,7 +371,17 @@ function startTransfer() {
       } else {
         isTransferring.value = false;
         transferStatus.value = "Transfer complete!";
-        conn.send({ type: 'complete', totalChunks: chunkIndex }); // Send total chunks count
+        conn.send({ type: 'complete', totalChunks: chunkIndex });
+        
+        // Add to history
+        transferHistory.value.unshift({
+          id: Date.now().toString(),
+          name: file.name,
+          type: 'sent',
+          size: file.size,
+          date: new Date(),
+          status: 'completed'
+        });
       }
     }
   };
@@ -334,17 +400,19 @@ function setupReceiverConnection() {
   receivedChunks = {};
   receivedSize = 0;
 
+  receivedSize = 0;
+
   conn.on('data', async (data: any) => {
-    // Handle Meta
-    if (data.type === 'meta') {
-      incomingFile.value = { name: data.name, size: data.size };
-      receivedChunks = {};
-      receivedSize = 0;
-      transferProgress.value = 0;
+    // Handle Offer
+    if (data.type === 'offer') {
+      pendingFile.value = { name: data.name, size: data.size };
+      notifications.info(`Incoming file: ${data.name}`);
       return;
     }
-
-    // Handle Data Chunk (Object with index)
+    
+    // Handle Meta (Legacy/Direct) - Optional fallback, but let's stick to Offer/Accept
+    
+    // Handle Data Chunk
     if (data.type === 'chunk') {
        receivedChunks[data.index] = data.data;
        receivedSize += data.data.byteLength;
@@ -376,7 +444,7 @@ async function saveReceivedFile(totalChunks: number) {
       chunksArray.push(receivedChunks[i]);
     } else {
       console.error(`Missing chunk ${i}`);
-      alert("Transfer corrupted: missing chunks.");
+      notifications.error("Transfer corrupted: missing chunks.");
       return;
     }
   }
@@ -387,7 +455,6 @@ async function saveReceivedFile(totalChunks: number) {
 
   transferStatus.value = "Saving file...";
   
-  // Use Rust to save to disk
   try {
     const savedPath = await invoke('save_local_file', {
        filename: incomingFile.value.name,
@@ -395,14 +462,43 @@ async function saveReceivedFile(totalChunks: number) {
        targetFolder: savePath.value || null
     });
     transferStatus.value = `File saved to: ${savedPath}`;
-    alert(`File Received!\nSaved to: ${savedPath}`);
+    notifications.success(`File Received! Saved to: ${savedPath}`);
+    
+    // Add to history
+    transferHistory.value.unshift({
+      id: Date.now().toString(),
+      name: incomingFile.value.name,
+      type: 'received',
+      size: incomingFile.value.size,
+      date: new Date(),
+      status: 'completed'
+    });
+
   } catch (e) {
     transferStatus.value = "Error saving file: " + e;
-    alert("Save Error: " + e);
+    notifications.error("Save Error: " + e);
   }
   
   incomingFile.value = null;
   receivedChunks = {};
+}
+
+function acceptTransfer() {
+  if (!pendingFile.value || !conn) return;
+  incomingFile.value = pendingFile.value;
+  pendingFile.value = null;
+  
+  receivedChunks = {};
+  receivedSize = 0;
+  transferProgress.value = 0;
+  
+  conn.send({ type: 'accept' });
+}
+
+function rejectTransfer() {
+  if (!conn) return;
+  conn.send({ type: 'reject' });
+  pendingFile.value = null;
 }
 </script>
 
@@ -549,5 +645,45 @@ async function saveReceivedFile(totalChunks: number) {
   color: #10b981;
   margin-top: 10px;
   font-weight: bold;
+}
+
+.confirmation-card {
+  background: var(--bg-card);
+  border: 1px solid var(--color-primary);
+  padding: 20px;
+  border-radius: 12px;
+  margin-top: 20px;
+  text-align: center;
+  animation: slideIn 0.3s ease;
+}
+
+.confirmation-card .actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 15px;
+}
+
+.history-section {
+  margin-top: 30px;
+  border-top: 1px solid var(--border-color);
+  padding-top: 20px;
+}
+.history-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  border-bottom: 1px solid var(--border-color);
+}
+.history-item .details {
+  flex: 1;
+}
+.history-item .name {
+  font-weight: 500;
+}
+.history-item .meta {
+  font-size: 0.8rem;
+  color: var(--text-muted);
 }
 </style>

@@ -222,6 +222,8 @@ body {
   padding: 24px;
   box-shadow: var(--shadow-glass);
   transition: var(--transition-base);
+  position: relative;
+  z-index: 1;
 }
 
 .glass-card:hover {
@@ -418,33 +420,65 @@ body {
   }
 }
 
-@media (max-width: 900px) {
+/* Tablet / Small Desktop: Collapse Sidebar to Icons */
+@media (max-width: 1024px) {
   .sidebar {
-    width: 72px;
-    min-width: 72px;
+    width: 80px;
+    min-width: 80px;
   }
 
-  .sidebar-brand span,
-  .nav-item span {
+  .sidebar-header {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .brand-text {
+    display: none; /* Hide Title */
+  }
+
+  /* Maybe show a logo icon instead? */
+  .sidebar-header::after {
+    content: "Ti"; /* Mini Brand */
+    font-weight: 900;
+    font-size: 1.5rem;
+    color: var(--color-primary);
+  }
+
+  .nav-link {
+    justify-content: center;
+    padding: 14px;
+  }
+
+  .nav-link span {
+    display: none; /* Hide Text */
+  }
+
+  .nav-link svg {
+    margin: 0;
+    width: 24px;
+    height: 24px;
+    display: block; /* Ensure visibility */
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar {
     display: none;
   }
 
-  .sidebar-brand h1 {
-    font-size: 1rem;
+  .bottom-nav {
+    display: flex;
   }
 
-  .nav-item {
-    justify-content: center;
-    padding: 12px;
+  .main-content {
+    padding: 20px;
+    padding-bottom: 80px; /* Space for Bottom Nav */
   }
 
   .grid-2,
   .grid-3 {
     grid-template-columns: 1fr;
-  }
-
-  .main-content {
-    padding: 24px;
   }
 }
 
