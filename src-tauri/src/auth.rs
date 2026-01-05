@@ -87,16 +87,30 @@ pub fn start_auth_flow() -> Result<String, String> {
                 .request(http_client)
                 .map_err(|e| e.to_string())?;
 
-            // Save tokens to DB
-            let access = token_result.access_token().secret();
+            let access = token_result.access_token().secret().to_string();
             let refresh = token_result
                 .refresh_token()
                 .map(|t| t.secret().clone())
                 .unwrap_or_default();
 
-            db::save_setting("google_access_token", access).map_err(|e| e.to_string())?;
-            if !refresh.is_empty() {
-                db::save_setting("google_refresh_token", &refresh).map_err(|e| e.to_string())?;
+            // Fetch User Info to get Email
+            let client_http = reqwest::blocking::Client::new();
+            let user_info_res = client_http
+                .get("https://www.googleapis.com/oauth2/v2/userinfo")
+                .header("Authorization", format!("Bearer {}", access))
+                .send()
+                .map_err(|e| e.to_string())?;
+
+            if user_info_res.status().is_success() {
+                let user_info: serde_json::Value =
+                    user_info_res.json().map_err(|e| e.to_string())?;
+                let email = user_info["email"].as_str().unwrap_or("unknown@gmail.com");
+
+                // Save to Cloud Accounts Table
+                db::add_cloud_account(email, "google", &access, &refresh)
+                    .map_err(|e| e.to_string())?;
+            } else {
+                return Err("Failed to fetch user info".to_string());
             }
 
             return Ok("Successfully authenticated".to_string());

@@ -106,6 +106,18 @@ pub fn init_database() -> Result<()> {
         [],
     )?;
 
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS cloud_accounts (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            email TEXT NOT NULL,
+            provider TEXT NOT NULL,
+            access_token TEXT NOT NULL,
+            refresh_token TEXT,
+            created_at TEXT NOT NULL
+        )",
+        [],
+    )?;
+
     // Migration for existing table
     let _ = conn.execute("ALTER TABLE tasks ADD COLUMN title_filter TEXT", []);
 
@@ -199,6 +211,38 @@ pub fn get_sessions_range(from: NaiveDate, to: NaiveDate) -> Result<Vec<Activity
 
     let sessions = stmt
         .query_map(params![from.to_string(), to.to_string()], |row| {
+            Ok(ActivitySession {
+                id: Some(row.get(0)?),
+                app_name: row.get(1)?,
+                window_title: row.get(2)?,
+                exe_path: row.get(3)?,
+                start_time: DateTime::parse_from_rfc3339(&row.get::<_, String>(4)?)
+                    .map(|dt| dt.with_timezone(&Local))
+                    .unwrap_or_else(|_| Local::now()),
+                end_time: row
+                    .get::<_, Option<String>>(5)?
+                    .and_then(|s| DateTime::parse_from_rfc3339(&s).ok())
+                    .map(|dt| dt.with_timezone(&Local)),
+                duration_seconds: row.get(6)?,
+            })
+        })?
+        .collect::<Result<Vec<_>>>()?;
+
+    Ok(sessions)
+}
+
+pub fn get_all_sessions() -> Result<Vec<ActivitySession>> {
+    let guard = DB.lock();
+    let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
+
+    let mut stmt = conn.prepare(
+        "SELECT id, app_name, window_title, exe_path, start_time, end_time, duration_seconds 
+         FROM activity_sessions 
+         ORDER BY start_time DESC",
+    )?;
+
+    let sessions = stmt
+        .query_map([], |row| {
             Ok(ActivitySession {
                 id: Some(row.get(0)?),
                 app_name: row.get(1)?,
@@ -505,4 +549,89 @@ pub fn get_recent_apps() -> Result<Vec<String>> {
         .collect::<Result<Vec<String>>>()?;
 
     Ok(apps)
+}
+
+// Cloud Accounts
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CloudAccount {
+    pub id: i64,
+    pub email: String,
+    pub provider: String,
+    pub created_at: DateTime<Local>,
+}
+
+pub fn add_cloud_account(
+    email: &str,
+    provider: &str,
+    access_token: &str,
+    refresh_token: &str,
+) -> Result<()> {
+    let guard = DB.lock();
+    let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
+
+    // Check if exists, update if so
+    let exists: bool = conn
+        .query_row(
+            "SELECT EXISTS(SELECT 1 FROM cloud_accounts WHERE email = ?1 AND provider = ?2)",
+            params![email, provider],
+            |row| row.get(0),
+        )
+        .unwrap_or(false);
+
+    if exists {
+        conn.execute(
+            "UPDATE cloud_accounts SET access_token = ?1, refresh_token = ?2 WHERE email = ?3 AND provider = ?4",
+            params![access_token, refresh_token, email, provider],
+        )?;
+    } else {
+        conn.execute(
+            "INSERT INTO cloud_accounts (email, provider, access_token, refresh_token, created_at) VALUES (?1, ?2, ?3, ?4, ?5)",
+            params![email, provider, access_token, refresh_token, Local::now().to_rfc3339()],
+        )?;
+    }
+    Ok(())
+}
+
+pub fn get_cloud_accounts() -> Result<Vec<CloudAccount>> {
+    let guard = DB.lock();
+    let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
+
+    let mut stmt = conn.prepare("SELECT id, email, provider, created_at FROM cloud_accounts")?;
+    let rows = stmt.query_map([], |row| {
+        Ok(CloudAccount {
+            id: row.get(0)?,
+            email: row.get(1)?,
+            provider: row.get(2)?,
+            created_at: DateTime::parse_from_rfc3339(&row.get::<_, String>(3)?)
+                .map(|dt| dt.with_timezone(&Local))
+                .unwrap_or_else(|_| Local::now()),
+        })
+    })?;
+
+    let mut accounts = Vec::new();
+    for row in rows {
+        accounts.push(row?);
+    }
+    Ok(accounts)
+}
+
+pub fn get_cloud_token(id: i64) -> Result<(String, String)> {
+    let guard = DB.lock();
+    let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
+
+    let (access, refresh): (String, String) = conn.query_row(
+        "SELECT access_token, refresh_token FROM cloud_accounts WHERE id = ?1",
+        params![id],
+        |row| Ok((row.get(0)?, row.get(1).unwrap_or_default())),
+    )?;
+    Ok((access, refresh))
+}
+
+pub fn remove_cloud_account(id: i64) -> Result<()> {
+    let guard = DB.lock();
+    let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
+
+    conn.execute("DELETE FROM cloud_accounts WHERE id = ?1", params![id])?;
+    Ok(())
 }
