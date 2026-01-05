@@ -5,7 +5,8 @@ use std::time::{SystemTime, UNIX_EPOCH};
 
 // Discord Client ID - injected at build time via environment variable
 // Set DISCORD_CLIENT_ID in your environment or GitHub Secrets
-const CLIENT_ID: &str = env!("DISCORD_CLIENT_ID");
+// If not set, Discord RPC will be disabled
+const CLIENT_ID: Option<&str> = option_env!("DISCORD_CLIENT_ID");
 
 // Global client state
 static CLIENT: Lazy<Mutex<Option<DiscordIpcClient>>> = Lazy::new(|| Mutex::new(None));
@@ -15,7 +16,16 @@ pub fn init() {
 }
 
 fn connect() {
-    let mut client = match DiscordIpcClient::new(CLIENT_ID) {
+    // Skip if no Client ID configured
+    let client_id = match CLIENT_ID {
+        Some(id) => id,
+        None => {
+            // Discord RPC disabled - no client ID configured
+            return;
+        }
+    };
+
+    let mut client = match DiscordIpcClient::new(client_id) {
         Ok(c) => c,
         Err(e) => {
             eprintln!("Failed to create Discord IPC client: {}", e);
@@ -25,7 +35,6 @@ fn connect() {
 
     if let Err(e) = client.connect() {
         eprintln!("Failed to connect to Discord IPC: {}", e);
-        // Don't store if failed
         return;
     }
 
@@ -34,15 +43,20 @@ fn connect() {
 }
 
 pub fn update_presence(app_name: &str, details: &str) {
+    // Skip if Discord RPC not configured
+    if CLIENT_ID.is_none() {
+        return;
+    }
+
     let mut guard = CLIENT.lock().unwrap();
 
     // Auto-reconnect if needed
     if guard.is_none() {
-        drop(guard); // unlock to connect
+        drop(guard);
         connect();
         guard = CLIENT.lock().unwrap();
         if guard.is_none() {
-            return; // Still failed, give up for now
+            return;
         }
     }
 
@@ -55,12 +69,12 @@ pub fn update_presence(app_name: &str, details: &str) {
             .as_secs() as i64;
 
         let assets = activity::Assets::new()
-            .large_image("icon") // Ensure you have an 'icon' asset uploaded in Discord Dev Portal
+            .large_image("icon")
             .large_text("TimiGS Activity Tracker");
 
         let payload = activity::Activity::new()
-            .state(details) // "Editing file.rs" or Window Title
-            .details(app_name) // "VS Code"
+            .state(details)
+            .details(app_name)
             .timestamps(activity::Timestamps::new().start(start_time))
             .assets(assets);
 

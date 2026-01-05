@@ -168,6 +168,12 @@ pub fn run() {
             commands::get_cloud_accounts,
             commands::remove_cloud_account,
             commands::create_drive_folder,
+            commands::list_drive_folders,
+            commands::upload_file,
+            commands::upload_file_with_data,
+            commands::download_file,
+            commands::save_local_file,
+            commands::list_drive_files,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

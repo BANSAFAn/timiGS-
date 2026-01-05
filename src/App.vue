@@ -94,6 +94,13 @@
           <span>{{ $t("nav.github") }}</span>
         </router-link>
 
+        <router-link to="/transfer" class="nav-link" active-class="active">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+          </svg>
+          <span>Transfer</span>
+        </router-link>
+
         <router-link to="/settings" class="nav-link" active-class="active">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -182,6 +189,13 @@
           <line x1="9" y1="20" x2="15" y2="20" stroke-width="2" />
         </svg>
         <span>Tools</span>
+      </router-link>
+
+      <router-link to="/transfer" class="bottom-nav-item" active-class="active">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+        </svg>
+        <span>Send</span>
       </router-link>
 
       <router-link to="/settings" class="bottom-nav-item" active-class="active">

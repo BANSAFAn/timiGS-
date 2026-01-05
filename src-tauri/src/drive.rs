@@ -9,7 +9,7 @@ use serde_json::Value;
 use urlencoding;
 
 // Helper to upload a single file (Create or Update)
-fn upload_file_to_drive(
+pub fn upload_file_to_drive(
     client: &Client,
     token: &str,
     folder_id: &str,
@@ -206,7 +206,7 @@ pub fn list_folders(account_id: i64) -> Result<Vec<DriveFolder>, String> {
 }
 
 // Helper to get token (either specific account or default first one)
-fn get_token(account_id: Option<i64>) -> Result<String, String> {
+pub fn get_token(account_id: Option<i64>) -> Result<String, String> {
     if let Some(id) = account_id {
         let (access, _) = crate::db::get_cloud_token(id).map_err(|e| e.to_string())?;
         Ok(access)
@@ -462,4 +462,96 @@ pub fn restore_data(account_id: Option<i64>, folder_id: Option<String>) -> Resul
             )
         }
     }
+}
+// Generic File Transfer Commands
+
+pub fn upload_any_file(
+    account_id: i64,
+    folder_id: String,
+    file_path: String,
+) -> Result<String, String> {
+    let token = get_token(Some(account_id))?;
+    let client = Client::new();
+
+    let path = std::path::Path::new(&file_path);
+    let filename = path
+        .file_name()
+        .and_then(|n| n.to_str())
+        .ok_or("Invalid filename")?;
+
+    let content = fs::read(path).map_err(|e| format!("Failed to read file: {}", e))?;
+
+    // Guess mime type or default
+    let mime = mime_guess::from_path(path)
+        .first_or_octet_stream()
+        .to_string();
+
+    upload_file_to_drive(&client, &token, &folder_id, filename, content, &mime)
+}
+
+pub fn download_any_file(
+    account_id: i64,
+    file_id: String,
+    dest_path: String,
+) -> Result<String, String> {
+    let token = get_token(Some(account_id))?;
+    let client = Client::new();
+
+    let download_url = format!(
+        "https://www.googleapis.com/drive/v3/files/{}?alt=media",
+        file_id
+    );
+
+    let mut res = client
+        .get(download_url)
+        .header("Authorization", format!("Bearer {}", token))
+        .send()
+        .map_err(|e| e.to_string())?;
+
+    let mut file = fs::File::create(dest_path).map_err(|e| e.to_string())?;
+    res.copy_to(&mut file).map_err(|e| e.to_string())?;
+
+    Ok("Download successful".to_string())
+}
+
+#[derive(serde::Serialize)]
+pub struct DriveFile {
+    pub id: String,
+    pub name: String,
+    pub mime_type: String,
+    pub size: Option<String>,
+}
+
+pub fn list_files_in_folder(account_id: i64, folder_id: String) -> Result<Vec<DriveFile>, String> {
+    let token = get_token(Some(account_id))?;
+    let client = Client::new();
+
+    let query = format!("'{}' in parents and trashed=false", folder_id);
+    let list_url = format!(
+        "https://www.googleapis.com/drive/v3/files?q={}&fields=files(id,name,mimeType,size)",
+        urlencoding::encode(&query)
+    );
+
+    let res = client
+        .get(&list_url)
+        .header("Authorization", format!("Bearer {}", token))
+        .send()
+        .map_err(|e| e.to_string())?;
+
+    let body: Value = res.json().map_err(|e| e.to_string())?;
+    let files = body
+        .get("files")
+        .and_then(|v| v.as_array())
+        .ok_or("No files found")?;
+
+    let mut drive_files = Vec::new();
+    for f in files {
+        drive_files.push(DriveFile {
+            id: f["id"].as_str().unwrap_or_default().to_string(),
+            name: f["name"].as_str().unwrap_or_default().to_string(),
+            mime_type: f["mimeType"].as_str().unwrap_or_default().to_string(),
+            size: f["size"].as_str().map(|s| s.to_string()),
+        });
+    }
+    Ok(drive_files)
 }

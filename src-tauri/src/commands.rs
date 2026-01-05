@@ -162,6 +162,91 @@ pub async fn restore_data(
 }
 
 #[command]
+pub async fn upload_file(
+    account_id: i64,
+    folder_id: String,
+    file_path: String,
+) -> Result<String, String> {
+    tokio::task::spawn_blocking(move || {
+        crate::drive::upload_any_file(account_id, folder_id, file_path)
+    })
+    .await
+    .map_err(|e| e.to_string())?
+}
+
+#[command]
+pub async fn upload_file_with_data(
+    account_id: i64,
+    folder_id: String,
+    filename: String,
+    mime_type: String,
+    data: Vec<u8>,
+) -> Result<String, String> {
+    tokio::task::spawn_blocking(move || {
+        let token = crate::drive::get_token(Some(account_id))?;
+        let client = reqwest::blocking::Client::new();
+        crate::drive::upload_file_to_drive(&client, &token, &folder_id, &filename, data, &mime_type)
+    })
+    .await
+    .map_err(|e| e.to_string())?
+}
+
+#[command]
+pub async fn download_file(
+    account_id: i64,
+    file_id: String,
+    dest_path: String,
+) -> Result<String, String> {
+    tokio::task::spawn_blocking(move || {
+        // Resolve path: if relative, use Downloads folder
+        let path = if std::path::Path::new(&dest_path).is_absolute() {
+            std::path::PathBuf::from(dest_path)
+        } else {
+            dirs::download_dir()
+                .ok_or("Could not find Downloads directory")?
+                .join(dest_path)
+        };
+
+        crate::drive::download_any_file(account_id, file_id, path.to_string_lossy().to_string())
+            .map(|_| format!("Saved to: {}", path.to_string_lossy()))
+    })
+    .await
+    .map_err(|e| e.to_string())?
+}
+
+#[command]
+pub async fn save_local_file(
+    filename: String,
+    data: Vec<u8>,
+    target_folder: Option<String>,
+) -> Result<String, String> {
+    tokio::task::spawn_blocking(move || {
+        let folder = if let Some(f) = target_folder {
+            std::path::PathBuf::from(f)
+        } else {
+            dirs::download_dir().unwrap_or_else(|| std::path::PathBuf::from("."))
+        };
+
+        let path = folder.join(&filename);
+        std::fs::write(&path, data)
+            .map(|_| format!("{}", path.to_string_lossy()))
+            .map_err(|e| e.to_string())
+    })
+    .await
+    .map_err(|e| e.to_string())?
+}
+
+#[command]
+pub async fn list_drive_files(
+    account_id: i64,
+    folder_id: String,
+) -> Result<Vec<crate::drive::DriveFile>, String> {
+    tokio::task::spawn_blocking(move || crate::drive::list_files_in_folder(account_id, folder_id))
+        .await
+        .map_err(|e| e.to_string())?
+}
+
+#[command]
 pub fn get_app_icon(path: String) -> Option<String> {
     crate::icons::get_app_icon(&path)
 }
