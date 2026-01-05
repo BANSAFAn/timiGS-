@@ -179,7 +179,7 @@ const incomingFile = ref<{ name: string; size: number } | null>(null);
 // P2P Objects
 let peer: Peer | null = null;
 let conn: any = null;
-let receivedChunks: ArrayBuffer[] = [];
+let receivedChunks: { [key: number]: ArrayBuffer } = {}; // Store chunks by index
 let receivedSize = 0;
 
 onMounted(() => {
@@ -191,22 +191,35 @@ onUnmounted(() => {
 });
 
 function initPeer() {
-  // Use public PeerJS server
-  peer = new Peer();
-
-  peer.on("open", (id) => {
-    myPeerId.value = id;
-    console.log("My Peer ID:", id);
+  // Use public PeerJS server with Google STUN for better NAT traversal
+  peer = new Peer({
+    config: {
+      iceServers: [
+        { urls: 'stun:stun.l.google.com:19302' },
+        { urls: 'stun:stun1.l.google.com:19302' },
+        { urls: 'stun:stun2.l.google.com:19302' },
+      ],
+    },
   });
 
-  peer.on("connection", (c) => {
+  peer.on('open', (id) => {
+    myPeerId.value = id;
+    console.log('My Peer ID:', id);
+  });
+
+  peer.on('connection', (c) => {
     // Receiver Side Logic
     conn = c;
     setupReceiverConnection();
   });
 
-  peer.on("error", (err) => {
-    connectionError.value = "P2P Error: " + err.type;
+  peer.on('error', (err: any) => {
+    // Handle 'peer-unavailable' specifically
+    if (err.type === 'peer-unavailable') {
+      connectionError.value = "Peer not found. Check the token.";
+    } else {
+      connectionError.value = "P2P Error: " + (err.type || err);
+    }
     console.error(err);
   });
 }
@@ -221,21 +234,22 @@ function copyToken() {
 // SENDER LOGIC
 function connectToPeer() {
   if (!targetPeerId.value || !peer) return;
-  connectionError.value = "";
-
-  conn = peer.connect(targetPeerId.value);
-
-  conn.on("open", () => {
+  connectionError.value = '';
+  
+  // Connect with reliable: true to ensure ordered delivery if possible (though slower)
+  conn = peer.connect(targetPeerId.value, { reliable: true });
+  
+  conn.on('open', () => {
     isConnected.value = true;
     transferStatus.value = "";
   });
-
-  conn.on("error", (err: any) => {
+  
+  conn.on('error', (err: any) => {
     connectionError.value = "Connection failed: " + err;
     isConnected.value = false;
   });
-
-  conn.on("close", () => {
+  
+  conn.on('close', () => {
     isConnected.value = false;
     transferStatus.value = "Connection closed.";
   });
@@ -260,7 +274,7 @@ function onDrop(e: DragEvent) {
 
 function startTransfer() {
   if (!conn || !selectedFile.value) return;
-
+  
   const file = selectedFile.value;
   isTransferring.value = true;
   transferProgress.value = 0;
@@ -268,29 +282,40 @@ function startTransfer() {
 
   // 1. Send Metadata
   conn.send({
-    type: "meta",
+    type: 'meta',
     name: file.name,
-    size: file.size,
+    size: file.size
   });
 
   // 2. Read and Send Chunks
-  const chunkSize = 16384; // 16KB chunks
+  const chunkSize = 16384 * 4; // 64KB chunks might be better
   const reader = new FileReader();
   let offset = 0;
+  let chunkIndex = 0;
 
   reader.onload = (e) => {
     if (e.target?.result) {
-      conn.send(e.target.result); // Send ArrayBuffer
-      offset += (e.target.result as ArrayBuffer).byteLength;
-
+      const arrayBuffer = e.target.result as ArrayBuffer;
+      
+      // Send chunk with index
+      conn.send({
+        type: 'chunk',
+        index: chunkIndex,
+        data: arrayBuffer
+      });
+      
+      offset += arrayBuffer.byteLength;
+      chunkIndex++;
+      
       transferProgress.value = Math.round((offset / file.size) * 100);
 
+      // Small delay to prevent flooding connection
       if (offset < file.size) {
-        readNextChunk();
+        setTimeout(readNextChunk, 5);
       } else {
         isTransferring.value = false;
         transferStatus.value = "Transfer complete!";
-        conn.send({ type: "complete" });
+        conn.send({ type: 'complete', totalChunks: chunkIndex }); // Send total chunks count
       }
     }
   };
@@ -306,57 +331,68 @@ function startTransfer() {
 // RECEIVER LOGIC
 function setupReceiverConnection() {
   isConnected.value = true;
-  receivedChunks = [];
+  receivedChunks = {};
   receivedSize = 0;
 
-  conn.on("data", async (data: any) => {
+  conn.on('data', async (data: any) => {
     // Handle Meta
-    if (data.type === "meta") {
+    if (data.type === 'meta') {
       incomingFile.value = { name: data.name, size: data.size };
-      receivedChunks = [];
+      receivedChunks = {};
       receivedSize = 0;
       transferProgress.value = 0;
       return;
     }
 
-    // Handle Completion
-    if (data.type === "complete") {
-      saveReceivedFile();
-      return;
+    // Handle Data Chunk (Object with index)
+    if (data.type === 'chunk') {
+       receivedChunks[data.index] = data.data;
+       receivedSize += data.data.byteLength;
+       
+       if (incomingFile.value) {
+         transferProgress.value = Math.round((receivedSize / incomingFile.value.size) * 100);
+       }
     }
 
-    // Handle Data Chunk (ArrayBuffer)
-    if (data instanceof ArrayBuffer) {
-      receivedChunks.push(data);
-      receivedSize += data.byteLength;
-      if (incomingFile.value) {
-        transferProgress.value = Math.round(
-          (receivedSize / incomingFile.value.size) * 100
-        );
-      }
+    // Handle Completion
+    if (data.type === 'complete') {
+       saveReceivedFile(data.totalChunks);
+       return;
     }
   });
 
-  conn.on("close", () => {
+  conn.on('close', () => {
     isConnected.value = false;
   });
 }
 
-async function saveReceivedFile() {
+async function saveReceivedFile(totalChunks: number) {
   if (!incomingFile.value) return;
+  
+  // Reassemble in order
+  const chunksArray: ArrayBuffer[] = [];
+  for (let i = 0; i < totalChunks; i++) {
+    if (receivedChunks[i]) {
+      chunksArray.push(receivedChunks[i]);
+    } else {
+      console.error(`Missing chunk ${i}`);
+      alert("Transfer corrupted: missing chunks.");
+      return;
+    }
+  }
 
-  const blob = new Blob(receivedChunks);
+  const blob = new Blob(chunksArray);
   const arrayBuffer = await blob.arrayBuffer();
   const bytes = Array.from(new Uint8Array(arrayBuffer));
 
   transferStatus.value = "Saving file...";
-
+  
   // Use Rust to save to disk
   try {
-    const savedPath = await invoke("save_local_file", {
-      filename: incomingFile.value.name,
-      data: bytes,
-      targetFolder: savePath.value || null,
+    const savedPath = await invoke('save_local_file', {
+       filename: incomingFile.value.name,
+       data: bytes,
+       targetFolder: savePath.value || null
     });
     transferStatus.value = `File saved to: ${savedPath}`;
     alert(`File Received!\nSaved to: ${savedPath}`);
@@ -364,9 +400,9 @@ async function saveReceivedFile() {
     transferStatus.value = "Error saving file: " + e;
     alert("Save Error: " + e);
   }
-
+  
   incomingFile.value = null;
-  receivedChunks = [];
+  receivedChunks = {};
 }
 </script>
 

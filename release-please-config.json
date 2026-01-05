@@ -8,12 +8,15 @@
       "changelog-sections": [
         {"type": "feat", "section": "Features"},
         {"type": "fix", "section": "Bug Fixes"},
-        {"type": "chore", "section": "Miscellaneous", "hidden": true},
-        {"type": "docs", "section": "Documentation", "hidden": true},
-        {"type": "style", "section": "Styles", "hidden": true},
-        {"type": "refactor", "section": "Code Refactoring", "hidden": true},
-        {"type": "perf", "section": "Performance", "hidden": true},
-        {"type": "test", "section": "Tests", "hidden": true}
+        {"type": "chore", "section": "Miscellaneous", "hidden": false},
+        {"type": "docs", "section": "Documentation", "hidden": false},
+        {"type": "style", "section": "Styles", "hidden": false},
+        {"type": "refactor", "section": "Code Refactoring", "hidden": false},
+        {"type": "perf", "section": "Performance", "hidden": false},
+        {"type": "test", "section": "Tests", "hidden": false},
+        {"type": "ci", "section": "CI/CD", "hidden": false}, 
+        {"type": "build", "section": "Build System", "hidden": false},
+        {"type": "revert", "section": "Reverts", "hidden": false}
       ]
     }
   },
