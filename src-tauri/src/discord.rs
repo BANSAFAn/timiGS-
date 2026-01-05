@@ -5,7 +5,8 @@ use std::time::{SystemTime, UNIX_EPOCH};
 
 // Discord Client ID - injected at build time via environment variable
 // Set DISCORD_CLIENT_ID in your environment or GitHub Secrets
-const CLIENT_ID: &str = env!("DISCORD_CLIENT_ID");
+// If not set, Discord RPC will be disabled
+const CLIENT_ID: Option<&str> = option_env!("DISCORD_CLIENT_ID");
 
 // Global client state
 static CLIENT: Lazy<Mutex<Option<DiscordIpcClient>>> = Lazy::new(|| Mutex::new(None));
@@ -15,7 +16,16 @@ pub fn init() {
 }
 
 fn connect() {
-    let mut client = match DiscordIpcClient::new(CLIENT_ID) {
+    // Skip if no Client ID configured
+    let client_id = match CLIENT_ID {
+        Some(id) => id,
+        None => {
+            // Discord RPC disabled - no client ID configured
+            return;
+        }
+    };
+
+    let mut client = match DiscordIpcClient::new(client_id) {
         Ok(c) => c,
         Err(e) => {
             eprintln!("Failed to create Discord IPC client: {}", e);

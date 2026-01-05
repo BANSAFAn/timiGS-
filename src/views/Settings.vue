@@ -399,7 +399,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, reactive, onErrorCaptured, computed } from "vue";
+import { ref, onMounted, reactive, computed } from "vue";
 import { useI18n } from "vue-i18n";
 import { invoke } from "@tauri-apps/api/core";
 import { useActivityStore } from "../stores/activity";
@@ -443,7 +443,7 @@ const isReady = ref(false);
 const globalError = ref("");
 const isTracking = ref(false);
 const appVersion = ref("1.1.0");
-const googleUser = ref<any>(null);
+
 const isGitHubConnected = ref(false);
 
 const localSettings = reactive({
@@ -711,13 +711,6 @@ async function installUpdate() {
     isUpdating.value = false;
   }
 }
-
-const exportData = () => {
-  const githubToken = localStorage.getItem("github_token");
-  safeInvoke("backup_data", { githubToken }).then(() => alert("Exported!"));
-};
-const importData = () =>
-  safeInvoke("restore_data").then(() => alert("Imported!"));
 
 onMounted(() => {
   // Delay slightly to allow transition
