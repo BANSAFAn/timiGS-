@@ -13,6 +13,7 @@ jobs:
   # Create release PR via release-please
   release-please:
     name: 📦 Release Please
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     outputs:
       release_created: ${{ steps.release.outputs.release_created }}
