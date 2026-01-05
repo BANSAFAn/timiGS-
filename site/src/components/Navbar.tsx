@@ -31,6 +31,7 @@ const Navbar: React.FC<NavbarProps> = ({ lang, t, pathname }) => {
     { path: '/', label: t.nav.home },
     { path: '/releases', label: t.nav.releases },
     { path: '/download', label: t.nav.download },
+    { path: '/docs', label: t.nav.docs },
     { path: '/terms', label: t.nav.terms },
   ];
 

@@ -1,0 +1,17 @@
+[
+  {
+    "id": "intro",
+    "title": "Introduction",
+    "file": "1.md"
+  },
+  {
+    "id": "installation",
+    "title": "Installation",
+    "file": "install.md"
+  },
+  {
+    "id": "features",
+    "title": "Features",
+    "file": "features.md"
+  }
+]

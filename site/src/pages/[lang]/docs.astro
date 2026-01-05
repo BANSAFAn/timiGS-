@@ -1,0 +1,21 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import DocsViewer from "../../components/DocsViewer";
+
+export function getStaticPaths() {
+ return [
+    {params: {lang: 'en'}},
+    {params: {lang: 'uk'}},
+    {params: {lang: 'de'}},
+    {params: {lang: 'fr'}},
+    {params: {lang: 'ru'}},
+    {params: {lang: 'zh-CN'}},
+  ];
+}
+
+const { lang } = Astro.params;
+---
+
+<Layout title="Documentation - TimiGS">
+  <DocsViewer client:only="react" lang={lang} />
+</Layout>
