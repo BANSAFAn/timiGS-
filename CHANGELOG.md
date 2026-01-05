@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.20.0](https://github.com/BANSAFAn/timiGS-/compare/v1.19.0...v1.20.0) (2026-01-05)
+
+
+### Features
+
+* Add mandatory attribution and license info to UI ([85cf147](https://github.com/BANSAFAn/timiGS-/commit/85cf14721abda883bec8225d8f6367fb6cd79410))
+* Add multi-cloud account support and Drive export features ([4075e74](https://github.com/BANSAFAn/timiGS-/commit/4075e74389f2e58ab1b261dc428cf0a14a53c8c2))
+* add new website design ([c925c16](https://github.com/BANSAFAn/timiGS-/commit/c925c16086b3a696940789268826b4a742989a0a))
+* Add task title filter and improve Google Drive backup ([733066a](https://github.com/BANSAFAn/timiGS-/commit/733066a4124ad48ae1642ac4614c9b16299e71d6))
+* Add tasks and goals tracking feature ([45194b6](https://github.com/BANSAFAn/timiGS-/commit/45194b61241e31cb518668489249719b36729e60))
+* Create LICENSE ([85641d4](https://github.com/BANSAFAn/timiGS-/commit/85641d4249b249bbd4fde6eec6590a65373435b0))
+* fix Settings.vue ([a90f9b5](https://github.com/BANSAFAn/timiGS-/commit/a90f9b52ded56a8b2e205bc572959b49f4bd21b6))
+* style format rust code ([81daed6](https://github.com/BANSAFAn/timiGS-/commit/81daed665df6d4b4bfb8f48a32912c3c09839175))
+* update release ([bb67b9d](https://github.com/BANSAFAn/timiGS-/commit/bb67b9da13b4ca15a792fc065c51254b07058227))
+
 ## [1.19.0](https://github.com/BANSAFAn/timiGS-/compare/v1.18.0...v1.19.0) (2026-01-02)
 
 
