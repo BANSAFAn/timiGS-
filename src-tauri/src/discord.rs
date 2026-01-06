@@ -11,6 +11,7 @@ const CLIENT_ID: Option<&str> = option_env!("DISCORD_CLIENT_ID");
 // Global client state
 static CLIENT: Lazy<Mutex<Option<DiscordIpcClient>>> = Lazy::new(|| Mutex::new(None));
 
+#[allow(dead_code)]
 pub fn init() {
     connect();
 }

@@ -124,6 +124,7 @@ pub fn start_auth_flow() -> Result<String, String> {
 }
 
 // Function to refresh token if needed
+#[allow(dead_code)]
 pub fn get_valid_token() -> Result<String, String> {
     // Logic: Get access token, try to use it. If 401, use refresh token to get new one.
     // Simplifying: Just return stored access token for now.

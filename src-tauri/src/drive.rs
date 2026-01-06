@@ -1,7 +1,6 @@
-use crate::auth;
 use crate::db::{get_all_sessions, ActivitySession};
 use chrono;
-use reqwest::{blocking::Client, header};
+use reqwest::blocking::Client;
 use std::collections::HashMap;
 use std::fs;
 
