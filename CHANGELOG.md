@@ -1,5 +1,40 @@
 # Changelog
 
+## [1.20.0](https://github.com/BANSAFAn/timiGS-/compare/v1.19.0...v1.20.0) (2026-01-06)
+
+
+### Features
+
+* Add documentation viewer and docs navigation ([27a4f88](https://github.com/BANSAFAn/timiGS-/commit/27a4f884187bad57f3148729d8cbf4c30022e195))
+* Add file transfer features and P2P transfer view ([5a31bbb](https://github.com/BANSAFAn/timiGS-/commit/5a31bbb06fa3a261b9b5208763077e09a62a348c))
+* Add mandatory attribution and license info to UI ([85cf147](https://github.com/BANSAFAn/timiGS-/commit/85cf14721abda883bec8225d8f6367fb6cd79410))
+* Add multi-cloud account support and Drive export features ([4075e74](https://github.com/BANSAFAn/timiGS-/commit/4075e74389f2e58ab1b261dc428cf0a14a53c8c2))
+* add new website design ([c925c16](https://github.com/BANSAFAn/timiGS-/commit/c925c16086b3a696940789268826b4a742989a0a))
+* Add task title filter and improve Google Drive backup ([733066a](https://github.com/BANSAFAn/timiGS-/commit/733066a4124ad48ae1642ac4614c9b16299e71d6))
+* Add tasks and goals tracking feature ([45194b6](https://github.com/BANSAFAn/timiGS-/commit/45194b61241e31cb518668489249719b36729e60))
+* Create LICENSE ([85641d4](https://github.com/BANSAFAn/timiGS-/commit/85641d4249b249bbd4fde6eec6590a65373435b0))
+* fix Settings.vue ([a90f9b5](https://github.com/BANSAFAn/timiGS-/commit/a90f9b52ded56a8b2e205bc572959b49f4bd21b6))
+* style format rust code ([81daed6](https://github.com/BANSAFAn/timiGS-/commit/81daed665df6d4b4bfb8f48a32912c3c09839175))
+* transfer ([8623dae](https://github.com/BANSAFAn/timiGS-/commit/8623daed401b16d4a94a8994244380675548640b))
+* update release ([bb67b9d](https://github.com/BANSAFAn/timiGS-/commit/bb67b9da13b4ca15a792fc065c51254b07058227))
+
+
+### Bug Fixes
+
+* Refactor icons, add icon fix script, and minor code cleanup ([6f1181b](https://github.com/BANSAFAn/timiGS-/commit/6f1181bed7721617bb0b78820ed2aa2336c3d005))
+* Settings.vue ([514d7c1](https://github.com/BANSAFAn/timiGS-/commit/514d7c125298b533e5b33faf6ba6aec08c15f8c4))
+* tracker.rs (show icon more) ([a5bacc9](https://github.com/BANSAFAn/timiGS-/commit/a5bacc9fdb81e021983ea5542e6fe7f49485f008))
+
+
+### CI/CD
+
+* realese please fixing ([ccaa86b](https://github.com/BANSAFAn/timiGS-/commit/ccaa86b3a96e0be24ac5bfbd6c618dac07d672da))
+
+
+### Build System
+
+* fix tauri ico ([f9c9be6](https://github.com/BANSAFAn/timiGS-/commit/f9c9be6a1feb7e5012ebd63d028c7b537bf8adfe))
+
 ## [1.19.0](https://github.com/BANSAFAn/timiGS-/compare/v1.18.0...v1.19.0) (2026-01-02)
 
 
