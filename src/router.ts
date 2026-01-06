@@ -40,6 +40,11 @@ const routes = [
     name: "Transfer",
     component: () => import("./views/Transfer.vue"),
   },
+  {
+    path: "/compare",
+    name: "Compare",
+    component: () => import("./views/Compare.vue"),
+  },
 ];
 
 export const router = createRouter({
