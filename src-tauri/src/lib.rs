@@ -22,7 +22,6 @@ use tauri::{
 #[cfg(desktop)]
 use tauri_plugin_autostart::MacosLauncher;
 
-#[cfg(mobile)]
 #[cfg(target_os = "windows")]
 use windows::core::PCWSTR;
 #[cfg(target_os = "windows")]

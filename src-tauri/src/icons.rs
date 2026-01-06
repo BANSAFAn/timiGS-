@@ -21,6 +21,21 @@ use windows::Win32::UI::WindowsAndMessaging::{
     DestroyIcon, DrawIconEx, GetIconInfo, DI_NORMAL, HICON,
 };
 
+// Helper struct for Go-style defer is not native, implemented manually via scope guard or just manual cleanup
+macro_rules! defer {
+    ($($body:tt)*) => {
+        struct _Defer<F: FnOnce()>(Option<F>);
+        impl<F: FnOnce()> Drop for _Defer<F> {
+            fn drop(&mut self) {
+                if let Some(f) = self.0.take() {
+                    f();
+                }
+            }
+        }
+        let _defer = _Defer(Some(|| { $($body)* }));
+    }
+}
+
 pub fn get_app_icon(exe_path: &str) -> Option<String> {
     #[cfg(target_os = "windows")]
     unsafe {
