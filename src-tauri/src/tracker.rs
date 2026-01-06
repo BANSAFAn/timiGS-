@@ -13,7 +13,7 @@ use std::time::Duration;
 #[cfg(windows)]
 use windows::Win32::{
     Foundation::HWND,
-    System::ProcessStatus::GetModuleBaseNameW,
+    System::ProcessStatus::{GetModuleBaseNameW, GetModuleFileNameExW},
     System::Threading::{OpenProcess, PROCESS_QUERY_INFORMATION, PROCESS_VM_READ},
     UI::WindowsAndMessaging::{GetForegroundWindow, GetWindowTextW, GetWindowThreadProcessId},
 };
@@ -69,14 +69,41 @@ fn get_foreground_window_info() -> Option<ActiveWindow> {
         );
 
         let (app_name, exe_path) = if let Ok(handle) = process {
-            let mut name_buf = [0u16; 260];
-            let len = GetModuleBaseNameW(handle, None, &mut name_buf);
+            let mut name_buf = [0u16; 1024];
+            let len = windows::Win32::System::ProcessStatus::GetModuleFileNameExW(
+                handle,
+                None,
+                &mut name_buf,
+            );
 
             if len > 0 {
-                let exe_name = String::from_utf16_lossy(&name_buf[..len as usize]);
-                let app_name = exe_name.replace(".exe", "").replace(".EXE", "");
-                (app_name, exe_name)
+                let full_path = String::from_utf16_lossy(&name_buf[..len as usize]);
+                let path = std::path::Path::new(&full_path);
+
+                let exe_name = path
+                    .file_name()
+                    .and_then(|n| n.to_str())
+                    .unwrap_or("unknown.exe")
+                    .to_string();
+
+                let name_only = path
+                    .file_stem()
+                    .and_then(|n| n.to_str())
+                    .unwrap_or("Unknown")
+                    .to_string();
+
+                // Filter ignored apps
+                if name_only.eq_ignore_ascii_case("explorer")
+                    || name_only.eq_ignore_ascii_case("LockApp")
+                {
+                    let _ = windows::Win32::Foundation::CloseHandle(handle);
+                    return None;
+                }
+
+                let _ = windows::Win32::Foundation::CloseHandle(handle);
+                (name_only, full_path)
             } else {
+                let _ = windows::Win32::Foundation::CloseHandle(handle);
                 ("Unknown".to_string(), "unknown.exe".to_string())
             }
         } else {
