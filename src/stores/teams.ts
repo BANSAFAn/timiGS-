@@ -54,6 +54,18 @@ export const useTeamsStore = defineStore("teams", () => {
   const voiceConnections = ref<MediaConnection[]>([]);
   const voiceActive = ref(false);
   const remoteStreams = ref<Map<string, MediaStream>>(new Map());
+  
+  // Voice Controls
+  const isMuted = ref(false);
+  const isCameraOn = ref(false);
+  const isScreenSharing = ref(false);
+  
+  // Device Management
+  const audioInputDevices = ref<MediaDeviceInfo[]>([]);
+  const audioOutputDevices = ref<MediaDeviceInfo[]>([]);
+  const videoInputDevices = ref<MediaDeviceInfo[]>([]);
+  const selectedAudioInput = ref<string>("");
+  const selectedAudioOutput = ref<string>("");
 
   // Computed
   const isConnected = computed(() => !!peer.value && !peer.value.disconnected);
@@ -236,6 +248,62 @@ export const useTeamsStore = defineStore("teams", () => {
        
        // Ideally we re-enable camera if it was on.
        // toggleCamera(); // logic to start cam
+       isScreenSharing.value = false;
+  }
+
+  function toggleMute() {
+      if (!localStream.value) return;
+      const audioTrack = localStream.value.getAudioTracks()[0];
+      if (audioTrack) {
+          audioTrack.enabled = !audioTrack.enabled;
+          isMuted.value = !audioTrack.enabled;
+      }
+  }
+
+  async function loadDevices() {
+      try {
+          const devices = await navigator.mediaDevices.enumerateDevices();
+          audioInputDevices.value = devices.filter(d => d.kind === 'audioinput');
+          audioOutputDevices.value = devices.filter(d => d.kind === 'audiooutput');
+          videoInputDevices.value = devices.filter(d => d.kind === 'videoinput');
+          
+          // Set defaults if not set
+          if (!selectedAudioInput.value && audioInputDevices.value.length) {
+              selectedAudioInput.value = audioInputDevices.value[0].deviceId;
+          }
+          if (!selectedAudioOutput.value && audioOutputDevices.value.length) {
+              selectedAudioOutput.value = audioOutputDevices.value[0].deviceId;
+          }
+      } catch (e) {
+          console.error("Device Enum Error", e);
+      }
+  }
+
+  async function switchAudioInput(deviceId: string) {
+      selectedAudioInput.value = deviceId;
+      if (!localStream.value || !voiceActive.value) return;
+      
+      try {
+          const newStream = await navigator.mediaDevices.getUserMedia({
+              audio: { deviceId: { exact: deviceId } }
+          });
+          const newTrack = newStream.getAudioTracks()[0];
+          const oldTrack = localStream.value.getAudioTracks()[0];
+          
+          if (oldTrack) {
+              oldTrack.stop();
+              localStream.value.removeTrack(oldTrack);
+          }
+          localStream.value.addTrack(newTrack);
+          
+          // Update in active calls
+          voiceConnections.value.forEach(call => {
+              const sender = call.peerConnection.getSenders().find(s => s.track?.kind === 'audio');
+              if (sender) sender.replaceTrack(newTrack);
+          });
+      } catch (e) {
+          console.error("Switch Audio Error", e);
+      }
   }
 
   function leaveVoice() {
@@ -247,6 +315,9 @@ export const useTeamsStore = defineStore("teams", () => {
       voiceConnections.value = [];
       remoteStreams.value.clear();
       voiceActive.value = false;
+      isMuted.value = false;
+      isCameraOn.value = false;
+      isScreenSharing.value = false;
       updateMyStatus('online');
   }
   
@@ -527,6 +598,16 @@ export const useTeamsStore = defineStore("teams", () => {
     voiceActive,
     remoteStreams,
     localStream,
+    // Voice Controls
+    isMuted,
+    isCameraOn,
+    isScreenSharing,
+    audioInputDevices,
+    audioOutputDevices,
+    videoInputDevices,
+    selectedAudioInput,
+    selectedAudioOutput,
+    // Actions
     saveProfile,
     setProfileFromGoogle,
     createTeam,
@@ -540,6 +621,9 @@ export const useTeamsStore = defineStore("teams", () => {
     joinVoice,
     leaveVoice,
     toggleCamera,
-    shareScreen
+    shareScreen,
+    toggleMute,
+    loadDevices,
+    switchAudioInput
   };
 });

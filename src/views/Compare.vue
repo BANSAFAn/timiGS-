@@ -102,16 +102,19 @@
                
                <!-- Controls -->
                <div class="video-controls">
-                   <button class="icon-btn" :class="{ active: store.voiceActive }" @click="toggleVoice" title="Mute/Unmute Mic">
-                       🎙️
+                   <button class="icon-btn" :class="{ muted: store.isMuted }" @click="store.toggleMute()" title="Mute/Unmute Mic">
+                       {{ store.isMuted ? '🔇' : '🎙️' }}
                    </button>
-                   <button class="icon-btn" @click="store.toggleCamera()" title="Toggle Camera">
-                       📷
+                   <button class="icon-btn" :class="{ active: store.isCameraOn }" @click="store.toggleCamera()" title="Toggle Camera">
+                       {{ store.isCameraOn ? '📷' : '📷' }}
                    </button>
-                   <button class="icon-btn" @click="store.shareScreen()" title="Share Screen">
+                   <button class="icon-btn" :class="{ active: store.isScreenSharing }" @click="store.shareScreen()" title="Share Screen">
                        🖥️
                    </button>
-                    <button class="icon-btn danger" @click="store.leaveVoice()" title="Leave Call">
+                   <button class="icon-btn settings" @click="showDeviceSettings = true" title="Audio Settings">
+                       ⚙️
+                   </button>
+                   <button class="icon-btn danger" @click="store.leaveVoice()" title="Leave Call">
                        📞
                    </button>
                </div>
@@ -213,29 +216,107 @@
       </div>
 
       <!-- Set Goal Modal (Leader Only) -->
-      <div class="modal-overlay" v-if="showGoalModal">
-          <div class="glass-card modal">
-              <h3>Set New Goal</h3>
-              <div class="form-group">
-                 <label>Application / Website</label>
-                 <!-- App Selector -->
-                 <select v-model="goalApp" class="input-glass">
-                    <option value="" disabled>Select an app...</option>
-                    <option v-for="app in filteredApps" :key="app.app_name" :value="app.app_name">
-                        {{ app.app_name }}
-                    </option>
-                    <option value="Visual Studio Code">Visual Studio Code (Manual)</option>
-                    <option value="Figma">Figma (Manual)</option>
-                 </select>
-                 <input v-if="!goalApp" v-model="goalApp" placeholder="Or type manually..." style="margin-top: 8px" />
+      <div class="modal-overlay" v-if="showGoalModal" @click.self="showGoalModal = false">
+          <div class="glass-card modal goal-modal">
+              <div class="modal-header">
+                  <h3>🎯 Set Team Goal</h3>
+                  <button class="btn-close" @click="showGoalModal = false">✕</button>
               </div>
-              <div class="form-group">
-                 <label>Duration (Minutes)</label>
-                 <input type="number" v-model="goalMinutes" />
+              
+              <div class="goal-search">
+                  <input v-model="goalSearch" placeholder="Search applications..." class="input-glass" />
               </div>
+              
+              <div class="app-grid">
+                  <div 
+                      v-for="app in searchedApps" 
+                      :key="app.app_name" 
+                      class="app-card" 
+                      :class="{ selected: goalApp === app.app_name }"
+                      @click="goalApp = app.app_name"
+                  >
+                      <div class="app-icon">{{ getAppEmoji(app.app_name) }}</div>
+                      <div class="app-info">
+                          <span class="app-name">{{ app.app_name }}</span>
+                          <span class="app-time">{{ formatTime(app.total_seconds) }} today</span>
+                      </div>
+                      <div class="app-check" v-if="goalApp === app.app_name">✓</div>
+                  </div>
+                  
+                  <!-- Manual Entry Option -->
+                  <div class="app-card manual" :class="{ selected: goalApp && !filteredApps.find(a => a.app_name === goalApp) }">
+                      <div class="app-icon">✏️</div>
+                      <input 
+                          v-model="goalApp" 
+                          placeholder="Type app name..."
+                          class="manual-input"
+                          @click.stop
+                      />
+                  </div>
+              </div>
+              
+              <div class="goal-duration">
+                  <label>Duration</label>
+                  <div class="duration-options">
+                      <button 
+                          v-for="mins in [15, 30, 60, 120]" 
+                          :key="mins"
+                          class="duration-btn"
+                          :class="{ active: goalMinutes === mins }"
+                          @click="goalMinutes = mins"
+                      >
+                          {{ mins < 60 ? mins + 'm' : (mins/60) + 'h' }}
+                      </button>
+                      <input type="number" v-model="goalMinutes" class="duration-input" min="5" max="480" /> min
+                  </div>
+              </div>
+              
               <div class="modal-actions">
                   <button class="btn btn-text" @click="showGoalModal = false">Cancel</button>
-                  <button class="btn btn-primary" @click="createGoal">Set Goal</button>
+                  <button class="btn btn-primary" :disabled="!goalApp" @click="createGoal">
+                      🚀 Start Goal
+                  </button>
+              </div>
+          </div>
+      </div>
+
+      <!-- Device Settings Modal -->
+      <div class="modal-overlay" v-if="showDeviceSettings" @click.self="showDeviceSettings = false">
+          <div class="glass-card modal device-modal">
+              <div class="modal-header">
+                  <h3>🎧 Audio Settings</h3>
+                  <button class="btn-close" @click="showDeviceSettings = false">✕</button>
+              </div>
+              
+              <div class="device-section">
+                  <label>🎙️ Microphone</label>
+                  <select v-model="store.selectedAudioInput" @change="store.switchAudioInput(store.selectedAudioInput)" class="input-glass">
+                      <option v-for="device in store.audioInputDevices" :key="device.deviceId" :value="device.deviceId">
+                          {{ device.label || 'Microphone ' + device.deviceId.slice(0, 8) }}
+                      </option>
+                  </select>
+              </div>
+              
+              <div class="device-section">
+                  <label>🔊 Speakers</label>
+                  <select v-model="store.selectedAudioOutput" class="input-glass">
+                      <option v-for="device in store.audioOutputDevices" :key="device.deviceId" :value="device.deviceId">
+                          {{ device.label || 'Speaker ' + device.deviceId.slice(0, 8) }}
+                      </option>
+                  </select>
+              </div>
+              
+              <div class="device-section">
+                  <label>📷 Camera</label>
+                  <select class="input-glass">
+                      <option v-for="device in store.videoInputDevices" :key="device.deviceId" :value="device.deviceId">
+                          {{ device.label || 'Camera ' + device.deviceId.slice(0, 8) }}
+                      </option>
+                  </select>
+              </div>
+              
+              <div class="modal-actions">
+                  <button class="btn btn-primary" @click="showDeviceSettings = false">Done</button>
               </div>
           </div>
       </div>
@@ -258,8 +339,32 @@ const chatMsg = ref("");
 const chatBox = ref<HTMLElement | null>(null);
 
 const showGoalModal = ref(false);
+const showDeviceSettings = ref(false);
 const goalApp = ref("");
 const goalMinutes = ref(30);
+const goalSearch = ref("");
+
+// Computed for searching apps
+const searchedApps = computed(() => {
+    if (!goalSearch.value) return filteredApps.value;
+    return filteredApps.value.filter(app => 
+        app.app_name.toLowerCase().includes(goalSearch.value.toLowerCase())
+    );
+});
+
+// App emoji helper
+function getAppEmoji(appName: string): string {
+    const lower = appName.toLowerCase();
+    if (lower.includes('code') || lower.includes('studio')) return '💻';
+    if (lower.includes('chrome') || lower.includes('firefox') || lower.includes('edge')) return '🌐';
+    if (lower.includes('figma') || lower.includes('photoshop')) return '🎨';
+    if (lower.includes('discord') || lower.includes('slack') || lower.includes('teams')) return '💬';
+    if (lower.includes('spotify') || lower.includes('music')) return '🎵';
+    if (lower.includes('game') || lower.includes('steam')) return '🎮';
+    if (lower.includes('terminal') || lower.includes('cmd')) return '⌨️';
+    if (lower.includes('explorer') || lower.includes('finder')) return '📁';
+    return '📱';
+}
 
 // --- State Management ---
 const googleAccount = ref<{ email: string; name?: string } | null>(null);
@@ -380,6 +485,9 @@ const filteredApps = computed(() => {
 watch(() => store.messages.length, scrollToBottom);
 watch(showGoalModal, (val) => {
     if (val) activityStore.fetchTodayData();
+});
+watch(showDeviceSettings, (val) => {
+    if (val) store.loadDevices();
 });
 
 function createGoal() {
@@ -540,4 +648,47 @@ onUnmounted(() => {
 
 .full-width { width: 100%; }
 .text-xs { font-size: 0.75rem; }
+
+/* Muted State */
+.video-controls .icon-btn.muted { background: rgba(239,68,68,0.15); color: var(--color-danger); }
+.video-controls .icon-btn.settings { background: var(--bg-hover); }
+.video-controls .icon-btn.settings:hover { background: var(--bg-active); }
+
+/* Modal Header */
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.modal-header h3 { margin: 0; }
+.btn-close { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.2rem; padding: 4px; }
+.btn-close:hover { color: var(--text-color); }
+
+/* Goal Modal */
+.goal-modal { width: 500px; max-height: 80vh; overflow-y: auto; }
+.goal-search { margin-bottom: 12px; }
+.goal-search input { width: 100%; }
+
+.app-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; max-height: 250px; overflow-y: auto; padding-right: 8px; }
+.app-card { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 12px; background: rgba(255,255,255,0.03); border: 1px solid transparent; cursor: pointer; transition: all 0.15s; }
+.app-card:hover { background: rgba(255,255,255,0.06); border-color: var(--border-color); }
+.app-card.selected { background: rgba(99,102,241,0.15); border-color: var(--color-primary); }
+.app-card .app-icon { font-size: 1.5rem; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: var(--bg-hover); border-radius: 10px; }
+.app-card .app-info { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.app-card .app-name { font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.app-card .app-time { font-size: 0.75rem; color: var(--text-muted); }
+.app-card .app-check { color: var(--color-primary); font-weight: bold; font-size: 1.2rem; }
+.app-card.manual { grid-column: span 2; background: rgba(255,255,255,0.02); }
+.app-card .manual-input { flex: 1; background: transparent; border: none; color: var(--text-color); font-size: 0.9rem; outline: none; }
+
+.goal-duration { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-color); }
+.goal-duration label { display: block; margin-bottom: 8px; font-weight: 500; }
+.duration-options { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.duration-btn { padding: 8px 16px; border-radius: 20px; background: var(--bg-hover); border: 1px solid var(--border-color); cursor: pointer; font-weight: 500; transition: all 0.15s; color: var(--text-color); }
+.duration-btn:hover { background: var(--bg-active); }
+.duration-btn.active { background: var(--color-primary); color: white; border-color: var(--color-primary); }
+.duration-input { width: 60px; padding: 8px; border-radius: 8px; background: var(--bg-hover); border: 1px solid var(--border-color); text-align: center; color: var(--text-color); }
+
+/* Device Modal */
+.device-modal { width: 400px; }
+.device-section { margin-bottom: 16px; }
+.device-section label { display: block; margin-bottom: 8px; font-weight: 500; }
+.device-section select { width: 100%; padding: 10px 12px; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: var(--text-color); cursor: pointer; }
+.device-section select:hover { background: rgba(255,255,255,0.08); }
 </style>
