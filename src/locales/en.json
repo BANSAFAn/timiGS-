@@ -9,9 +9,9 @@
     "analytics": "Analytics",
     "tools": "Tools",
     "github": "GitHub",
-    "settings": "Settings"
+    "settings": "Settings",
+    "compare": "Teams"
   },
-
   "github": {
     "connection": "GitHub Connection",
     "connectDesc": "Connect your GitHub account to track your coding activity",
@@ -48,7 +48,9 @@
     "endTime": "End Time",
     "noSessions": "No sessions for this date",
     "websites": "Websites",
-    "noWebsites": "No website history found"
+    "noWebsites": "No website history found",
+    "noSearchResults": "Not found",
+    "websiteStats": "Stats Web"
   },
   "analytics": {
     "title": "Analytics",
@@ -126,15 +128,15 @@
     "untitled": "Untitled Note"
   },
   "tasks": {
-      "title": "Tasks & Goals",
-      "addTask": "Add Task",
-      "noTasks": "No active tasks",
-      "appName": "App Name",
-      "description": "Description",
-      "hours": "Hours",
-      "create": "Create",
-      "cancel": "Cancel",
-      "goal": "Goal"
+    "title": "Tasks & Goals",
+    "addTask": "Add Task",
+    "noTasks": "No active tasks",
+    "appName": "App Name",
+    "description": "Description",
+    "hours": "Hours",
+    "create": "Create",
+    "cancel": "Cancel",
+    "goal": "Goal"
   },
   "common": {
     "loading": "Loading...",

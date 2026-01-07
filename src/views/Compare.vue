@@ -14,24 +14,46 @@
         <div class="header-actions" v-if="store.isConnected">
             <button class="btn btn-secondary" @click="leaveTeam">Leave Team</button>
         </div>
+        <div class="header-actions" v-else-if="store.myProfile.name">
+             <button class="btn btn-text" @click="regenerateId" title="Refresh ID">↻ New ID</button>
+             <button class="btn btn-text danger" @click="logout" title="Clear Profile">Logout</button>
+        </div>
       </div>
 
       <!-- IDENTITY SETUP (If no name) -->
       <div class="setup-container animate-enter" v-if="!store.myProfile.name">
          <div class="glass-card setup-card">
-            <h3>Set Up Profile</h3>
-            <p>Enter your details to join teams.</p>
-            <div class="form-group">
-                <label>Nickname</label>
-                <input v-model="tempName" placeholder="e.g. Alex" />
-            </div>
-            <div class="form-group">
-                <label>Email (Optional)</label>
-                <input v-model="tempEmail" placeholder="alex@example.com" />
-            </div>
-            <button class="btn btn-primary" :disabled="!tempName" @click="saveProfile">Save Profile</button>
+            <div class="icon-circle primary" style="margin: 0 auto 16px;">🔑</div>
+            <h3>Welcome to Teams</h3>
+            <p style="margin-bottom: 24px">Please sign in with Google to continue.</p>
+            
+             <!-- Google Auth Option -->
+             <div class="google-auth-option" v-if="googleAccount">
+                 <div class="user-preview">
+                     <div class="avatar-preview">{{ googleAccount.email.charAt(0).toUpperCase() }}</div>
+                     <div class="user-details">
+                         <span class="name">{{ googleAccount.name || googleAccount.email.split('@')[0] }}</span>
+                         <span class="email">{{ googleAccount.email }}</span>
+                     </div>
+                 </div>
+                 <button class="btn btn-primary full-width" @click="loginWithGoogle">
+                     Continue as <strong>{{ googleAccount.name || googleAccount.email.split('@')[0] }}</strong>
+                 </button>
+                 <button class="btn btn-text sm" @click="startGoogleAuth">Switch Account</button>
+             </div>
+
+             <div class="google-auth-option" v-else>
+                 <button class="btn btn-google-login" @click="startGoogleAuth">
+                     <span class="icon">G</span>
+                     Sign in with Google
+                 </button>
+                 <p class="text-xs text-muted" style="margin-top: 12px">
+                     Secure authentication via Google is required to join teams.
+                 </p>
+             </div>
          </div>
       </div>
+
 
       <!-- LOBBY (If not connected) -->
       <div class="lobby-grid animate-enter" v-else-if="!store.isConnected">
@@ -60,18 +82,62 @@
          
          <!-- LEFT: Members & Chat -->
          <div class="col-left">
+            <!-- VIDEO GRID (PIP Style) -->
+            <div class="glass-card video-card" v-if="store.voiceActive">
+               <div class="video-container">
+                   <!-- Remote Videos -->
+                   <div class="remote-video" v-for="[peerId, stream] in store.remoteStreams" :key="peerId">
+                       <video :srcObject="stream" autoplay playsinline></video>
+                       <span class="peer-label">{{ getMemberName(peerId) }}</span>
+                   </div>
+                   <!-- Local Video (Mini) -->
+                   <div class="local-video" v-if="store.localStream">
+                       <video :srcObject="store.localStream" autoplay playsinline muted></video>
+                   </div>
+                   <!-- Placeholder if no video -->
+                   <div class="video-placeholder" v-if="store.remoteStreams.size === 0 && !store.localStream">
+                       Waiting for video...
+                   </div>
+               </div>
+               
+               <!-- Controls -->
+               <div class="video-controls">
+                   <button class="icon-btn" :class="{ active: store.voiceActive }" @click="toggleVoice" title="Mute/Unmute Mic">
+                       🎙️
+                   </button>
+                   <button class="icon-btn" @click="store.toggleCamera()" title="Toggle Camera">
+                       📷
+                   </button>
+                   <button class="icon-btn" @click="store.shareScreen()" title="Share Screen">
+                       🖥️
+                   </button>
+                    <button class="icon-btn danger" @click="store.leaveVoice()" title="Leave Call">
+                       📞
+                   </button>
+               </div>
+            </div>
+
             <!-- Members List -->
             <div class="glass-card members-card">
-               <h3>Members ({{ store.members.length }})</h3>
+               <div class="card-header">
+                  <h3>Members ({{ store.members.length }})</h3>
+                  <button class="icon-btn sm" @click="toggleVoice" :class="{ 'active': store.voiceActive }" title="Join Voice" v-if="!store.voiceActive">
+                     📞
+                  </button>
+               </div>
                <div class="members-list">
                   <div class="member-row" v-for="member in store.members" :key="member.id">
-                      <div class="avatar" :class="{ leader: member.isLeader }">
+                      <div class="avatar" :class="{ leader: member.isLeader, voice: member.status === 'voice' }">
                          {{ member.name.charAt(0).toUpperCase() }}
                       </div>
                       <div class="member-info">
                          <span class="member-name">{{ member.name }} <span v-if="member.id === store.myProfile.id">(You)</span></span>
-                         <span class="member-status">{{ member.isLeader ? 'Leader' : 'Member' }}</span>
+                         <span class="member-status">{{ member.isLeader ? 'Leader' : member.status }}</span>
                       </div>
+                      <!-- Kick Button (Admin) -->
+                      <button v-if="store.isLeader && member.id !== store.myProfile.id" class="icon-btn danger sm" @click="kickMember(member.id)" title="Kick">
+                         ✕
+                      </button>
                       <div class="member-progress-text" v-if="member.progress">
                          {{ member.progress.percentage }}%
                       </div>
@@ -101,7 +167,7 @@
              <div class="glass-card goal-card">
                 <div class="card-header">
                    <h3>Active Goal</h3>
-                   <span class="goal-status" v-if="store.activeGoal">IN PROGRESS</span>
+                   <span class="goal-status" v-if="store.activeGoal" :class="store.activeGoal.status">{{ store.activeGoal.status?.toUpperCase() || 'ACTIVE' }}</span>
                    <span class="goal-status idle" v-else>IDLE</span>
                 </div>
 
@@ -112,7 +178,15 @@
                       <p>{{ store.activeGoal.description }}</p>
                    </div>
                 </div>
-                <div v-else class="no-goal">
+                
+                <!-- Admin Goal Controls -->
+                <div v-if="store.isLeader && store.activeGoal" class="admin-actions">
+                     <button class="btn btn-success btn-sm" @click="store.updateGoalStatus('completed')">Done</button>
+                     <button class="btn btn-danger btn-sm" @click="store.updateGoalStatus('failed')">Fail</button>
+                     <button class="btn btn-secondary btn-sm" @click="store.updateGoalStatus('cancelled')">Cancel</button>
+                </div>
+
+                <div v-if="!store.activeGoal" class="no-goal">
                    <p>No active goal set.</p>
                    <button v-if="store.isLeader" class="btn btn-outline" @click="showGoalModal = true">Set Team Goal</button>
                 </div>
@@ -144,7 +218,16 @@
               <h3>Set New Goal</h3>
               <div class="form-group">
                  <label>Application / Website</label>
-                 <input v-model="goalApp" placeholder="e.g. VS Code, Figma" />
+                 <!-- App Selector -->
+                 <select v-model="goalApp" class="input-glass">
+                    <option value="" disabled>Select an app...</option>
+                    <option v-for="app in filteredApps" :key="app.app_name" :value="app.app_name">
+                        {{ app.app_name }}
+                    </option>
+                    <option value="Visual Studio Code">Visual Studio Code (Manual)</option>
+                    <option value="Figma">Figma (Manual)</option>
+                 </select>
+                 <input v-if="!goalApp" v-model="goalApp" placeholder="Or type manually..." style="margin-top: 8px" />
               </div>
               <div class="form-group">
                  <label>Duration (Minutes)</label>
@@ -156,13 +239,12 @@
               </div>
           </div>
       </div>
-
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, watch, nextTick, onMounted, onUnmounted } from "vue";
+import { ref, watch, nextTick, onMounted, onUnmounted, computed } from "vue";
 import { useTeamsStore } from "../stores/teams";
 import { useActivityStore } from "../stores/activity";
 
@@ -181,8 +263,36 @@ const goalMinutes = ref(30);
 
 // --- State Management ---
 
-function saveProfile() {
-  store.saveProfile(tempName.value, tempEmail.value);
+function saveProfile(name?: string, email?: string) {
+  store.saveProfile(name || tempName.value, email || tempEmail.value);
+}
+
+function logout() {
+    if (confirm("Clear profile and logout?")) {
+        store.saveProfile("", ""); // Clear local storage in store
+        tempName.value = "";
+        tempEmail.value = "";
+    }
+}
+
+async function regenerateId() {
+    // Force re-init peer
+    store.leaveTeam(); // Ensure disconnected
+    // We need a way to force new ID in store. Assuming initializePeer does it if peer is null
+    // But currently store caches peer.
+    // Ideally store should have resetPeer().
+    // For now, reload window is simplest, but let's try to just re-call createTeam logic which re-inits if null.
+    // Actually, `peer` in store is persistent. We need to destroy it.
+    window.location.reload(); 
+}
+
+// Google Auth Check
+async function checkGoogleProfile() {
+  if (store.myProfile.name) return;
+  try {
+     // const accounts = await invoke("get_cloud_accounts");
+     // ... logic
+  } catch {}
 }
 
 async function createTeam() {
@@ -199,7 +309,6 @@ function leaveTeam() {
 
 function copyId() {
   navigator.clipboard.writeText(store.myProfile.id);
-  // Optional: show toast
 }
 
 function sendChat() {
@@ -209,13 +318,32 @@ function sendChat() {
   scrollToBottom();
 }
 
+function toggleVoice() {
+    if (store.voiceActive) store.leaveVoice();
+    else store.joinVoice();
+}
+
+function kickMember(id: string) {
+    if (confirm("Kick this member?")) {
+        store.kickMember(id);
+    }
+}
+
 function scrollToBottom() {
   nextTick(() => {
     if (chatBox.value) chatBox.value.scrollTop = chatBox.value.scrollHeight;
   });
 }
 
+const filteredApps = computed(() => {
+    const ignored = ['lockapp', 'explorer', 'searchapp', 'shellexperiencehost', 'applicationframehost'];
+    return activityStore.topApps.filter(app => !ignored.includes(app.app_name.toLowerCase().replace(/\s/g, '')));
+});
+
 watch(() => store.messages.length, scrollToBottom);
+watch(showGoalModal, (val) => {
+    if (val) activityStore.fetchTodayData();
+});
 
 function createGoal() {
   store.setGoal(goalApp.value, goalMinutes.value * 60);
@@ -229,26 +357,33 @@ function formatTime(seconds: number) {
 }
 
 // --- Tracking Integration ---
-// Monitor activity store and report progress if matching active goal
 let trackInterval: number | null = null;
 
-onMounted(() => {
+onMounted(async () => {
+    // Try auto-fill profile
+    if (!store.myProfile.name) {
+       // Check settings for google accounts
+       // We can't access Settings.vue local state, so we invoke backend directly
+       try {
+           const { invoke } = await import("@tauri-apps/api/core");
+           const accounts: any = await invoke("get_cloud_accounts");
+           if (Array.isArray(accounts) && accounts.length > 0) {
+              const acc = accounts[0];
+              // Extract name if available or use email
+              tempName.value = acc.email.split('@')[0]; // Simple fallback
+              tempEmail.value = acc.email;
+              // Auto-save? Maybe better to let user confirm.
+              // saveProfile(tempName.value, tempEmail.value);
+           }
+       } catch {}
+    }
+
   trackInterval = window.setInterval(async () => {
-    if (store.isConnected && store.activeGoal) {
+    if (store.isConnected && store.activeGoal && store.activeGoal.status === 'active') { // Only track if active
       await activityStore.fetchCurrentActivity();
       const currentApp = activityStore.currentActivity?.app_name || "";
       
-      // Simple logic: If current app contains goal keyword
       if (currentApp.toLowerCase().includes(store.activeGoal.appName.toLowerCase())) {
-         // In real app, we'd sum up session time.
-         // Here, let's just increment a local "session time" counter or fetch from backend analytics.
-         // For demo, we rely on user strictly using it. Ideally, backend `get_today_summary` gives filtered time.
-         
-         // Let's use `get_today_summary` filtered by appName? Too heavy.
-         // Let's just create a tracker in store or use activityStore.
-         
-         // Simplest: Check if active matches. If yes, increment logic "server-side" or just assume +5s.
-         // Better: Scan `activityStore.topApps` for today to find total time for this app.
          await activityStore.fetchTodayData();
          const appStats = activityStore.topApps.find(a => a.app_name.toLowerCase().includes(store.activeGoal!.appName.toLowerCase()));
          const totalSeconds = appStats ? appStats.total_seconds : 0;
@@ -290,8 +425,10 @@ onUnmounted(() => {
 .members-list { overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding-top: 16px; }
 .member-row { display: flex; align-items: center; gap: 12px; padding: 8px; border-radius: 8px; transition: background 0.2s; }
 .member-row:hover { background: var(--bg-hover); }
-.avatar { width: 40px; height: 40px; background: var(--bg-hover); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--text-muted); border: 2px solid transparent; }
+.avatar { width: 40px; height: 40px; background: var(--bg-hover); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--text-muted); border: 2px solid transparent; position: relative; }
 .avatar.leader { border-color: var(--color-warning); color: var(--color-warning); }
+.avatar.voice { box-shadow: 0 0 0 2px var(--color-success); }
+.avatar.voice::after { content: '🎤'; position: absolute; bottom: -5px; right: -5px; font-size: 10px; background: var(--bg-color); border-radius: 50%; padding: 2px; }
 .member-info { flex: 1; display: flex; flex-direction: column; line-height: 1.2; }
 .member-name { font-weight: 600; font-size: 0.9rem; }
 .member-status { font-size: 0.75rem; color: var(--text-muted); }
@@ -311,6 +448,14 @@ onUnmounted(() => {
 .card-header { display: flex; justify-content: space-between; align-items: center; }
 .goal-status { font-size: 0.75rem; font-weight: bold; background: rgba(16,185,129,0.2); color: var(--color-success); padding: 4px 8px; border-radius: 4px; }
 .goal-status.idle { background: var(--bg-hover); color: var(--text-muted); }
+.goal-status.completed { background: rgba(16,185,129,0.2); color: var(--color-success); }
+.goal-status.failed { background: rgba(239,68,68,0.2); color: var(--color-danger); }
+.goal-status.cancelled { background: rgba(255,255,255,0.1); color: var(--text-muted); }
+
+.admin-actions { display: flex; gap: 8px; margin-top: 16px; justify-content: flex-end; }
+.btn-success { background: var(--color-success); color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; }
+.btn-danger { background: var(--color-danger); color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; }
+
 .goal-details { display: flex; align-items: center; gap: 16px; background: var(--bg-hover); padding: 16px; border-radius: 12px; }
 .goal-icon { font-size: 2rem; }
 .goal-text h4 { margin: 0; font-size: 1.1rem; }
@@ -331,8 +476,46 @@ onUnmounted(() => {
 /* Form */
 .form-group { display: flex; flex-direction: column; gap: 6px; text-align: left; }
 .form-group label { font-size: 0.9rem; color: var(--text-muted); }
-.form-group input { padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-color); }
+.form-group input, .form-group select { padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-color); }
+.form-group select option { background: var(--bg-color); color: var(--text-color); }
+.input-glass { background: rgba(255,255,255,0.05); }
+
+.icon-btn.sm { width: 32px; height: 32px; font-size: 0.8rem; }
+.icon-btn.active { color: var(--color-success); background: rgba(16,185,129,0.1); }
+.icon-btn.danger { color: var(--color-danger); }
+.icon-btn.danger:hover { background: rgba(239,68,68,0.1); }
 
 .animate-enter { animation: fadeIn 0.3s ease-out; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Video */
+.video-card { min-height: 250px; display: flex; flex-direction: column; overflow: hidden; background: black; }
+.video-container { flex: 1; position: relative; display: flex; align-items: center; justify-content: center; background: #111; }
+.remote-video { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+.remote-video video { width: 100%; height: 100%; object-fit: contain; }
+.local-video { position: absolute; bottom: 16px; right: 16px; width: 120px; height: 90px; background: #222; border-radius: 8px; border: 2px solid var(--border-color); overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
+.local-video video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
+.video-placeholder { color: var(--text-muted); font-size: 0.9rem; }
+.peer-label { position: absolute; bottom: 8px; left: 8px; background: rgba(0,0,0,0.6); padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; pointer-events: none; }
+
+.video-controls { display: flex; align-items: center; justify-content: center; gap: 16px; padding: 12px; background: rgba(255,255,255,0.02); border-top: 1px solid var(--border-color); }
+.video-controls .icon-btn { width: 40px; height: 40px; font-size: 1.2rem; border-radius: 50%; background: var(--bg-hover); }
+.video-controls .icon-btn:hover { background: var(--bg-active); }
+.video-controls .icon-btn.active { background: var(--color-success); color: white; }
+.video-controls .icon-btn.danger { background: var(--color-danger); color: white; }
+
+/* Google Button */
+.google-auth-option { display: flex; flex-direction: column; align-items: center; gap: 16px; margin-bottom: 24px; width: 100%; }
+.btn-google-login { display: flex; align-items: center; gap: 10px; background: white; color: rgba(0,0,0,0.7); font-weight: 500; font-family: 'Roboto', sans-serif; padding: 12px 24px; border-radius: 24px; border: 1px solid #ddd; cursor: pointer; transition: transform 0.1s; width: 100%; justify-content: center; font-size: 1rem; }
+.btn-google-login:hover { background: #f8f9fa; transform: translateY(-1px); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+.btn-google-login .icon { font-weight: bold; font-family: 'Product Sans', sans-serif; color: #4285f4; font-size: 1.4rem; }
+
+.user-preview { display: flex; align-items: center; gap: 12px; background: var(--bg-hover); padding: 8px 16px; border-radius: 12px; width: 100%; margin-bottom: 8px; text-align: left; }
+.avatar-preview { width: 40px; height: 40px; background: var(--color-primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2rem; }
+.user-details { display: flex; flex-direction: column; }
+.user-details .name { font-weight: 600; font-size: 1rem; }
+.user-details .email { font-size: 0.8rem; color: var(--text-muted); }
+
+.full-width { width: 100%; }
+.text-xs { font-size: 0.75rem; }
 </style>

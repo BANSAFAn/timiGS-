@@ -1,13 +1,13 @@
 import { defineStore } from "pinia";
 import { ref, reactive, computed } from "vue";
-import Peer, { type DataConnection } from "peerjs";
+import Peer, { type DataConnection, type MediaConnection } from "peerjs";
 
 export interface TeamMember {
   id: string; // Peer ID
   name: string;
   email: string; // Optional, can be empty
   isLeader: boolean;
-  status: 'online' | 'offline' | 'busy';
+  status: 'online' | 'offline' | 'busy' | 'voice';
   progress?: {
     appName: string;
     current: number; // seconds
@@ -28,6 +28,7 @@ export interface TeamGoal {
   appName: string; // e.g., "Visual Studio Code" or "figma.com"
   targetSeconds: number;
   description: string;
+  status?: 'active' | 'completed' | 'failed' | 'cancelled';
 }
 
 export const useTeamsStore = defineStore("teams", () => {
@@ -48,6 +49,12 @@ export const useTeamsStore = defineStore("teams", () => {
   const messages = ref<ChatMessage[]>([]);
   const activeGoal = ref<TeamGoal | null>(null);
   
+  // Voice State
+  const localStream = ref<MediaStream | null>(null);
+  const voiceConnections = ref<MediaConnection[]>([]);
+  const voiceActive = ref(false);
+  const remoteStreams = ref<Map<string, MediaStream>>(new Map());
+
   // Computed
   const isConnected = computed(() => !!peer.value && !peer.value.disconnected);
   // const amILeader = computed(() => isLeader.value);
@@ -58,6 +65,10 @@ export const useTeamsStore = defineStore("teams", () => {
     myProfile.email = email;
     localStorage.setItem("timigs_team_name", name);
     localStorage.setItem("timigs_team_email", email);
+  }
+
+  function setProfileFromGoogle(name: string, email: string) {
+     if (!myProfile.name) saveProfile(name, email);
   }
 
   function initializePeer() {
@@ -78,6 +89,9 @@ export const useTeamsStore = defineStore("teams", () => {
         // Setup listener for incoming connections (Host logic mostly)
         newPeer.on('connection', handleIncomingConnection);
         
+        // Setup listener for incoming voice calls
+        newPeer.on('call', handleIncomingCall);
+
         resolve(id);
       });
 
@@ -89,9 +103,6 @@ export const useTeamsStore = defineStore("teams", () => {
   }
 
   function handleIncomingConnection(conn: DataConnection) {
-    // If I am not leader and already connected to someone, I might reject? 
-    // Or simpler: anyone takes incoming, but only Leader logic handles grouping.
-    
     conn.on('open', () => {
       console.log("New connection from:", conn.peer);
       connections.value.push(conn);
@@ -100,20 +111,194 @@ export const useTeamsStore = defineStore("teams", () => {
       conn.send({ type: 'REQUEST_PROFILE' });
       
       if (isLeader.value) {
-        // As leader, I accept them into the team
-        // Wait for profile response to add to members list
+        broadcastState();
       }
     });
-
-    conn.on('data', (data: any) => handleData(data, conn));
     
+    conn.on('data', (data: any) => handleData(data, conn));
+
     conn.on('close', () => {
-        // Remove from members
-        members.value = members.value.filter(m => m.id !== conn.peer);
-        connections.value = connections.value.filter(c => c.peer !== conn.peer);
-        broadcastState(); // Notify others
+      members.value = members.value.filter(m => m.id !== conn.peer);
+      connections.value = connections.value.filter(c => c.peer !== conn.peer);
+      broadcastState();
     });
   }
+
+  // --- Voice/Video Logic ---
+  async function joinVoice(video = false) {
+    if (voiceActive.value) return;
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ 
+            audio: true, 
+            video: video ? { width: 1280, height: 720 } : false 
+        });
+        localStream.value = stream;
+        voiceActive.value = true;
+        
+        // Update status
+        updateMyStatus('voice');
+
+        // Call everyone
+        if (isLeader.value) {
+            connections.value.forEach(conn => callPeer(conn.peer, stream));
+        } else {
+             callPeer(currentTeamId.value, stream);
+        }
+    } catch (e) {
+        console.error("Voice Error:", e);
+    }
+  }
+
+  async function toggleCamera() {
+      if (!localStream.value) {
+          await joinVoice(true);
+          return;
+      }
+      
+      const videoTrack = localStream.value.getVideoTracks()[0];
+      if (videoTrack) {
+          // Toggle existing
+          videoTrack.enabled = !videoTrack.enabled;
+          // If we stopped it, maybe we want to actually stop the track to turn off light?
+          // videoTrack.stop(); // But then we need to re-request. `enabled = false` is mute.
+          // To truly "Turn On" if we started with audio-only:
+      } else {
+          // We started with audio-only, now want video
+          try {
+              const videoStream = await navigator.mediaDevices.getUserMedia({ video: true });
+              const newTrack = videoStream.getVideoTracks()[0];
+              localStream.value.addTrack(newTrack);
+              
+              // Replace track in active calls
+              voiceConnections.value.forEach(call => {
+                  const sender = call.peerConnection.getSenders().find(s => s.track?.kind === 'video');
+                  if (sender) sender.replaceTrack(newTrack);
+                  else call.peerConnection.addTrack(newTrack, localStream.value!);
+              });
+          } catch(e) { 
+              console.error("Cam Error", e);
+          }
+      }
+  }
+
+  async function shareScreen() {
+      if (!localStream.value) await joinVoice(false);
+      
+      try {
+          // @ts-ignore - getDisplayMedia exists
+          const screenStream = await navigator.mediaDevices.getDisplayMedia({ 
+              video: { cursor: "always" }, 
+              audio: false 
+          });
+          
+          const screenTrack = screenStream.getVideoTracks()[0];
+          
+          screenTrack.onended = () => {
+              stopScreenShare(); // Handle "Stop Sharing" floating UI click
+          };
+
+          // Replace video track in local stream logic is tricky if we want both Cam + Screen.
+          // For now, simpler: Screen replaces Cam or is the only video.
+          // Or we trigger a special "SCREEN_SHARE" call?
+          // Replacing track is smoothest.
+          
+          const videoTrack = localStream.value!.getVideoTracks()[0];
+          if (videoTrack) {
+              videoTrack.stop();
+              localStream.value!.removeTrack(videoTrack);
+          }
+          localStream.value!.addTrack(screenTrack);
+          
+          // Update peers
+          voiceConnections.value.forEach(call => {
+               const sender = call.peerConnection.getSenders().find(s => s.track?.kind === 'video');
+               if (sender) sender.replaceTrack(screenTrack);
+               else call.peerConnection.addTrack(screenTrack, localStream.value!);
+          });
+          
+      } catch (e) {
+          console.error("Screen Share Error", e);
+      }
+  }
+  
+  function stopScreenShare() {
+      // Revert to camera or just audio?
+      // For now, just stop video.
+       if (localStream.value) {
+          const videoTrack = localStream.value.getVideoTracks()[0];
+          if (videoTrack) {
+              videoTrack.stop();
+              localStream.value.removeTrack(videoTrack);
+          }
+       }
+       // Notify peers essentially by track ending or replacing with nothing? 
+       // They will see black frame. 
+       
+       // Ideally we re-enable camera if it was on.
+       // toggleCamera(); // logic to start cam
+  }
+
+  function leaveVoice() {
+      if (localStream.value) {
+          localStream.value.getTracks().forEach(track => track.stop());
+          localStream.value = null;
+      }
+      voiceConnections.value.forEach(call => call.close());
+      voiceConnections.value = [];
+      remoteStreams.value.clear();
+      voiceActive.value = false;
+      updateMyStatus('online');
+  }
+  
+  function callPeer(peerId: string, stream: MediaStream) {
+     if (!peer.value) return;
+     const call = peer.value.call(peerId, stream);
+     setupCallEvents(call);
+  }
+
+  function handleIncomingCall(call: MediaConnection) {
+      if (voiceActive.value && localStream.value) {
+          call.answer(localStream.value);
+          setupCallEvents(call);
+      } else {
+          // Auto-join voice as listener/talker if called?
+          // For now, we must be in voice mode to answer.
+          // Or we auto-answer with audio only?
+          // Let's simple: Auto answer audio-only if not yet setup.
+          navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+              localStream.value = stream;
+              voiceActive.value = true;
+              call.answer(stream);
+              setupCallEvents(call);
+          }).catch(e => {
+               console.error("Could not auto-answer", e);
+               call.close();
+          });
+      }
+  }
+
+  function setupCallEvents(call: MediaConnection) {
+      call.on('stream', (remoteStream) => {
+          console.log("Got remote stream from", call.peer);
+          remoteStreams.value.set(call.peer, remoteStream);
+          // Don't auto-play audio element here, we do it in UI
+      });
+      call.on('close', () => {
+          remoteStreams.value.delete(call.peer);
+      });
+      call.on('error', (e) => console.error("Call error", e));
+      voiceConnections.value.push(call);
+  }
+  
+  function updateMyStatus(status: 'online' | 'voice') {
+      const self = members.value.find(m => m.id === myProfile.id);
+      if (self) self.status = status;
+      
+      const payload = { id: myProfile.id, status };
+       if (isLeader.value) broadcast({ type: 'STATUS_UPDATE', payload });
+       else connections.value.forEach(c => c.send({ type: 'STATUS_UPDATE', payload }));
+  }
+
 
   function handleData(data: any, conn: DataConnection) {
     switch (data.type) {
@@ -127,7 +312,6 @@ export const useTeamsStore = defineStore("teams", () => {
 
       case 'PROFILE_RESPONSE':
         // A new member sent their details
-        // Or the leader sent their details
         handleProfileResponse(data.payload, conn);
         break;
 
@@ -136,10 +320,15 @@ export const useTeamsStore = defineStore("teams", () => {
         if (!isLeader.value) {
           members.value = data.payload.members;
           activeGoal.value = data.payload.goal;
-          // Merge messages or replace? Replace for simplicity now, or append new
-          // messages.value = data.payload.messages; 
         }
         break;
+        
+      case 'STATUS_UPDATE':
+         // Update member status
+         const m = members.value.find(mem => mem.id === data.payload.id);
+         if (m) m.status = data.payload.status;
+         if (isLeader.value) broadcast(data, conn.peer);
+         break;
 
       case 'CHAT_MESSAGE':
         messages.value.push(data.payload);
@@ -210,8 +399,35 @@ export const useTeamsStore = defineStore("teams", () => {
   }
 
   function setGoal(appName: string, targetSeconds: number) {
-    activeGoal.value = { appName, targetSeconds, description: `Work on ${appName} for ${Math.floor(targetSeconds/60)}m` };
+    activeGoal.value = { 
+        appName, 
+        targetSeconds, 
+        description: `Work on ${appName} for ${Math.floor(targetSeconds/60)}m`,
+        status: 'active'
+    };
     broadcastState();
+  }
+  
+  function updateGoalStatus(status: 'completed' | 'failed' | 'cancelled') {
+      if (activeGoal.value) {
+          activeGoal.value.status = status;
+          broadcastState();
+      }
+  }
+
+  function kickMember(memberId: string) {
+      if (!isLeader.value) return;
+      
+      // Notify them
+      const conn = connections.value.find(c => c.peer === memberId);
+      if (conn) {
+          conn.send({ type: 'KICK' });
+          conn.close();
+      }
+      
+      // Remove local
+      members.value = members.value.filter(m => m.id !== memberId);
+      broadcastState();
   }
 
   function broadcastState() {
@@ -221,7 +437,6 @@ export const useTeamsStore = defineStore("teams", () => {
       payload: {
         members: members.value,
         goal: activeGoal.value,
-        // messages: messages.value // Optional sync
       }
     };
     connections.value.forEach(conn => conn.send(state));
@@ -245,14 +460,13 @@ export const useTeamsStore = defineStore("teams", () => {
     conn.on('open', () => {
       console.log("Connected to Leader");
       connections.value.push(conn);
-      // Wait for REQUEST_PROFILE or send immediately?
-      // Usually Host asks, but we can preventively send
     });
     conn.on('data', (d) => handleData(d, conn));
     conn.on('close', leaveTeam);
   }
 
   function leaveTeam() {
+    leaveVoice(); // Ensure voice is closed
     connections.value.forEach(c => c.close());
     connections.value = [];
     isLeader.value = false;
@@ -310,12 +524,22 @@ export const useTeamsStore = defineStore("teams", () => {
     isLeader,
     currentTeamId,
     isConnected,
+    voiceActive,
+    remoteStreams,
+    localStream,
     saveProfile,
+    setProfileFromGoogle,
     createTeam,
     joinTeam,
     leaveTeam,
     setGoal,
+    updateGoalStatus,
+    kickMember,
     sendMessage,
-    sendProgress
+    sendProgress,
+    joinVoice,
+    leaveVoice,
+    toggleCamera,
+    shareScreen
   };
 });
