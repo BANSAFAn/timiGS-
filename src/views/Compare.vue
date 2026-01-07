@@ -262,37 +262,75 @@ const goalApp = ref("");
 const goalMinutes = ref(30);
 
 // --- State Management ---
+const googleAccount = ref<{ email: string; name?: string } | null>(null);
 
 function saveProfile(name?: string, email?: string) {
   store.saveProfile(name || tempName.value, email || tempEmail.value);
 }
 
+function loginWithGoogle() {
+  if (googleAccount.value) {
+    const name = googleAccount.value.name || googleAccount.value.email.split('@')[0];
+    saveProfile(name, googleAccount.value.email);
+  }
+}
+
+async function startGoogleAuth() {
+  try {
+    const { invoke } = await import("@tauri-apps/api/core");
+    const { open } = await import("@tauri-apps/plugin-shell");
+    
+    const port = await invoke("start_google_auth_server");
+    await open(`http://localhost:${port}/auth/google`);
+    
+    // Start polling for account
+    const poll = setInterval(async () => {
+      const accounts: any = await invoke("get_cloud_accounts");
+      if (Array.isArray(accounts) && accounts.length > 0) {
+        googleAccount.value = accounts[0];
+        clearInterval(poll);
+      }
+    }, 2000);
+  } catch (e) {
+    console.error("Auth Error", e);
+    alert("Failed to start Google Auth. Please try again.");
+  }
+}
+
+function getMemberName(peerId: string) {
+  const m = store.members.find(x => x.id === peerId);
+  return m ? m.name : 'Unknown';
+}
+
 function logout() {
-    if (confirm("Clear profile and logout?")) {
-        store.saveProfile("", ""); // Clear local storage in store
-        tempName.value = "";
-        tempEmail.value = "";
-    }
+  if (confirm("Clear profile and logout?")) {
+    store.saveProfile("", "");
+    tempName.value = "";
+    tempEmail.value = "";
+    googleAccount.value = null;
+    window.location.reload();
+  }
 }
 
 async function regenerateId() {
-    // Force re-init peer
-    store.leaveTeam(); // Ensure disconnected
-    // We need a way to force new ID in store. Assuming initializePeer does it if peer is null
-    // But currently store caches peer.
-    // Ideally store should have resetPeer().
-    // For now, reload window is simplest, but let's try to just re-call createTeam logic which re-inits if null.
-    // Actually, `peer` in store is persistent. We need to destroy it.
-    window.location.reload(); 
+  store.leaveTeam();
+  window.location.reload(); 
 }
 
 // Google Auth Check
 async function checkGoogleProfile() {
   if (store.myProfile.name) return;
   try {
-     // const accounts = await invoke("get_cloud_accounts");
-     // ... logic
-  } catch {}
+    const { invoke } = await import("@tauri-apps/api/core");
+    const accounts: any = await invoke("get_cloud_accounts");
+    if (Array.isArray(accounts) && accounts.length > 0) {
+      googleAccount.value = accounts[0];
+      tempName.value = accounts[0].name || accounts[0].email.split('@')[0];
+      tempEmail.value = accounts[0].email;
+    }
+  } catch (e) {
+    console.error(e);
+  }
 }
 
 async function createTeam() {
@@ -360,23 +398,8 @@ function formatTime(seconds: number) {
 let trackInterval: number | null = null;
 
 onMounted(async () => {
-    // Try auto-fill profile
-    if (!store.myProfile.name) {
-       // Check settings for google accounts
-       // We can't access Settings.vue local state, so we invoke backend directly
-       try {
-           const { invoke } = await import("@tauri-apps/api/core");
-           const accounts: any = await invoke("get_cloud_accounts");
-           if (Array.isArray(accounts) && accounts.length > 0) {
-              const acc = accounts[0];
-              // Extract name if available or use email
-              tempName.value = acc.email.split('@')[0]; // Simple fallback
-              tempEmail.value = acc.email;
-              // Auto-save? Maybe better to let user confirm.
-              // saveProfile(tempName.value, tempEmail.value);
-           }
-       } catch {}
-    }
+    // Load any existing Google account
+    await checkGoogleProfile();
 
   trackInterval = window.setInterval(async () => {
     if (store.isConnected && store.activeGoal && store.activeGoal.status === 'active') { // Only track if active

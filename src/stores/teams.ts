@@ -187,7 +187,7 @@ export const useTeamsStore = defineStore("teams", () => {
       try {
           // @ts-ignore - getDisplayMedia exists
           const screenStream = await navigator.mediaDevices.getDisplayMedia({ 
-              video: { cursor: "always" }, 
+              video: true, 
               audio: false 
           });
           
