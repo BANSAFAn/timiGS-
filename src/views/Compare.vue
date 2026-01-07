@@ -278,10 +278,9 @@ function loginWithGoogle() {
 async function startGoogleAuth() {
   try {
     const { invoke } = await import("@tauri-apps/api/core");
-    const { open } = await import("@tauri-apps/plugin-shell");
     
-    const port = await invoke("start_google_auth_server");
-    await open(`http://localhost:${port}/auth/google`);
+    // Call login_google which starts auth flow and opens browser
+    await invoke("login_google");
     
     // Start polling for account
     const poll = setInterval(async () => {
@@ -293,7 +292,7 @@ async function startGoogleAuth() {
     }, 2000);
   } catch (e) {
     console.error("Auth Error", e);
-    alert("Failed to start Google Auth. Please try again.");
+    alert("Failed to start Google Auth. " + (e instanceof Error ? e.message : String(e)));
   }
 }
 
