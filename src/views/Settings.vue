@@ -729,6 +729,11 @@ async function saveSettings() {
 }
 
 function toggleTracking() {
+  if (store.isMobile) {
+    alert("Background tracking is only available on Desktop (Windows).");
+    return;
+  }
+
   if (isTracking.value) {
     safeInvoke("stop_tracking");
     isTracking.value = false;
@@ -785,9 +790,19 @@ async function fetchCloudAccounts() {
 async function handleGoogleAuth() {
   isConnecting.value = true;
   try {
-    await safeInvoke("login_google");
-    // Wait a bit for DB update then refresh list
-    setTimeout(fetchCloudAccounts, 2000);
+    const res: any = await safeInvoke("login_google");
+    
+    // Check if mobile response
+    if (typeof res === 'string' && res.includes("mobile")) {
+      alert(res);
+      // Don't fetch accounts immediately, wait for deep link
+    } else {
+      // Desktop flow (server returns success)
+      setTimeout(fetchCloudAccounts, 2000);
+    }
+  } catch (e) {
+    console.error("Auth error:", e);
+    globalError.value = typeof e === 'string' ? e : "Authentication failed";
   } finally {
     isConnecting.value = false;
   }

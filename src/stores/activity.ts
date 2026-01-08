@@ -60,7 +60,8 @@ export const useActivityStore = defineStore('activity', {
       discord_rpc: true
     } as Settings,
     isTracking: false,
-    isLoading: false
+    isLoading: false,
+    isMobile: false
   }),
 
   getters: {
@@ -207,6 +208,14 @@ export const useActivityStore = defineStore('activity', {
       } catch (error) {
         console.error('Failed to stop tracking:', error);
       }
+    },
+
+    async checkPlatform() {
+        // Simple check: if window.screen.width < 768 or navigator.userAgent ... 
+        // Better: use explicit Tauri API if available, or just heuristic for now.
+        // We can check if 'shutdown_pc' is supported or if 'get_current_activity' returns null constantly.
+        // But let's use a simple detection.
+        this.isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     },
 
     async getActivityRange(from: string, to: string) {

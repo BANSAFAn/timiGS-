@@ -75,7 +75,7 @@
     "theme": "Theme",
     "themeDark": "Dark",
     "themeLight": "Light",
-    "autostart": "Start with Windows",
+    "autostart": "Auto-start",
     "minimizeToTray": "Minimize to system tray",
     "discordRpc": "Discord Rich Presence",
     "discordRpcDesc": "Show activity on Discord profile",

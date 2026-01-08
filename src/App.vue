@@ -261,6 +261,7 @@ watch(() => store.settings.theme, (newTheme) => {
 });
 
 onMounted(async () => {
+  await store.checkPlatform();
   await store.fetchSettings();
   document.documentElement.setAttribute("data-theme", store.settings.theme);
   checkGitHubConnection();
