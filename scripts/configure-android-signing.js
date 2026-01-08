@@ -1,5 +1,5 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
 const gradlePath = path.join('src-tauri', 'gen', 'android', 'app', 'build.gradle.kts');
 
