@@ -70,6 +70,13 @@
           <span>{{ $t("nav.tools") }}</span>
         </router-link>
 
+        <router-link to="/weather" class="nav-link" active-class="active">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 0 0 4 4h.9a5 5 0 1 0 5.15-8.7A6 6 0 1 0 3 15z" />
+          </svg>
+          <span>Weather</span>
+        </router-link>
+
         <router-link
           v-if="isGitHubConnected"
           to="/github"
@@ -194,6 +201,13 @@
           <line x1="9" y1="20" x2="15" y2="20" stroke-width="2" />
         </svg>
         <span>Tools</span>
+      </router-link>
+
+      <router-link to="/weather" class="bottom-nav-item" active-class="active">
+         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 0 0 4 4h.9a5 5 0 1 0 5.15-8.7A6 6 0 1 0 3 15z" />
+         </svg>
+        <span>Weather</span>
       </router-link>
 
       <router-link to="/transfer" class="bottom-nav-item" active-class="active">

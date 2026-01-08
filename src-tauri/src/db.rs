@@ -42,6 +42,8 @@ pub struct Settings {
     pub autostart: bool,
     pub minimize_to_tray: bool,
     pub discord_rpc: bool,
+    pub google_client_id: Option<String>,
+    pub google_client_secret: Option<String>,
 }
 
 impl Default for Settings {
@@ -52,6 +54,8 @@ impl Default for Settings {
             autostart: true,
             minimize_to_tray: true,
             discord_rpc: true,
+            google_client_id: None,
+            google_client_secret: None,
         }
     }
 }
@@ -361,6 +365,22 @@ pub fn get_settings() -> Settings {
             settings.discord_rpc = discord == "true";
         }
 
+        if let Ok(client_id) = conn.query_row(
+            "SELECT value FROM settings WHERE key = 'google_client_id'",
+            [],
+            |row| row.get::<_, String>(0),
+        ) {
+            settings.google_client_id = Some(client_id);
+        }
+
+        if let Ok(client_secret) = conn.query_row(
+            "SELECT value FROM settings WHERE key = 'google_client_secret'",
+            [],
+            |row| row.get::<_, String>(0),
+        ) {
+            settings.google_client_secret = Some(client_secret);
+        }
+
         settings
     } else {
         Settings::default()
@@ -399,6 +419,20 @@ pub fn save_settings(settings: &Settings) -> Result<()> {
             "false"
         }],
     )?;
+
+    if let Some(client_id) = &settings.google_client_id {
+        conn.execute(
+            "INSERT OR REPLACE INTO settings (key, value) VALUES ('google_client_id', ?1)",
+            [client_id],
+        )?;
+    }
+
+    if let Some(client_secret) = &settings.google_client_secret {
+        conn.execute(
+            "INSERT OR REPLACE INTO settings (key, value) VALUES ('google_client_secret', ?1)",
+            [client_secret],
+        )?;
+    }
 
     Ok(())
 }

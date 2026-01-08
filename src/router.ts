@@ -21,6 +21,11 @@ const routes = [
     component: Analytics,
   },
   {
+    path: "/weather",
+    name: "Weather",
+    component: () => import("./views/Weather.vue"),
+  },
+  {
     path: "/settings",
     name: "Settings",
     component: Settings,

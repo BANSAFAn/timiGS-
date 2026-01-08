@@ -94,6 +94,9 @@
     "syncGoogle": "Google Account Sync",
     "syncGoogleDesc": "Sync your activity data to Google Drive",
     "googleDrive": "Google Drive",
+    "googleClientId": "Client ID",
+    "googleClientSecret": "Client Secret",
+    "connectAccount": "Connect Account",
     "connectGoogle": "Connect Google",
     "connected": "Connected",
     "localStorage": "Local Storage",
@@ -137,6 +140,9 @@
     "create": "Create",
     "cancel": "Cancel",
     "goal": "Goal"
+  },
+  "weather": {
+    "title": "Weather & Activity"
   },
   "common": {
     "loading": "Loading...",
