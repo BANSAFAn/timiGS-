@@ -69,6 +69,9 @@ pub fn run() {
         ));
 
     let builder = builder.setup(|app| {
+        #[cfg(any(target_os = "android", target_os = "ios"))]
+        let _ = app;
+
         // Start tracking on app launch (only on desktop)
         #[cfg(desktop)]
         tracker::start_tracking();

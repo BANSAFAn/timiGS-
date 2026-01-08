@@ -22,6 +22,7 @@ use windows::Win32::UI::WindowsAndMessaging::{
 };
 
 // Helper struct for Go-style defer is not native, implemented manually via scope guard or just manual cleanup
+#[cfg(target_os = "windows")]
 macro_rules! defer {
     ($($body:tt)*) => {
         struct _Defer<F: FnOnce()>(Option<F>);

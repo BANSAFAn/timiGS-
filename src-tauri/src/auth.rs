@@ -6,6 +6,7 @@ use oauth2::{
 use crate::db;
 use once_cell::sync::Lazy;
 use parking_lot::Mutex;
+#[cfg(not(target_os = "android"))]
 use tiny_http::{Response, Server};
 
 // TODO: Replace with env vars or settings
@@ -38,14 +39,13 @@ fn get_client() -> Result<BasicClient, String> {
         REDIRECT_URL_DESKTOP
     };
 
-    BasicClient::new(
+    Ok(BasicClient::new(
         ClientId::new(client_id),
         Some(ClientSecret::new(client_secret)),
         AuthUrl::new(AUTH_URL.to_string()).map_err(|e| e.to_string())?,
         Some(TokenUrl::new(TOKEN_URL.to_string()).map_err(|e| e.to_string())?),
     )
-    .set_redirect_uri(RedirectUrl::new(redirect_url.to_string()).map_err(|e| e.to_string())?)
-    .map_err(|e| e.to_string())
+    .set_redirect_uri(RedirectUrl::new(redirect_url.to_string()).map_err(|e| e.to_string())?))
 }
 
 pub fn start_auth_flow() -> Result<String, String> {
