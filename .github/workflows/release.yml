@@ -167,7 +167,6 @@ jobs:
           "
 
       - name: Init Android
-      - name: Init Android
         run: cargo tauri android init
 
       - name: Generate Android Icons
