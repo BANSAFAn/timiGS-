@@ -169,6 +169,9 @@ jobs:
       - name: Init Android
         run: cargo tauri android init
 
+      - name: Configure Android Signing
+        run: node scripts/configure-android-signing.js
+
       # Build Universal APK
       - name: Build Universal APK
         run: cargo tauri android build --apk true --target aarch64 --target x86_64 --target armv7 --target i686
