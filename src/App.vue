@@ -224,7 +224,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import { useActivityStore } from "./stores/activity";
 import NotificationToast from "./components/NotificationToast.vue";
 
@@ -237,6 +237,11 @@ function checkGitHubConnection() {
 
 // Listen for storage changes (when user connects in Settings)
 window.addEventListener("storage", checkGitHubConnection);
+
+// Reactive Theme Switching
+watch(() => store.settings.theme, (newTheme) => {
+  document.documentElement.setAttribute("data-theme", newTheme);
+});
 
 onMounted(async () => {
   await store.fetchSettings();
@@ -262,5 +267,15 @@ onMounted(async () => {
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+
+/* Hide labels on mobile bottom nav */
+@media (max-width: 768px) {
+  .bottom-nav-item span {
+    display: none;
+  }
+  .bottom-nav-item svg {
+    margin-bottom: 0;
+  }
 }
 </style>
