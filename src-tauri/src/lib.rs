@@ -55,7 +55,8 @@ pub fn run() {
     let builder = tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_shell::init())
-        .plugin(tauri_plugin_process::init());
+        .plugin(tauri_plugin_process::init())
+        .plugin(tauri_plugin_deep_link::init());
 
     // Desktop-only plugins
     #[cfg(desktop)]
@@ -149,6 +150,7 @@ pub fn run() {
             commands::stop_tracking,
             commands::is_tracking,
             commands::login_google,
+            commands::exchange_google_code,
             commands::get_google_user,
             commands::backup_data,
             commands::restore_data,

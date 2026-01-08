@@ -101,6 +101,13 @@ pub async fn login_google() -> Result<String, String> {
         .map_err(|e| e.to_string())?
 }
 
+#[command]
+pub async fn exchange_google_code(code: String) -> Result<String, String> {
+    tokio::task::spawn_blocking(move || crate::auth::exchange_auth_code(code))
+        .await
+        .map_err(|e| e.to_string())?
+}
+
 // Old method for backward compatibility / single account check
 #[command]
 pub fn get_google_user() -> Option<String> {
