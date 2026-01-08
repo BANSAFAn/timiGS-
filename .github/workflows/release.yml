@@ -167,7 +167,14 @@ jobs:
           "
 
       - name: Init Android
+      - name: Init Android
         run: cargo tauri android init
+
+      - name: Generate Android Icons
+        run: npx tauri icon src-tauri/icons/icon.png
+
+      - name: Patch Android Manifest (Deep Links & Permissions)
+        run: node scripts/patch-android-manifest.js
 
       - name: Configure Android Signing
         run: node scripts/configure-android-signing.js
