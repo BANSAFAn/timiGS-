@@ -226,6 +226,7 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from "vue";
 import { invoke } from "@tauri-apps/api/core";
+// @ts-ignore
 import { onOpenUrl } from "@tauri-apps/plugin-deep-link";
 import { useActivityStore } from "./stores/activity";
 import NotificationToast from "./components/NotificationToast.vue";
@@ -252,7 +253,8 @@ onMounted(async () => {
 
   // Setup Deep Link Listener (Mobile Auth)
   try {
-    await onOpenUrl((urls) => {
+    // @ts-ignore
+    await onOpenUrl((urls: string[]) => {
       console.log('Deep link received:', urls);
       for (const url of urls) {
         if (url.includes('code=')) {
