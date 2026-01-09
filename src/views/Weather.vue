@@ -88,15 +88,17 @@
           
           <!-- Data points (high) -->
           <circle v-for="(point, i) in chartHighPoints" :key="'h'+i" :cx="point.x" :cy="point.y" r="5" fill="#ff6b6b" />
+          <text v-for="(point, i) in chartHighPoints" :key="'ht'+i" :x="point.x" :y="point.y - 10" text-anchor="middle" fill="#ff6b6b" font-size="12" font-weight="bold">{{ Math.round(forecast[i].high) }}°</text>
           
           <!-- Data points (low) -->
           <circle v-for="(point, i) in chartLowPoints" :key="'l'+i" :cx="point.x" :cy="point.y" r="4" fill="#6b9bff" />
+          <text v-for="(point, i) in chartLowPoints" :key="'lt'+i" :x="point.x" :y="point.y + 20" text-anchor="middle" fill="#6b9bff" font-size="12">{{ Math.round(forecast[i].low) }}°</text>
         </svg>
         
         <!-- Legend -->
         <div class="chart-legend">
-          <span class="legend-item"><span class="legend-dot high"></span> High</span>
-          <span class="legend-item"><span class="legend-dot low"></span> Low</span>
+          <span class="legend-item"><span class="legend-dot high"></span> High Temp</span>
+          <span class="legend-item"><span class="legend-dot low"></span> Low Temp</span>
         </div>
       </div>
       
@@ -225,12 +227,39 @@ import { ref, onMounted, reactive, computed } from 'vue';
 const isEnabled = ref(true);
 const showSettings = ref(false);
 
-// --- Chart Computed Properties ---
+// --- Chart Computed Properties (Smooth Curves) ---
+
+
+
+function getSmoothPath(points: {x: number, y: number}[]) {
+    if (points.length === 0) return "";
+    if (points.length === 1) return `M ${points[0].x} ${points[0].y}`;
+    
+    let path = `M ${points[0].x} ${points[0].y}`;
+    
+    for (let i = 0; i < points.length - 1; i++) {
+        const p0 = points[Math.max(0, i - 1)];
+        const p1 = points[i];
+        const p2 = points[i + 1];
+        const p3 = points[Math.min(points.length - 1, i + 2)];
+        
+        // Simple catmull-rom to cubic bezier conversion logic or tension-based
+        // Simplified approach for fixed points:
+        const cp1x = p1.x + (p2.x - p0.x) * 0.15; // Tension 0.15
+        const cp1y = p1.y + (p2.y - p0.y) * 0.15;
+        const cp2x = p2.x - (p3.x - p1.x) * 0.15;
+        const cp2y = p2.y - (p3.y - p1.y) * 0.15;
+        
+        path += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${p2.x} ${p2.y}`;
+    }
+    return path;
+}
+
 const chartHighPoints = computed(() => {
   if (forecast.value.length === 0) return [];
   const highs = forecast.value.map(d => d.high);
-  const min = Math.min(...highs, ...forecast.value.map(d => d.low));
-  const max = Math.max(...highs);
+  const min = Math.min(...highs, ...forecast.value.map(d => d.low)) - 2; // Add padding
+  const max = Math.max(...highs) + 2;
   const range = max - min || 1;
   
   return forecast.value.map((day, i) => ({
@@ -243,8 +272,8 @@ const chartLowPoints = computed(() => {
   if (forecast.value.length === 0) return [];
   const lows = forecast.value.map(d => d.low);
   const highs = forecast.value.map(d => d.high);
-  const min = Math.min(...lows, ...highs);
-  const max = Math.max(...highs);
+  const min = Math.min(...lows, ...highs) - 2;
+  const max = Math.max(...highs) + 2;
   const range = max - min || 1;
   
   return forecast.value.map((day, i) => ({
@@ -253,21 +282,19 @@ const chartLowPoints = computed(() => {
   }));
 });
 
-const chartHighPath = computed(() => {
-  if (chartHighPoints.value.length === 0) return '';
-  return `M ${chartHighPoints.value.map(p => `${p.x},${p.y}`).join(' L ')}`;
-});
-
-const chartLowPath = computed(() => {
-  if (chartLowPoints.value.length === 0) return '';
-  return `M ${chartLowPoints.value.map(p => `${p.x},${p.y}`).join(' L ')}`;
-});
+const chartHighPath = computed(() => getSmoothPath(chartHighPoints.value));
+const chartLowPath = computed(() => getSmoothPath(chartLowPoints.value));
 
 const chartAreaPath = computed(() => {
   if (chartHighPoints.value.length === 0) return '';
-  const points = chartHighPoints.value;
-  return `M ${points[0].x},120 L ${points.map(p => `${p.x},${p.y}`).join(' L ')} L ${points[points.length-1].x},120 Z`;
+  const highPath = getSmoothPath(chartHighPoints.value);
+  const lastX = chartHighPoints.value[chartHighPoints.value.length - 1].x;
+  const firstX = chartHighPoints.value[0].x;
+  
+  // Close the loop for area fill
+  return `${highPath} L ${lastX} 120 L ${firstX} 120 Z`;
 });
+
 
 function getWeatherClass(code: number) {
   if (code === 0) return 'weather-sunny';
@@ -450,7 +477,6 @@ interface HistoryEntry {
 
 const history = ref<HistoryEntry[]>([]);
 
-
 function saveConfig() {
   localStorage.setItem('weather_config', JSON.stringify(config));
 }
@@ -480,38 +506,79 @@ function stringToColor(str: string) {
   return '#' + '00000'.substring(0, 6 - c.length) + c;
 }
 
+import { useActivityStore } from '../stores/activity';
+
+const activityStore = useActivityStore();
+
+
 async function loadHistory() {
    const days = 7;
    const today = new Date();
-   
+   const pastDate = new Date(today);
+   pastDate.setDate(today.getDate() - days);
+
+   // Helper for Local ISO Date String (YYYY-MM-DD)
+   const getLocalDateStr = (d: Date) => {
+       const year = d.getFullYear();
+       const month = String(d.getMonth() + 1).padStart(2, '0');
+       const day = String(d.getDate()).padStart(2, '0');
+       return `${year}-${month}-${day}`;
+   };
+
+   const toStr = getLocalDateStr(today);
+   const fromStr = getLocalDateStr(pastDate);
+
+   console.log(`Loading history from ${fromStr} to ${toStr}`);
+
+   // Fetch real activity data
+   // We assume db.rs/get_activity_range uses inclusive string comparison
+   const sessions = await activityStore.getActivityRange(fromStr + " 00:00:00", toStr + " 23:59:59");
+   console.log("Sessions found:", sessions.length);
+
    const newHistory: HistoryEntry[] = [];
 
+   // Process last 7 days (reverse order: Today -> Past)
    for (let i = 0; i < days; i++) {
       const date = new Date(today);
       date.setDate(date.getDate() - i);
-      
-      const mockApps = [
-         { name: "VS Code", duration: 3600 },
-         { name: "Chrome", duration: 1800 },
-         { name: "Discord", duration: 900 },
-         { name: "Spotify", duration: 7200 }
-      ];
+      const dateStr = getLocalDateStr(date);
 
-      const count = Math.floor(Math.random() * 4) + 1;
-      const daysApps = mockApps.slice(0, count);
+      // Filter sessions for this day (Matches "YYYY-MM-DD HH:mm:ss")
+      const daySessions = sessions.filter(s => s.start_time.startsWith(dateStr));
+
+      // Aggregate by App Name
+      const appMap: Record<string, number> = {};
+      daySessions.forEach(s => {
+          if (!appMap[s.app_name]) appMap[s.app_name] = 0;
+          appMap[s.app_name] += s.duration_seconds;
+      });
+
+      // Convert to array and sort
+      const sortedApps = Object.entries(appMap)
+         .map(([name, duration]) => ({ name, duration }))
+         .sort((a, b) => b.duration - a.duration);
+
+      const topApps = sortedApps.slice(0, 4);
+      const moreCount = Math.max(0, sortedApps.length - 4);
+
+      // Weather Data (Forecast or fallback)
+      const forecastDay = forecast.value.find(d => d.date === dateStr);
+      let weatherCode = forecastDay ? forecastDay.code : (Math.random() > 0.5 ? 1 : 2); 
+      let temp = forecastDay ? forecastDay.high : (15 + Math.floor(Math.random() * 10) - (i*2));
 
       newHistory.push({
-         date: date.toISOString().split('T')[0],
+         date: dateStr,
          day: date.getDate().toString(),
          month: date.toLocaleString('default', { month: 'short' }),
-         weatherCode: [0, 1, 61, 71][Math.floor(Math.random() * 4)],
-         temp: 15 + Math.floor(Math.random() * 10),
-         apps: daysApps,
-         moreCount: 0
+         weatherCode: weatherCode,
+         temp: temp,
+         apps: topApps, // Real app data
+         moreCount: moreCount
       });
    }
    history.value = newHistory;
 }
+
 
 // Initial Load
 onMounted(() => {

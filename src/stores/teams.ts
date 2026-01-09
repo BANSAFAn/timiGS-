@@ -8,6 +8,8 @@ export interface TeamMember {
   email: string; // Optional, can be empty
   isLeader: boolean;
   status: 'online' | 'offline' | 'busy' | 'voice';
+  isScreenSharing?: boolean;
+  currentApp?: string;
   progress?: {
     appName: string;
     current: number; // seconds
@@ -206,14 +208,9 @@ export const useTeamsStore = defineStore("teams", () => {
           const screenTrack = screenStream.getVideoTracks()[0];
           
           screenTrack.onended = () => {
-              stopScreenShare(); // Handle "Stop Sharing" floating UI click
+              stopScreenShare(); 
           };
 
-          // Replace video track in local stream logic is tricky if we want both Cam + Screen.
-          // For now, simpler: Screen replaces Cam or is the only video.
-          // Or we trigger a special "SCREEN_SHARE" call?
-          // Replacing track is smoothest.
-          
           const videoTrack = localStream.value!.getVideoTracks()[0];
           if (videoTrack) {
               videoTrack.stop();
@@ -221,12 +218,14 @@ export const useTeamsStore = defineStore("teams", () => {
           }
           localStream.value!.addTrack(screenTrack);
           
-          // Update peers
           voiceConnections.value.forEach(call => {
                const sender = call.peerConnection.getSenders().find(s => s.track?.kind === 'video');
                if (sender) sender.replaceTrack(screenTrack);
                else call.peerConnection.addTrack(screenTrack, localStream.value!);
           });
+          
+          isScreenSharing.value = true;
+          updateMyStatus('voice', true);
           
       } catch (e) {
           console.error("Screen Share Error", e);
@@ -234,8 +233,6 @@ export const useTeamsStore = defineStore("teams", () => {
   }
   
   function stopScreenShare() {
-      // Revert to camera or just audio?
-      // For now, just stop video.
        if (localStream.value) {
           const videoTrack = localStream.value.getVideoTracks()[0];
           if (videoTrack) {
@@ -243,12 +240,10 @@ export const useTeamsStore = defineStore("teams", () => {
               localStream.value.removeTrack(videoTrack);
           }
        }
-       // Notify peers essentially by track ending or replacing with nothing? 
-       // They will see black frame. 
-       
-       // Ideally we re-enable camera if it was on.
-       // toggleCamera(); // logic to start cam
        isScreenSharing.value = false;
+       updateMyStatus('voice', false);
+       
+       // Optional: Try to restore camera here if needed
   }
 
   function toggleMute() {
@@ -318,7 +313,7 @@ export const useTeamsStore = defineStore("teams", () => {
       isMuted.value = false;
       isCameraOn.value = false;
       isScreenSharing.value = false;
-      updateMyStatus('online');
+      updateMyStatus('online', false);
   }
   
   function callPeer(peerId: string, stream: MediaStream) {
@@ -332,10 +327,7 @@ export const useTeamsStore = defineStore("teams", () => {
           call.answer(localStream.value);
           setupCallEvents(call);
       } else {
-          // Auto-join voice as listener/talker if called?
-          // For now, we must be in voice mode to answer.
-          // Or we auto-answer with audio only?
-          // Let's simple: Auto answer audio-only if not yet setup.
+          // Auto-join voice audio-only
           navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
               localStream.value = stream;
               voiceActive.value = true;
@@ -352,7 +344,6 @@ export const useTeamsStore = defineStore("teams", () => {
       call.on('stream', (remoteStream) => {
           console.log("Got remote stream from", call.peer);
           remoteStreams.value.set(call.peer, remoteStream);
-          // Don't auto-play audio element here, we do it in UI
       });
       call.on('close', () => {
           remoteStreams.value.delete(call.peer);
@@ -361,13 +352,23 @@ export const useTeamsStore = defineStore("teams", () => {
       voiceConnections.value.push(call);
   }
   
-  function updateMyStatus(status: 'online' | 'voice') {
+  function updateMyStatus(status: 'online' | 'voice', sharing?: boolean) {
       const self = members.value.find(m => m.id === myProfile.id);
-      if (self) self.status = status;
+      if (self) {
+          self.status = status;
+          if (typeof sharing === 'boolean') {
+              self.isScreenSharing = sharing;
+          }
+      }
       
-      const payload = { id: myProfile.id, status };
-       if (isLeader.value) broadcast({ type: 'STATUS_UPDATE', payload });
-       else connections.value.forEach(c => c.send({ type: 'STATUS_UPDATE', payload }));
+      const payload = { 
+          id: myProfile.id, 
+          status, 
+          isScreenSharing: typeof sharing === 'boolean' ? sharing : self?.isScreenSharing 
+      };
+      
+      if (isLeader.value) broadcast({ type: 'STATUS_UPDATE', payload });
+      else connections.value.forEach(c => c.send({ type: 'STATUS_UPDATE', payload }));
   }
 
 
@@ -397,7 +398,12 @@ export const useTeamsStore = defineStore("teams", () => {
       case 'STATUS_UPDATE':
          // Update member status
          const m = members.value.find(mem => mem.id === data.payload.id);
-         if (m) m.status = data.payload.status;
+         if (m) {
+             m.status = data.payload.status;
+             if (data.payload.isScreenSharing !== undefined) {
+                 m.isScreenSharing = data.payload.isScreenSharing;
+             }
+         }
          if (isLeader.value) broadcast(data, conn.peer);
          break;
 
@@ -416,6 +422,14 @@ export const useTeamsStore = defineStore("teams", () => {
           broadcastState(); // Reflect change to everyone
         }
         break;
+
+      case 'ACTIVITY_UPDATE':
+         if (isLeader.value) {
+            updateMemberActivity(conn.peer, data.payload.appName);
+            broadcastState();
+         }
+         break;
+        
         
       case 'KICK':
          // I was kicked
@@ -587,6 +601,20 @@ export const useTeamsStore = defineStore("teams", () => {
     }
   }
 
+  function sendActivity(appName: string) {
+      if (!isLeader.value) {
+          connections.value.forEach(c => c.send({ type: 'ACTIVITY_UPDATE', payload: { appName } }));
+      }
+      // Update local
+      updateMemberActivity(myProfile.id, appName);
+      if (isLeader.value) broadcastState();
+  }
+
+  function updateMemberActivity(peerId: string, appName: string) {
+      const m = members.value.find(x => x.id === peerId);
+      if (m) m.currentApp = appName;
+  }
+
   return {
     myProfile,
     members,
@@ -618,6 +646,7 @@ export const useTeamsStore = defineStore("teams", () => {
     kickMember,
     sendMessage,
     sendProgress,
+    sendActivity,
     joinVoice,
     leaveVoice,
     toggleCamera,

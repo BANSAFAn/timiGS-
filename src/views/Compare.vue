@@ -4,12 +4,16 @@
       
       <!-- HEADER -->
       <div class="page-header">
-        <div>
+        <div class="header-left">
            <h2>{{ store.isConnected ? (store.isLeader ? 'Your Team (Leader)' : 'Team Member') : 'Team Collaboration' }}</h2>
-           <p class="text-muted" v-if="store.isConnected">
+           <div class="nickname-form" v-if="store.myProfile.name">
+              <input v-model="tempName" @change="saveProfile(undefined)" placeholder="Your Nickname" class="input-glass xs" />
+              <span class="text-muted text-xs">Activity: {{ activityStore.currentActivity?.app_name || 'Idle' }}</span>
+           </div>
+           
+           <p class="text-muted" v-if="store.isConnected" style="margin-top: 4px;">
               Peer ID: <span class="code-badge" @click="copyId">{{ store.myProfile.id }}</span>
            </p>
-           <p class="text-muted" v-else>Connect to work together.</p>
         </div>
         <div class="header-actions" v-if="store.isConnected">
             <button class="btn btn-secondary" @click="leaveTeam">Leave Team</button>
@@ -83,25 +87,58 @@
          <!-- LEFT: Members & Chat -->
          <div class="col-left">
             <!-- VIDEO GRID (PIP Style) -->
-            <div class="glass-card video-card" v-if="store.voiceActive">
-               <div class="video-container">
-                   <!-- Remote Videos -->
-                   <div class="remote-video" v-for="[peerId, stream] in store.remoteStreams" :key="peerId">
-                       <video :srcObject="stream" autoplay playsinline></video>
-                       <span class="peer-label">{{ getMemberName(peerId) }}</span>
+            <div class="glass-card video-card" v-if="store.voiceActive" :class="{ minimized: isVideoMinimized, theater: isTheaterMode }">
+                <div class="video-container" v-show="!isVideoMinimized">
+                   <!-- FEATURED VIDEO (Screen Share) -->
+                   <div class="featured-video" v-if="featuredPeerId && (featuredStream || isLocalSharing)">
+                       <video :srcObject="isLocalSharing ? store.localStream : featuredStream" autoplay playsinline class="main-feed" ref="featuredVideoRef"></video>
+                       <span class="peer-label featured">{{ featuredName }} (Sharing Screen)</span>
                    </div>
-                   <!-- Local Video (Mini) -->
-                   <div class="local-video" v-if="store.localStream">
-                       <video :srcObject="store.localStream" autoplay playsinline muted></video>
+
+                   <!-- NORMAL GRID -->
+                   <div class="video-grid" :class="{ 'sidebar-mode': !!featuredPeerId }">
+                       <!-- Remote Videos -->
+                       <div class="remote-video" v-for="[peerId, stream] in visibleRemoteStreams" :key="peerId" @click="setFeatured(peerId)">
+                           <video :srcObject="stream" autoplay playsinline></video>
+                           <span class="peer-label">{{ getMemberName(peerId) }}</span>
+                       </div>
+                       <!-- Local Video -->
+                       <div class="local-video-card" v-if="store.localStream && !isLocalSharing" :class="{ draggable: true }">
+                           <video :srcObject="store.localStream" autoplay playsinline muted></video>
+                           <span class="peer-label">You</span>
+                       </div>
                    </div>
+
                    <!-- Placeholder if no video -->
                    <div class="video-placeholder" v-if="store.remoteStreams.size === 0 && !store.localStream">
-                       Waiting for video...
+                       <div class="placeholder-content">
+                           <span style="font-size: 3rem;">👋</span>
+                           <p>Waiting for participants...</p>
+                       </div>
                    </div>
+               </div>
+               
+               <!-- Minimized Placeholder -->
+               <div class="minimized-banner" v-if="isVideoMinimized">
+                   <span>📞 Call in progress with {{ store.members.length - 1 }} others</span>
                </div>
                
                <!-- Controls -->
                <div class="video-controls">
+                   <button class="icon-btn" @click="isVideoMinimized = !isVideoMinimized" :title="isVideoMinimized ? 'Expand' : 'Minimize'">
+                       {{ isVideoMinimized ? '🔼' : '🔽' }}
+                   </button>
+                   
+                   <button class="icon-btn" :class="{ active: isTheaterMode }" @click="toggleTheater" title="Theater Mode (Larger View)">
+                       🔲
+                   </button>
+
+                   <button class="icon-btn" @click="togglePiP" title="Pop-out Window (Picture-in-Picture)">
+                       ↗️
+                   </button>
+
+                   <div class="separator"></div>
+
                    <button class="icon-btn" :class="{ muted: store.isMuted }" @click="store.toggleMute()" title="Mute/Unmute Mic">
                        {{ store.isMuted ? '🔇' : '🎙️' }}
                    </button>
@@ -136,6 +173,7 @@
                       <div class="member-info">
                          <span class="member-name">{{ member.name }} <span v-if="member.id === store.myProfile.id">(You)</span></span>
                          <span class="member-status">{{ member.isLeader ? 'Leader' : member.status }}</span>
+                         <span class="member-activity" v-if="member.currentApp">Running: {{ member.currentApp }}</span>
                       </div>
                       <!-- Kick Button (Admin) -->
                       <button v-if="store.isLeader && member.id !== store.myProfile.id" class="icon-btn danger sm" @click="kickMember(member.id)" title="Kick">
@@ -207,7 +245,8 @@
                   </div>
                   <div class="progress-meta">
                      <span v-if="member.progress">{{ formatTime(member.progress.current) }} / {{ formatTime(member.progress.target) }}</span>
-                     <span v-else>Thinking...</span>
+                     <span v-else-if="member.currentApp" class="text-primary">{{ member.currentApp }}</span>
+                     <span v-else>Idle</span>
                   </div>
                </div>
              </div>
@@ -328,6 +367,7 @@
 import { ref, watch, nextTick, onMounted, onUnmounted, computed } from "vue";
 import { useTeamsStore } from "../stores/teams";
 import { useActivityStore } from "../stores/activity";
+import { useRouter } from "vue-router";
 
 const store = useTeamsStore();
 const activityStore = useActivityStore();
@@ -343,6 +383,106 @@ const showDeviceSettings = ref(false);
 const goalApp = ref("");
 const goalMinutes = ref(30);
 const goalSearch = ref("");
+const isVideoMinimized = ref(false);
+const isTheaterMode = ref(false);
+const remoteVideoRefs = ref<HTMLVideoElement[]>([]);
+
+// --- Screen Share / Feature Logic ---
+const featuredPeerId = ref<string | null>(null);
+const featuredVideoRef = ref<HTMLVideoElement | null>(null);
+
+const isLocalSharing = computed(() => store.isScreenSharing);
+
+const featuredStream = computed(() => {
+    if (!featuredPeerId.value) return null;
+    if (featuredPeerId.value === store.myProfile.id) return store.localStream;
+    return store.remoteStreams.get(featuredPeerId.value);
+});
+
+const featuredName = computed(() => {
+    if (featuredPeerId.value === store.myProfile.id) return "You";
+    return getMemberName(featuredPeerId.value || "");
+});
+
+const visibleRemoteStreams = computed(() => {
+    const all = Array.from(store.remoteStreams.entries());
+    if (featuredPeerId.value && featuredPeerId.value !== store.myProfile.id) {
+        return all.filter(([id]) => id !== featuredPeerId.value);
+    }
+    return all;
+});
+
+function setFeatured(id: string) {
+    featuredPeerId.value = featuredPeerId.value === id ? null : id;
+    if (featuredPeerId.value) isTheaterMode.value = true;
+}
+
+// Watch for NEW screen sharers
+watch(() => store.members.map(m => ({ id: m.id, sharing: m.isScreenSharing })), (newVal, oldVal) => {
+    // Find who started sharing
+    console.log("Checking for screen share update...", newVal);
+    const sharer = newVal.find(m => m.sharing && (!oldVal || !oldVal.find(o => o.id === m.id)?.sharing));
+    
+    if (sharer) {
+        console.log("Auto-focusing screen sharer:", sharer.id);
+        featuredPeerId.value = sharer.id;
+        isTheaterMode.value = true;
+        isVideoMinimized.value = false;
+    }
+    
+    // If current featured stopped sharing, unfeature if it was sharing
+    if (featuredPeerId.value) {
+        const current = newVal.find(m => m.id === featuredPeerId.value);
+        if (!current || !current.sharing) {
+            // Only unfeature if they were sharing (and are no longer). 
+            // If we manually featured them, maybe keep it? 
+            // For now, auto-exit feature if sharing stops to avoid confusion.
+             featuredPeerId.value = null;
+        }
+    }
+}, { deep: true });
+
+function toggleTheater() {
+  isTheaterMode.value = !isTheaterMode.value;
+}
+
+async function togglePiP() {
+  // Find valid video element
+  const videos = [...remoteVideoRefs.value];
+  if (featuredVideoRef.value) videos.push(featuredVideoRef.value);
+  
+  // Try local
+  const local = document.querySelector('.local-video-card video') as HTMLVideoElement;
+  if(local) videos.push(local);
+
+  const video = videos.find(v => {
+      if (!v || !v.srcObject) return false;
+      const stream = v.srcObject as MediaStream;
+      return stream.getVideoTracks().some(t => t.readyState === 'live' && t.enabled);
+  });
+  
+  if (video) {
+        if (document.pictureInPictureElement) {
+            await document.exitPictureInPicture();
+        } else {
+            if (video.readyState < 2) { 
+                 alert("Video is not ready yet. Please wait.");
+                 return;
+            }
+            try {
+               // @ts-ignore
+               await video.requestPictureInPicture();
+            } catch (e) {
+               console.error("PiP failed", e);
+               // @ts-ignore
+               alert("PiP Failed: " + e.message);
+            }
+        }
+  } else {
+    alert("No active video camera found to pop out.");
+  }
+}
+
 
 // Computed for searching apps
 const searchedApps = computed(() => {
@@ -383,11 +523,7 @@ function loginWithGoogle() {
 async function startGoogleAuth() {
   try {
     const { invoke } = await import("@tauri-apps/api/core");
-    
-    // Call login_google which starts auth flow and opens browser
     await invoke("login_google");
-    
-    // Start polling for account
     const poll = setInterval(async () => {
       const accounts: any = await invoke("get_cloud_accounts");
       if (Array.isArray(accounts) && accounts.length > 0) {
@@ -404,6 +540,30 @@ async function startGoogleAuth() {
 function getMemberName(peerId: string) {
   const m = store.members.find(x => x.id === peerId);
   return m ? m.name : 'Unknown';
+}
+
+const router = useRouter();
+
+async function leaveTeam() {
+  if (confirm("Are you sure you want to leave the team?")) {
+    try {
+        await Promise.race([
+            store.leaveVoice(),
+            new Promise(resolve => setTimeout(resolve, 1000))
+        ]);
+    } catch (e) {
+        console.error("Leave voice failed", e);
+    }
+    
+    store.members = [];
+    store.messages = [];
+    store.isLeader = false;
+    store.myProfile.name = ""; 
+    store.saveProfile("", ""); 
+    
+    await router.push('/');
+    window.location.reload();
+  }
 }
 
 function logout() {
@@ -443,10 +603,6 @@ async function createTeam() {
 
 async function joinTeam() {
   await store.joinTeam(joinId.value);
-}
-
-function leaveTeam() {
-  store.leaveTeam();
 }
 
 function copyId() {
@@ -505,21 +661,23 @@ function formatTime(seconds: number) {
 let trackInterval: number | null = null;
 
 onMounted(async () => {
-    // Load any existing Google account
     await checkGoogleProfile();
 
   trackInterval = window.setInterval(async () => {
-    if (store.isConnected && store.activeGoal && store.activeGoal.status === 'active') { // Only track if active
-      await activityStore.fetchCurrentActivity();
-      const currentApp = activityStore.currentActivity?.app_name || "";
-      
-      if (currentApp.toLowerCase().includes(store.activeGoal.appName.toLowerCase())) {
-         await activityStore.fetchTodayData();
-         const appStats = activityStore.topApps.find(a => a.app_name.toLowerCase().includes(store.activeGoal!.appName.toLowerCase()));
-         const totalSeconds = appStats ? appStats.total_seconds : 0;
-         
-         store.sendProgress(totalSeconds, currentApp);
-      }
+    if (store.isConnected) {
+        await activityStore.fetchCurrentActivity();
+        const currentApp = activityStore.currentActivity?.app_name || "Idle";
+        
+        store.sendActivity(currentApp);
+
+        if (store.activeGoal && store.activeGoal.status === 'active') {
+             if (currentApp.toLowerCase().includes(store.activeGoal.appName.toLowerCase())) {
+                 await activityStore.fetchTodayData();
+                 const appStats = activityStore.topApps.find(a => a.app_name.toLowerCase().includes(store.activeGoal!.appName.toLowerCase()));
+                 const totalSeconds = appStats ? appStats.total_seconds : 0;
+                 store.sendProgress(totalSeconds, currentApp);
+             }
+        }
     }
   }, 5000);
 });
@@ -534,6 +692,10 @@ onUnmounted(() => {
 .page-container { max-width: 1200px; margin: 0 auto; height: 100vh; display: flex; flex-direction: column; }
 .text-muted { color: var(--text-muted); }
 .code-badge { background: var(--bg-hover); padding: 4px 8px; border-radius: 4px; font-family: monospace; cursor: pointer; color: var(--color-primary); }
+
+.nickname-form { display: flex; align-items: center; gap: 12px; margin-top: 4px; }
+.input-glass.xs { padding: 4px 8px; width: 200px; font-size: 0.9rem; }
+.member-activity { font-size: 0.75rem; color: var(--color-primary); display: block; margin-top: 2px; }
 
 .setup-container { height: 60vh; display: flex; align-items: center; justify-content: center; }
 .setup-card { width: 400px; padding: 32px; text-align: center; }
@@ -619,18 +781,111 @@ onUnmounted(() => {
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
 /* Video */
-.video-card { min-height: 250px; display: flex; flex-direction: column; overflow: hidden; background: black; }
-.video-container { flex: 1; position: relative; display: flex; align-items: center; justify-content: center; background: #111; }
-.remote-video { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
-.remote-video video { width: 100%; height: 100%; object-fit: contain; }
-.local-video { position: absolute; bottom: 16px; right: 16px; width: 120px; height: 90px; background: #222; border-radius: 8px; border: 2px solid var(--border-color); overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
-.local-video video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
-.video-placeholder { color: var(--text-muted); font-size: 0.9rem; }
-.peer-label { position: absolute; bottom: 8px; left: 8px; background: rgba(0,0,0,0.6); padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; pointer-events: none; }
+.video-card { min-height: 350px; display: flex; flex-direction: column; overflow: hidden; background: black; transition: all 0.3s ease; position: relative; }
+.video-card.theater {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 9999;
+  width: 100vw;
+  height: 100vh;
+  border-radius: 0;
+}
 
-.video-controls { display: flex; align-items: center; justify-content: center; gap: 16px; padding: 12px; background: rgba(255,255,255,0.02); border-top: 1px solid var(--border-color); }
-.video-controls .icon-btn { width: 40px; height: 40px; font-size: 1.2rem; border-radius: 50%; background: var(--bg-hover); }
-.video-controls .icon-btn:hover { background: var(--bg-active); }
+.video-container { 
+    flex: 1; 
+    position: relative; 
+    display: flex; 
+    flex-direction: column;
+    background: #000; 
+}
+
+/* Featured Video Layout */
+.featured-video {
+    flex: 1;
+    width: 100%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #111;
+}
+.featured-video video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+.peer-label.featured {
+    font-size: 1.2rem;
+    padding: 8px 16px;
+    background: rgba(0,0,0,0.8);
+    top: 16px; left: 16px;
+    bottom: auto;
+}
+
+/* Grid Layout */
+.video-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 8px;
+    padding: 8px;
+    width: 100%;
+    align-content: center;
+    justify-content: center;
+    flex: 1;
+}
+
+/* Sidebar Mode (when featured exists) */
+.video-grid.sidebar-mode {
+    display: flex;
+    flex-direction: row;
+    height: 140px;
+    background: rgba(0,0,0,0.8);
+    overflow-x: auto;
+    flex-shrink: 0;
+    padding: 10px;
+    gap: 12px;
+    justify-content: center;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    flex: 0 0 auto;
+}
+.video-grid.sidebar-mode .remote-video, 
+.video-grid.sidebar-mode .local-video-card {
+    width: 200px;
+    min-width: 200px;
+    height: 100%;
+    border-radius: 6px;
+}
+
+.remote-video { position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #222; border-radius: 8px; overflow: hidden; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); }
+.remote-video video { width: 100%; height: 100%; object-fit: cover; }
+
+.local-video-card { position: relative; width: 100%; height: 100%; background: #222; border-radius: 8px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); }
+.local-video-card video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
+
+.video-placeholder { color: var(--text-muted); font-size: 0.9rem; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; }
+.placeholder-content { text-align: center; opacity: 0.5; }
+
+.peer-label { position: absolute; bottom: 8px; left: 8px; background: rgba(0,0,0,0.6); padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; pointer-events: none; z-index: 5; }
+
+
+.minimized-banner {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-success);
+    font-weight: bold;
+    background: rgba(0,0,0,0.5);
+    height: 100%;
+}
+
+.video-controls { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 16px; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); border-top: 1px solid var(--border-color); position: relative; z-index: 20; }
+.video-card.theater .video-controls { position: absolute; bottom: 0; left: 0; right: 0; }
+
+.separator { width: 1px; height: 24px; background: rgba(255,255,255,0.2); margin: 0 8px; }
+
+.video-controls .icon-btn { width: 44px; height: 44px; font-size: 1.2rem; border-radius: 50%; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.05); transition: all 0.2s; }
+.video-controls .icon-btn:hover { background: rgba(255,255,255,0.2); transform: scale(1.05); }
 .video-controls .icon-btn.active { background: var(--color-success); color: white; }
 .video-controls .icon-btn.danger { background: var(--color-danger); color: white; }
 
@@ -666,29 +921,22 @@ onUnmounted(() => {
 .goal-search input { width: 100%; }
 
 .app-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; max-height: 250px; overflow-y: auto; padding-right: 8px; }
-.app-card { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 12px; background: rgba(255,255,255,0.03); border: 1px solid transparent; cursor: pointer; transition: all 0.15s; }
-.app-card:hover { background: rgba(255,255,255,0.06); border-color: var(--border-color); }
-.app-card.selected { background: rgba(99,102,241,0.15); border-color: var(--color-primary); }
-.app-card .app-icon { font-size: 1.5rem; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: var(--bg-hover); border-radius: 10px; }
-.app-card .app-info { flex: 1; display: flex; flex-direction: column; min-width: 0; }
-.app-card .app-name { font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.app-card .app-time { font-size: 0.75rem; color: var(--text-muted); }
-.app-card .app-check { color: var(--color-primary); font-weight: bold; font-size: 1.2rem; }
-.app-card.manual { grid-column: span 2; background: rgba(255,255,255,0.02); }
-.app-card .manual-input { flex: 1; background: transparent; border: none; color: var(--text-color); font-size: 0.9rem; outline: none; }
+.app-card { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 8px; background: var(--bg-hover); border: 1px solid transparent; cursor: pointer; transition: all 0.2s; position: relative; }
+.app-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+.app-card.selected { border-color: var(--color-primary); background: rgba(99,102,241,0.1); }
+.app-icon { font-size: 1.5rem; }
+.app-info { flex: 1; display: flex; flex-direction: column; }
+.app-name { font-weight: 600; font-size: 0.9rem; }
+.app-time { font-size: 0.75rem; color: var(--text-muted); }
+.app-check { color: var(--color-primary); font-weight: bold; }
 
-.goal-duration { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-color); }
-.goal-duration label { display: block; margin-bottom: 8px; font-weight: 500; }
-.duration-options { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-.duration-btn { padding: 8px 16px; border-radius: 20px; background: var(--bg-hover); border: 1px solid var(--border-color); cursor: pointer; font-weight: 500; transition: all 0.15s; color: var(--text-color); }
-.duration-btn:hover { background: var(--bg-active); }
+.app-card.manual { justify-content: center; border-style: dashed; border-color: var(--border-color); }
+.manual-input { border: none; background: transparent; color: var(--text-color); width: 100%; outline: none; font-family: inherit; }
+
+.goal-duration { margin-top: 24px; }
+.duration-options { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
+.duration-btn { background: var(--bg-hover); border: 1px solid var(--border-color); color: var(--text-muted); padding: 8px 12px; border-radius: 6px; cursor: pointer; }
 .duration-btn.active { background: var(--color-primary); color: white; border-color: var(--color-primary); }
-.duration-input { width: 60px; padding: 8px; border-radius: 8px; background: var(--bg-hover); border: 1px solid var(--border-color); text-align: center; color: var(--text-color); }
+.duration-input { width: 60px; text-align: center; }
 
-/* Device Modal */
-.device-modal { width: 400px; }
-.device-section { margin-bottom: 16px; }
-.device-section label { display: block; margin-bottom: 8px; font-weight: 500; }
-.device-section select { width: 100%; padding: 10px 12px; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: var(--text-color); cursor: pointer; }
-.device-section select:hover { background: rgba(255,255,255,0.08); }
 </style>

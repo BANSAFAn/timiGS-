@@ -67,20 +67,26 @@
             </div>
           </div>
 
-          <div class="setting-row">
+            <div class="setting-row">
             <div class="setting-info">
               <label>{{ $t("settings.theme") }}</label>
               <p class="setting-desc">Toggle dark or light mode</p>
             </div>
-            <div class="select-wrapper">
-              <select
-                v-model="localSettings.theme"
-                @change="saveSettings"
-                class="input-glass"
-              >
-                <option value="dark">{{ $t("settings.dark") }}</option>
-                <option value="light">{{ $t("settings.light") }}</option>
-              </select>
+            <div class="theme-switcher">
+               <button 
+                 class="theme-btn" 
+                 :class="{ active: localSettings.theme === 'dark' }"
+                 @click="setTheme('dark')"
+               >
+                 🌙 {{ $t("settings.dark") }}
+               </button>
+               <button 
+                 class="theme-btn" 
+                 :class="{ active: localSettings.theme === 'light' }"
+                 @click="setTheme('light')"
+               >
+                 ☀️ {{ $t("settings.themeLight") || 'Light' }}
+               </button>
             </div>
           </div>
         </div>
@@ -196,31 +202,7 @@
             </button>
           </div>
           
-          <!-- API Credentials Section -->
-          <div class="credentials-section" style="margin-bottom: 15px; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 8px;">
-            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px;">
-              Enter your Google Cloud OAuth credentials:
-            </p>
-            <div style="display: flex; flex-direction: column; gap: 10px;">
-              <input 
-                type="text" 
-                v-model="googleClientId" 
-                class="input-glass" 
-                placeholder="Google Client ID"
-                style="font-size: 0.85rem;"
-              />
-              <input 
-                type="password" 
-                v-model="googleClientSecret" 
-                class="input-glass" 
-                placeholder="Google Client Secret"
-                style="font-size: 0.85rem;"
-              />
-              <button class="btn btn-sm" style="align-self: flex-start;" @click="saveGoogleCredentials">
-                Save Credentials
-              </button>
-            </div>
-          </div>
+
 
           <div class="accounts-list">
             <div v-if="cloudAccounts.length === 0" class="empty-accounts">
@@ -624,30 +606,18 @@ function changeLanguage(code: string) {
   saveSettings();
   langOpen.value = false;
 }
+
+function setTheme(theme: string) {
+  localSettings.theme = theme;
+  saveSettings();
+}
+
 const isReady = ref(false);
 const globalError = ref("");
 const isTracking = ref(false);
 const appVersion = ref("1.1.0");
 
 const isGitHubConnected = ref(false);
-
-// Google Credentials (for local development / manual setup)
-const googleClientId = ref("");
-const googleClientSecret = ref("");
-
-async function saveGoogleCredentials() {
-  if (!googleClientId.value || !googleClientSecret.value) {
-    alert("Please enter both Client ID and Client Secret");
-    return;
-  }
-  try {
-    await safeInvoke("save_setting", { key: "google_client_id", value: googleClientId.value });
-    await safeInvoke("save_setting", { key: "google_client_secret", value: googleClientSecret.value });
-    alert("Credentials saved! You can now connect your Google account.");
-  } catch (e) {
-    console.error("Failed to save credentials:", e);
-  }
-}
 
 const localSettings = reactive({
   language: "en",

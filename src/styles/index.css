@@ -270,6 +270,21 @@ body {
   background: rgba(255, 255, 255, 0.1);
 }
 
+.device-section select:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* Global Select Options Fix */
+select option {
+  background-color: #1a1b26; /* Dark background */
+  color: #f8fafc; /* Light text */
+  padding: 10px;
+}
+[data-theme="light"] select option {
+  background-color: #ffffff;
+  color: #0f172a;
+}
+
 /* Inputs */
 .input-glass {
   width: 100%;
