@@ -399,7 +399,6 @@
         </div>
     </div>
 
-  </div>
     <!-- Custom Screen Picker -->
     <Transition name="fade">
         <ScreenPicker 
@@ -408,6 +407,7 @@
             @select="(id: string) => { showScreenPicker = false; store.shareScreen(id); }"
         />
     </Transition>
+  </div>
 </template>
 
 <script setup lang="ts">
