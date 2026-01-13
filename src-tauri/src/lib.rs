@@ -9,6 +9,7 @@ mod db;
 mod discord;
 mod drive;
 mod icons;
+mod picker;
 mod tasks;
 mod tracker;
 
@@ -160,6 +161,7 @@ pub fn run() {
             commands::shutdown_pc,
             commands::shutdown_pc,
             commands::get_app_icon,
+            commands::get_desktop_sources,
             tasks::create_task_cmd,
             tasks::get_tasks_cmd,
             tasks::update_task_status_cmd,

@@ -274,3 +274,8 @@ pub fn shutdown_pc() -> Result<(), String> {
         Err("Shutdown not supported on this OS".to_string())
     }
 }
+
+#[command]
+pub fn get_desktop_sources() -> Vec<crate::picker::DesktopSource> {
+    crate::picker::get_sources()
+}

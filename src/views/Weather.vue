@@ -531,8 +531,8 @@ async function loadHistory() {
    console.log(`Loading history from ${fromStr} to ${toStr}`);
 
    // Fetch real activity data
-   // We assume db.rs/get_activity_range uses inclusive string comparison
-   const sessions = await activityStore.getActivityRange(fromStr + " 00:00:00", toStr + " 23:59:59");
+   // db.rs/get_activity_range expects "YYYY-MM-DD"
+   const sessions = await activityStore.getActivityRange(fromStr, toStr);
    console.log("Sessions found:", sessions.length);
 
    const newHistory: HistoryEntry[] = [];
@@ -704,8 +704,11 @@ onMounted(() => {
 .temp-graph-container {
   padding: 20px;
   margin-bottom: 20px;
+  margin-left: auto;
+  margin-right: auto;
   position: relative;
   background: rgba(255,255,255,0.03);
+  max-width: 900px;
 }
 
 .temp-graph {
@@ -749,16 +752,19 @@ onMounted(() => {
 
 .forecast-card {
    min-width: 130px;
-   padding: 15px;
+   padding: 18px 15px;
    display: flex;
    flex-direction: column;
    align-items: center;
    text-align: center;
    flex-shrink: 0;
    transition: all 0.3s ease;
-   border: 1px solid rgba(255,255,255,0.05);
+   border: 1px solid rgba(255,255,255,0.08);
    position: relative;
    overflow: hidden;
+   border-radius: 16px;
+   background: rgba(255,255,255,0.03);
+   box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
 
 /* Weather Condition Gradients */
@@ -784,8 +790,9 @@ onMounted(() => {
 }
 
 .forecast-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+  border-color: rgba(99,102,241,0.3);
 }
 
 .day-name {
@@ -806,13 +813,14 @@ onMounted(() => {
 }
 
 .day-icon {
-   font-size: 2.2rem;
-   filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
-   transition: transform 0.3s ease;
+   font-size: 2.4rem;
+   filter: drop-shadow(0 4px 12px rgba(255,255,255,0.15));
+   transition: all 0.3s ease;
 }
 
 .forecast-card:hover .day-icon {
-  transform: scale(1.1);
+  transform: scale(1.15);
+  filter: drop-shadow(0 6px 16px rgba(255,200,100,0.3));
 }
 
 .day-temp {

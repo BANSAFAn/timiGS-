@@ -266,6 +266,13 @@ onMounted(async () => {
   document.documentElement.setAttribute("data-theme", store.settings.theme);
   checkGitHubConnection();
 
+  // Initialize Activity Tracking
+  await store.fetchTrackingStatus();
+  if (!store.isTracking) {
+      console.log("Starting activity tracking...");
+      await store.startTracking();
+  }
+
   // Setup Deep Link Listener (Mobile Auth)
   try {
     // @ts-ignore

@@ -195,15 +195,48 @@ export const useTeamsStore = defineStore("teams", () => {
       }
   }
 
-  async function shareScreen() {
+  // --- Screen Share ---
+  const desktopSources = ref<{ id: string, name: string, thumbnail: string }[]>([]);
+
+  async function fetchDesktopSources() {
+      try {
+          const { invoke } = await import("@tauri-apps/api/core");
+          desktopSources.value = await invoke("get_desktop_sources");
+      } catch (e) {
+          console.error("Failed to fetch desktop sources", e);
+          desktopSources.value = [];
+      }
+  }
+
+  async function shareScreen(sourceId?: string) {
       if (!localStream.value) await joinVoice(false);
       
       try {
-          // @ts-ignore - getDisplayMedia exists
-          const screenStream = await navigator.mediaDevices.getDisplayMedia({ 
-              video: true, 
-              audio: false 
-          });
+          let screenStream: MediaStream;
+          
+          if (sourceId) {
+             // Custom source selected
+             // Note: In WebView2/Tauri, the ID format from EnumWindows (HWND) typically needs to be passed 
+             // in a specific way or we might need to use getDisplayMedia which ignores sourceId usually.
+             // Try standard legacy constraint for specific window:
+             screenStream = await navigator.mediaDevices.getUserMedia({
+                 audio: false,
+                 video: {
+                     // @ts-ignore
+                     mandatory: {
+                         chromeMediaSource: 'desktop',
+                         chromeMediaSourceId: sourceId
+                     }
+                 }
+             });
+          } else {
+             // Fallback to system picker
+             // @ts-ignore
+             screenStream = await navigator.mediaDevices.getDisplayMedia({ 
+                 video: true, 
+                 audio: false 
+             });
+          }
           
           const screenTrack = screenStream.getVideoTracks()[0];
           
@@ -653,6 +686,8 @@ export const useTeamsStore = defineStore("teams", () => {
     shareScreen,
     toggleMute,
     loadDevices,
-    switchAudioInput
+    switchAudioInput,
+    fetchDesktopSources,
+    desktopSources
   };
 });
