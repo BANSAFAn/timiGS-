@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Language } from '../i18n/types';
 import type { Translation } from '../i18n/types';
-import { Menu, X, Globe, Clock, Star, Sparkles } from 'lucide-react';
+import { Menu, X, Globe, Clock, Star, Download } from 'lucide-react';
 
 interface NavbarProps {
   lang: Language;
@@ -30,7 +30,6 @@ const Navbar: React.FC<NavbarProps> = ({ lang, t, pathname }) => {
   const navLinks = [
     { path: '/', label: t.nav.home },
     { path: '/releases', label: t.nav.releases },
-    { path: '/download', label: t.nav.download },
     { path: '/docs', label: t.nav.docs },
     { path: '/terms', label: t.nav.terms },
   ];
@@ -46,6 +45,7 @@ const Navbar: React.FC<NavbarProps> = ({ lang, t, pathname }) => {
     { code: Language.AR, label: 'العربية' },
     { code: Language.NL, label: 'Nederlands' },
     { code: Language.BE, label: 'Беларуская' },
+    { code: Language.ZH_TW, label: '繁體中文' },
   ];
 
   const isActive = (path: string) => {
@@ -63,7 +63,11 @@ const Navbar: React.FC<NavbarProps> = ({ lang, t, pathname }) => {
     const segments = currentPath.split('/').filter(Boolean);
     
     if (segments.length > 0) {
-      segments[0] = newLang;
+      if (Object.values(Language).includes(segments[0] as Language)) {
+          segments[0] = newLang;
+      } else {
+          segments.unshift(newLang);
+      }
       window.location.href = `/${segments.join('/')}`;
     } else {
       window.location.href = `/${newLang}/`;
@@ -71,84 +75,93 @@ const Navbar: React.FC<NavbarProps> = ({ lang, t, pathname }) => {
   };
 
   return (
-    <nav className={`fixed w-full z-50 top-0 start-0 transition-all duration-300 ${
-      scrolled 
-        ? 'glass-panel border-b border-slate-800/50 bg-slate-900/90 backdrop-blur-xl shadow-lg shadow-slate-950/50' 
-        : 'bg-transparent border-b border-transparent'
-    }`}>
+    <>
+    <nav 
+      className={`fixed w-full z-50 top-0 start-0 transition-all duration-500 ${
+        scrolled || isMenuOpen
+          ? 'bg-apple-gray-950/70 backdrop-blur-md border-b border-white/5 supports-[backdrop-filter]:bg-apple-gray-950/40' 
+          : 'bg-transparent border-b border-transparent py-2'
+      }`}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-wrap items-center justify-between py-4">
           
           {/* Logo */}
-          <a href={`/${lang}/`} className="flex items-center space-x-3 rtl:space-x-reverse group">
-            <div className="relative p-2.5 bg-gradient-to-br from-sky-500/20 to-purple-500/10 rounded-xl group-hover:from-sky-500/30 group-hover:to-purple-500/20 transition-all duration-300 shadow-lg shadow-sky-500/10">
-              <Clock className="w-7 h-7 text-sky-400 group-hover:text-sky-300 transition-colors" />
-              <div className="absolute inset-0 bg-sky-400/20 rounded-xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          <a href={`/${lang}/`} className="flex items-center space-x-3 rtl:space-x-reverse group z-50">
+            <div className="relative flex items-center justify-center p-2 rounded-xl transition-all duration-500 overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-tr from-apple-blue to-purple-500 opacity-20 group-hover:opacity-100 transition-opacity duration-500 blur-lg"></div>
+              <Clock className="w-6 h-6 text-white group-hover:scale-110 transition-transform duration-500 relative z-10" />
             </div>
-            <div className="flex flex-col">
-              <span className="text-xl font-black text-white tracking-tight group-hover:text-sky-100 transition-colors">TimiGS</span>
-              <span className="text-[10px] text-slate-500 font-medium tracking-widest uppercase">Activity Tracker</span>
-            </div>
+            <span className="text-xl font-display font-bold text-white tracking-tight">TimiGS</span>
           </a>
 
           {/* Desktop Nav */}
-          <div className="hidden w-full md:flex md:w-auto md:order-1 items-center gap-6">
-            <ul className="flex flex-row p-0 space-x-1 rtl:space-x-reverse mt-0 font-medium">
-              {navLinks.map((link) => (
-                <li key={link.path}>
-                  <a
+          <div className="hidden md:flex items-center gap-1">
+            <div className="flex p-1 bg-white/5 rounded-full border border-white/5 backdrop-blur-sm mr-4">
+                {navLinks.map((link) => (
+                    <a
+                    key={link.path}
                     href={getLinkHref(link.path)}
-                    className={`relative block py-2 px-4 rounded-lg transition-all duration-300 ${
-                      isActive(link.path)
-                        ? 'text-sky-400 font-bold bg-sky-500/10'
-                        : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+                    className={`relative px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
+                        isActive(link.path)
+                        ? 'text-white bg-white/10 shadow-sm'
+                        : 'text-apple-gray-400 hover:text-white hover:bg-white/5'
                     }`}
-                  >
+                    >
                     {link.label}
-                    {isActive(link.path) && (
-                      <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-sky-400" />
-                    )}
-                  </a>
-                </li>
-              ))}
-            </ul>
-
-            {/* GitHub Stars Button */}
-            <a
-              href="https://github.com/BANSAFAn/timiGS-"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-800/50 border border-slate-700/50 hover:border-yellow-500/30 hover:bg-slate-800 transition-all duration-300"
-            >
-              <Star className="w-4 h-4 text-yellow-400 fill-yellow-400 group-hover:animate-wiggle" />
-              {stars !== null ? (
-                <span className="text-sm font-bold text-white">{stars}</span>
-              ) : (
-                <span className="w-6 h-3 bg-slate-700 rounded animate-pulse" />
-              )}
-            </a>
-            
-            {/* Language Selector */}
-            <div className="relative group">
-              <button className="flex items-center gap-2 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/50 transition-all">
-                <Globe className="w-4 h-4" />
-                <span className="text-sm font-medium uppercase">{lang}</span>
-              </button>
-              <div className="absolute right-0 mt-2 w-48 py-2 bg-slate-900/95 backdrop-blur-xl border border-slate-700 rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 h-64 overflow-y-auto z-50">
-                {languages.map((l) => (
-                  <button
-                    key={l.code}
-                    onClick={() => switchLanguage(l.code)}
-                    className={`block w-full text-left px-4 py-2.5 text-sm transition-colors ${
-                      lang === l.code 
-                        ? 'text-sky-400 font-bold bg-sky-500/10' 
-                        : 'text-slate-400 hover:text-white hover:bg-slate-800'
-                    }`}
-                  >
-                    {l.label}
-                  </button>
+                    </a>
                 ))}
-              </div>
+            </div>
+
+            <div className="flex items-center gap-3 pl-4 border-l border-white/10">
+                {/* GitHub Stars - Minimalist */}
+                <a
+                href="https://github.com/BANSAFAn/timiGS-"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-apple-gray-400 hover:text-white transition-colors"
+                title="GitHub Stars"
+                >
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/10 transition-all">
+                    <Star className="w-3.5 h-3.5 fill-current" />
+                    <span className="text-xs font-medium font-mono">
+                        {stars !== null ? (
+                            stars >= 1000 ? `${(stars / 1000).toFixed(1)}k` : stars
+                        ) : '...'}
+                    </span>
+                </div>
+                </a>
+                
+                {/* Language Selector - Minimalist */}
+                <div className="relative group">
+                    <button className="p-2 rounded-full text-apple-gray-400 hover:text-white hover:bg-white/10 transition-all">
+                        <Globe className="w-5 h-5" />
+                    </button>
+                    <div className="absolute right-0 mt-4 w-56 py-2 bg-apple-gray-900/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform origin-top-right scale-95 group-hover:scale-100 h-80 overflow-y-auto">
+                        <div className="px-4 py-2 text-xs font-medium text-apple-gray-500 uppercase tracking-wider mb-1">Select Language</div>
+                        {languages.map((l) => (
+                        <button
+                            key={l.code}
+                            onClick={() => switchLanguage(l.code)}
+                            className={`block w-full text-left px-4 py-2.5 text-sm transition-all ${
+                            lang === l.code 
+                                ? 'text-apple-blue font-medium bg-apple-blue/10 border-l-2 border-apple-blue' 
+                                : 'text-apple-gray-300 hover:text-white hover:bg-white/5 border-l-2 border-transparent'
+                            }`}
+                        >
+                            {l.label}
+                        </button>
+                        ))}
+                    </div>
+                </div>
+
+                <a 
+                    href={getLinkHref('/download')}
+                    className="ml-2 flex items-center gap-2 px-4 py-2 rounded-full bg-apple-blue hover:bg-apple-blue-dark text-white text-sm font-medium transition-all shadow-lg shadow-apple-blue/20 hover:scale-105 active:scale-95"
+                >
+                    <Download className="w-4 h-4" />
+                    <span>Get App</span>
+                </a>
             </div>
           </div>
 
@@ -156,52 +169,68 @@ const Navbar: React.FC<NavbarProps> = ({ lang, t, pathname }) => {
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             type="button"
-            className="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-slate-400 rounded-lg md:hidden hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-600 transition-colors"
+            className="inline-flex items-center justify-center p-2 rounded-full text-white md:hidden hover:bg-white/10 transition-colors z-50 relative"
           >
             <span className="sr-only">Open main menu</span>
-            {isMenuOpen ? <X /> : <Menu />}
+            {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
-
-          {/* Mobile Menu Content */}
-          <div className={`${isMenuOpen ? 'block' : 'hidden'} w-full md:hidden mt-4 border-t border-slate-800 pt-4`}>
-            <ul className="flex flex-col font-medium p-4 md:p-0 bg-slate-900/50 rounded-lg space-y-2">
-              {navLinks.map((link) => (
-                <li key={link.path}>
-                  <a
-                    href={getLinkHref(link.path)}
-                    onClick={() => setIsMenuOpen(false)}
-                    className={`block py-2 px-3 rounded hover:bg-slate-800 ${
-                      isActive(link.path) ? 'text-sky-400 bg-slate-800/50' : 'text-slate-300'
-                    }`}
-                  >
-                    {link.label}
-                  </a>
-                </li>
-              ))}
-              <li className="pt-4 border-t border-slate-700">
-                <p className="px-3 text-xs text-slate-500 uppercase mb-2">Language</p>
-                <div className="grid grid-cols-2 gap-2">
-                  {languages.map((l) => (
-                    <button
-                      key={l.code}
-                      onClick={() => {
-                        switchLanguage(l.code);
-                        setIsMenuOpen(false);
-                      }}
-                      className={`text-left px-3 py-2 text-sm rounded ${
-                        lang === l.code ? 'bg-sky-500/20 text-sky-400' : 'text-slate-400 hover:text-white'
-                      }`}
-                    >
-                      {l.label}
-                    </button>
-                  ))}
-                </div>
-              </li>
-            </ul>
-          </div>
         </div>
       </div>
     </nav>
+    
+    {/* Mobile Overlay Menu */}
+    <div className={`fixed inset-0 z-40 md:hidden transition-all duration-500 ${
+        isMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+    }`}>
+        <div className="absolute inset-0 bg-apple-gray-950/80 backdrop-blur-2xl"></div>
+        <div className={`relative h-full flex flex-col justify-center px-8 transition-all duration-700 delay-100 ${
+            isMenuOpen ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
+        }`}>
+            <ul className="flex flex-col space-y-6">
+                {navLinks.map((link) => (
+                <li key={link.path}>
+                    <a
+                    href={getLinkHref(link.path)}
+                    onClick={() => setIsMenuOpen(false)}
+                    className={`text-3xl font-display font-medium tracking-tight ${
+                        isActive(link.path) ? 'text-apple-blue' : 'text-white'
+                    }`}
+                    >
+                    {link.label}
+                    </a>
+                </li>
+                ))}
+            </ul>
+
+            <div className="mt-12 pt-12 border-t border-white/10 grid grid-cols-2 gap-4">
+                <a
+                    href={getLinkHref('/download')}
+                    className="flex justify-center items-center gap-2 px-6 py-4 rounded-xl bg-apple-blue text-white font-medium shadow-lg"
+                    onClick={() => setIsMenuOpen(false)}
+                >
+                    <Download className="w-5 h-5" />
+                    {t.nav.download}
+                </a>
+                
+                <div className="relative">
+                    <select 
+                        className="w-full px-6 py-4 rounded-xl bg-white/10 text-white font-medium appearance-none outline-none"
+                        onChange={(e) => {
+                            switchLanguage(e.target.value as Language);
+                            setIsMenuOpen(false);
+                        }}
+                        value={lang}
+                    >
+                        {languages.map(l => (
+                            <option key={l.code} value={l.code} className="bg-apple-gray-900">{l.label}</option>
+                        ))}
+                    </select>
+                    <Globe className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/50 pointer-events-none" />
+                </div>
+            </div>
+        </div>
+    </div>
+    </>
   );
 };
 

@@ -3,6 +3,36 @@ export default {
   content: ['./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}'],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'sans-serif'],
+        display: ['SF Pro Display', 'Inter', 'sans-serif'],
+      },
+      colors: {
+        // Apple-style grays
+        'apple-gray': {
+          50: '#F9FAFB',
+          100: '#F3F4F6',
+          200: '#E5E7EB',
+          300: '#D1D5DB',
+          400: '#9CA3AF',
+          500: '#6B7280',
+          600: '#4B5563',
+          700: '#374151',
+          800: '#1F2937',
+          900: '#111827',
+          950: '#030712',
+        },
+        // Apple-style accents
+        'apple-blue': '#0071e3',
+        'apple-blue-dark': '#0077ED',
+      },
+      backgroundImage: {
+        'glass-gradient': 'linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%)',
+        'glass-gradient-dark': 'linear-gradient(180deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.6) 100%)',
+      },
+      backdropBlur: {
+        xs: '2px',
+      },
       animation: {
         blob: "blob 7s infinite",
         scroll: "scroll 30s linear infinite",
@@ -12,12 +42,8 @@ export default {
         "gradient-y": "gradient-y 10s ease infinite",
         shimmer: "shimmer 2s linear infinite",
         "pulse-glow": "pulse-glow 2s ease-in-out infinite",
-        "bounce-slow": "bounce 3s infinite",
-        wiggle: "wiggle 1s ease-in-out infinite",
-        "slide-up": "slide-up 0.5s ease-out",
-        "slide-down": "slide-down 0.5s ease-out",
-        "fade-in": "fade-in 0.5s ease-out",
-        "scale-in": "scale-in 0.3s ease-out",
+        "fade-in-up": "fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards",
+        "fade-in": "fadeIn 0.6s ease-out forwards",
       },
       keyframes: {
         blob: {
@@ -33,6 +59,14 @@ export default {
         float: {
           "0%, 100%": { transform: "translateY(0px)" },
           "50%": { transform: "translateY(-20px)" },
+        },
+        fadeInUp: {
+            "0%": { opacity: "0", transform: "translateY(20px)" },
+            "100%": { opacity: "1", transform: "translateY(0)" },
+        },
+        fadeIn: {
+            "0%": { opacity: "0" },
+            "100%": { opacity: "1" },
         },
         "gradient-x": {
           "0%, 100%": { backgroundPosition: "0% 50%" },
@@ -50,29 +84,6 @@ export default {
           "0%, 100%": { boxShadow: "0 0 20px 5px rgba(56, 189, 248, 0.3)" },
           "50%": { boxShadow: "0 0 40px 10px rgba(56, 189, 248, 0.5)" },
         },
-        wiggle: {
-          "0%, 100%": { transform: "rotate(-3deg)" },
-          "50%": { transform: "rotate(3deg)" },
-        },
-        "slide-up": {
-          "0%": { transform: "translateY(20px)", opacity: "0" },
-          "100%": { transform: "translateY(0)", opacity: "1" },
-        },
-        "slide-down": {
-          "0%": { transform: "translateY(-20px)", opacity: "0" },
-          "100%": { transform: "translateY(0)", opacity: "1" },
-        },
-        "fade-in": {
-          "0%": { opacity: "0" },
-          "100%": { opacity: "1" },
-        },
-        "scale-in": {
-          "0%": { transform: "scale(0.9)", opacity: "0" },
-          "100%": { transform: "scale(1)", opacity: "1" },
-        },
-      },
-      backgroundSize: {
-        "300%": "300%",
       },
     },
   },

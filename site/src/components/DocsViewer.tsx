@@ -21,71 +21,36 @@ export default function DocsViewer({ lang = "en" }: { lang?: string }) {
     const renderer = new marked.Renderer();
     
     // 2. Custom Blockquote for Alerts
-    // GitHub uses: > [!NOTE] content
     const originalBlockquote = renderer.blockquote.bind(renderer);
-    renderer.blockquote = (token) => {
-      // In marked v12+ token is object { type, text, tokens, ... }
-      // Older versions it might be string text. 
-      // Safe check:
-       const text = token.text || token;
-       
-       const alertMatch = text.match(/^\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]\s*([\s\S]*)/);
-       
-       if (alertMatch) {
-         const type = alertMatch[1].toLowerCase();
-         const content = alertMatch[2];
+    renderer.blockquote = ({ text }) => { // Token object in newer marked
+         if (!text) return '<blockquote></blockquote>';
+         const alertMatch = text.match(/^\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]\s*([\s\S]*)/i);
          
-         let styles = "bg-slate-800 border-l-4 border-slate-500 text-slate-300";
-         let icon = "ℹ️";
-         let title = "Note";
+         if (alertMatch) {
+             const type = alertMatch[1].toLowerCase();
+             const content = alertMatch[2];
+             
+             let styles = "bg-white/5 border-white/10 text-stone-300";
+             let icon = "INFO";
+             let titleColor = "text-white";
 
-         switch(type) {
-           case 'note':
-             styles = "bg-blue-500/10 border-l-4 border-blue-500 text-blue-200";
-             icon = "ℹ️";
-             title = "Note";
-             break;
-           case 'tip':
-              styles = "bg-emerald-500/10 border-l-4 border-emerald-500 text-emerald-200";
-              icon = "💡";
-              title = "Tip";
-              break;
-           case 'important':
-              styles = "bg-purple-500/10 border-l-4 border-purple-500 text-purple-200";
-              icon = "💜";
-              title = "Important";
-              break;
-           case 'warning':
-              styles = "bg-amber-500/10 border-l-4 border-amber-500 text-amber-200";
-              icon = "⚠️";
-              title = "Warning";
-              break;
-           case 'caution':
-              styles = "bg-red-500/10 border-l-4 border-red-500 text-red-200";
-              icon = "🛑";
-              title = "Caution";
-              break;
+             if (type === 'note') { styles = "bg-blue-500/10 border-blue-500/30 text-blue-100"; icon="ℹ️"; titleColor="text-blue-400"; }
+             if (type === 'tip') { styles = "bg-emerald-500/10 border-emerald-500/30 text-emerald-100"; icon="💡"; titleColor="text-emerald-400"; }
+             if (type === 'important') { styles = "bg-purple-500/10 border-purple-500/30 text-purple-100"; icon="💜"; titleColor="text-purple-400"; }
+             if (type === 'warning') { styles = "bg-amber-500/10 border-amber-500/30 text-amber-100"; icon="⚠️"; titleColor="text-amber-400"; }
+             if (type === 'caution') { styles = "bg-red-500/10 border-red-500/30 text-red-100"; icon="🛑"; titleColor="text-red-400"; }
+
+             // render inner MD
+             const inner = marked.parse(content);
+             return `<div class="my-6 p-5 rounded-2xl border ${styles} backdrop-blur-sm">
+                <div class="flex items-center gap-2 font-display font-bold text-xs mb-2 uppercase tracking-wider ${titleColor}">
+                    <span>${icon}</span>
+                    <span>${type}</span>
+                </div>
+                <div class="prose prose-invert prose-sm max-w-none prose-p:leading-relaxed opacity-90">${inner}</div>
+             </div>`;
          }
-
-         // We need to parse inner content effectively. 
-         // Since we interrupted the blockquote, we might need to process inline markdown of 'content'.
-         // But simple replacement works for basic text. For full MD support inside alert, we'd recursively parse.
-         const innerHtml = marked.parse(content);
-
-         return `
-           <div class="mb-6 p-4 rounded-r-lg ${styles}">
-             <div class="flex items-center gap-2 font-bold mb-2 uppercase text-xs tracking-wider opacity-90">
-                <span>${icon}</span>
-                <span>${title}</span>
-             </div>
-             <div class="prose prose-invert prose-sm max-w-none text-opacity-90">
-               ${innerHtml}
-             </div>
-           </div>
-         `;
-       }
-       
-       return originalBlockquote(token);
+         return `<blockquote class="border-l-2 border-white/20 pl-4 italic text-stone-400 my-4">${text}</blockquote>`;
     };
 
     marked.setOptions({
@@ -122,10 +87,7 @@ export default function DocsViewer({ lang = "en" }: { lang?: string }) {
     fetch(`/docx/${section.file}`)
       .then(res => res.text())
       .then(text => {
-        // Parse MD
-        const html = marked.parse(text); // highlight/renderer configured globally above? No, marked is stateless now mostly? 
-        // Actually marked v5+ isn't stateful options. We should pass renderer here or use marked.use.
-        // Let's fix above logic by using marked.use() once or passing renderer here.
+        const html = marked.parse(text); 
         setContent(html as string); 
         setLoading(false);
       })
@@ -136,49 +98,17 @@ export default function DocsViewer({ lang = "en" }: { lang?: string }) {
       });
   }, [activeDoc, sections]);
 
-  // Re-configure marked inside effect dependency to ensure it uses custom renderer
-  useEffect(() => {
-    const renderer = new marked.Renderer();
-    renderer.blockquote = ({ text }) => { // Token object in newer marked
-         if (!text) return '<blockquote></blockquote>';
-         const alertMatch = text.match(/^\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]\s*([\s\S]*)/i);
-         
-         if (alertMatch) {
-             const type = alertMatch[1].toLowerCase();
-             const content = alertMatch[2];
-             let styles = "bg-slate-800/50 border-emerald-500/50 text-slate-300"; // default
-             let icon = "INFO";
-
-             if (type === 'note') { styles = "bg-blue-500/10 border-blue-500 text-blue-100"; icon="ℹ️ NOTE"; }
-             if (type === 'tip') { styles = "bg-emerald-500/10 border-emerald-500 text-emerald-100"; icon="💡 TIP"; }
-             if (type === 'important') { styles = "bg-purple-500/10 border-purple-500 text-purple-100"; icon="💜 IMPORTANT"; }
-             if (type === 'warning') { styles = "bg-amber-500/10 border-amber-500 text-amber-100"; icon="⚠️ WARNING"; }
-             if (type === 'caution') { styles = "bg-red-500/10 border-red-500 text-red-100"; icon="🛑 CAUTION"; }
-
-             // render inner MD
-             const inner = marked.parse(content);
-             return `<div class="my-6 p-4 rounded-r-xl border-l-4 ${styles} shadow-sm backdrop-blur-sm">
-                <div class="font-bold text-xs mb-2 opacity-80">${icon}</div>
-                <div class="prose prose-invert prose-sm max-w-none">${inner}</div>
-             </div>`;
-         }
-         return `<blockquote class="border-l-4 border-slate-600 pl-4 italic text-slate-400">${text}</blockquote>`;
-    };
-
-    marked.use({ 
-        renderer,
-        gfm: true,
-    });
-  }, []);
-
   return (
-    <div className="flex flex-col md:flex-row min-h-screen bg-[#020617] text-slate-200">
+    <div className="flex flex-col md:flex-row min-h-screen bg-apple-gray-950 text-white">
       {/* Sidebar - Sticky & Glass */}
-      <aside className="w-full md:w-72 flex-shrink-0 border-r border-slate-800 bg-[#0f172a]/80 backdrop-blur-xl md:h-screen sticky top-0 overflow-y-auto">
-        <div className="p-6">
-            <h2 className="text-2xl font-black bg-gradient-to-r from-sky-400 to-purple-400 bg-clip-text text-transparent mb-8 tracking-tight">
+      <aside className="w-full md:w-80 flex-shrink-0 border-r border-white/5 bg-apple-gray-900/50 backdrop-blur-xl md:h-screen sticky top-0 overflow-y-auto z-20">
+        <div className="p-6 md:p-8">
+            <h2 className="text-xl md:text-2xl font-display font-bold text-white mb-2 tracking-tight">
             Documentation
             </h2>
+            <p className="text-sm text-apple-gray-400 mb-8">
+                Guides & Resources
+            </p>
             
             <nav className="flex flex-col space-y-1">
             {sections.map((section) => (
@@ -187,8 +117,8 @@ export default function DocsViewer({ lang = "en" }: { lang?: string }) {
                 onClick={() => setActiveDoc(section.id)}
                 className={`text-left px-4 py-3 rounded-xl transition-all duration-300 text-sm font-medium border ${
                     activeDoc === section.id
-                    ? "bg-sky-500/10 text-sky-400 border-sky-500/20 shadow-lg shadow-sky-500/5 translate-x-1"
-                    : "text-slate-400 border-transparent hover:text-slate-100 hover:bg-slate-800/50 hover:pl-5"
+                    ? "bg-white/10 text-white border-white/10 shadow-lg shadow-black/5"
+                    : "text-apple-gray-400 border-transparent hover:text-white hover:bg-white/5"
                 }`}
                 >
                 {section.title}
@@ -198,39 +128,42 @@ export default function DocsViewer({ lang = "en" }: { lang?: string }) {
         </div>
         
         {/* Footer in sidebar */}
-        <div className="p-6 mt-auto border-t border-slate-800/50">
-            <div className="text-xs text-slate-600 font-mono">
+        <div className="p-6 mt-auto border-t border-white/5">
+            <div className="flex items-center gap-2 text-xs text-apple-gray-500 font-mono">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                 v2.0.0-stable
             </div>
         </div>
       </aside>
 
       {/* Content Area */}
-      <main className="flex-1 relative">
+      <main className="flex-1 relative min-h-screen">
         {/* Background Gradients */}
-        <div className="absolute top-0 left-0 w-full h-96 bg-gradient-to-b from-sky-500/5 to-transparent pointer-events-none" />
+        <div className="absolute top-0 inset-x-0 h-96 bg-gradient-to-b from-apple-blue/5 to-transparent pointer-events-none" />
         
         <div className="max-w-4xl mx-auto p-8 md:p-16 relative z-10">
             {loading ? (
-                <div className="space-y-4 animate-pulse">
-                    <div className="h-12 bg-slate-800/50 rounded-xl w-3/4"></div>
-                    <div className="h-4 bg-slate-800/50 rounded w-full"></div>
-                    <div className="h-4 bg-slate-800/50 rounded w-5/6"></div>
-                    <div className="h-64 bg-slate-800/30 rounded-xl w-full mt-8"></div>
+                <div className="space-y-6 animate-pulse">
+                    <div className="h-14 bg-white/5 rounded-2xl w-3/4"></div>
+                    <div className="h-4 bg-white/5 rounded w-full"></div>
+                    <div className="h-4 bg-white/5 rounded w-5/6"></div>
+                    <div className="h-64 bg-white/5 rounded-2xl w-full mt-12"></div>
                 </div>
             ) : (
                 <article 
                     className="prose prose-invert prose-lg max-w-none 
-                    prose-headings:font-bold prose-headings:tracking-tight prose-headings:text-white
-                    prose-h1:text-5xl prose-h1:mb-8 prose-h1:bg-gradient-to-br prose-h1:from-white prose-h1:to-slate-400 prose-h1:bg-clip-text prose-h1:text-transparent
-                    prose-h2:text-3xl prose-h2:mt-12 prose-h2:mb-6 prose-h2:border-b prose-h2:border-slate-800 prose-h2:pb-4
-                    prose-p:text-slate-300 prose-p:leading-relaxed
-                    prose-a:text-sky-400 prose-a:no-underline hover:prose-a:text-sky-300 hover:prose-a:underline
-                    prose-pre:bg-[#0f172a] prose-pre:border prose-pre:border-slate-800 prose-pre:rounded-2xl prose-pre:shadow-2xl
-                    prose-code:text-sky-300 prose-code:bg-slate-800/50 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-md prose-code:before:content-none prose-code:after:content-none
+                    font-body
+                    prose-headings:font-display prose-headings:font-bold prose-headings:tracking-tight prose-headings:text-white
+                    prose-h1:text-4xl md:prose-h1:text-5xl prose-h1:mb-8 
+                    prose-h2:text-2xl md:prose-h2:text-3xl prose-h2:mt-16 prose-h2:mb-6 prose-h2:border-b prose-h2:border-white/10 prose-h2:pb-4 prose-h2:text-white
+                    prose-h3:text-xl prose-h3:mt-8 prose-h3:text-white
+                    prose-p:text-apple-gray-300 prose-p:leading-relaxed prose-p:text-base md:prose-p:text-lg
+                    prose-a:text-apple-blue prose-a:no-underline hover:prose-a:text-apple-blue/80 hover:prose-a:underline
+                    prose-pre:bg-[#1a1a1a] prose-pre:border prose-pre:border-white/5 prose-pre:rounded-2xl prose-pre:shadow-2xl prose-pre:shadow-black/20
+                    prose-code:text-emerald-300 prose-code:bg-white/5 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-md prose-code:before:content-none prose-code:after:content-none prose-code:font-mono prose-code:text-sm
                     prose-strong:text-white prose-strong:font-bold
-                    prose-ul:list-disc prose-ul:pl-6 prose-li:marker:text-sky-500
-                    prose-img:rounded-2xl prose-img:shadow-xl prose-img:border prose-img:border-slate-800"
+                    prose-ul:list-disc prose-ul:pl-6 prose-li:marker:text-apple-gray-500
+                    prose-img:rounded-3xl prose-img:shadow-2xl prose-img:shadow-black/20 prose-img:border prose-img:border-white/5 prose-img:my-8"
                     dangerouslySetInnerHTML={{ __html: content }}
                 />
             )}

@@ -4,6 +4,7 @@ import tailwind from '@astrojs/tailwind';
 
 // https://astro.build/config
 export default defineConfig({
+  site: 'https://timigs.bansafan.com',
   integrations: [react(), tailwind()],
   i18n: {
     defaultLocale: "en",
