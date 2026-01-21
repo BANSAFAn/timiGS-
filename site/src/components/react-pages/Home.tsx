@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import { Language } from "../../i18n/types";
 import type { Translation } from "../../i18n/types";
-import GitHubStats from "../GitHubStats";
+
 
 const BentoCard: React.FC<{
   className?: string;

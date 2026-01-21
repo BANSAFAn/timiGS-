@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { marked } from "marked";
 import hljs from "highlight.js";
 import 'highlight.js/styles/atom-one-dark.css';
@@ -14,6 +14,7 @@ export default function DocsViewer({ lang = "en" }: { lang?: string }) {
   const [activeDoc, setActiveDoc] = useState<string | null>(null);
   const [content, setContent] = useState<string>("");
   const [loading, setLoading] = useState(true);
+  const contentRef = useRef<HTMLDivElement>(null);
 
   // Setup marked options and custom extensions
   useEffect(() => {
@@ -22,7 +23,7 @@ export default function DocsViewer({ lang = "en" }: { lang?: string }) {
     
     // 2. Custom Blockquote for Alerts
     const originalBlockquote = renderer.blockquote.bind(renderer);
-    renderer.blockquote = ({ text }) => { // Token object in newer marked
+    renderer.blockquote = ({ text }: { text: string }) => { 
          if (!text) return '<blockquote></blockquote>';
          const alertMatch = text.match(/^\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]\s*([\s\S]*)/i);
          
@@ -55,12 +56,13 @@ export default function DocsViewer({ lang = "en" }: { lang?: string }) {
 
     marked.setOptions({
       renderer,
+      gfm: true,
       highlight: function(code, lang) {
         const language = hljs.getLanguage(lang) ? lang : 'plaintext';
         return hljs.highlight(code, { language }).value;
       },
       langPrefix: 'hljs language-'
-    });
+    } as any); // Cast to any to avoid type issues with older/newer types mismatch if present
   }, []);
 
   // Fetch Sidebar Config
@@ -86,8 +88,8 @@ export default function DocsViewer({ lang = "en" }: { lang?: string }) {
     setLoading(true);
     fetch(`/docx/${section.file}`)
       .then(res => res.text())
-      .then(text => {
-        const html = marked.parse(text); 
+      .then(async text => {
+        const html = await marked.parse(text); 
         setContent(html as string); 
         setLoading(false);
       })
@@ -97,6 +99,15 @@ export default function DocsViewer({ lang = "en" }: { lang?: string }) {
         setLoading(false);
       });
   }, [activeDoc, sections]);
+
+  // Syntax highlighting effect
+  useEffect(() => {
+    if (!loading && contentRef.current) {
+      contentRef.current.querySelectorAll('pre code').forEach((block) => {
+        hljs.highlightElement(block as HTMLElement);
+      });
+    }
+  }, [content, loading]);
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-apple-gray-950 text-white">
@@ -151,6 +162,7 @@ export default function DocsViewer({ lang = "en" }: { lang?: string }) {
                 </div>
             ) : (
                 <article 
+                    ref={contentRef}
                     className="prose prose-invert prose-lg max-w-none 
                     font-body
                     prose-headings:font-display prose-headings:font-bold prose-headings:tracking-tight prose-headings:text-white
