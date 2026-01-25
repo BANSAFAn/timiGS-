@@ -1,5 +1,53 @@
 # Changelog
 
+## [1.21.0](https://github.com/BANSAFAn/timiGS-/compare/v1.20.0...v1.21.0) (2026-01-25)
+
+
+### Features
+
+* add voice controls (mute, device selection), redesign goal selector with card UI ([21be353](https://github.com/BANSAFAn/timiGS-/commit/21be3533c815410c5e39dd7e1612bba8d8eee154))
+* Docs ([7614010](https://github.com/BANSAFAn/timiGS-/commit/7614010c1f7533dec3035cc6e27444cba7506507))
+* implement mobile google auth logic (deep links) ([6dfb715](https://github.com/BANSAFAn/timiGS-/commit/6dfb715e62a2ae5fc59c14387c6d9bba0a46d52b))
+* New site ! ([bdc4194](https://github.com/BANSAFAn/timiGS-/commit/bdc4194988741395bb997f18093524d7c2f5fdb9))
+* New Tab TEAMS ([fd408a6](https://github.com/BANSAFAn/timiGS-/commit/fd408a67a5e182ae6cf32c1d4f9f8743305113ed))
+* setup android deep links and fix icons via CI scripts ([5427a6e](https://github.com/BANSAFAn/timiGS-/commit/5427a6eb508fbfb1e1c5612ea1bbf03ec5521d66))
+* weather tab menu :3 ([65fd6ec](https://github.com/BANSAFAn/timiGS-/commit/65fd6ec5c6c8d28cba81a7a82350b1011bb66239))
+
+
+### Bug Fixes
+
+* ci workflow syntax error ([2992834](https://github.com/BANSAFAn/timiGS-/commit/2992834ed9827a64f329b62a4905ced2d1272ca3))
+* convert signing script to ESM to resolve CI module error ([8eb5e8f](https://github.com/BANSAFAn/timiGS-/commit/8eb5e8f2bced0b688e0699be6ed4d06d6615a702))
+* ensure android release builds are signed with debug key to fix installation issues ([3158e6e](https://github.com/BANSAFAn/timiGS-/commit/3158e6eabdd1a45bae6b7172d80d953977341168))
+* Icon ([cc32ec9](https://github.com/BANSAFAn/timiGS-/commit/cc32ec9d9b34f3f52a8980fd841ea5948dac7500))
+* lib & picker ([da15ee7](https://github.com/BANSAFAn/timiGS-/commit/da15ee7ba07da12cab66ad738063045eebefc245))
+* lower Android minSdkVersion from 30 to 24 for wider device support ([b5bd428](https://github.com/BANSAFAn/timiGS-/commit/b5bd428e20d972220e2dd84f0b43ad072bf47489))
+* mobile trans ([16ad439](https://github.com/BANSAFAn/timiGS-/commit/16ad4390f432967cb1279d6c238993127f25f96f))
+* mobile ui (hide menu labels), reactive theme toggle ([7e4f67e](https://github.com/BANSAFAn/timiGS-/commit/7e4f67e7213130376f16f811034f0576f5760e94))
+* patch ([7f1d5ef](https://github.com/BANSAFAn/timiGS-/commit/7f1d5ef02867a7e7489ff2151540a87f1011ed7d))
+* patch 2.3 ([867ef91](https://github.com/BANSAFAn/timiGS-/commit/867ef91193c1ad0e8568d6750d028e15ecfb45a5))
+* patch-manifest script esm and deep-link ts types ([4fbdf45](https://github.com/BANSAFAn/timiGS-/commit/4fbdf4509e31da0686cc78675a6cce519963314f))
+* regenerate icons in RGBA format for Tauri ([1f925dd](https://github.com/BANSAFAn/timiGS-/commit/1f925ddd6e7370352a6d51b5e1e89273e8cd7bab))
+* resolve TypeScript errors in Compare.vue and teams.ts ([d197bef](https://github.com/BANSAFAn/timiGS-/commit/d197befe32f5bc99fa4a119c082c7ef746fb42bf))
+* use correct login_google command for Google Auth in Teams ([7170d7b](https://github.com/BANSAFAn/timiGS-/commit/7170d7b87a82991e63eb196f1dbec7aa84c95276))
+
+
+### Styles
+
+* New style Weather, Transfer, Weather ([735d171](https://github.com/BANSAFAn/timiGS-/commit/735d171c728c905e817487aafa2554208f48a425))
+* Settings ([05314bd](https://github.com/BANSAFAn/timiGS-/commit/05314bd054d8167ec9334748931c7cbfa8d65c2b))
+
+
+### CI/CD
+
+* build fix & teams call ([1047f92](https://github.com/BANSAFAn/timiGS-/commit/1047f92de41ed42ebf713d00c7bc4bde8358309c))
+
+
+### Build System
+
+* **deps:** bump devalue ([08fbc07](https://github.com/BANSAFAn/timiGS-/commit/08fbc075b4a7fd50ccf7eee4a0ca9acbaa18b817))
+* **deps:** bump react-router ([761f0a7](https://github.com/BANSAFAn/timiGS-/commit/761f0a71e2e5556023af567bd1c79ec53c25c8b0))
+
 ## [1.20.0](https://github.com/BANSAFAn/timiGS-/compare/v1.19.0...v1.20.0) (2026-01-06)
 
 
