@@ -1,6 +1,13 @@
 //! Tauri IPC commands
 
-use crate::{db, tracker};
+use crate::db;
+
+#[cfg(target_os = "windows")]
+use crate::tracker;
+
+#[cfg(target_os = "android")]
+use crate::android_tracker as tracker;
+
 use tauri::command;
 
 #[command]
@@ -90,6 +97,18 @@ pub fn stop_tracking() {
 #[command]
 pub fn is_tracking() -> bool {
     tracker::is_tracking()
+}
+
+#[command]
+#[cfg(target_os = "android")]
+pub fn check_usage_permission() -> bool {
+    tracker::check_permission()
+}
+
+#[command]
+#[cfg(target_os = "android")]
+pub fn request_usage_permission() -> Result<(), String> {
+    tracker::request_permission()
 }
 
 // Auth & Sync Commands

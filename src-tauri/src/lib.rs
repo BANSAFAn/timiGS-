@@ -12,7 +12,12 @@ mod icons;
 
 mod picker;
 mod tasks;
+
+#[cfg(target_os = "windows")]
 mod tracker;
+
+#[cfg(target_os = "android")]
+mod android_tracker;
 
 #[cfg(desktop)]
 use tauri::{
@@ -179,6 +184,10 @@ pub fn run() {
             commands::download_file,
             commands::save_local_file,
             commands::list_drive_files,
+            #[cfg(target_os = "android")]
+            commands::check_usage_permission,
+            #[cfg(target_os = "android")]
+            commands::request_usage_permission,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

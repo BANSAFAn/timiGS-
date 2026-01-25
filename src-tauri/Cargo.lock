@@ -5612,6 +5612,7 @@ dependencies = [
  "dotenv",
  "glib 0.20.12",
  "image",
+ "jni",
  "mime_guess",
  "oauth2",
  "once_cell",

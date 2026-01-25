@@ -95,71 +95,42 @@
           <h3 class="section-title">5-Day Forecast</h3>
         </div>
         
-        <!-- Temperature Graph -->
-        <div class="temp-graph-card">
-          <svg class="temp-graph" viewBox="0 0 500 140" preserveAspectRatio="none">
-            <defs>
-              <linearGradient id="tempGradientNew" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" style="stop-color:rgba(251,113,133,0.5)" />
-                <stop offset="100%" style="stop-color:rgba(251,113,133,0)" />
-              </linearGradient>
-              <linearGradient id="highLineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" style="stop-color:#fb7185" />
-                <stop offset="50%" style="stop-color:#f43f5e" />
-                <stop offset="100%" style="stop-color:#fb7185" />
-              </linearGradient>
-              <filter id="glow">
-                <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
-                <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
-              </filter>
-            </defs>
-            
-            <!-- Grid lines -->
-            <line v-for="y in [35, 70, 105]" :key="y" x1="0" :y1="y" x2="500" :y2="y" stroke="rgba(255,255,255,0.06)" stroke-width="1" />
-            
-            <!-- Area fill -->
-            <path :d="chartAreaPath" fill="url(#tempGradientNew)" />
-            
-            <!-- High temp line -->
-            <path :d="chartHighPath" fill="none" stroke="url(#highLineGradient)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)" />
-            
-            <!-- Low temp line -->
-            <path :d="chartLowPath" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="6,4" opacity="0.8" />
-            
-            <!-- Data points (high) -->
-            <g v-for="(point, i) in chartHighPoints" :key="'h'+i">
-              <circle :cx="point.x" :cy="point.y" r="6" fill="#1a1a2e" stroke="#fb7185" stroke-width="2" />
-              <text :x="point.x" :y="point.y - 14" text-anchor="middle" fill="#fb7185" font-size="12" font-weight="600">{{ Math.round(forecast[i].high) }}°</text>
-            </g>
-            
-            <!-- Data points (low) -->
-            <g v-for="(point, i) in chartLowPoints" :key="'l'+i">
-              <circle :cx="point.x" :cy="point.y" r="5" fill="#1a1a2e" stroke="#60a5fa" stroke-width="2" />
-              <text :x="point.x" :y="point.y + 20" text-anchor="middle" fill="#60a5fa" font-size="11">{{ Math.round(forecast[i].low) }}°</text>
-            </g>
-          </svg>
-          
-          <div class="chart-legend">
-            <span class="legend-item"><span class="legend-dot high"></span> High</span>
-            <span class="legend-item"><span class="legend-dot low"></span> Low</span>
-          </div>
-        </div>
-        
-        <!-- Forecast Cards -->
-        <div class="forecast-grid">
+        <!-- Premium Forecast Cards -->
+        <div class="forecast-list">
           <div 
-            class="forecast-card" 
-            v-for="day in forecast" 
+            class="forecast-item" 
+            v-for="(day, index) in forecast" 
             :key="day.date"
-            :class="getWeatherClass(day.code)"
+            :style="{ animationDelay: (index * 0.05) + 's' }"
           >
-            <div class="forecast-day">{{ day.dayName }}</div>
-            <div class="forecast-icon">
-              <span>{{ getWeatherIcon(day.code) }}</span>
+            <div class="forecast-item-left">
+              <div class="forecast-day-name">{{ day.dayName }}</div>
+              <div class="forecast-date">{{ formatDate(day.date) }}</div>
             </div>
-            <div class="forecast-temps">
-              <span class="temp-high">{{ Math.round(day.high) }}°</span>
-              <span class="temp-low">{{ Math.round(day.low) }}°</span>
+            
+            <div class="forecast-item-center">
+              <div class="forecast-weather-icon" :class="getWeatherClass(day.code)">
+                {{ getWeatherIcon(day.code) }}
+              </div>
+              <div class="forecast-condition">{{ getWeatherDesc(day.code) }}</div>
+            </div>
+            
+            <div class="forecast-item-right">
+              <div class="temp-range">
+                <span class="temp-max">{{ Math.round(day.high) }}°</span>
+                <div class="temp-bar-container">
+                  <div 
+                    class="temp-bar" 
+                    :style="{ 
+                      left: getTempBarPosition(day.low) + '%',
+                      right: (100 - getTempBarPosition(day.high)) + '%'
+                    }"
+                  >
+                    <div class="temp-bar-fill"></div>
+                  </div>
+                </div>
+                <span class="temp-min">{{ Math.round(day.low) }}°</span>
+              </div>
             </div>
           </div>
         </div>
@@ -173,7 +144,7 @@
         
         <div class="history-timeline">
           <div class="timeline-line"></div>
-          <div class="history-entry" v-for="entry in history" :key="entry.date">
+          <div class="history-entry" v-for="entry in history" :key="entry.date" @click="openHistoryDetail(entry)">
             <div class="timeline-dot" :class="{ 'has-weather': isEnabled }">
               <span v-if="isEnabled">{{ getWeatherIcon(entry.weatherCode) }}</span>
               <span v-else>📅</span>
@@ -192,15 +163,19 @@
               
               <div class="entry-apps" v-if="entry.apps.length > 0">
                 <div 
-                  class="app-chip" 
+                  class="app-group" 
                   v-for="app in entry.apps" 
                   :key="app.name"
-                  :title="app.name + ' (' + formatDuration(app.duration) + ')'"
                 >
-                  <div class="app-avatar" :style="{ background: stringToColor(app.name) }">
-                    {{ app.name.charAt(0).toUpperCase() }}
+                  <div 
+                    class="app-icon" 
+                    :style="{ background: appIcons[app.name] ? 'transparent' : stringToColor(app.name) }"
+                    :title="app.name"
+                  >
+                    <img v-if="appIcons[app.name]" :src="appIcons[app.name]" class="real-icon" />
+                    <span v-else>{{ app.name.charAt(0).toUpperCase() }}</span>
                   </div>
-                  <span class="app-time">{{ formatDuration(app.duration) }}</span>
+                  <span class="app-duration">{{ formatDuration(app.duration) }}</span>
                 </div>
                 <div class="more-badge" v-if="entry.moreCount > 0">+{{ entry.moreCount }}</div>
               </div>
@@ -282,76 +257,68 @@
         </div>
       </div>
     </Teleport>
+    <!-- History Detail Modal -->
+    <Teleport to="body">
+      <div v-if="showDetailModal" class="modal-overlay" @click.self="showDetailModal = false">
+        <div class="modal-card detail-modal">
+          <div class="modal-header">
+            <div class="header-left">
+              <h3>{{ selectedDayEntry?.month }} {{ selectedDayEntry?.day }}</h3>
+              <span class="text-muted">Daily Activity Log</span>
+            </div>
+            <button class="modal-close" @click="showDetailModal = false">×</button>
+          </div>
+          
+          <div class="modal-body custom-scrollbar">
+             <div class="sessions-list">
+               <div v-if="selectedDaySessions.length === 0" class="no-activity">
+                 No detailed activity found for this day.
+               </div>
+               <div v-for="(session, index) in selectedDaySessions" :key="index" class="session-item">
+                  <div class="session-time">
+                    {{ new Date(session.start_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) }}
+                  </div>
+                  <div class="session-timeline-line"></div>
+                  <div class="session-content">
+                    <div class="app-icon-large" :style="{ background: appIcons[session.app_name] ? 'transparent' : stringToColor(session.app_name) }">
+                       <img v-if="appIcons[session.app_name]" :src="appIcons[session.app_name]" />
+                       <span v-else>{{ session.app_name.charAt(0).toUpperCase() }}</span>
+                    </div>
+                    <div class="session-info">
+                       <div class="session-app-name">{{ session.app_name }}</div>
+                       <div class="session-duration">{{ formatDuration(session.duration_seconds) }}</div>
+                       <div class="session-window text-muted sm" v-if="session.window_title">{{ session.window_title }}</div>
+                    </div>
+                  </div>
+               </div>
+             </div>
+          </div>
+        </div>
+      </div>
+    </Teleport>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, reactive, computed } from 'vue';
+import { ref, onMounted, reactive } from 'vue';
+import { invoke } from '@tauri-apps/api/core';
 
 const isEnabled = ref(true);
 const showSettings = ref(false);
 
-// --- Chart Computed Properties ---
-function getSmoothPath(points: {x: number, y: number}[]) {
-    if (points.length === 0) return "";
-    if (points.length === 1) return `M ${points[0].x} ${points[0].y}`;
-    
-    let path = `M ${points[0].x} ${points[0].y}`;
-    
-    for (let i = 0; i < points.length - 1; i++) {
-        const p0 = points[Math.max(0, i - 1)];
-        const p1 = points[i];
-        const p2 = points[i + 1];
-        const p3 = points[Math.min(points.length - 1, i + 2)];
-        
-        const cp1x = p1.x + (p2.x - p0.x) * 0.15;
-        const cp1y = p1.y + (p2.y - p0.y) * 0.15;
-        const cp2x = p2.x - (p3.x - p1.x) * 0.15;
-        const cp2y = p2.y - (p3.y - p1.y) * 0.15;
-        
-        path += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${p2.x} ${p2.y}`;
-    }
-    return path;
+// --- Forecast Helpers ---
+function formatDate(dateStr: string) {
+  const date = new Date(dateStr);
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
-const chartHighPoints = computed(() => {
-  if (forecast.value.length === 0) return [];
-  const highs = forecast.value.map(d => d.high);
-  const lows = forecast.value.map(d => d.low);
-  const min = Math.min(...highs, ...lows) - 3;
-  const max = Math.max(...highs) + 3;
-  const range = max - min || 1;
-  
-  return forecast.value.map((day, i) => ({
-    x: 50 + i * 100,
-    y: 115 - ((day.high - min) / range) * 85
-  }));
-});
-
-const chartLowPoints = computed(() => {
-  if (forecast.value.length === 0) return [];
-  const lows = forecast.value.map(d => d.low);
-  const highs = forecast.value.map(d => d.high);
-  const min = Math.min(...lows, ...highs) - 3;
-  const max = Math.max(...highs) + 3;
-  const range = max - min || 1;
-  
-  return forecast.value.map((day, i) => ({
-    x: 50 + i * 100,
-    y: 115 - ((day.low - min) / range) * 85
-  }));
-});
-
-const chartHighPath = computed(() => getSmoothPath(chartHighPoints.value));
-const chartLowPath = computed(() => getSmoothPath(chartLowPoints.value));
-
-const chartAreaPath = computed(() => {
-  if (chartHighPoints.value.length === 0) return '';
-  const highPath = getSmoothPath(chartHighPoints.value);
-  const lastX = chartHighPoints.value[chartHighPoints.value.length - 1].x;
-  const firstX = chartHighPoints.value[0].x;
-  return `${highPath} L ${lastX} 140 L ${firstX} 140 Z`;
-});
+function getTempBarPosition(temp: number) {
+  // Map temp from range -10 to 40 roughly to 0-100%
+  const min = -15;
+  const max = 40;
+  const clamped = Math.max(min, Math.min(max, temp));
+  return ((clamped - min) / (max - min)) * 100;
+}
 
 function getWeatherClass(code: number) {
   if (code === 0) return 'weather-clear';
@@ -564,6 +531,43 @@ function stringToColor(str: string) {
 import { useActivityStore } from '../stores/activity';
 const activityStore = useActivityStore();
 
+const appIcons = ref<Record<string, string>>({});
+
+async function loadIcon(appName: string) {
+  if (appIcons.value[appName]) return;
+  try {
+     // Try to get icon (assuming backend has this command, typical for Tauri apps)
+     // If not, we fall back to initals in template
+     const icon = await invoke('get_app_icon', { path: appName }); // simplified, usually need full path or app name
+     if (typeof icon === 'string' && icon.length > 0) {
+        appIcons.value[appName] = icon;
+     }
+  } catch (e) {
+     // Silent fail
+  }
+}
+
+// History Detail State
+const showDetailModal = ref(false);
+const selectedDayEntry = ref<HistoryEntry | null>(null);
+const selectedDaySessions = ref<any[]>([]);
+
+function openHistoryDetail(entry: HistoryEntry) {
+  selectedDayEntry.value = entry;
+  showDetailModal.value = true;
+  // We need to re-fetch or filter sessions for this day if we stored them?
+  // We didn't store raw sessions in history entry yet. Let's fix that.
+  loadDaySessions(entry.date);
+}
+
+async function loadDaySessions(dateStr: string) {
+  const sessions = await activityStore.getActivityRange(dateStr, dateStr);
+  selectedDaySessions.value = sessions.sort((a, b) => new Date(b.end_time || b.start_time).getTime() - new Date(a.end_time || a.start_time).getTime());
+  
+  // Load icons for these sessions too
+  sessions.forEach(s => loadIcon(s.app_name));
+}
+
 async function loadHistory() {
    const days = 7;
    const today = new Date();
@@ -602,6 +606,9 @@ async function loadHistory() {
 
       const topApps = sortedApps.slice(0, 4);
       const moreCount = Math.max(0, sortedApps.length - 4);
+      
+      // Load icons
+      topApps.forEach(app => loadIcon(app.name));
 
       const forecastDay = forecast.value.find(d => d.date === dateStr);
       let weatherCode = forecastDay ? forecastDay.code : (Math.random() > 0.5 ? 1 : 2); 
@@ -1497,57 +1504,276 @@ onMounted(() => {
   }
 }
 
-/* Mobile Responsive */
-@media (max-width: 768px) {
-  .hero-main {
-    flex-direction: column;
-    text-align: center;
-  }
-  
-  .hero-stats {
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-  
-  .stat-divider {
-    display: none;
-  }
-  
-  .stat-item {
-    min-width: 100px;
-  }
-  
-  .forecast-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-  
-  .forecast-grid .forecast-card:nth-child(n+4) {
-    grid-column: span 1;
-  }
-  
-  .history-timeline {
-    padding-left: 30px;
-  }
-  
-  .timeline-line {
-    left: 10px;
-  }
-  
-  .timeline-dot {
-    left: -24px;
-    width: 28px;
-    height: 28px;
-    font-size: 0.9rem;
-  }
+/* Forecast List Styles */
+.forecast-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
-@media (max-width: 500px) {
-  .forecast-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  .forecast-card:last-child {
-    grid-column: span 2;
-  }
+.forecast-item {
+  display: flex;
+  align-items: center;
+  padding: 16px 20px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  transition: all 0.2s;
+  animation: fadeSlideIn 0.5s ease forwards;
+  opacity: 0;
+}
+
+.forecast-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+  transform: translateX(4px);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.forecast-item-left {
+  width: 120px;
+}
+
+.forecast-day-name {
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 2px;
+}
+
+.forecast-date {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.forecast-item-center {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.forecast-weather-icon {
+  font-size: 1.5rem;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+}
+
+.forecast-condition {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+}
+
+.forecast-item-right {
+  width: 250px;
+}
+
+/* Temp Bar Visualization */
+.temp-range {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.temp-max, .temp-min {
+  width: 30px;
+  text-align: center;
+  font-weight: 600;
+}
+
+.temp-max { color: #fff; }
+.temp-min { color: var(--text-muted); }
+
+.temp-bar-container {
+  flex: 1;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  position: relative;
+  overflow: hidden;
+}
+
+.temp-bar {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  /* left and right set dynamically */
+}
+
+.temp-bar-fill {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, #60a5fa, #f43f5e);
+  border-radius: 3px;
+  opacity: 0.8;
+}
+
+/* Weather specific styles for icons/text colors if needed */
+.weather-clear { color: #f59e0b; }
+.weather-rainy { color: #3b82f6; }
+.weather-snowy { color: #06b6d4; }
+.weather-stormy { color: #8b5cf6; }
+.weather-cloudy { color: #9ca3af; }
+
+
+.text-muted {
+  color: var(--text-muted);
+}
+
+.sm {
+  font-size: 0.8rem;
+}
+
+/* App Group & Icons */
+.app-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255,255,255,0.05);
+  padding: 4px 10px 4px 4px;
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.05);
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.app-group:hover {
+  background: rgba(255,255,255,0.1);
+  border-color: rgba(255,255,255,0.1);
+}
+
+.app-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #fff;
+  overflow: hidden;
+}
+
+.real-icon {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.app-duration {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* Detail Modal specific */
+.detail-modal {
+  width: 500px;
+  max-width: 90%;
+  height: 80vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.detail-modal .modal-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0;
+}
+
+.sessions-list {
+  padding: 20px;
+}
+
+.session-item {
+  display: flex;
+  gap: 16px;
+  padding-bottom: 20px;
+  position: relative;
+}
+
+.session-time {
+  font-family: monospace;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  width: 50px;
+  text-align: right;
+  padding-top: 4px;
+}
+
+.session-timeline-line {
+  width: 2px;
+  background: rgba(255,255,255,0.1);
+  position: relative;
+}
+
+.session-timeline-line::before {
+  content: '';
+  position: absolute;
+  top: 8px;
+  left: -4px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--bg-secondary);
+  border: 2px solid var(--color-primary);
+}
+
+.session-content {
+  flex: 1;
+  background: rgba(255,255,255,0.03);
+  padding: 12px;
+  border-radius: 12px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  border: 1px solid rgba(255,255,255,0.05);
+}
+
+.app-icon-large {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #fff;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.app-icon-large img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.session-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.session-app-name {
+  font-weight: 600;
+  color: #fff;
+  font-size: 0.95rem;
+}
+
+.session-duration {
+  font-size: 0.85rem;
+  color: var(--color-primary);
+  margin-bottom: 4px;
+}
+
+.session-window {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.8rem;
 }
 </style>

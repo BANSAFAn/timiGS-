@@ -62,5 +62,6 @@ windows = { version = "0.58", features = [
 
 [target.'cfg(target_os = "android")'.dependencies]
 # Android-specific dependencies (managed by Tauri)
+jni = "0.21"
 
 

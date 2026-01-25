@@ -1,6 +1,6 @@
 <template>
   <div class="shutdown-timer">
-    <h3>{{ t('shutdownTimer.title', 'Shutdown Timer') }}</h3>
+    <h3>{{ t('tools.shutdownTimer.title', 'Shutdown Timer') }}</h3>
     
     <div v-if="timeLeft === null" class="timer-setup">
       <div class="time-inputs">
@@ -21,7 +21,7 @@
       </div>
       
       <button @click="startTimer" class="btn-primary full-width">
-        {{ t('shutdownTimer.start', 'Start Timer') }}
+        {{ t('tools.shutdownTimer.start', 'Start Timer') }}
       </button>
     </div>
 
@@ -34,10 +34,10 @@
         <div class="time-display">{{ formattedTime }}</div>
       </div>
       <p class="timer-message">
-        {{ t('shutdownTimer.pcWillShutdown', 'PC will shutdown when timer ends.') }}
+        {{ t('tools.shutdownTimer.pcWillShutdown', 'PC will shutdown when timer ends.') }}
       </p>
       <button @click="cancelTimer" class="btn-danger">
-        {{ t('shutdownTimer.cancel', 'Cancel Timer') }}
+        {{ t('tools.shutdownTimer.cancel', 'Cancel Timer') }}
       </button>
     </div>
   </div>
@@ -109,7 +109,7 @@ async function triggerShutdown() {
       Notification.requestPermission().then(permission => {
         if (permission === 'granted') {
            new Notification(t('app.name'), { 
-            body: t('shutdownTimer.shutdownNow', 'Time is up! Shutting down PC...') 
+            body: t('tools.shutdownTimer.shutdownNow', 'Time is up! Shutting down PC...') 
           });
         }
       });

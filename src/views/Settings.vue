@@ -1,11 +1,16 @@
 <template>
   <div class="page page-shell">
-    <div class="page-container">
-      <div class="page-header">
-        <h2>{{ $t("settings.title") }}</h2>
-        <p>
-          {{ $t("settings.subtitle") || "Manage your application preferences" }}
-        </p>
+    <div class="page-container settings-page">
+      <div class="page-header modern-header">
+        <div class="header-content">
+          <div class="header-icon">⚙️</div>
+          <div>
+            <h2>{{ $t("settings.title") }}</h2>
+            <p class="header-subtitle">
+              {{ $t("settings.subtitle") || "Customize your experience" }}
+            </p>
+          </div>
+        </div>
       </div>
 
       <!-- Live Debug (Hidden in Prod usually, but good for now) -->
@@ -33,169 +38,199 @@
       <!-- Settings Content -->
       <div v-else class="settings-grid animate-enter">
         <!-- Appearance -->
-        <div class="glass-card" style="z-index: 20">
-          <div class="card-header">
-            <h3 class="card-title">{{ $t("settings.appearance") }}</h3>
+        <div class="modern-card">
+          <div class="card-header-modern">
+            <div class="card-icon">🎨</div>
+            <div>
+              <h3 class="card-title-modern">{{ $t("settings.appearance") }}</h3>
+              <p class="card-subtitle">Personalize your interface</p>
+            </div>
           </div>
 
-          <div class="setting-row">
-            <div class="setting-info">
-              <label>{{ $t("settings.language") }}</label>
-              <p class="setting-desc">Select your preferred language</p>
-            </div>
-            <div
-              class="custom-select"
-              :class="{ open: langOpen }"
-              @click="langOpen = !langOpen"
-            >
-              <div class="selected-option">
-                <span class="flag-icon">{{ currentLangFlag }}</span>
-                <span class="lang-name">{{ currentLangName }}</span>
-                <span class="chevron">▼</span>
+          <div class="settings-group">
+            <div class="setting-item">
+              <div class="setting-left">
+                <div class="setting-icon">🌐</div>
+                <div class="setting-content">
+                  <label class="setting-label">{{ $t("settings.language") }}</label>
+                  <p class="setting-description">Choose your preferred language</p>
+                </div>
               </div>
-              <div class="options-list" v-show="langOpen">
-                <div
-                  v-for="lang in availableLanguages"
-                  :key="lang.code"
-                  class="option-item"
-                  @click.stop="changeLanguage(lang.code)"
-                >
-                  <span class="flag-icon">{{ lang.flag }}</span>
-                  {{ lang.name }}
+              <div
+                class="custom-select modern-select"
+                :class="{ open: langOpen }"
+                @click="langOpen = !langOpen"
+              >
+                <div class="selected-option">
+                  <span class="flag-icon">{{ currentLangFlag }}</span>
+                  <span class="lang-name">{{ currentLangName }}</span>
+                  <span class="chevron">▼</span>
+                </div>
+                <div class="options-list" v-show="langOpen">
+                  <div
+                    v-for="lang in availableLanguages"
+                    :key="lang.code"
+                    class="option-item"
+                    @click.stop="changeLanguage(lang.code)"
+                  >
+                    <span class="flag-icon">{{ lang.flag }}</span>
+                    {{ lang.name }}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-            <div class="setting-row">
-            <div class="setting-info">
-              <label>{{ $t("settings.theme") }}</label>
-              <p class="setting-desc">Toggle dark or light mode</p>
-            </div>
-            <div class="theme-switcher">
-               <button 
-                 class="theme-btn" 
-                 :class="{ active: localSettings.theme === 'dark' }"
-                 @click="setTheme('dark')"
-               >
-                 🌙 {{ $t("settings.dark") }}
-               </button>
-               <button 
-                 class="theme-btn" 
-                 :class="{ active: localSettings.theme === 'light' }"
-                 @click="setTheme('light')"
-               >
-                 ☀️ {{ $t("settings.themeLight") || 'Light' }}
-               </button>
+            <div class="setting-item">
+              <div class="setting-left">
+                <div class="setting-icon">🌓</div>
+                <div class="setting-content">
+                  <label class="setting-label">{{ $t("settings.theme") }}</label>
+                  <p class="setting-description">Switch between dark and light mode</p>
+                </div>
+              </div>
+              <div class="theme-switcher-modern">
+                 <button 
+                   class="theme-btn-modern" 
+                   :class="{ active: localSettings.theme === 'dark' }"
+                   @click="setTheme('dark')"
+                 >
+                   <span class="theme-icon">🌙</span>
+                   <span class="theme-label">Dark</span>
+                 </button>
+                 <button 
+                   class="theme-btn-modern" 
+                   :class="{ active: localSettings.theme === 'light' }"
+                   @click="setTheme('light')"
+                 >
+                   <span class="theme-icon">☀️</span>
+                   <span class="theme-label">Light</span>
+                 </button>
+              </div>
             </div>
           </div>
         </div>
 
         <!-- System -->
-        <div class="glass-card">
-          <div class="card-header">
-            <h3 class="card-title">{{ $t("settings.system") }}</h3>
-          </div>
-
-          <div class="setting-row">
-            <div class="setting-info">
-              <div class="setting-label">{{ $t("settings.tracking") }}</div>
-              <div class="setting-desc">
-                {{ isTracking ? "Active" : "Paused" }}
-              </div>
-            </div>
-            <button
-              class="btn"
-              :class="isTracking ? 'btn-danger' : 'btn-success'"
-              @click="toggleTracking"
-            >
-              {{
-                isTracking
-                  ? $t("settings.stopTracking")
-                  : $t("settings.startTracking")
-              }}
-            </button>
-          </div>
-
-          <div class="setting-row">
-            <div class="setting-info">
-              <div class="setting-label">{{ $t("settings.autostart") }}</div>
-              <div class="setting-desc">Launch TimiGS on system startup</div>
-            </div>
-            <div
-              class="toggle-switch"
-              :class="{ checked: localSettings.autostart }"
-              @click="toggleAutostart"
-            >
-              <div class="toggle-thumb"></div>
+        <div class="modern-card">
+          <div class="card-header-modern">
+            <div class="card-icon">⚙️</div>
+            <div>
+              <h3 class="card-title-modern">{{ $t("settings.system") }}</h3>
+              <p class="card-subtitle">Manage app behavior</p>
             </div>
           </div>
 
-          <div class="setting-row">
-            <div class="setting-info">
-              <div class="setting-label">
-                {{ $t("settings.minimizeToTray") }}
-              </div>
-              <div class="setting-desc">Keep running in background</div>
-            </div>
-            <div
-              class="toggle-switch"
-              :class="{ checked: localSettings.minimize_to_tray }"
-              @click="toggleMinimize"
-            >
-              <div class="toggle-thumb"></div>
-            </div>
-          </div>
+          <div class="settings-group">
 
-          <div class="setting-row">
-            <div class="setting-info">
-              <div class="setting-label">
-                {{ $t("settings.discordRpc") || "Discord Rich Presence" }}
+            <div class="setting-item">
+              <div class="setting-left">
+                <div class="setting-icon">📊</div>
+                <div class="setting-content">
+                  <label class="setting-label">{{ $t("settings.tracking") }}</label>
+                  <p class="setting-description">{{ isTracking ? "Active" : "Paused" }}</p>
+                </div>
               </div>
-              <div class="setting-desc">
-                {{
-                  $t("settings.discordRpcDesc") ||
-                  "Show activity on Discord profile"
-                }}
+              <button
+                class="btn"
+                :class="isTracking ? 'btn-danger' : 'btn-success'"
+                @click="toggleTracking"
+              >
+                {{ isTracking ? $t("settings.stopTracking") : $t("settings.startTracking") }}
+              </button>
+            </div>
+
+            <div class="setting-item">
+              <div class="setting-left">
+                <div class="setting-icon">🚀</div>
+                <div class="setting-content">
+                  <label class="setting-label">{{ $t("settings.autostart") }}</label>
+                  <p class="setting-description">Launch TimiGS on system startup</p>
+                </div>
+              </div>
+              <div
+                class="toggle-switch"
+                :class="{ checked: localSettings.autostart }"
+                @click="toggleAutostart"
+              >
+                <div class="toggle-thumb"></div>
               </div>
             </div>
-            <div
-              class="toggle-switch"
-              :class="{ checked: localSettings.discord_rpc }"
-              @click="toggleDiscord"
-            >
-              <div class="toggle-thumb"></div>
+
+            <div class="setting-item">
+              <div class="setting-left">
+                <div class="setting-icon">📌</div>
+                <div class="setting-content">
+                  <label class="setting-label">{{ $t("settings.minimizeToTray") }}</label>
+                  <p class="setting-description">Keep running in background</p>
+                </div>
+              </div>
+              <div
+                class="toggle-switch"
+                :class="{ checked: localSettings.minimize_to_tray }"
+                @click="toggleMinimize"
+              >
+                <div class="toggle-thumb"></div>
+              </div>
+            </div>
+
+            <div class="setting-item">
+              <div class="setting-left">
+                <div class="setting-icon">🎮</div>
+                <div class="setting-content">
+                  <label class="setting-label">{{ $t("settings.discordRpc") || "Discord Rich Presence" }}</label>
+                  <p class="setting-description">{{ $t("settings.discordRpcDesc") || "Show activity on Discord profile" }}</p>
+                </div>
+              </div>
+              <div
+                class="toggle-switch"
+                :class="{ checked: localSettings.discord_rpc }"
+                @click="toggleDiscord"
+              >
+                <div class="toggle-thumb"></div>
+              </div>
             </div>
           </div>
         </div>
 
         <!-- Cloud & Data -->
-        <div class="glass-card">
-          <div class="card-header">
-            <h3 class="card-title">Cloud & Data</h3>
+        <div class="modern-card">
+          <div class="card-header-modern">
+            <div class="card-icon">☁️</div>
+            <div>
+              <h3 class="card-title-modern">Cloud & Data</h3>
+              <p class="card-subtitle">Sync and backup settings</p>
+            </div>
           </div>
 
-          <div class="setting-row">
-            <div class="setting-info">
-              <div class="setting-label">Auto Sync</div>
-              <div class="setting-desc">
-                Automatically backup data every 30 minutes
+          <div class="settings-group">
+
+            <div class="setting-item">
+              <div class="setting-left">
+                <div class="setting-icon">🔄</div>
+                <div class="setting-content">
+                  <label class="setting-label">Auto Sync</label>
+                  <p class="setting-description">Automatically backup data every 30 minutes</p>
+                </div>
               </div>
-            </div>
-            <div
-              class="toggle-switch"
-              :class="{ checked: localSettings.auto_sync }"
-              @click="toggleAutoSync"
-            >
-              <div class="toggle-thumb"></div>
+              <div
+                class="toggle-switch"
+                :class="{ checked: localSettings.auto_sync }"
+                @click="toggleAutoSync"
+              >
+                <div class="toggle-thumb"></div>
+              </div>
             </div>
           </div>
         </div>
 
         <!-- Google Drive (Multi-Account) -->
-        <div class="glass-card">
-          <div class="card-header">
-            <h3 class="card-title">{{ $t("settings.googleDrive") }}</h3>
+        <div class="modern-card">
+          <div class="card-header-modern">
+            <div class="card-icon">💾</div>
+            <div style="flex: 1;">
+              <h3 class="card-title-modern">{{ $t("settings.googleDrive") }}</h3>
+              <p class="card-subtitle">Connect and manage cloud storage</p>
+            </div>
             <button class="btn btn-primary btn-sm" @click="handleGoogleAuth">
               <span v-if="isConnecting" class="spinner-sm"></span>
               {{ $t("settings.connectAccount") }}
@@ -355,10 +390,13 @@
         </div>
 
         <!-- Updates -->
-        <div class="glass-card">
-          <div class="card-header">
-            <h3 class="card-title">{{ $t("settings.updates") }}</h3>
-            <span class="text-muted sm">v{{ appVersion }}</span>
+        <div class="modern-card">
+          <div class="card-header-modern">
+            <div class="card-icon">🚀</div>
+            <div>
+              <h3 class="card-title-modern">{{ $t("settings.updates") }}</h3>
+              <p class="card-subtitle">v{{ appVersion }}</p>
+            </div>
           </div>
           <p class="text-muted sm" style="margin-bottom: 16px">
             Check for the latest features and improvements.
@@ -369,9 +407,13 @@
         </div>
 
         <!-- About & License (Mandatory Attribution) -->
-        <div class="glass-card">
-          <div class="card-header">
-            <h3 class="card-title">About & License</h3>
+        <div class="modern-card">
+          <div class="card-header-modern">
+            <div class="card-icon">ℹ️</div>
+            <div>
+              <h3 class="card-title-modern">About & License</h3>
+              <p class="card-subtitle">Software information</p>
+            </div>
           </div>
           <div class="setting-info" style="text-align: center; padding: 10px 0">
             <p
@@ -698,10 +740,31 @@ async function saveSettings() {
   await store.fetchSettings();
 }
 
-function toggleTracking() {
+async function toggleTracking() {
+  // Check if on Android and handle permissions
   if (store.isMobile) {
-    alert("Background tracking is only available on Desktop (Windows).");
-    return;
+    try {
+      // Check if permission is granted
+      const hasPermission = await safeInvoke("check_usage_permission");
+      
+      if (!hasPermission) {
+        // Request permission
+        const confirmed = confirm(
+          "TimiGS needs 'Usage Access' permission to track app activity on Android. " +
+          "You will be redirected to Settings to grant this permission."
+        );
+        
+        if (confirmed) {
+          await safeInvoke("request_usage_permission");
+          alert("Please grant 'Usage Access' permission in Settings, then try again.");
+        }
+        return;
+      }
+    } catch (e) {
+      console.error("Permission check failed:", e);
+      alert("Failed to check permissions: " + e);
+      return;
+    }
   }
 
   if (isTracking.value) {
@@ -1378,6 +1441,256 @@ onMounted(() => {
 .folder-icon {
   font-size: 1.2rem;
 }
+
+/* Modern Design System */
+.settings-page {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.modern-header {
+  margin-bottom: 32px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.header-icon {
+  font-size: 3rem;
+  width: 70px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+  border-radius: 20px;
+  border: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+.header-subtitle {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  margin-top: 4px;
+}
+
+/* Modern Cards */
+.modern-card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 20px;
+  padding: 24px;
+  margin-bottom: 20px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(10px);
+}
+
+.modern-card:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+.card-header-modern {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.card-icon {
+  font-size: 2rem;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(139, 92, 246, 0.15));
+  border-radius: 14px;
+  border: 1px solid rgba(99, 102, 241, 0.25);
+}
+
+.card-title-modern {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+.card-subtitle {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin: 4px 0 0 0;
+}
+
+/* Settings Group */
+.settings-group {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.setting-item {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 18px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 14px;
+  transition: all 0.2s;
+  gap: 14px;
+}
+
+.setting-item:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.setting-left {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  width: 100%;
+}
+
+.setting-icon {
+  font-size: 1.5rem;
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.setting-content {
+  flex: 1;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.setting-label {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: block;
+  margin-bottom: 4px;
+}
+
+.setting-description {
+  font-size: 0.92rem;
+  color: rgba(255, 255, 255, 0.65);
+  margin: 0;
+  line-height: 1.5;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Modern Theme Switcher */
+.theme-switcher-modern {
+  display: flex;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 4px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  align-self: flex-start;
+}
+
+.theme-btn-modern {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  background: transparent;
+  border: none;
+  border-radius: 10px;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  min-width: 100px;
+}
+
+.theme-btn-modern:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
+}
+
+.theme-btn-modern.active {
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+}
+
+.theme-icon {
+  font-size: 1.3rem;
+}
+
+.theme-label {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+/* Modern Select */
+.modern-select {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  min-width: 180px;
+  transition: all 0.2s;
+}
+
+.modern-select:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.modern-select.open {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .setting-item {
+    padding: 16px;
+    gap: 12px;
+  }
+  
+  .theme-switcher-modern {
+    width: 100%;
+  }
+  
+  .theme-btn-modern {
+    flex: 1;
+    justify-content: center;
+  }
+  
+  .modern-select {
+    width: 100%;
+  }
+  
+  .header-icon {
+    width: 60px;
+    height: 60px;
+    font-size: 2.5rem;
+  }
+}
+
 </style>
 
 <style scoped>
