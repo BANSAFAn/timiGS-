@@ -13,5 +13,25 @@
     "id": "features",
     "title": "Features",
     "file": "features.md"
+  },
+  {
+    "id": "weather",
+    "title": "Weather Module",
+    "file": "weather.md"
+  },
+  {
+    "id": "settings",
+    "title": "Settings",
+    "file": "settings.md"
+  },
+  {
+    "id": "google-api",
+    "title": "Google Drive Integration",
+    "file": "google-api.md"
+  },
+  {
+    "id": "github-api",
+    "title": "GitHub Integration",
+    "file": "github-api.md"
   }
 ]

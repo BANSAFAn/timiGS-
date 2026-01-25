@@ -9,6 +9,16 @@ const CustomCursor = () => {
   const mousePos = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
+    // Detect touch device - don't render custom cursor on mobile/tablets
+    const isTouchDevice = 
+      'ontouchstart' in window || 
+      navigator.maxTouchPoints > 0 ||
+      window.matchMedia('(pointer: coarse)').matches;
+    
+    if (isTouchDevice) {
+      return; // Exit early on touch devices
+    }
+
     const moveCursor = (e: MouseEvent) => {
       mousePos.current = { x: e.clientX, y: e.clientY };
 
