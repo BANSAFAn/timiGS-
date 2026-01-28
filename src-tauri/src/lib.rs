@@ -80,8 +80,11 @@ pub fn run() {
         let _ = app;
 
         // Start tracking on app launch (only on desktop)
-        #[cfg(desktop)]
+        #[cfg(target_os = "windows")]
         tracker::start_tracking();
+
+        #[cfg(target_os = "android")]
+        android_tracker::start_tracking();
 
         // Setup Tray Icon (desktop only)
         #[cfg(desktop)]
@@ -96,6 +99,7 @@ pub fn run() {
                             .show_menu_on_left_click(true)
                             .on_menu_event(|app, event| match event.id.as_ref() {
                                 "quit" => {
+                                    #[cfg(target_os = "windows")]
                                     tracker::stop_tracking();
                                     app.exit(0);
                                 }

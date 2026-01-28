@@ -11,13 +11,27 @@ use crate::android_tracker as tracker;
 use tauri::command;
 
 #[command]
+#[cfg(any(target_os = "windows", target_os = "android"))]
 pub fn get_current_activity() -> Option<tracker::ActiveWindow> {
     tracker::get_current_active()
 }
 
 #[command]
+#[cfg(not(any(target_os = "windows", target_os = "android")))]
+pub fn get_current_activity() -> Option<()> {
+    None
+}
+
+#[command]
+#[cfg(any(target_os = "windows", target_os = "android"))]
 pub fn get_current_session() -> Option<tracker::CurrentSession> {
     tracker::get_current_session()
+}
+
+#[command]
+#[cfg(not(any(target_os = "windows", target_os = "android")))]
+pub fn get_current_session() -> Option<()> {
+    None
 }
 
 #[command]
@@ -85,18 +99,39 @@ pub fn save_setting_cmd(key: String, value: String) -> Result<(), String> {
 }
 
 #[command]
+#[cfg(any(target_os = "windows", target_os = "android"))]
 pub fn start_tracking() {
     tracker::start_tracking();
 }
 
 #[command]
+#[cfg(not(any(target_os = "windows", target_os = "android")))]
+pub fn start_tracking() {
+    // No-op on unsupported platforms
+}
+
+#[command]
+#[cfg(any(target_os = "windows", target_os = "android"))]
 pub fn stop_tracking() {
     tracker::stop_tracking();
 }
 
 #[command]
+#[cfg(not(any(target_os = "windows", target_os = "android")))]
+pub fn stop_tracking() {
+    // No-op on unsupported platforms
+}
+
+#[command]
+#[cfg(any(target_os = "windows", target_os = "android"))]
 pub fn is_tracking() -> bool {
     tracker::is_tracking()
+}
+
+#[command]
+#[cfg(not(any(target_os = "windows", target_os = "android")))]
+pub fn is_tracking() -> bool {
+    false
 }
 
 #[command]
