@@ -10,9 +10,9 @@ use std::time::Duration;
 
 #[cfg(target_os = "android")]
 use jni::{
-    objects::{JClass, JObject, JString, JValue},
+    objects::{JClass, JString},
     sys::jlong,
-    JNIEnv, JavaVM,
+    JNIEnv,
 };
 
 static RUNNING: AtomicBool = AtomicBool::new(false);
@@ -42,7 +42,7 @@ struct AppUsageStats {
 }
 
 #[cfg(target_os = "android")]
-fn get_usage_stats(start_time_ms: i64, end_time_ms: i64) -> Result<Vec<AppUsageStats>, String> {
+fn get_usage_stats(_start_time_ms: i64, _end_time_ms: i64) -> Result<Vec<AppUsageStats>, String> {
     // This will be called from Kotlin/Java side via JNI
     // For now, return empty vec - actual implementation requires Kotlin service
     Ok(Vec::new())
@@ -168,11 +168,11 @@ pub extern "C" fn Java_com_timigs_app_UsageStatsService_updateUsageStats(
     last_used_ms: jlong,
 ) {
     let package: String = env
-        .get_string(package_name)
+        .get_string(&package_name)
         .map(|s| s.into())
         .unwrap_or_default();
     let name: String = env
-        .get_string(app_name)
+        .get_string(&app_name)
         .map(|s| s.into())
         .unwrap_or_default();
 

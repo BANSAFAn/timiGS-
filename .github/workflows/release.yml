@@ -29,7 +29,6 @@ jobs:
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
 
-
   # Build desktop apps for Windows, Linux, macOS
   build-desktop:
     name: 🖥️ Desktop (${{ matrix.name }})
@@ -116,122 +115,123 @@ jobs:
             src-tauri/target/release/bundle/dmg/*.dmg
           if-no-files-found: warn
 
-  # Build Android APKs
-  build-android:
-    name: 📱 Android
-    needs: release-please
-    permissions:
-      contents: write
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: "17"
-
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: lts/*
-
-      - name: Setup Rust
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: aarch64-linux-android,x86_64-linux-android,armv7-linux-androideabi,i686-linux-android
-
-      - name: Install Tauri CLI
-        run: cargo install tauri-cli
-
-      - name: Install frontend dependencies
-        run: npm install
-
-      - name: Patch version
-        run: |
-          node -e "
-            const fs = require('fs');
-            const conf = JSON.parse(fs.readFileSync('src-tauri/tauri.conf.json'));
-            const tag = '${{ needs.release-please.outputs.tag_name }}'.replace(/^v/, '');
-            if (tag && /^\d+\.\d+\.\d+/.test(tag)) {
-              conf.version = tag;
-              fs.writeFileSync('src-tauri/tauri.conf.json', JSON.stringify(conf, null, 2));
-              console.log('Version patched to:', tag);
-            } else {
-              console.log('Using existing version:', conf.version);
-            }
-          "
-
-      - name: Init Android
-        run: cargo tauri android init
-
-      - name: Generate Android Icons
-        run: npx tauri icon src-tauri/icons/icon.png
-
-      - name: Patch Android Manifest (Deep Links & Permissions)
-        run: node scripts/patch-android-manifest.js
-
-      - name: Configure Android Signing
-        run: node scripts/configure-android-signing.js
-
-      # Build Universal APK
-      - name: Build Universal APK
-        run: cargo tauri android build --apk true --target aarch64 --target x86_64 --target armv7 --target i686
-
-      - name: Collect APKs
-        run: |
-          mkdir -p artifacts
-
-          # Find and copy universal APK
-          find src-tauri/gen/android -path "*/universal/release/*.apk" -type f -exec cp {} artifacts/TimiGS-universal.apk \; 2>/dev/null || true
-
-          # Fallback: copy any release APK as universal
-          if [ ! -f artifacts/TimiGS-universal.apk ]; then
-            find src-tauri/gen/android -path "*/release/*.apk" -type f | head -1 | xargs -I {} cp {} artifacts/TimiGS-universal.apk 2>/dev/null || true
-          fi
-
-      # Build per-ABI APKs
-      - name: Build ARM64 APK
-        run: cargo tauri android build --apk true --split-per-abi --target aarch64
-
-      - name: Collect ARM64 APK
-        run: |
-          find src-tauri/gen/android -path "*arm64*release*.apk" -type f -exec cp {} artifacts/TimiGS-arm64-v8a.apk \; 2>/dev/null || true
-
-      - name: Build ARMv7 APK
-        run: cargo tauri android build --apk true --split-per-abi --target armv7
-
-      - name: Collect ARMv7 APK
-        run: |
-          find src-tauri/gen/android -path "*armeabi*release*.apk" -type f -exec cp {} artifacts/TimiGS-armeabi-v7a.apk \; 2>/dev/null || true
-
-      - name: Build x86_64 APK
-        run: cargo tauri android build --apk true --split-per-abi --target x86_64
-
-      - name: Collect x86_64 APK
-        run: |
-          find src-tauri/gen/android -path "*x86_64*release*.apk" -type f -exec cp {} artifacts/TimiGS-x86_64.apk \; 2>/dev/null || true
-
-      - name: List collected APKs
-        run: ls -la artifacts/
-
-      - name: Upload APKs to Release
-        if: ${{ needs.release-please.outputs.release_created }}
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ needs.release-please.outputs.tag_name }}
-          files: artifacts/*.apk
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Upload APKs as Artifacts (for manual builds)
-        if: ${{ !needs.release-please.outputs.release_created }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: android-apks
-          path: artifacts/*.apk
-          if-no-files-found: warn
+  # Build Android APKs (DISABLED - Using Flutter Android instead)
+  # See .github/workflows/flutter-android.yml for Flutter Android builds
+  # build-android:
+  #   name: 📱 Android
+  #   needs: release-please
+  #   permissions:
+  #     contents: write
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #
+  #     - name: Setup Java
+  #       uses: actions/setup-java@v4
+  #       with:
+  #         distribution: temurin
+  #         java-version: "17"
+  #
+  #     - name: Setup Android SDK
+  #       uses: android-actions/setup-android@v3
+  #
+  #     - name: Setup Node.js
+  #       uses: actions/setup-node@v4
+  #       with:
+  #         node-version: lts/*
+  #
+  #     - name: Setup Rust
+  #       uses: dtolnay/rust-toolchain@stable
+  #       with:
+  #         targets: aarch64-linux-android,x86_64-linux-android,armv7-linux-androideabi,i686-linux-android
+  #
+  #     - name: Install Tauri CLI
+  #       run: cargo install tauri-cli
+  #
+  #     - name: Install frontend dependencies
+  #       run: npm install
+  #
+  #     - name: Patch version
+  #       run: |
+  #         node -e "
+  #           const fs = require('fs');
+  #           const conf = JSON.parse(fs.readFileSync('src-tauri/tauri.conf.json'));
+  #           const tag = '${{ needs.release-please.outputs.tag_name }}'.replace(/^v/, '');
+  #           if (tag && /^\d+\.\d+\.\d+/.test(tag)) {
+  #             conf.version = tag;
+  #             fs.writeFileSync('src-tauri/tauri.conf.json', JSON.stringify(conf, null, 2));
+  #             console.log('Version patched to:', tag);
+  #           } else {
+  #             console.log('Using existing version:', conf.version);
+  #           }
+  #         "
+  #
+  #     - name: Init Android
+  #       run: cargo tauri android init
+  #
+  #     - name: Generate Android Icons
+  #       run: npx tauri icon src-tauri/icons/icon.png
+  #
+  #     - name: Patch Android Manifest (Deep Links & Permissions)
+  #       run: node scripts/patch-android-manifest.js
+  #
+  #     - name: Configure Android Signing
+  #       run: node scripts/configure-android-signing.js
+  #
+  #     # Build Universal APK
+  #     - name: Build Universal APK
+  #       run: cargo tauri android build --apk true --target aarch64 --target x86_64 --target armv7 --target i686
+  #
+  #     - name: Collect APKs
+  #       run: |
+  #         mkdir -p artifacts
+  #
+  #         # Find and copy universal APK
+  #         find src-tauri/gen/android -path "*/universal/release/*.apk" -type f -exec cp {} artifacts/TimiGS-universal.apk \; 2>/dev/null || true
+  #
+  #         # Fallback: copy any release APK as universal
+  #         if [ ! -f artifacts/TimiGS-universal.apk ]; then
+  #           find src-tauri/gen/android -path "*/release/*.apk" -type f | head -1 | xargs -I {} cp {} artifacts/TimiGS-universal.apk 2>/dev/null || true
+  #         fi
+  #
+  #     # Build per-ABI APKs
+  #     - name: Build ARM64 APK
+  #       run: cargo tauri android build --apk true --split-per-abi --target aarch64
+  #
+  #     - name: Collect ARM64 APK
+  #       run: |
+  #         find src-tauri/gen/android -path "*arm64*release*.apk" -type f -exec cp {} artifacts/TimiGS-arm64-v8a.apk \; 2>/dev/null || true
+  #
+  #     - name: Build ARMv7 APK
+  #       run: cargo tauri android build --apk true --split-per-abi --target armv7
+  #
+  #     - name: Collect ARMv7 APK
+  #       run: |
+  #         find src-tauri/gen/android -path "*armeabi*release*.apk" -type f -exec cp {} artifacts/TimiGS-armeabi-v7a.apk \; 2>/dev/null || true
+  #
+  #     - name: Build x86_64 APK
+  #       run: cargo tauri android build --apk true --split-per-abi --target x86_64
+  #
+  #     - name: Collect x86_64 APK
+  #       run: |
+  #         find src-tauri/gen/android -path "*x86_64*release*.apk" -type f -exec cp {} artifacts/TimiGS-x86_64.apk \; 2>/dev/null || true
+  #
+  #     - name: List collected APKs
+  #       run: ls -la artifacts/
+  #
+  #     - name: Upload APKs to Release
+  #       if: ${{ needs.release-please.outputs.release_created }}
+  #       uses: softprops/action-gh-release@v2
+  #       with:
+  #         tag_name: ${{ needs.release-please.outputs.tag_name }}
+  #         files: artifacts/*.apk
+  #       env:
+  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #
+  #     - name: Upload APKs as Artifacts (for manual builds)
+  #       if: ${{ !needs.release-please.outputs.release_created }}
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: android-apks
+  #         path: artifacts/*.apk
+  #         if-no-files-found: warn

@@ -1,0 +1,98 @@
+name: Flutter Android Build
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: [nexting, main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-flutter-android:
+    name: 📱 Flutter Android APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "17"
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.24.0"
+          channel: "stable"
+          cache: true
+
+      - name: Get dependencies
+        working-directory: timigs-android
+        run: flutter pub get
+
+      - name: Analyze code
+        working-directory: timigs-android
+        run: flutter analyze || true
+
+      - name: Run tests
+        working-directory: timigs-android
+        run: flutter test || true
+
+      - name: Build APK (Debug)
+        if: github.ref != 'refs/heads/main'
+        working-directory: timigs-android
+        run: flutter build apk --debug
+
+      - name: Build APK (Release)
+        if: github.ref == 'refs/heads/main'
+        working-directory: timigs-android
+        run: flutter build apk --release
+
+      - name: Build App Bundle (Release)
+        if: github.ref == 'refs/heads/main'
+        working-directory: timigs-android
+        run: flutter build appbundle --release
+
+      - name: Rename artifacts
+        run: |
+          mkdir -p artifacts
+          if [ -f timigs-android/build/app/outputs/flutter-apk/app-release.apk ]; then
+            cp timigs-android/build/app/outputs/flutter-apk/app-release.apk artifacts/TimiGS-Android-release.apk
+          fi
+          if [ -f timigs-android/build/app/outputs/flutter-apk/app-debug.apk ]; then
+            cp timigs-android/build/app/outputs/flutter-apk/app-debug.apk artifacts/TimiGS-Android-debug.apk
+          fi
+          if [ -f timigs-android/build/app/outputs/bundle/release/app-release.aab ]; then
+            cp timigs-android/build/app/outputs/bundle/release/app-release.aab artifacts/TimiGS-Android-release.aab
+          fi
+
+      - name: Upload APK artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: flutter-android-apk
+          path: artifacts/*.apk
+          if-no-files-found: warn
+
+      - name: Upload AAB artifacts
+        if: github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v4
+        with:
+          name: flutter-android-bundle
+          path: artifacts/*.aab
+          if-no-files-found: warn
+
+      - name: Create Release
+        if: github.ref == 'refs/heads/main' && startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            artifacts/*.apk
+            artifacts/*.aab
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
