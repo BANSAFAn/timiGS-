@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.22.0](https://github.com/BANSAFAn/timiGS-/compare/v1.21.0...v1.22.0) (2026-01-28)
+
+
+### Features
+
+* Add Android app scaffold and JNI fixes ([1393d03](https://github.com/BANSAFAn/timiGS-/commit/1393d034e521c3bd3bf85fc0e3975652e145ee2c))
+
+
+### Bug Fixes
+
+* ci/cli ([0baca21](https://github.com/BANSAFAn/timiGS-/commit/0baca210bc5c60a690d0940e5f704d770cff6aa0))
+* version ([a10e4a4](https://github.com/BANSAFAn/timiGS-/commit/a10e4a4d1735d2e3f7f5ae3fa1b76d540603f3b3))
+
 ## [1.21.0](https://github.com/BANSAFAn/timiGS-/compare/v1.20.0...v1.21.0) (2026-01-25)
 
 
