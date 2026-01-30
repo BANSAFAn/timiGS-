@@ -1,0 +1,25 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import NotesViewer from "../../components/NotesViewer";
+
+export function getStaticPaths() {
+ return [
+    {params: {lang: 'en'}},
+    {params: {lang: 'uk'}},
+    {params: {lang: 'de'}},
+    {params: {lang: 'fr'}},
+    {params: {lang: 'ru'}},
+    {params: {lang: 'zh-CN'}},
+    {params: {lang: 'es'}},
+    {params: {lang: 'ar'}},
+    {params: {lang: 'nl'}},
+    {params: {lang: 'be'}},
+  ];
+}
+
+const { lang } = Astro.params;
+---
+
+<Layout title="Developer Notes - TimiGS">
+  <NotesViewer client:only="react" lang={lang} />
+</Layout>

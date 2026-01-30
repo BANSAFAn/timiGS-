@@ -39,6 +39,7 @@ export interface Translation {
     features: string;
     terms: string;
     docs: string;
+    notes: string;
   };
   hero: {
     new_version: string;
