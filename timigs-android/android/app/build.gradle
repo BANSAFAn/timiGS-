@@ -42,7 +42,7 @@ android {
 
     defaultConfig {
         applicationId "com.timigs.timigs_android"
-        minSdkVersion flutter.minSdkVersion
+        minSdkVersion 23
         targetSdk 35
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
