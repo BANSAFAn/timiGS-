@@ -117,11 +117,6 @@ class _MyAppState extends State<MyApp> {
       ),
       scaffoldBackgroundColor:
           isDark ? const Color(0xFF0F0F1E) : const Color(0xFFF5F5F7),
-      cardTheme: CardThemeData(
-        elevation: 0,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        color: isDark ? const Color(0xFF1A1A2E) : Colors.white,
-      ),
       appBarTheme: AppBarTheme(
         elevation: 0,
         centerTitle: false,

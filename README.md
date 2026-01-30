@@ -2,138 +2,139 @@
 
 ![TimiGS Banner](https://via.placeholder.com/1200x400?text=TimiGS+Activity+Tracker)
 
-**TimiGS** is a modern, privacy-focused PC activity tracking application built with **Tauri v2**, **Rust**, and **Vue 3**. It helps you understand how you spend your time on your computer by tracking active windows, generating detailed analytics, and visualizing your productivity trends.
+**TimiGS** is a modern, privacy-focused activity tracking application for **Desktop (Windows/macOS/Linux)** and **Android**. It helps you understand how you spend your time by tracking active windows/apps, generating detailed analytics, and visualizing your productivity trends.
 
-> **Privacy First**: All data is stored locally on your machine in an SQLite database. No personal data is ever sent to the cloud unless you explicitly choose to sync it.
+> **Privacy First**: All data is stored locally on your device in an SQLite database. No personal data is ever sent to the cloud unless you explicitly choose to sync it.
+
+---
+
+## 📱 Platforms
+
+| Platform | Technology | Status |
+|----------|------------|--------|
+| **Windows** | Tauri v2 + Rust + Vue 3 | ✅ Stable |
+| **macOS** | Tauri v2 + Rust + Vue 3 | ✅ Stable |
+| **Linux** | Tauri v2 + Rust + Vue 3 | ✅ Stable |
+| **Android** | Flutter + Dart | ✅ Stable |
 
 ---
 
 ## 🚀 Key Features
 
-*   **Real-time Tracking**: Automatically detects the active window and tracks the duration of usage.
-*   **Detailed Dashboard**: View your daily summary, top used applications, and active sessions in real-time.
-*   **Analytics & Charts**: Visualize your data with beautiful Donut, Pie, and Bar charts.
-*   **Timeline View**: Browse your activity history day-by-day with granular session details.
-*   **Privacy & Security**: Native SQLite database encryption support and 100% local operation.
-*   **Cross-Platform Technology**: Built on the robust Tauri framework for high performance and low resource usage.
-*   **Internationalization (i18n)**: Fully localized interface (currently supports English and Ukrainian).
-*   **Dark & Light Modes**: Choose the theme that fits your workflow.
+### Desktop & Android
+- 📊 **Real-time Tracking** - Automatically tracks active windows/apps and duration
+- 📈 **Analytics Dashboard** - Visualize your data with Donut, Pie, and Bar charts
+- 📅 **Timeline View** - Browse your activity history day-by-day
+- 🎯 **Tasks & Goals** - Set app usage goals and track progress
+- 🌍 **Multi-language** - English and Ukrainian support
+- 🎨 **Dark & Light Modes** - Choose the theme that fits your workflow
+- 💾 **Local Database** - All data stored locally with SQLite
+- 📤 **Data Export** - Export your data for backup
+
+### Desktop Only
+- 🖥️ **Window Title Tracking** - Track specific window titles, not just apps
+- ☁️ **Google Drive Sync** - Cloud backup and sync
+- 🔔 **Discord RPC** - Show your activity status in Discord
+- ⏰ **Shutdown Timer** - Schedule automatic shutdown
+
+### Android Only
+- 📲 **Usage Stats API** - Native Android app usage tracking
+- 🔄 **Background Service** - Continuous tracking with foreground notification
 
 ---
 
 ## 🛠️ Technology Stack
 
-*   **Core**: [Tauri v2](https://v2.tauri.app/) (Rust)
-*   **Frontend**: [Vue 3](https://vuejs.org/) + [TypeScript](https://www.typescriptlang.org/)
-*   **Build Tool**: [Vite](https://vitejs.dev/)
-*   **State Management**: [Pinia](https://pinia.vuejs.org/)
-*   **Database**: [SQLite](https://www.sqlite.org/) (via `rusqlite`)
-*   **Visualizations**: [Chart.js](https://www.chartjs.org/) + [vue-chartjs](https://vue-chartjs.org/)
-*   **Styling**: Custom CSS with Glassmorphism design system
+### Desktop (src-tauri)
+- **Core**: [Tauri v2](https://v2.tauri.app/) (Rust)
+- **Frontend**: [Vue 3](https://vuejs.org/) + [TypeScript](https://www.typescriptlang.org/)
+- **Build Tool**: [Vite](https://vitejs.dev/)
+- **State Management**: [Pinia](https://pinia.vuejs.org/)
+- **Database**: [SQLite](https://www.sqlite.org/) (via `rusqlite`)
+- **Visualizations**: [Chart.js](https://www.chartjs.org/) + [vue-chartjs](https://vue-chartjs.org/)
+
+### Android (timigs-android)
+- **Framework**: Flutter 3.x
+- **Language**: Dart
+- **Database**: SQLite (sqflite)
+- **Charts**: fl_chart
+- **State Management**: Provider
+- **Background Tasks**: WorkManager
 
 ---
 
-## 💻 Getting Started
+## 💻 Getting Started - Desktop
 
 ### Prerequisites
 
-Before you begin, ensure you have the following installed:
-
-1.  **Node.js** (v18 or newer) - [Download](https://nodejs.org/)
-2.  **Rust** (latest stable) - [Download](https://www.rust-lang.org/tools/install)
-3.  **C++ Build Tools** (Visual Studio Build Tools for Windows) - Required for compiling Rust native modules.
+1. **Node.js** (v18 or newer) - [Download](https://nodejs.org/)
+2. **Rust** (latest stable) - [Download](https://www.rust-lang.org/tools/install)
+3. **C++ Build Tools** (Visual Studio Build Tools for Windows)
 
 ### Installation
 
-1.  **Clone the repository**:
-    ```bash
-    git clone https://github.com/yourusername/timigs.git
-    cd timigs
-    ```
-
-2.  **Install frontend dependencies**:
-    ```bash
-    npm install
-    ```
-
----
-
-## 🏃‍♂️ How to Run
-
-### Development Mode
-To start the application in development mode with hot-reloading:
-
 ```bash
-npm run tauri dev
+git clone https://github.com/BANSAFAn/timiGS-.git
+cd timiGS-
+npm install
 ```
-*   This will start the Vite server at `http://localhost:1420`.
-*   It will compile the Rust backend and launch the application window.
 
-### Production Build
-To build the optimized executable and installer for your operating system:
+### Running
 
 ```bash
+# Development mode
+npm run tauri dev
+
+# Production build
 npm run tauri build
 ```
-*   The output artifacts (installers) will be located in `src-tauri/target/release/bundle/`.
+
+Output artifacts will be in `src-tauri/target/release/bundle/`.
 
 ---
 
-## 🌍 Localization (Adding a Translation)
+## 📱 Getting Started - Android
 
-TimiGS uses `vue-i18n` for localization. To add a new language (e.g., Spanish):
+### Requirements
 
-1.  **Create a Locale File**:
-    *   Navigate to `src/locales/`.
-    *   Create a new file named `es.json` (for Spanish).
-    *   Copy the content from `en.json` and translate the values.
+- **Android 6.0 (API 23) or higher**
+- **Usage Stats Permission** (granted manually in Settings)
 
-    ```json
-    {
-      "dashboard": {
-        "title": "Panel de Control",
-        ...
-      }
-    }
-    ```
+### Installation from APK
 
-2.  **Register the Language**:
-    *   Open `src/i18n.ts`.
-    *   Import your new locale file.
-    *   Add it to the `messages` object.
+1. Download the latest `app-release.apk` from [Releases](../../releases)
+2. Enable "Install from Unknown Sources" in your Android settings
+3. Install the APK
+4. Open the app and grant Usage Stats permission when prompted
 
-    ```typescript
-    import es from './locales/es.json';
+### Building from Source
 
-    const i18n = createI18n({
-      // ...
-      messages: {
-        en,
-        uk,
-        es // Add this line
-      }
-    });
-    ```
+```bash
+cd timigs-android
+flutter pub get
+flutter build apk --release
+```
 
-3.  **Update Settings UI**:
-    *   Open `src/views/Settings.vue`.
-    *   Add a new option to the language selector.
+See [timigs-android/BUILD_INSTRUCTIONS.md](timigs-android/BUILD_INSTRUCTIONS.md) for detailed instructions.
 
-    ```html
-    <select class="select" v-model="localSettings.language" @change="updateSettings">
-      <option value="en">English</option>
-      <option value="uk">Українська</option>
-      <option value="es">Español</option> <!-- Add this line -->
-    </select>
-    ```
+### Android Permissions
+
+| Permission | Purpose |
+|------------|---------|
+| `PACKAGE_USAGE_STATS` | Required for tracking app usage |
+| `INTERNET` | For Google Drive sync feature |
+| `FOREGROUND_SERVICE` | For background tracking |
+| `POST_NOTIFICATIONS` | For tracking status notifications |
+
+**To grant Usage Stats permission**: Settings → Apps → Special app access → Usage access → Enable for TimiGS
 
 ---
 
 ## 📂 Project Structure
 
 ```
-timigs/
-├── src/                    # Frontend (Vue 3)
+timiGS-/
+├── src/                    # Desktop Frontend (Vue 3)
 │   ├── assets/            # Images and static assets
 │   ├── components/        # Reusable UI components
 │   ├── locales/           # Translation JSON files
@@ -143,14 +144,69 @@ timigs/
 │   ├── App.vue            # Root component
 │   └── main.ts            # Entry point
 │
-├── src-tauri/              # Backend (Rust)
+├── src-tauri/              # Desktop Backend (Rust)
 │   ├── src/
-│   │   ├── commands.rs    # Tauri commands (Frontend <-> Backend)
+│   │   ├── commands.rs    # Tauri commands
 │   │   ├── db.rs          # Database schema & queries
 │   │   ├── tracker.rs     # Active window tracking logic
 │   │   └── lib.rs         # Application entry & setup
 │   ├── Cargo.toml         # Rust dependencies
 │   └── tauri.conf.json    # Tauri configuration
 │
+├── timigs-android/         # Android App (Flutter)
+│   ├── lib/
+│   │   ├── models/        # Data models
+│   │   ├── screens/       # UI screens
+│   │   ├── services/      # Business logic
+│   │   └── widgets/       # Reusable widgets
+│   ├── android/           # Android-specific config
+│   └── pubspec.yaml       # Flutter dependencies
+│
+├── site/                   # Marketing website (Astro)
+│
 └── package.json            # Node.js dependencies
 ```
+
+---
+
+## 🌍 Localization
+
+TimiGS supports English and Ukrainian. To add a new language:
+
+### Desktop
+1. Create `src/locales/{lang}.json`
+2. Register in `src/i18n.ts`
+3. Add option to `src/views/Settings.vue`
+
+### Android
+1. Create `timigs-android/lib/l10n/app_{lang}.arb`
+2. Update `pubspec.yaml` generate settings
+
+---
+
+## 🗺️ Roadmap
+
+### Desktop
+- [ ] macOS native notifications
+- [ ] Linux system tray improvements
+- [ ] More chart types
+
+### Android
+- [ ] Google Drive sync implementation
+- [ ] Home screen widget
+- [ ] Focus mode
+- [ ] App blocking
+
+---
+
+## 📜 License
+
+[Your License Here]
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+For issues and feature requests, please use the [GitHub Issues](../../issues) page.

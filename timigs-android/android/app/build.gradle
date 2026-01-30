@@ -24,8 +24,8 @@ if (flutterVersionName == null) {
 
 android {
     namespace "com.timigs.timigs_android"
-    compileSdk 34
-    ndkVersion flutter.ndkVersion
+    compileSdk 35
+    ndkVersion "26.1.10909125"
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_11
@@ -43,7 +43,7 @@ android {
     defaultConfig {
         applicationId "com.timigs.timigs_android"
         minSdkVersion flutter.minSdkVersion
-        targetSdk 34
+        targetSdk 35
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }
