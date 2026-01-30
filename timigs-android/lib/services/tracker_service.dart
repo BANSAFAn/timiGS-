@@ -5,7 +5,7 @@ import 'database_service.dart';
 
 class TrackerService {
   static final TrackerService instance = TrackerService._init();
-  
+
   TrackerService._init();
 
   bool _isTracking = false;
@@ -39,7 +39,7 @@ class TrackerService {
   // Start tracking
   Future<void> startTracking() async {
     if (_isTracking) return;
-    
+
     final hasPermission = await this.hasPermission();
     if (!hasPermission) {
       print('Usage stats permission not granted');
@@ -47,7 +47,7 @@ class TrackerService {
     }
 
     _isTracking = true;
-    
+
     // Start periodic tracking (every 5 seconds)
     _trackingTimer = Timer.periodic(Duration(seconds: 5), (timer) async {
       await _trackCurrentApp();
@@ -55,7 +55,7 @@ class TrackerService {
 
     // Initial track
     await _trackCurrentApp();
-    
+
     // Register background work
     await Workmanager().registerPeriodicTask(
       'tracking_task',
@@ -67,7 +67,7 @@ class TrackerService {
   // Stop tracking
   Future<void> stopTracking() async {
     if (!_isTracking) return;
-    
+
     _isTracking = false;
     _trackingTimer?.cancel();
     _trackingTimer = null;
@@ -95,9 +95,8 @@ class TrackerService {
       if (usageStats.isEmpty) return;
 
       // Get the most recent app
-      usageStats.sort((a, b) => 
-        (b.lastTimeUsed ?? 0).compareTo(a.lastTimeUsed ?? 0)
-      );
+      usageStats.sort((a, b) => ((b.lastTimeUsed ?? 0) as int)
+          .compareTo((a.lastTimeUsed ?? 0) as int));
 
       final UsageInfo currentUsage = usageStats.first;
       final String appName = currentUsage.packageName ?? 'Unknown';
@@ -135,9 +134,8 @@ class TrackerService {
 
       if (usageStats.isEmpty) return null;
 
-      usageStats.sort((a, b) => 
-        (b.lastTimeUsed ?? 0).compareTo(a.lastTimeUsed ?? 0)
-      );
+      usageStats.sort((a, b) => ((b.lastTimeUsed ?? 0) as int)
+          .compareTo((a.lastTimeUsed ?? 0) as int));
 
       return usageStats.first.packageName;
     } catch (e) {
@@ -162,9 +160,8 @@ void callbackDispatcher() {
       );
 
       if (usageStats.isNotEmpty) {
-        usageStats.sort((a, b) => 
-          (b.lastTimeUsed ?? 0).compareTo(a.lastTimeUsed ?? 0)
-        );
+        usageStats.sort((a, b) => ((b.lastTimeUsed ?? 0) as int)
+            .compareTo((a.lastTimeUsed ?? 0) as int));
 
         final UsageInfo currentUsage = usageStats.first;
         final String appName = currentUsage.packageName ?? 'Unknown';

@@ -10,7 +10,8 @@ class TransferScreen extends StatefulWidget {
   State<TransferScreen> createState() => _TransferScreenState();
 }
 
-class _TransferScreenState extends State<TransferScreen> with SingleTickerProviderStateMixin {
+class _TransferScreenState extends State<TransferScreen>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
   File? _selectedFile;
   final List<Map<String, dynamic>> _transferHistory = [];
@@ -30,7 +31,7 @@ class _TransferScreenState extends State<TransferScreen> with SingleTickerProvid
   Future<void> _pickFile() async {
     try {
       final result = await FilePicker.platform.pickFiles();
-      
+
       if (result != null && result.files.single.path != null) {
         setState(() {
           _selectedFile = File(result.files.single.path!);
@@ -47,13 +48,13 @@ class _TransferScreenState extends State<TransferScreen> with SingleTickerProvid
 
   Future<void> _shareFile() async {
     if (_selectedFile == null) return;
-    
+
     try {
       await Share.shareXFiles(
         [XFile(_selectedFile!.path)],
         text: 'Sharing file via TimiGS',
       );
-      
+
       setState(() {
         _transferHistory.insert(0, {
           'name': _selectedFile!.path.split('/').last,
@@ -64,7 +65,7 @@ class _TransferScreenState extends State<TransferScreen> with SingleTickerProvid
         });
         _selectedFile = null;
       });
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('File shared successfully!')),
@@ -92,15 +93,27 @@ class _TransferScreenState extends State<TransferScreen> with SingleTickerProvid
     final ext = filename.split('.').last.toLowerCase();
     const icons = {
       'pdf': '📕',
-      'doc': '📘', 'docx': '📘',
-      'xls': '📗', 'xlsx': '📗',
-      'ppt': '📙', 'pptx': '📙',
-      'zip': '🗜️', 'rar': '🗜️', '7z': '🗜️',
-      'jpg': '🖼️', 'jpeg': '🖼️', 'png': '🖼️', 'gif': '🖼️',
-      'mp4': '🎬', 'mov': '🎬', 'avi': '🎬',
-      'mp3': '🎵', 'wav': '🎵',
+      'doc': '📘',
+      'docx': '📘',
+      'xls': '📗',
+      'xlsx': '📗',
+      'ppt': '📙',
+      'pptx': '📙',
+      'zip': '🗜️',
+      'rar': '🗜️',
+      '7z': '🗜️',
+      'jpg': '🖼️',
+      'jpeg': '🖼️',
+      'png': '🖼️',
+      'gif': '🖼️',
+      'mp4': '🎬',
+      'mov': '🎬',
+      'avi': '🎬',
+      'mp3': '🎵',
+      'wav': '🎵',
       'apk': '📦',
-      'txt': '📝', 'md': '📝',
+      'txt': '📝',
+      'md': '📝',
     };
     return icons[ext] ?? '📄';
   }
@@ -145,9 +158,10 @@ class _TransferScreenState extends State<TransferScreen> with SingleTickerProvid
                     Expanded(
                       child: Text(
                         'Android File Sharing',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style:
+                            Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
                       ),
                     ),
                   ],
@@ -162,7 +176,7 @@ class _TransferScreenState extends State<TransferScreen> with SingleTickerProvid
           ),
         ),
         const SizedBox(height: 20),
-        
+
         // File picker
         GestureDetector(
           onTap: _pickFile,
@@ -231,9 +245,9 @@ class _TransferScreenState extends State<TransferScreen> with SingleTickerProvid
                   ),
           ),
         ),
-        
+
         const SizedBox(height: 20),
-        
+
         // Share button
         if (_selectedFile != null)
           FilledButton.icon(
@@ -245,9 +259,9 @@ class _TransferScreenState extends State<TransferScreen> with SingleTickerProvid
               minimumSize: const Size.fromHeight(56),
             ),
           ),
-        
+
         const SizedBox(height: 20),
-        
+
         // Sharing methods info
         Card(
           child: Padding(
@@ -258,14 +272,18 @@ class _TransferScreenState extends State<TransferScreen> with SingleTickerProvid
                 Text(
                   'Available Sharing Methods',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+                        fontWeight: FontWeight.bold,
+                      ),
                 ),
                 const SizedBox(height: 12),
-                _buildSharingMethod(Icons.bluetooth, 'Bluetooth', 'Share with nearby devices'),
-                _buildSharingMethod(Icons.wifi, 'Wi-Fi Direct', 'Fast local transfer'),
-                _buildSharingMethod(Icons.nearby_share, 'Nearby Share', 'Google\'s sharing service'),
-                _buildSharingMethod(Icons.apps, 'Other Apps', 'Telegram, WhatsApp, Email, etc.'),
+                _buildSharingMethod(
+                    Icons.bluetooth, 'Bluetooth', 'Share with nearby devices'),
+                _buildSharingMethod(
+                    Icons.wifi, 'Wi-Fi Direct', 'Fast local transfer'),
+                _buildSharingMethod(
+                    Icons.share, 'Nearby Share', 'Google\'s sharing service'),
+                _buildSharingMethod(Icons.apps, 'Other Apps',
+                    'Telegram, WhatsApp, Email, etc.'),
               ],
             ),
           ),
@@ -363,12 +381,12 @@ class _TransferScreenState extends State<TransferScreen> with SingleTickerProvid
   String _formatDate(DateTime date) {
     final now = DateTime.now();
     final diff = now.difference(date);
-    
+
     if (diff.inMinutes < 1) return 'Just now';
     if (diff.inMinutes < 60) return '${diff.inMinutes}m ago';
     if (diff.inHours < 24) return '${diff.inHours}h ago';
     if (diff.inDays < 7) return '${diff.inDays}d ago';
-    
+
     return '${date.day}/${date.month}/${date.year}';
   }
 }

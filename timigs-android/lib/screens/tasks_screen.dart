@@ -22,14 +22,14 @@ class _TasksScreenState extends State<TasksScreen> {
 
   Future<void> _loadTasks() async {
     setState(() => _isLoading = true);
-    
+
     final tasks = await TaskService.instance.getTasks();
     final Map<int, int> progress = {};
-    
+
     for (var task in tasks) {
       progress[task.id] = await TaskService.instance.getTaskProgress(task.id);
     }
-    
+
     if (mounted) {
       setState(() {
         _tasks = tasks;
@@ -43,11 +43,11 @@ class _TasksScreenState extends State<TasksScreen> {
     final appNameController = TextEditingController();
     final descriptionController = TextEditingController();
     final hoursController = TextEditingController(text: '1');
-    
+
     final recentApps = await TaskService.instance.getRecentApps();
-    
+
     if (!mounted) return;
-    
+
     await showDialog(
       context: context,
       builder: (context) {
@@ -62,13 +62,15 @@ class _TasksScreenState extends State<TasksScreen> {
                     if (textEditingValue.text.isEmpty) {
                       return recentApps;
                     }
-                    return recentApps.where((app) =>
-                        app.toLowerCase().contains(textEditingValue.text.toLowerCase()));
+                    return recentApps.where((app) => app
+                        .toLowerCase()
+                        .contains(textEditingValue.text.toLowerCase()));
                   },
                   onSelected: (selection) {
                     appNameController.text = selection;
                   },
-                  fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
+                  fieldViewBuilder:
+                      (context, controller, focusNode, onFieldSubmitted) {
                     appNameController.text = controller.text;
                     return TextField(
                       controller: controller,
@@ -111,8 +113,8 @@ class _TasksScreenState extends State<TasksScreen> {
                   final hours = int.tryParse(hoursController.text) ?? 1;
                   await TaskService.instance.createTask(
                     appName: appNameController.text,
-                    description: descriptionController.text.isEmpty 
-                        ? null 
+                    description: descriptionController.text.isEmpty
+                        ? null
                         : descriptionController.text,
                     goalSeconds: hours * 3600,
                   );
@@ -133,7 +135,7 @@ class _TasksScreenState extends State<TasksScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Tasks & Goals'),
@@ -174,9 +176,12 @@ class _TasksScreenState extends State<TasksScreen> {
                     itemBuilder: (context, index) {
                       final task = _tasks[index];
                       final progress = _taskProgress[task.id] ?? 0;
-                      final percentage = (progress / task.goalSeconds * 100).clamp(0, 100);
-                      
-                      return _buildTaskCard(context, task, progress, percentage);
+                      final percentage = (progress / task.goalSeconds * 100)
+                          .clamp(0, 100)
+                          .toDouble();
+
+                      return _buildTaskCard(
+                          context, task, progress, percentage);
                     },
                   ),
                 ),
@@ -187,10 +192,11 @@ class _TasksScreenState extends State<TasksScreen> {
     );
   }
 
-  Widget _buildTaskCard(BuildContext context, Task task, int progress, double percentage) {
+  Widget _buildTaskCard(
+      BuildContext context, Task task, int progress, double percentage) {
     final theme = Theme.of(context);
     final isCompleted = task.status == 'completed' || percentage >= 100;
-    
+
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: Padding(
@@ -208,7 +214,8 @@ class _TasksScreenState extends State<TasksScreen> {
                         task.appName,
                         style: theme.textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.bold,
-                          decoration: isCompleted ? TextDecoration.lineThrough : null,
+                          decoration:
+                              isCompleted ? TextDecoration.lineThrough : null,
                         ),
                       ),
                       if (task.description != null) ...[
@@ -229,7 +236,8 @@ class _TasksScreenState extends State<TasksScreen> {
                       PopupMenuItem(
                         child: const Text('Mark Complete'),
                         onTap: () async {
-                          await TaskService.instance.updateTaskStatus(task.id, 'completed');
+                          await TaskService.instance
+                              .updateTaskStatus(task.id, 'completed');
                           _loadTasks();
                         },
                       ),
@@ -261,7 +269,8 @@ class _TasksScreenState extends State<TasksScreen> {
                   '${percentage.toStringAsFixed(0)}%',
                   style: theme.textTheme.bodySmall?.copyWith(
                     fontWeight: FontWeight.bold,
-                    color: isCompleted ? Colors.green : theme.colorScheme.primary,
+                    color:
+                        isCompleted ? Colors.green : theme.colorScheme.primary,
                   ),
                 ),
               ],
@@ -278,7 +287,8 @@ class _TasksScreenState extends State<TasksScreen> {
                 ),
                 if (isCompleted)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
                       color: Colors.green.withOpacity(0.2),
                       borderRadius: BorderRadius.circular(12),
@@ -302,7 +312,7 @@ class _TasksScreenState extends State<TasksScreen> {
   String _formatDuration(int seconds) {
     final hours = seconds ~/ 3600;
     final minutes = (seconds % 3600) ~/ 60;
-    
+
     if (hours > 0) {
       return '${hours}h ${minutes}m';
     } else {

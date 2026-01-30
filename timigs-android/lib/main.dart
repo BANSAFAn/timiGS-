@@ -115,10 +115,9 @@ class _MyAppState extends State<MyApp> {
         seedColor: const Color(0xFF6366F1),
         brightness: brightness,
       ),
-      scaffoldBackgroundColor: isDark
-          ? const Color(0xFF0F0F1E)
-          : const Color(0xFFF5F5F7),
-      cardTheme: CardTheme(
+      scaffoldBackgroundColor:
+          isDark ? const Color(0xFF0F0F1E) : const Color(0xFFF5F5F7),
+      cardTheme: CardThemeData(
         elevation: 0,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         color: isDark ? const Color(0xFF1A1A2E) : Colors.white,
@@ -126,9 +125,8 @@ class _MyAppState extends State<MyApp> {
       appBarTheme: AppBarTheme(
         elevation: 0,
         centerTitle: false,
-        backgroundColor: isDark
-            ? const Color(0xFF0F0F1E)
-            : const Color(0xFFF5F5F7),
+        backgroundColor:
+            isDark ? const Color(0xFF0F0F1E) : const Color(0xFFF5F5F7),
         foregroundColor: isDark ? Colors.white : Colors.black,
       ),
     );
