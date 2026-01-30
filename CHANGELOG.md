@@ -1,5 +1,24 @@
 # Changelog
 
+## [1.22.0](https://github.com/BANSAFAn/timiGS-/compare/v1.21.0...v1.22.0) (2026-01-30)
+
+
+### Features
+
+* Add Android app scaffold and JNI fixes ([1393d03](https://github.com/BANSAFAn/timiGS-/commit/1393d034e521c3bd3bf85fc0e3975652e145ee2c))
+
+
+### Bug Fixes
+
+* Add adaptive launcher icon and update manifest ([ef84264](https://github.com/BANSAFAn/timiGS-/commit/ef842643829f5d4d6d8646dda56c755ebdfbbc3b))
+* ci/cli ([0baca21](https://github.com/BANSAFAn/timiGS-/commit/0baca210bc5c60a690d0940e5f704d770cff6aa0))
+* version ([a10e4a4](https://github.com/BANSAFAn/timiGS-/commit/a10e4a4d1735d2e3f7f5ae3fa1b76d540603f3b3))
+
+
+### CI/CD
+
+* Add Android docs, bump SDK, update theme ([577968c](https://github.com/BANSAFAn/timiGS-/commit/577968cc54e996ca8d97581c5fbebe247f927415))
+
 ## [1.21.0](https://github.com/BANSAFAn/timiGS-/compare/v1.20.0...v1.21.0) (2026-01-25)
 
 
