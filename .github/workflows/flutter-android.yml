@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   build-flutter-android:
-    name: 📱 Flutter Android APK
+    name: 📱 Flutter Android APK (Rust Backend)
     runs-on: ubuntu-latest
 
     steps:
@@ -25,6 +25,25 @@ jobs:
           distribution: "temurin"
           java-version: "17"
 
+      # Setup Rust for native backend
+      - name: Setup Rust
+        uses: dtolnay/rust-action@stable
+        with:
+          targets: aarch64-linux-android,armv7-linux-androideabi,x86_64-linux-android,i686-linux-android
+
+      - name: Install cargo-ndk
+        run: cargo install cargo-ndk
+
+      - name: Setup Android NDK
+        uses: nttld/setup-ndk@v1
+        id: setup-ndk
+        with:
+          ndk-version: r26b
+
+      - name: Set NDK environment
+        run: |
+          echo "ANDROID_NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
+
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
@@ -32,9 +51,20 @@ jobs:
           channel: "stable"
           cache: true
 
-      - name: Get dependencies
+      # Build Rust library for Android
+      - name: Build Rust library
+        working-directory: timigs-android/rust
+        run: |
+          cargo ndk -t arm64-v8a -t armeabi-v7a -t x86_64 -t x86 -o ../android/app/src/main/jniLibs build --release
+
+      - name: Get Flutter dependencies
         working-directory: timigs-android
         run: flutter pub get
+
+      # Generate flutter_rust_bridge bindings
+      - name: Generate Rust bindings
+        working-directory: timigs-android
+        run: dart run flutter_rust_bridge_codegen generate || true
 
       - name: Analyze code
         working-directory: timigs-android

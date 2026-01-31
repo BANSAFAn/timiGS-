@@ -1,3 +1,11 @@
+/// Tracker service for Android activity tracking
+///
+/// This service uses Android's UsageStats API to track app usage.
+/// The data is then sent to the Rust backend for storage.
+///
+/// Note: UsageStats is Android-specific and must remain in Dart.
+/// Only the data storage is handled by Rust.
+
 import 'package:usage_stats/usage_stats.dart';
 import 'package:workmanager/workmanager.dart';
 import 'dart:async';
@@ -15,7 +23,7 @@ class TrackerService {
 
   bool get isTracking => _isTracking;
 
-  // Request usage stats permission
+  /// Request usage stats permission (Android-specific)
   Future<bool> requestPermission() async {
     try {
       await UsageStats.grantUsagePermission();
@@ -26,7 +34,7 @@ class TrackerService {
     }
   }
 
-  // Check if permission is granted
+  /// Check if permission is granted
   Future<bool> hasPermission() async {
     try {
       return await UsageStats.checkUsagePermission() ?? false;
@@ -36,7 +44,7 @@ class TrackerService {
     }
   }
 
-  // Start tracking
+  /// Start tracking
   Future<void> startTracking() async {
     if (_isTracking) return;
 
@@ -64,7 +72,7 @@ class TrackerService {
     );
   }
 
-  // Stop tracking
+  /// Stop tracking
   Future<void> stopTracking() async {
     if (!_isTracking) return;
 
@@ -72,7 +80,7 @@ class TrackerService {
     _trackingTimer?.cancel();
     _trackingTimer = null;
 
-    // End current session if exists
+    // End current session if exists (calls Rust backend)
     if (_currentSessionId != null) {
       await DatabaseService.instance.endSession(_currentSessionId!);
       _currentSessionId = null;
@@ -81,7 +89,7 @@ class TrackerService {
     await Workmanager().cancelByUniqueName('tracking_task');
   }
 
-  // Track current app
+  /// Track current app (Android-specific, stores via Rust)
   Future<void> _trackCurrentApp() async {
     try {
       final DateTime endDate = DateTime.now();
@@ -103,12 +111,12 @@ class TrackerService {
 
       // Check if app changed
       if (appName != _currentApp) {
-        // End previous session
+        // End previous session (via Rust)
         if (_currentSessionId != null) {
           await DatabaseService.instance.endSession(_currentSessionId!);
         }
 
-        // Start new session
+        // Start new session (via Rust backend)
         _currentApp = appName;
         _currentSessionId = await DatabaseService.instance.startSession(
           appName: appName,
@@ -121,7 +129,7 @@ class TrackerService {
     }
   }
 
-  // Get current active app
+  /// Get current active app
   Future<String?> getCurrentApp() async {
     try {
       final DateTime endDate = DateTime.now();
@@ -145,11 +153,17 @@ class TrackerService {
   }
 }
 
-// Background task callback
+/// Background task callback
+///
+/// This runs periodically in the background to track app usage.
+/// Data is stored via the Rust backend.
 @pragma('vm:entry-point')
 void callbackDispatcher() {
   Workmanager().executeTask((task, inputData) async {
     try {
+      // Initialize database service for background context
+      await DatabaseService.instance.initialize();
+
       // Track current app in background
       final DateTime endDate = DateTime.now();
       final DateTime startDate = endDate.subtract(Duration(minutes: 1));
@@ -166,14 +180,14 @@ void callbackDispatcher() {
         final UsageInfo currentUsage = usageStats.first;
         final String appName = currentUsage.packageName ?? 'Unknown';
 
-        // Save to database
+        // Save to Rust backend
         final sessionId = await DatabaseService.instance.startSession(
           appName: appName,
           windowTitle: appName,
           exePath: currentUsage.packageName ?? '',
         );
 
-        // End session after 1 minute (approximate)
+        // End session after brief delay
         await Future.delayed(Duration(seconds: 5));
         await DatabaseService.instance.endSession(sessionId);
       }

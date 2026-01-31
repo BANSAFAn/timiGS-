@@ -1,0 +1,69 @@
+OUT_DIR = Some(C:\Users\baneronetwo\Documents\GitHub\timiGS-\timigs-android\rust\target\debug\build\dart-sys-39598c27571a4d9f\out)
+OPT_LEVEL = Some(0)
+TARGET = Some(x86_64-pc-windows-msvc)
+CARGO_ENCODED_RUSTFLAGS = Some()
+cargo:rerun-if-env-changed=VCINSTALLDIR
+VCINSTALLDIR = None
+cargo:rerun-if-env-changed=VSTEL_MSBuildProjectFullPath
+VSTEL_MSBuildProjectFullPath = None
+cargo:rerun-if-env-changed=VCToolsVersion
+VCToolsVersion = None
+cargo:rerun-if-env-changed=VSCMD_ARG_VCVARS_SPECTRE
+VSCMD_ARG_VCVARS_SPECTRE = None
+cargo:rerun-if-env-changed=WindowsSdkDir
+WindowsSdkDir = None
+cargo:rerun-if-env-changed=WindowsSDKVersion
+WindowsSDKVersion = None
+cargo:rerun-if-env-changed=LIB
+LIB = None
+PATH = Some(C:\Users\baneronetwo\Documents\GitHub\timiGS-\timigs-android\rust\target\debug\deps;C:\Users\baneronetwo\Documents\GitHub\timiGS-\timigs-android\rust\target\debug;C:\Users\baneronetwo\.rustup\toolchains\stable-x86_64-pc-windows-msvc\lib\rustlib\x86_64-pc-windows-msvc\lib;D:\Programms\flutter\flutter\bin\;C:\Program Files\Eclipse Adoptium\jdk-21.0.7.6-hotspot\bin;C:\Program Files (x86)\Common Files\Intel\Shared Libraries\redist\intel64_win\compiler;C:\Program Files\Common Files\Oracle\Java\javapath;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files\NVIDIA Corporation\NVIDIA App\NvDLISR;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files (x86)\Windows Kits\10\Windows Performance Toolkit\;C:\Program Files (x86)\Go\bin;C:\Program Files\nodejs\;C:\ProgramData\chocolatey\bin;C:\Program Files\Git LFS;C:\Program Files (x86)\CMake\bin;C:\Program Files\Gradle\gradle-8.14.1\bin;C:\Program Files\flutter\bin;C:\Program Files\NVIDIA Corporation\Nsight Compute 2025.2.1\;C:\Users\baneronetwo\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Anaconda (miniconda3);D:\Programms\ffmpeg\bin;C:\gradle\gradle-8.14.2\bin;C:\Program Files\Git\cmd;D:\Programms\Neovim\bin;C:\Program Files\Go\bin;C:\Program Files\dotnet\;C:\Program Files\Cloudflare\Cloudflare WARP\;c:\\Users\\baneronetwo\\.trae\\sdks\\workspaces\\05f4bb84\\versions\\node\\current;c:\\Users\\baneronetwo\\.trae\\sdks\\versions\\node\\current;c:\Users\baneronetwo\.trae\sdks\workspaces\05f4bb84\versions\node\current;c:\Users\baneronetwo\.trae\sdks\versions\node\current;C:\Program Files\Eclipse Adoptium\jdk-21.0.7.6-hotspot\bin;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.9\bin;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.9\libnvvp;C:\Program Files (x86)\Common Files\Intel\Shared Libraries\redist\intel64_win\compiler;C:\Program Files\Common Files\Oracle\Java\javapath;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files\NVIDIA Corporation\NVIDIA App\NvDLISR;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files (x86)\Windows Kits\10\Windows Performance Toolkit\;C:\Program Files\dotnet\;C:\Program Files (x86)\Go\bin;C:\Program Files\nodejs\;C:\ProgramData\chocolatey\bin;C:\Program Files\Git LFS;C:\Program Files (x86)\CMake\bin;C:\Program Files\Gradle\gradle-8.14.1\bin;C:\Program Files\flutter\bin;C:\Program Files\Neovim\bin;C:\Program Files\NVIDIA Corporation\Nsight Compute 2025.2.1\;C:\Users\baneronetwo\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Anaconda (miniconda3);D:\Programms\ffmpeg\bin;C:\gradle\gradle-8.14.2\bin;C:\Program Files\Git\cmd;C:\Program Files\Cloudflare\Cloudflare WARP\;C:\Users\baneronetwo\AppData\Local\pnpm;C:\Users\baneronetwo\.cargo\bin;C:\Users\baneronetwo\AppData\Local\pnpm;C:\Program Files\CMake\bin;C:\Users\baneronetwo\AppData\Local\Microsoft\WindowsApps;C:\Users\baneronetwo\AppData\Local\GitHubDesktop\bin;C:\Users\baneronetwo\AppData\Local\Muse Hub\lib;D:\Games\Cossacks 3\Steam\ext\bin;c:\program files (x86)\steam\ext\bin;C:\Users\baneronetwo\go\bin;C:\Users\baneronetwo\AppData\Roaming\npm;C:\Users\baneronetwo\AppData\Local\JetBrains\Toolbox\scripts;C:\tools\dart-sdk\bin;C:\Users\baneronetwo\AppData\Local\Pub\Cache\bin;C:\Users\baneronetwo\miniconda3\Library\bin;C:\Users\baneronetwo\miniconda3\Scripts;C:\Users\baneronetwo\miniconda3\condabin;D:\Programms\Microsoft VS Code\bin;C:\Users\baneronetwo\.bun\bin;C:\Users\baneronetwo\.dotnet\tools;C:\ProgramData\mingw64\mingw64\bin;c:\flutter\flutter\bin;C:\Users\baneronetwo\go\bin;D:\Programms\Zed\bin;C:\Users\baneronetwo\.dotnet\tools;D:\Antigravity\bin;D:\Programms\flutter\flutter\bin;c:\Users\baneronetwo\.antigravity\extensions\vscjava.vscode-java-debug-0.58.5-universal\bundled\scripts\noConfigScripts;C:\Users\baneronetwo\.rustup\toolchains\stable-x86_64-pc-windows-msvc\bin)
+cargo:rerun-if-env-changed=INCLUDE
+INCLUDE = None
+HOST = Some(x86_64-pc-windows-msvc)
+cargo:rerun-if-env-changed=CC_x86_64-pc-windows-msvc
+CC_x86_64-pc-windows-msvc = None
+cargo:rerun-if-env-changed=CC_x86_64_pc_windows_msvc
+CC_x86_64_pc_windows_msvc = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+CARGO_CFG_TARGET_FEATURE = Some(cmpxchg16b,fxsr,sse,sse2,sse3)
+DEBUG = Some(true)
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_x86_64_pc_windows_msvc
+CFLAGS_x86_64_pc_windows_msvc = None
+cargo:rerun-if-env-changed=CFLAGS_x86_64-pc-windows-msvc
+CFLAGS_x86_64-pc-windows-msvc = None
+cargo:rerun-if-env-changed=CC_ENABLE_DEBUG_OUTPUT
+dart_api_dl.c
+C:\Users\baneronetwo\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\dart-sys-4.1.5\dart-sdk\include\dart_api_dl.c(26): warning C4152: nonstandard extension, function/data pointer conversion in expression
+C:\Users\baneronetwo\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\dart-sys-4.1.5\dart-sdk\include\dart_api_dl.c(33): warning C4100: 'external_size': unreferenced parameter
+C:\Users\baneronetwo\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\dart-sys-4.1.5\dart-sdk\include\dart_api_dl.c(33): warning C4100: 'object': unreferenced parameter
+C:\Users\baneronetwo\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\dart-sys-4.1.5\dart-sdk\include\dart_api_dl.c(40): warning C4100: 'external_allocation_size': unreferenced parameter
+C:\Users\baneronetwo\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\dart-sys-4.1.5\dart-sdk\include\dart_api_dl.c(39): warning C4100: 'strong_ref_to_object': unreferenced parameter
+C:\Users\baneronetwo\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\dart-sys-4.1.5\dart-sdk\include\dart_api_dl.c(38): warning C4100: 'object': unreferenced parameter
+cargo:rerun-if-env-changed=AR_x86_64-pc-windows-msvc
+AR_x86_64-pc-windows-msvc = None
+cargo:rerun-if-env-changed=AR_x86_64_pc_windows_msvc
+AR_x86_64_pc_windows_msvc = None
+cargo:rerun-if-env-changed=HOST_AR
+HOST_AR = None
+cargo:rerun-if-env-changed=AR
+AR = None
+cargo:rerun-if-env-changed=ARFLAGS
+ARFLAGS = None
+cargo:rerun-if-env-changed=HOST_ARFLAGS
+HOST_ARFLAGS = None
+cargo:rerun-if-env-changed=ARFLAGS_x86_64_pc_windows_msvc
+ARFLAGS_x86_64_pc_windows_msvc = None
+cargo:rerun-if-env-changed=ARFLAGS_x86_64-pc-windows-msvc
+ARFLAGS_x86_64-pc-windows-msvc = None
+cargo:rustc-link-search=native=D:\Programms\VS-2026\VC\Tools\MSVC\14.50.35717\atlmfc\lib\x64
+cargo:rustc-link-lib=static=dart_api_dl
+cargo:rustc-link-search=native=C:\Users\baneronetwo\Documents\GitHub\timiGS-\timigs-android\rust\target\debug\build\dart-sys-39598c27571a4d9f\out

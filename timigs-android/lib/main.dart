@@ -16,8 +16,8 @@ import 'models/settings.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize database
-  await DatabaseService.instance.database;
+  // Initialize Rust backend and database
+  await DatabaseService.instance.initialize();
 
   // Initialize workmanager for background tasks
   await Workmanager().initialize(callbackDispatcher, isInDebugMode: false);

@@ -1,0 +1,15 @@
+# flutter_rust_bridge configuration
+rust_input:
+  - rust/src/api/*.rs
+
+dart_output: lib/src/rust
+
+full_dep: true
+local: true
+
+# Android-specific settings
+web: false
+
+# Code generation options
+dart3: true
+dart_format_line_length: 100

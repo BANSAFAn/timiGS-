@@ -1,0 +1,9 @@
+C:\Users\baneronetwo\Documents\GitHub\timiGS-\timigs-android\rust\target\debug\deps\allo_isolate-5a949fb9325e53e2.d: C:\Users\baneronetwo\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\allo-isolate-0.1.27\src\lib.rs C:\Users\baneronetwo\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\allo-isolate-0.1.27\src\dart_array.rs C:\Users\baneronetwo\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\allo-isolate-0.1.27\src\into_dart.rs C:\Users\baneronetwo\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\allo-isolate-0.1.27\src\into_dart_extra.rs C:\Users\baneronetwo\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\allo-isolate-0.1.27\src\ffi.rs
+
+C:\Users\baneronetwo\Documents\GitHub\timiGS-\timigs-android\rust\target\debug\deps\liballo_isolate-5a949fb9325e53e2.rmeta: C:\Users\baneronetwo\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\allo-isolate-0.1.27\src\lib.rs C:\Users\baneronetwo\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\allo-isolate-0.1.27\src\dart_array.rs C:\Users\baneronetwo\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\allo-isolate-0.1.27\src\into_dart.rs C:\Users\baneronetwo\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\allo-isolate-0.1.27\src\into_dart_extra.rs C:\Users\baneronetwo\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\allo-isolate-0.1.27\src\ffi.rs
+
+C:\Users\baneronetwo\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\allo-isolate-0.1.27\src\lib.rs:
+C:\Users\baneronetwo\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\allo-isolate-0.1.27\src\dart_array.rs:
+C:\Users\baneronetwo\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\allo-isolate-0.1.27\src\into_dart.rs:
+C:\Users\baneronetwo\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\allo-isolate-0.1.27\src\into_dart_extra.rs:
+C:\Users\baneronetwo\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\allo-isolate-0.1.27\src\ffi.rs:
