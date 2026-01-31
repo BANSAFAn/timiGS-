@@ -61,10 +61,14 @@ jobs:
         working-directory: timigs-android
         run: flutter pub get
 
+      # Install flutter_rust_bridge_codegen via Cargo
+      - name: Install flutter_rust_bridge_codegen
+        run: cargo install flutter_rust_bridge_codegen
+
       # Generate flutter_rust_bridge bindings
       - name: Generate Rust bindings
         working-directory: timigs-android
-        run: dart run flutter_rust_bridge_codegen generate || true
+        run: flutter_rust_bridge_codegen generate || true
 
       - name: Analyze code
         working-directory: timigs-android
