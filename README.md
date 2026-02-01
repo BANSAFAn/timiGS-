@@ -15,7 +15,7 @@
 | **Windows** | Tauri v2 + Rust + Vue 3 | ✅ Stable |
 | **macOS** | Tauri v2 + Rust + Vue 3 | ✅ Stable |
 | **Linux** | Tauri v2 + Rust + Vue 3 | ✅ Stable |
-| **Android** | Flutter + Dart | ✅ Stable |
+| **Android** | Flutter + Dart | 🟥 Nuh uh |
 
 ---
 
