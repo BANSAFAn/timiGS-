@@ -1,3 +1,10 @@
+// Set SDK versions for all subprojects (fixes lStar attribute error)
+ext {
+    set('compileSdkVersion', 35)
+    set('targetSdkVersion', 35)
+    set('minSdkVersion', 23)
+}
+
 allprojects {
     repositories {
         google()
@@ -10,26 +17,6 @@ rootProject.buildDir = '../build'
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
     project.evaluationDependsOn(':app')
-}
-
-// Force all subprojects to use compileSdk 35 to fix lStar attribute error
-subprojects { sub ->
-    sub.plugins.withId('com.android.library') {
-        sub.android {
-            if (namespace == null) {
-                namespace = sub.group.toString()
-            }
-            compileSdk = 35
-        }
-    }
-    sub.plugins.withId('com.android.application') {
-        sub.android {
-            if (namespace == null) {
-                namespace = sub.group.toString()
-            }
-            compileSdk = 35
-        }
-    }
 }
 
 tasks.register("clean", Delete) {
