@@ -24,7 +24,7 @@ dependencies:
   provider: ^6.1.1
 
   # Android Activity Tracking (maintained alternative to usage_stats)
-  app_usage: ^1.2.1
+  app_usage: ^4.0.1
 
   # Google Integration
   google_sign_in: ^6.1.6
