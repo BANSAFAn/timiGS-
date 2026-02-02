@@ -15,18 +15,27 @@ class _DashboardScreenState extends State<DashboardScreen> {
   String? _currentApp;
   int _totalTimeToday = 0;
   List<AppUsageSummary> _topApps = [];
+  bool _hasPermission = false;
   bool _isLoading = true;
   Timer? _refreshTimer;
 
   @override
   void initState() {
     super.initState();
+    _checkPermission();
     _loadData();
-    
+
     // Refresh every 5 seconds
     _refreshTimer = Timer.periodic(const Duration(seconds: 5), (_) {
       _loadData();
     });
+  }
+
+  Future<void> _checkPermission() async {
+    final hasPermission = await TrackerService.instance.hasPermission();
+    if (mounted) {
+      setState(() => _hasPermission = hasPermission);
+    }
   }
 
   @override
@@ -36,10 +45,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Future<void> _loadData() async {
+    if (!_hasPermission) {
+      _checkPermission(); // Retry check
+      // Don't load data if no permission
+      if (mounted) setState(() => _isLoading = false);
+      return;
+    }
+
     final currentApp = await TrackerService.instance.getCurrentApp();
     final totalTime = await DatabaseService.instance.getTotalTimeToday();
     final summary = await DatabaseService.instance.getTodaySummary();
-    
+
     if (mounted) {
       setState(() {
         _currentApp = currentApp;
@@ -54,7 +70,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final hours = seconds ~/ 3600;
     final minutes = (seconds % 3600) ~/ 60;
     final secs = seconds % 60;
-    
+
     if (hours > 0) {
       return '${hours}h ${minutes}m';
     } else if (minutes > 0) {
@@ -67,7 +83,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Dashboard'),
@@ -78,127 +94,170 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         ],
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : RefreshIndicator(
-              onRefresh: _loadData,
-              child: ListView(
-                padding: const EdgeInsets.all(16),
+      body: !_hasPermission
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Active Now Card
-                  Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(20),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.circle,
-                                color: Colors.green,
-                                size: 12,
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                'Active Now',
-                                style: theme.textTheme.titleMedium,
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 12),
-                          Text(
-                            _currentApp ?? 'No activity detected',
-                            style: theme.textTheme.headlineSmall?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  
+                  Icon(Icons.security,
+                      size: 64, color: theme.colorScheme.primary),
                   const SizedBox(height: 16),
-                  
-                  // Today's Summary
-                  Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(20),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Today\'s Summary',
-                            style: theme.textTheme.titleLarge?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              _buildStatItem(
-                                context,
-                                'Total Time',
-                                _formatDuration(_totalTimeToday),
-                                Icons.access_time,
-                              ),
-                              _buildStatItem(
-                                context,
-                                'Apps Used',
-                                '${_topApps.length}',
-                                Icons.apps,
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
+                  Text('Usage Access Required',
+                      style: theme.textTheme.titleLarge
+                          ?.copyWith(fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 8),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 32),
+                    child: Text(
+                        'To track app usage, please grant Usage Access permission in settings.',
+                        textAlign: TextAlign.center,
+                        style: theme.textTheme.bodyMedium),
                   ),
-                  
-                  const SizedBox(height: 16),
-                  
-                  // Top Apps
-                  Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(20),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Top Applications',
-                            style: theme.textTheme.titleLarge?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          if (_topApps.isEmpty)
-                            Center(
-                              child: Padding(
-                                padding: const EdgeInsets.all(20),
-                                child: Text(
-                                  'No activity recorded yet today',
-                                  style: theme.textTheme.bodyMedium?.copyWith(
-                                    color: theme.colorScheme.onSurface.withOpacity(0.6),
-                                  ),
-                                ),
-                              ),
-                            )
-                          else
-                            ..._topApps.map((app) => _buildAppItem(context, app)),
-                        ],
-                      ),
-                    ),
+                  const SizedBox(height: 24),
+                  ElevatedButton(
+                    onPressed: () {
+                      TrackerService.instance
+                          .requestPermission()
+                          .then((granted) {
+                        if (mounted) {
+                          setState(() {
+                            _hasPermission = granted;
+                            if (granted) _loadData();
+                          });
+                        }
+                      });
+                    },
+                    child: const Text('Grant Permission'),
                   ),
                 ],
               ),
-            ),
+            )
+          : _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : RefreshIndicator(
+                  onRefresh: _loadData,
+                  child: ListView(
+                    padding: const EdgeInsets.all(16),
+                    children: [
+                      // Active Now Card
+                      Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.circle,
+                                    color: Colors.green,
+                                    size: 12,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    'Active Now',
+                                    style: theme.textTheme.titleMedium,
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 12),
+                              Text(
+                                _currentApp ?? 'No activity detected',
+                                style: theme.textTheme.headlineSmall?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      // Today's Summary
+                      Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Today\'s Summary',
+                                style: theme.textTheme.titleLarge?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 20),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                children: [
+                                  _buildStatItem(
+                                    context,
+                                    'Total Time',
+                                    _formatDuration(_totalTimeToday),
+                                    Icons.access_time,
+                                  ),
+                                  _buildStatItem(
+                                    context,
+                                    'Apps Used',
+                                    '${_topApps.length}',
+                                    Icons.apps,
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      // Top Apps
+                      Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Top Applications',
+                                style: theme.textTheme.titleLarge?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              if (_topApps.isEmpty)
+                                Center(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(20),
+                                    child: Text(
+                                      'No activity recorded yet today',
+                                      style:
+                                          theme.textTheme.bodyMedium?.copyWith(
+                                        color: theme.colorScheme.onSurface
+                                            .withOpacity(0.6),
+                                      ),
+                                    ),
+                                  ),
+                                )
+                              else
+                                ..._topApps
+                                    .map((app) => _buildAppItem(context, app)),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
     );
   }
 
-  Widget _buildStatItem(BuildContext context, String label, String value, IconData icon) {
+  Widget _buildStatItem(
+      BuildContext context, String label, String value, IconData icon) {
     final theme = Theme.of(context);
-    
+
     return Column(
       children: [
         Icon(icon, size: 32, color: theme.colorScheme.primary),
@@ -222,10 +281,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Widget _buildAppItem(BuildContext context, AppUsageSummary app) {
     final theme = Theme.of(context);
-    final percentage = _totalTimeToday > 0 
+    final percentage = _totalTimeToday > 0
         ? (app.totalSeconds / _totalTimeToday * 100).toStringAsFixed(1)
         : '0.0';
-    
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Row(

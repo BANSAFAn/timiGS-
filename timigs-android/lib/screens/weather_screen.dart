@@ -19,43 +19,59 @@ class _WeatherScreenState extends State<WeatherScreen> {
   double _windSpeed = 0;
   List<Map<String, dynamic>> _forecast = [];
 
+  late TextEditingController _cityController;
+
   @override
   void initState() {
     super.initState();
+    _cityController = TextEditingController(text: _city);
     _fetchWeather();
   }
 
+  @override
+  void dispose() {
+    _cityController.dispose();
+    super.dispose();
+  }
+
   Future<void> _fetchWeather() async {
+    // Update city from controller if needed, or keeping them in sync
+    // Logic remains mostly same but using controller
+
     setState(() => _isLoading = true);
-    
+
     try {
       // Geocoding to get coordinates
-      final geoUrl = 'https://geocoding-api.open-meteo.com/v1/search?name=$_city&count=1&language=en&format=json';
+      final geoUrl =
+          'https://geocoding-api.open-meteo.com/v1/search?name=$_city&count=1&language=en&format=json';
       final geoResponse = await http.get(Uri.parse(geoUrl));
-      
+
       if (geoResponse.statusCode == 200) {
         final geoData = json.decode(geoResponse.body);
         if (geoData['results'] != null && geoData['results'].isNotEmpty) {
           final lat = geoData['results'][0]['latitude'];
           final lon = geoData['results'][0]['longitude'];
-          
+
           // Get weather data
-          final weatherUrl = 'https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lon&current_weather=true&daily=weathercode,temperature_2m_max,temperature_2m_min&hourly=relativehumidity_2m&timezone=auto';
+          final weatherUrl =
+              'https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lon&current_weather=true&daily=weathercode,temperature_2m_max,temperature_2m_min&hourly=relativehumidity_2m&timezone=auto';
           final weatherResponse = await http.get(Uri.parse(weatherUrl));
-          
+
           if (weatherResponse.statusCode == 200) {
             final weatherData = json.decode(weatherResponse.body);
-            
+
             setState(() {
               _temperature = weatherData['current_weather']['temperature'];
               _weatherCode = weatherData['current_weather']['weathercode'];
               _windSpeed = weatherData['current_weather']['windspeed'];
               _condition = _getWeatherDescription(_weatherCode);
-              
+
               // Get current hour humidity
               final currentHour = DateTime.now().hour;
-              _humidity = weatherData['hourly']['relativehumidity_2m'][currentHour].toDouble();
-              
+              _humidity = weatherData['hourly']['relativehumidity_2m']
+                      [currentHour]
+                  .toDouble();
+
               // Get 5-day forecast
               _forecast = [];
               for (int i = 1; i < 6; i++) {
@@ -145,7 +161,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
                                 setState(() => _city = value);
                                 _fetchWeather();
                               },
-                              controller: TextEditingController(text: _city),
+                              controller: _cityController,
                             ),
                           ),
                           IconButton(
@@ -157,7 +173,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  
+
                   // Current weather card
                   if (_temperature != null)
                     Card(
@@ -169,8 +185,14 @@ class _WeatherScreenState extends State<WeatherScreen> {
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                             colors: [
-                              Theme.of(context).colorScheme.primary.withOpacity(0.3),
-                              Theme.of(context).colorScheme.secondary.withOpacity(0.2),
+                              Theme.of(context)
+                                  .colorScheme
+                                  .primary
+                                  .withOpacity(0.3),
+                              Theme.of(context)
+                                  .colorScheme
+                                  .secondary
+                                  .withOpacity(0.2),
                             ],
                           ),
                         ),
@@ -183,9 +205,12 @@ class _WeatherScreenState extends State<WeatherScreen> {
                             const SizedBox(height: 16),
                             Text(
                               '${_temperature!.round()}°C',
-                              style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .displayLarge
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
                             ),
                             const SizedBox(height: 8),
                             Text(
@@ -196,58 +221,66 @@ class _WeatherScreenState extends State<WeatherScreen> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceAround,
                               children: [
-                                _buildWeatherStat('💧', '${_humidity.round()}%', 'Humidity'),
-                                _buildWeatherStat('💨', '${_windSpeed.round()} km/h', 'Wind'),
-                                _buildWeatherStat('🌡️', '${(_temperature! - 2).round()}°', 'Feels Like'),
+                                _buildWeatherStat(
+                                    '💧', '${_humidity.round()}%', 'Humidity'),
+                                _buildWeatherStat(
+                                    '💨', '${_windSpeed.round()} km/h', 'Wind'),
+                                _buildWeatherStat(
+                                    '🌡️',
+                                    '${(_temperature! - 2).round()}°',
+                                    'Feels Like'),
                               ],
                             ),
                           ],
                         ),
                       ),
                     ),
-                  
+
                   const SizedBox(height: 24),
-                  
+
                   // 5-day forecast
                   if (_forecast.isNotEmpty) ...[
                     Text(
                       '5-Day Forecast',
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                            fontWeight: FontWeight.bold,
+                          ),
                     ),
                     const SizedBox(height: 12),
                     ..._forecast.map((day) => Card(
-                      margin: const EdgeInsets.only(bottom: 8),
-                      child: ListTile(
-                        leading: Text(
-                          _getWeatherIcon(day['code']),
-                          style: const TextStyle(fontSize: 32),
-                        ),
-                        title: Text(_formatDate(day['date'])),
-                        subtitle: Text(_getWeatherDescription(day['code'])),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              '${day['high'].round()}°',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                              ),
+                          margin: const EdgeInsets.only(bottom: 8),
+                          child: ListTile(
+                            leading: Text(
+                              _getWeatherIcon(day['code']),
+                              style: const TextStyle(fontSize: 32),
                             ),
-                            const SizedBox(width: 8),
-                            Text(
-                              '${day['low'].round()}°',
-                              style: TextStyle(
-                                color: Theme.of(context).textTheme.bodySmall?.color,
-                                fontSize: 16,
-                              ),
+                            title: Text(_formatDate(day['date'])),
+                            subtitle: Text(_getWeatherDescription(day['code'])),
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  '${day['high'].round()}°',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  '${day['low'].round()}°',
+                                  style: TextStyle(
+                                    color: Theme.of(context)
+                                        .textTheme
+                                        .bodySmall
+                                        ?.color,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
-                      ),
-                    )),
+                          ),
+                        )),
                   ],
                 ],
               ),

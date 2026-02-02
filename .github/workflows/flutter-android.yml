@@ -61,6 +61,10 @@ jobs:
         working-directory: timigs-android
         run: flutter pub get
 
+      - name: Generate App Icons
+        working-directory: timigs-android
+        run: flutter pub run flutter_launcher_icons
+
       # Install flutter_rust_bridge_codegen via Cargo
       - name: Install flutter_rust_bridge_codegen
         run: cargo install flutter_rust_bridge_codegen

@@ -50,6 +50,13 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^3.0.0
+  flutter_launcher_icons: ^0.13.1
+
+flutter_launcher_icons:
+  android: "ic_launcher"
+  image_path: "assets/icon.png"
+  min_sdk_android: 23
+
   build_runner: ^2.4.8
   freezed: ^2.4.7
 
