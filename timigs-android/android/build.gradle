@@ -1,3 +1,10 @@
+// Set SDK versions for all subprojects
+ext {
+    set('compileSdkVersion', 36)
+    set('targetSdkVersion', 36)
+    set('minSdkVersion', 23)
+}
+
 allprojects {
     repositories {
         google()
