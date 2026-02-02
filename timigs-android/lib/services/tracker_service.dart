@@ -6,7 +6,7 @@
 /// Note: UsageStats is Android-specific and must remain in Dart.
 /// Only the data storage is handled by Rust.
 
-import 'package:usage_stats/usage_stats.dart';
+import 'package:app_usage/app_usage.dart';
 import 'package:workmanager/workmanager.dart';
 import 'dart:async';
 import 'database_service.dart';
@@ -26,8 +26,18 @@ class TrackerService {
   /// Request usage stats permission (Android-specific)
   Future<bool> requestPermission() async {
     try {
-      await UsageStats.grantUsagePermission();
-      return await UsageStats.checkUsagePermission() ?? false;
+      // app_usage automatically opens permission settings when needed
+      // Try to get usage to trigger permission request
+      final DateTime endDate = DateTime.now();
+      final DateTime startDate = endDate.subtract(Duration(hours: 1));
+
+      try {
+        await AppUsage().getAppUsage(startDate, endDate);
+        return true;
+      } catch (e) {
+        // Permission not granted, the plugin will have opened settings
+        return false;
+      }
     } catch (e) {
       print('Error requesting permission: $e');
       return false;
@@ -37,9 +47,14 @@ class TrackerService {
   /// Check if permission is granted
   Future<bool> hasPermission() async {
     try {
-      return await UsageStats.checkUsagePermission() ?? false;
+      final DateTime endDate = DateTime.now();
+      final DateTime startDate = endDate.subtract(Duration(hours: 1));
+
+      // Try to get usage - if it fails, permission is not granted
+      await AppUsage().getAppUsage(startDate, endDate);
+      return true;
     } catch (e) {
-      print('Error checking permission: $e');
+      print('Permission not granted: $e');
       return false;
     }
   }
@@ -95,19 +110,18 @@ class TrackerService {
       final DateTime endDate = DateTime.now();
       final DateTime startDate = endDate.subtract(Duration(seconds: 10));
 
-      final List<UsageInfo> usageStats = await UsageStats.queryUsageStats(
+      final List<AppUsageInfo> usageStats = await AppUsage().getAppUsage(
         startDate,
         endDate,
       );
 
       if (usageStats.isEmpty) return;
 
-      // Get the most recent app
-      usageStats.sort((a, b) => ((b.lastTimeUsed ?? 0) as int)
-          .compareTo((a.lastTimeUsed ?? 0) as int));
+      // Get the most recently used app (by usage time)
+      usageStats.sort((a, b) => b.usage.inSeconds.compareTo(a.usage.inSeconds));
 
-      final UsageInfo currentUsage = usageStats.first;
-      final String appName = currentUsage.packageName ?? 'Unknown';
+      final AppUsageInfo currentUsage = usageStats.first;
+      final String appName = currentUsage.packageName;
 
       // Check if app changed
       if (appName != _currentApp) {
@@ -119,9 +133,10 @@ class TrackerService {
         // Start new session (via Rust backend)
         _currentApp = appName;
         _currentSessionId = await DatabaseService.instance.startSession(
-          appName: appName,
-          windowTitle: appName, // Android doesn't have window titles
-          exePath: currentUsage.packageName ?? '',
+          appName: currentUsage.appName,
+          windowTitle:
+              currentUsage.appName, // Android doesn't have window titles
+          exePath: currentUsage.packageName,
         );
       }
     } catch (e) {
@@ -135,15 +150,14 @@ class TrackerService {
       final DateTime endDate = DateTime.now();
       final DateTime startDate = endDate.subtract(Duration(seconds: 10));
 
-      final List<UsageInfo> usageStats = await UsageStats.queryUsageStats(
+      final List<AppUsageInfo> usageStats = await AppUsage().getAppUsage(
         startDate,
         endDate,
       );
 
       if (usageStats.isEmpty) return null;
 
-      usageStats.sort((a, b) => ((b.lastTimeUsed ?? 0) as int)
-          .compareTo((a.lastTimeUsed ?? 0) as int));
+      usageStats.sort((a, b) => b.usage.inSeconds.compareTo(a.usage.inSeconds));
 
       return usageStats.first.packageName;
     } catch (e) {
@@ -168,23 +182,22 @@ void callbackDispatcher() {
       final DateTime endDate = DateTime.now();
       final DateTime startDate = endDate.subtract(Duration(minutes: 1));
 
-      final List<UsageInfo> usageStats = await UsageStats.queryUsageStats(
+      final List<AppUsageInfo> usageStats = await AppUsage().getAppUsage(
         startDate,
         endDate,
       );
 
       if (usageStats.isNotEmpty) {
-        usageStats.sort((a, b) => ((b.lastTimeUsed ?? 0) as int)
-            .compareTo((a.lastTimeUsed ?? 0) as int));
+        usageStats
+            .sort((a, b) => b.usage.inSeconds.compareTo(a.usage.inSeconds));
 
-        final UsageInfo currentUsage = usageStats.first;
-        final String appName = currentUsage.packageName ?? 'Unknown';
+        final AppUsageInfo currentUsage = usageStats.first;
 
         // Save to Rust backend
         final sessionId = await DatabaseService.instance.startSession(
-          appName: appName,
-          windowTitle: appName,
-          exePath: currentUsage.packageName ?? '',
+          appName: currentUsage.appName,
+          windowTitle: currentUsage.appName,
+          exePath: currentUsage.packageName,
         );
 
         // End session after brief delay

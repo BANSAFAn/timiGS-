@@ -1,10 +1,3 @@
-// Set SDK versions for all subprojects (fixes lStar attribute error)
-ext {
-    set('compileSdkVersion', 35)
-    set('targetSdkVersion', 35)
-    set('minSdkVersion', 23)
-}
-
 allprojects {
     repositories {
         google()
@@ -17,14 +10,6 @@ rootProject.buildDir = '../build'
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
     project.evaluationDependsOn(':app')
-    
-    // Force all subprojects to use compatible AndroidX versions (fixes lStar not found)
-    project.configurations.configureEach { config ->
-        config.resolutionStrategy {
-            force 'androidx.core:core:1.13.0'
-            force 'androidx.core:core-ktx:1.13.0'
-        }
-    }
 }
 
 tasks.register("clean", Delete) {
