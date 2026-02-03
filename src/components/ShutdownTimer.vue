@@ -56,7 +56,8 @@ const secondsInput = ref<number | null>(0);
 
 const timeLeft = ref<number | null>(null);
 const totalDuration = ref<number>(0);
-let intervalId: number | null = null;
+let pollInterval: number | null = null;
+import { listen } from '@tauri-apps/api/event';
 
 const formattedTime = computed(() => {
   if (timeLeft.value === null) return '';
@@ -71,7 +72,20 @@ const progressOffset = computed(() => {
   return 283 - (283 * timeLeft.value) / totalDuration.value;
 });
 
-function startTimer() {
+// Load initial status
+async function loadStatus() {
+  const remaining = await invoke<number | null>('get_timer_status_cmd');
+  if (remaining !== null) {
+      timeLeft.value = remaining;
+      // We don't know totalDuration from backend easily without storing it, 
+      // but for progress bar we can just approximate or hide it if needed. 
+      // For now let's assume max relative to current if we just loaded.
+      if (totalDuration.value === 0) totalDuration.value = remaining;
+      startPolling();
+  }
+}
+
+async function startTimer() {
   const h = hoursInput.value || 0;
   const m = minutesInput.value || 0;
   const s = secondsInput.value || 0;
@@ -80,50 +94,52 @@ function startTimer() {
   if (total > 0) {
     totalDuration.value = total;
     timeLeft.value = total;
-    intervalId = window.setInterval(tick, 1000);
+    
+    await invoke('start_timer_cmd', { durationSecs: total });
+    startPolling();
   }
 }
 
-function cancelTimer() {
-  if (intervalId) {
-    clearInterval(intervalId);
-    intervalId = null;
+async function cancelTimer() {
+  await invoke('cancel_timer_cmd');
+  if (pollInterval) {
+    clearInterval(pollInterval);
+    pollInterval = null;
   }
   timeLeft.value = null;
 }
 
-async function tick() {
-  if (timeLeft.value !== null) {
-    timeLeft.value--;
-    
-    if (timeLeft.value <= 0) {
-      cancelTimer();
-      await triggerShutdown();
-    }
-  }
+function startPolling() {
+    if (pollInterval) clearInterval(pollInterval);
+    pollInterval = window.setInterval(async () => {
+        const remaining = await invoke<number | null>('get_timer_status_cmd');
+        if (remaining === null) {
+            // Timer finished or cancelled externally
+            timeLeft.value = null;
+            if (pollInterval) clearInterval(pollInterval);
+        } else {
+            timeLeft.value = remaining;
+        }
+    }, 1000);
 }
 
-async function triggerShutdown() {
-  try {
-    if ('Notification' in window && Notification.permission !== 'denied') {
-      Notification.requestPermission().then(permission => {
-        if (permission === 'granted') {
-           new Notification(t('app.name'), { 
-            body: t('tools.shutdownTimer.shutdownNow', 'Time is up! Shutting down PC...') 
-          });
-        }
-      });
-    }
-    await invoke('shutdown_pc');
-  } catch (error) {
-    console.error('Failed to shutdown:', error);
-    alert(t('common.error') + ': ' + error);
-  }
-}
+import { onMounted } from 'vue';
+
+onMounted(async () => {
+    loadStatus();
+    
+    // Listen for finish event
+    await listen('timer-finished', () => {
+        timeLeft.value = null;
+        if (pollInterval) clearInterval(pollInterval);
+        alert(t('tools.shutdownTimer.shutdownNow', 'Time is up! Shutting down PC...'));
+    });
+});
 
 onUnmounted(() => {
-  if (intervalId) clearInterval(intervalId);
+    if (pollInterval) clearInterval(pollInterval);
 });
+
 </script>
 
 <style scoped>

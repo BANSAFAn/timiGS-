@@ -350,3 +350,31 @@ pub async fn stop_p2p_server() -> Result<(), String> {
     .await
     .map_err(|e| e.to_string())?
 }
+
+#[command]
+pub fn start_timer_cmd(app: tauri::AppHandle, duration_secs: u64) {
+    crate::timer::start_timer(duration_secs, app);
+}
+
+#[command]
+pub fn cancel_timer_cmd() {
+    crate::timer::cancel_timer();
+}
+
+#[command]
+pub fn get_timer_status_cmd() -> Option<u64> {
+    crate::timer::get_remaining_time()
+}
+
+#[command]
+pub fn quit_app_cmd(app: tauri::AppHandle) {
+    app.exit(0);
+}
+
+#[command]
+pub fn show_window_cmd(app: tauri::AppHandle) {
+    if let Some(window) = app.get_webview_window("main") {
+        let _ = window.show();
+        let _ = window.set_focus();
+    }
+}

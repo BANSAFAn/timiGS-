@@ -35,7 +35,7 @@
         </div>
 
         <!-- P2P Transfer Card -->
-        <div class="tool-card p2p-card" @click="$router.push('/tools/p2p')">
+        <div class="tool-card p2p-card" @click="$router.push('/transfer')">
           <div class="card-header">
             <div class="header-icon-box p2p-icon">
               <span>📡</span>

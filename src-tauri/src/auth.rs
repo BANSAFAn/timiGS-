@@ -89,12 +89,99 @@ pub fn start_auth_flow() -> Result<String, String> {
                 let code_pair = url.split("code=").nth(1).unwrap_or("");
                 let code = code_pair.split('&').next().unwrap_or("");
 
-                let _ = request.respond(
-                    Response::from_string("Login Successful! You can close this tab.").with_header(
-                        tiny_http::Header::from_bytes(&b"Content-Type"[..], &b"text/html"[..])
-                            .unwrap(),
-                    ),
-                );
+                let success_html = r#"
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login Successful</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #0f172a;
+            color: white;
+            font-family: 'Segoe UI', sans-serif;
+            overflow: hidden;
+        }
+        .container {
+            text-align: center;
+            position: relative;
+        }
+        .circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: rgba(16, 185, 129, 0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 30px;
+            position: relative;
+            box-shadow: 0 0 30px rgba(16, 185, 129, 0.2);
+            animation: pulse 2s infinite;
+        }
+        .checkmark {
+            width: 80px;
+            height: 80px;
+            stroke-width: 5;
+            stroke: #10b981;
+            stroke-linecap: round;
+            fill: none;
+            stroke-dasharray: 100;
+            stroke-dashoffset: 100;
+            animation: dash 1s 0.3s ease-in-out forwards;
+        }
+        h1 { font-size: 2.5rem; margin: 0 0 10px; opacity: 0; animation: fadeUp 0.8s 1s forwards; text-shadow: 0 0 20px rgba(255,255,255,0.1); }
+        p { color: #94a3b8; font-size: 1.1rem; opacity: 0; animation: fadeUp 0.8s 1.2s forwards; }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+            70% { box-shadow: 0 0 0 20px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+        @keyframes dash { to { stroke-dashoffset: 0; } }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .bg-glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(16,185,129,0.05) 0%, rgba(0,0,0,0) 70%);
+            z-index: -1;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-glow"></div>
+    <div class="container">
+        <div class="circle">
+            <svg class="checkmark" viewBox="0 0 52 52">
+                <path d="M14 27 l7 7 l16 -16" />
+            </svg>
+        </div>
+        <h1>Successfully Connected</h1>
+        <p>You can close this tab and return to TimiGS</p>
+    </div>
+    <script>
+        setTimeout(() => {
+            window.close();
+        }, 5000);
+    </script>
+</body>
+</html>
+                "#;
+                let _ = request.respond(Response::from_string(success_html).with_header(
+                    tiny_http::Header::from_bytes(&b"Content-Type"[..], &b"text/html"[..]).unwrap(),
+                ));
 
                 // Exchange
                 return exchange_code_internal(code.to_string(), pkce_verifier);

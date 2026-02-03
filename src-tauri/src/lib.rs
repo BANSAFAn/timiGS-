@@ -13,6 +13,7 @@ mod icons;
 mod p2p;
 mod picker;
 mod tasks;
+mod timer;
 
 #[cfg(target_os = "windows")]
 mod tracker;
@@ -88,48 +89,41 @@ pub fn run() {
         android_tracker::start_tracking();
 
         // Setup Tray Icon (desktop only)
+        // Setup Tray Icon (desktop only)
         #[cfg(desktop)]
         {
-            if let Ok(quit_i) = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>) {
-                if let Ok(show_i) =
-                    MenuItem::with_id(app, "show", "Show Window", true, None::<&str>)
-                {
-                    if let Ok(menu) = Menu::with_items(app, &[&show_i, &quit_i]) {
-                        let mut tray_builder = TrayIconBuilder::new()
-                            .menu(&menu)
-                            .show_menu_on_left_click(true)
-                            .on_menu_event(|app, event| match event.id.as_ref() {
-                                "quit" => {
-                                    #[cfg(target_os = "windows")]
-                                    tracker::stop_tracking();
-                                    app.exit(0);
-                                }
-                                "show" => {
-                                    if let Some(window) = app.get_webview_window("main") {
-                                        let _ = window.show();
-                                        let _ = window.set_focus();
-                                    }
-                                }
-                                _ => {}
-                            })
-                            .on_tray_icon_event(|tray, event| {
-                                if let tauri::tray::TrayIconEvent::DoubleClick { .. } = event {
-                                    let app = tray.app_handle();
-                                    if let Some(window) = app.get_webview_window("main") {
-                                        let _ = window.show();
-                                        let _ = window.set_focus();
-                                    }
-                                }
-                            });
+            let tray = TrayIconBuilder::new()
+                .show_menu_on_left_click(false)
+                .on_tray_icon_event(|tray, event| {
+                    if let tauri::tray::TrayIconEvent::Click {
+                        button: tauri::tray::MouseButton::Left,
+                        ..
+                    } = event
+                    {
+                        let app = tray.app_handle();
+                        if let Some(window) = app.get_webview_window("tray") {
+                            // Toggle visibility
+                            if window.is_visible().unwrap_or(false) {
+                                let _ = window.hide();
+                            } else {
+                                // Position window near cursor?
+                                // For now, let's just show it. Ideally we calculate position.
+                                // Simplest is allow OS to place or center via config,
+                                // but for tray usually we want bottom right.
+                                // We can use tauri-plugin-positioner if available, or just center for now.
+                                // Given request "Mini Menu", let's try to center it or just show.
 
-                        if let Some(icon) = app.default_window_icon() {
-                            tray_builder = tray_builder.icon(icon.clone());
+                                // Reposition logic basic:
+                                use tauri::PhysicalPosition;
+                                // Simple hardcoded position for now or just show (it has alwaysOnTop)
+
+                                let _ = window.show();
+                                let _ = window.set_focus();
+                            }
                         }
-
-                        let _ = tray_builder.build(app);
                     }
-                }
-            }
+                })
+                .build(app);
         }
 
         Ok(())
@@ -193,6 +187,13 @@ pub fn run() {
             commands::check_usage_permission,
             #[cfg(target_os = "android")]
             commands::request_usage_permission,
+            // Timer
+            commands::start_timer_cmd,
+            commands::cancel_timer_cmd,
+            commands::get_timer_status_cmd,
+            // Tray
+            commands::quit_app_cmd,
+            commands::show_window_cmd,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -611,12 +611,11 @@ import { ref, onMounted, reactive, computed } from "vue";
 import { useI18n } from "vue-i18n";
 import { invoke } from "@tauri-apps/api/core";
 import { useActivityStore } from "../stores/activity";
-import { check } from "@tauri-apps/plugin-updater";
-import { relaunch } from "@tauri-apps/plugin-process";
+import { open } from '@tauri-apps/plugin-shell';
 import { useRouter } from "vue-router";
 import { useNotificationStore } from "../stores/notifications";
 
-const { locale } = useI18n();
+const { locale, t } = useI18n();
 const router = useRouter();
 const store = useActivityStore();
 const notifications = useNotificationStore();
@@ -1043,40 +1042,41 @@ function openGitHubLogin() {
 }
 
 // Update modal state
+const isUpdating = ref(false);
 const showUpdateModal = ref(false);
 const updateVersion = ref("");
-const isUpdating = ref(false);
-let pendingUpdate: any = null;
+const updateUrl = ref("");
 
 async function checkForUpdates() {
   try {
-    const update = await check();
-    if (update?.available) {
-      updateVersion.value = update.version;
-      pendingUpdate = update;
-      showUpdateModal.value = true;
+    const response = await window.fetch("https://api.github.com/repos/BANSAFAn/timiGS-/releases/latest");
+    if (!response.ok) throw new Error("Failed to fetch releases");
+    
+    const data = await response.json();
+    const latestVersion = data.tag_name.replace("v", "");
+    
+    // Simple version compare
+    if (latestVersion !== appVersion.value) {
+        updateVersion.value = latestVersion;
+        // Find asset URL (exe or msi)
+        const asset = data.assets.find((a: any) => a.name.endsWith(".exe") || a.name.endsWith(".msi"));
+        updateUrl.value = asset ? asset.browser_download_url : data.html_url;
+        showUpdateModal.value = true;
     } else {
-      // No update available - show toast or subtle message
-      notifications.info("You are on the latest version.");
+        alert(t('settings.noUpdates', "You are using the latest version."));
     }
   } catch (error) {
     console.error("Update check failed:", error);
-    notifications.error(`Update check failed: ${error}`);
+    alert("Failed to check for updates: " + error);
   }
 }
 
 async function installUpdate() {
-  if (!pendingUpdate) return;
-
-  isUpdating.value = true;
-  try {
-    await pendingUpdate.downloadAndInstall();
-    await relaunch();
-  } catch (e) {
-    console.error("Update failed:", e);
-    notifications.error("Update failed: " + e);
-    isUpdating.value = false;
-  }
+   if (updateUrl.value) {
+       await open(updateUrl.value);
+       showUpdateModal.value = false;
+   }
+   isUpdating.value = false;
 }
 
 onMounted(() => {

@@ -45,6 +45,11 @@ const routes = [
     name: "Transfer",
     component: () => import("./views/Transfer.vue"),
   },
+  {
+    path: "/tray",
+    name: "Tray",
+    component: () => import("./views/Tray.vue"),
+  },
 
 ];
 

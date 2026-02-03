@@ -21,6 +21,19 @@
         "resizable": true,
         "decorations": true,
         "transparent": false
+      },
+      {
+        "label": "tray",
+        "title": "TimiGS Tray",
+        "url": "/tray",
+        "width": 300,
+        "height": 450,
+        "decorations": false,
+        "transparent": true,
+        "visible": false,
+        "skipTaskbar": true,
+        "alwaysOnTop": true,
+        "resizable": false
       }
     ],
     "security": {
