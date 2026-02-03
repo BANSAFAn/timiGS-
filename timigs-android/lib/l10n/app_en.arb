@@ -5,6 +5,7 @@
   "timeline": "Timeline",
   "analytics": "Analytics",
   "tools": "Tools",
+  "transfer": "Transfer",
   "settings": "Settings",
   "activeNow": "Active Now",
   "noActivity": "No activity detected",
@@ -30,5 +31,15 @@
   "dataManagement": "Data Management",
   "exportData": "Export Data",
   "about": "About",
-  "version": "Version"
+  "version": "Version",
+  "permissionRequired": "Usage Access Required",
+  "permissionMsg": "To track app usage, please grant Usage Access permission in settings.",
+  "grantPermission": "Grant Permission",
+  "weatherTitle": "Weather",
+  "enterCity": "Enter city name",
+  "humidity": "Humidity",
+  "wind": "Wind",
+  "feelsLike": "Feels Like",
+  "forecast": "5-Day Forecast",
+  "tomorrow": "Tomorrow"
 }

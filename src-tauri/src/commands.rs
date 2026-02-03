@@ -333,3 +333,20 @@ pub fn shutdown_pc() -> Result<(), String> {
 pub fn get_desktop_sources() -> Vec<crate::picker::DesktopSource> {
     crate::picker::get_sources()
 }
+
+#[command]
+pub async fn start_p2p_server() -> Result<String, String> {
+    tokio::task::spawn_blocking(move || crate::p2p::start_server())
+        .await
+        .map_err(|e| e.to_string())?
+}
+
+#[command]
+pub async fn stop_p2p_server() -> Result<(), String> {
+    tokio::task::spawn_blocking(move || {
+        crate::p2p::stop_server();
+        Ok(())
+    })
+    .await
+    .map_err(|e| e.to_string())?
+}

@@ -10,6 +10,7 @@ mod discord;
 mod drive;
 mod icons;
 
+mod p2p;
 mod picker;
 mod tasks;
 

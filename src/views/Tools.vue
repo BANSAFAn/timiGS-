@@ -34,6 +34,19 @@
           </div>
         </div>
 
+        <!-- P2P Transfer Card -->
+        <div class="tool-card p2p-card" @click="$router.push('/tools/p2p')">
+          <div class="card-header">
+            <div class="header-icon-box p2p-icon">
+              <span>📡</span>
+            </div>
+            <h3>P2P Transfer</h3>
+          </div>
+          <div class="card-body">
+            <p>Receive DB from Mobile</p>
+          </div>
+        </div>
+
         <!-- Notepad Card (Full Width) -->
         <div class="tool-card notepad-card">
           <div class="card-header flex-between">
@@ -288,6 +301,7 @@ onMounted(() => {
 .timer-icon { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
 .task-icon { background: rgba(59, 130, 246, 0.15); color: #3b82f6; }
 .note-icon { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
+.p2p-icon { background: rgba(16, 185, 129, 0.15); color: #10b981; }
 
 .tool-card h3 {
   font-size: 1.1rem;

@@ -5,6 +5,7 @@
   "timeline": "Часова шкала",
   "analytics": "Аналітика",
   "tools": "Інструменти",
+  "transfer": "Передача",
   "settings": "Налаштування",
   "activeNow": "Зараз активно",
   "noActivity": "Активність не виявлено",
@@ -30,5 +31,15 @@
   "dataManagement": "Управління даними",
   "exportData": "Експорт даних",
   "about": "Про програму",
-  "version": "Версія"
+  "version": "Версія",
+  "permissionRequired": "Потрібен доступ",
+  "permissionMsg": "Щоб відстежувати програми, надайте дозвіл у налаштуваннях.",
+  "grantPermission": "Надати дозвіл",
+  "weatherTitle": "Погода",
+  "enterCity": "Введіть місто",
+  "humidity": "Вологість",
+  "wind": "Вітер",
+  "feelsLike": "Відчувається",
+  "forecast": "Прогноз на 5 днів",
+  "tomorrow": "Завтра"
 }

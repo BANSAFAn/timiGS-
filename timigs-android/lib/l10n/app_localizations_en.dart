@@ -100,4 +100,35 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get version => 'Version';
+
+  @override
+  String get permissionRequired => 'Usage Access Required';
+
+  @override
+  String get permissionMsg =>
+      'To track app usage, please grant Usage Access permission in settings.';
+
+  @override
+  String get grantPermission => 'Grant Permission';
+
+  @override
+  String get weatherTitle => 'Weather';
+
+  @override
+  String get enterCity => 'Enter city name';
+
+  @override
+  String get humidity => 'Humidity';
+
+  @override
+  String get wind => 'Wind';
+
+  @override
+  String get feelsLike => 'Feels Like';
+
+  @override
+  String get forecast => '5-Day Forecast';
+
+  @override
+  String get tomorrow => 'Tomorrow';
 }

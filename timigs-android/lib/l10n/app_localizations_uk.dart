@@ -100,4 +100,35 @@ class AppLocalizationsUk extends AppLocalizations {
 
   @override
   String get version => 'Версія';
+
+  @override
+  String get permissionRequired => 'Потрібен доступ';
+
+  @override
+  String get permissionMsg =>
+      'Щоб відстежувати програми, надайте дозвіл у налаштуваннях.';
+
+  @override
+  String get grantPermission => 'Надати дозвіл';
+
+  @override
+  String get weatherTitle => 'Погода';
+
+  @override
+  String get enterCity => 'Введіть місто';
+
+  @override
+  String get humidity => 'Вологість';
+
+  @override
+  String get wind => 'Вітер';
+
+  @override
+  String get feelsLike => 'Відчувається';
+
+  @override
+  String get forecast => 'Прогноз на 5 днів';
+
+  @override
+  String get tomorrow => 'Завтра';
 }
