@@ -1,16 +1,13 @@
 //! Tauri IPC commands
 
 use crate::db;
-use tauri::Manager;
-use tauri::{command, AppHandle, Window};
+use tauri::{command, AppHandle, Manager, Window};
 
 #[cfg(target_os = "windows")]
 use crate::tracker;
 
 #[cfg(target_os = "android")]
 use crate::android_tracker as tracker;
-
-use tauri::command;
 
 #[command]
 #[cfg(any(target_os = "windows", target_os = "android"))]
