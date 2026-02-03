@@ -13,9 +13,9 @@
 | Platform | Technology | Status |
 |----------|------------|--------|
 | **Windows** | Tauri v2 + Rust + Vue 3 | ✅ Stable |
-| **macOS** | Tauri v2 + Rust + Vue 3 | ✅ Stable |
-| **Linux** | Tauri v2 + Rust + Vue 3 | ✅ Stable |
-| **Android** | Flutter + Dart | 🟥 Nuh uh |
+| **macOS** | Tauri v2 + Rust + Vue 3 | Nuh uh  |
+| **Linux** | Tauri v2 + Rust + Vue 3 |  Nuh uh  |
+| **Android** | Flutter + Dart + Rust | 🟥 Nuh uh |
 
 ---
 
