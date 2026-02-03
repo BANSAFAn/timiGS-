@@ -2,7 +2,7 @@ use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use std::sync::{Arc, Mutex, OnceLock};
 use std::thread;
 use std::time::Duration;
-use tauri::Manager;
+use tauri::Emitter;
 
 static TIMER_STATE: OnceLock<Mutex<TimerState>> = OnceLock::new();
 

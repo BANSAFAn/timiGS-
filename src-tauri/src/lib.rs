@@ -22,11 +22,7 @@ mod tracker;
 mod android_tracker;
 
 #[cfg(desktop)]
-use tauri::{
-    menu::{Menu, MenuItem},
-    tray::TrayIconBuilder,
-    Manager, WindowEvent,
-};
+use tauri::{tray::TrayIconBuilder, Manager, WindowEvent};
 
 #[cfg(desktop)]
 use tauri_plugin_autostart::MacosLauncher;
@@ -92,7 +88,7 @@ pub fn run() {
         // Setup Tray Icon (desktop only)
         #[cfg(desktop)]
         {
-            let tray = TrayIconBuilder::new()
+            let _tray = TrayIconBuilder::new()
                 .show_menu_on_left_click(false)
                 .on_tray_icon_event(|tray, event| {
                     if let tauri::tray::TrayIconEvent::Click {
@@ -114,7 +110,6 @@ pub fn run() {
                                 // Given request "Mini Menu", let's try to center it or just show.
 
                                 // Reposition logic basic:
-                                use tauri::PhysicalPosition;
                                 // Simple hardcoded position for now or just show (it has alwaysOnTop)
 
                                 let _ = window.show();

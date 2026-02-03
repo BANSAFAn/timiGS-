@@ -1,7 +1,6 @@
 use std::fs::File;
-use std::io::{self, Write};
+use std::io;
 use std::sync::atomic::{AtomicBool, Ordering};
-use std::sync::Arc;
 use std::thread;
 use tiny_http::{Response, Server, StatusCode};
 

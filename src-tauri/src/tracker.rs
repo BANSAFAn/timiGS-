@@ -13,7 +13,6 @@ use std::time::Duration;
 #[cfg(windows)]
 use windows::Win32::{
     Foundation::HWND,
-    System::ProcessStatus::{GetModuleBaseNameW, GetModuleFileNameExW},
     System::Threading::{OpenProcess, PROCESS_QUERY_INFORMATION, PROCESS_VM_READ},
     UI::WindowsAndMessaging::{GetForegroundWindow, GetWindowTextW, GetWindowThreadProcessId},
 };
@@ -80,7 +79,7 @@ fn get_foreground_window_info() -> Option<ActiveWindow> {
                 let full_path = String::from_utf16_lossy(&name_buf[..len as usize]);
                 let path = std::path::Path::new(&full_path);
 
-                let exe_name = path
+                let _exe_name = path
                     .file_name()
                     .and_then(|n| n.to_str())
                     .unwrap_or("unknown.exe")
