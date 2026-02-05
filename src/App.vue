@@ -1,7 +1,7 @@
 <template>
   <div class="app-shell">
     <!-- Desktop Sidebar -->
-    <aside class="sidebar">
+    <aside class="sidebar" v-if="shouldShowNav">
       <div class="sidebar-header">
         <h1 class="brand-text">TimiGS</h1>
       </div>
@@ -140,7 +140,7 @@
     </main>
 
     <!-- Mobile Bottom Navigation -->
-    <nav class="bottom-nav">
+    <nav class="bottom-nav" v-if="shouldShowNav">
       <router-link to="/" class="bottom-nav-item" active-class="active">
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -235,15 +235,20 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted, watch, computed } from "vue";
 import { invoke } from "@tauri-apps/api/core";
 // @ts-ignore
 import { onOpenUrl } from "@tauri-apps/plugin-deep-link";
+import { useRouter, useRoute } from "vue-router";
 import { useActivityStore } from "./stores/activity";
 import NotificationToast from "./components/NotificationToast.vue";
 
 const store = useActivityStore();
 const isGitHubConnected = ref(false);
+const router = useRouter(); // Move to top level
+const route = useRoute();
+
+const shouldShowNav = computed(() => route.path !== '/tray');
 
 function checkGitHubConnection() {
   isGitHubConnected.value = !!localStorage.getItem("github_token");
@@ -262,7 +267,14 @@ onMounted(async () => {
   await store.fetchSettings();
   document.documentElement.setAttribute("data-theme", store.settings.theme);
   checkGitHubConnection();
-
+  
+  const { listen } = await import('@tauri-apps/api/event');
+  
+  await listen('navigate', (event: any) => {
+      console.log("Navigating to:", event.payload);
+      router.push(event.payload);
+  });
+  
   // Initialize Activity Tracking
   await store.fetchTrackingStatus();
   if (!store.isTracking) {

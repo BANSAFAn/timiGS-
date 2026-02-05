@@ -83,11 +83,42 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isTracking = TrackerService.instance.isTracking;
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Dashboard'),
         actions: [
+          // Tracking status indicator
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: isTracking
+                  ? Colors.green.withOpacity(0.2)
+                  : Colors.red.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.circle,
+                  color: isTracking ? Colors.green : Colors.red,
+                  size: 8,
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  isTracking ? 'Tracking' : 'Off',
+                  style: TextStyle(
+                    color: isTracking ? Colors.green : Colors.red,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+          ),
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: _loadData,

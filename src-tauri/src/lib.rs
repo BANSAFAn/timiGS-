@@ -85,7 +85,6 @@ pub fn run() {
         android_tracker::start_tracking();
 
         // Setup Tray Icon (desktop only)
-        // Setup Tray Icon (desktop only)
         #[cfg(desktop)]
         {
             let _tray = TrayIconBuilder::new()
@@ -102,15 +101,30 @@ pub fn run() {
                             if window.is_visible().unwrap_or(false) {
                                 let _ = window.hide();
                             } else {
-                                // Position window near cursor?
-                                // For now, let's just show it. Ideally we calculate position.
-                                // Simplest is allow OS to place or center via config,
-                                // but for tray usually we want bottom right.
-                                // We can use tauri-plugin-positioner if available, or just center for now.
-                                // Given request "Mini Menu", let's try to center it or just show.
+                                // Position window near bottom-right (taskbar area)
+                                use tauri::PhysicalPosition;
 
-                                // Reposition logic basic:
-                                // Simple hardcoded position for now or just show (it has alwaysOnTop)
+                                if let Ok(Some(monitor)) = window.primary_monitor() {
+                                    let screen_size = monitor.size();
+                                    let window_size =
+                                        window.outer_size().unwrap_or(tauri::PhysicalSize {
+                                            width: 180,
+                                            height: 180,
+                                        });
+
+                                    // Position: bottom-right with margins for taskbar
+                                    let margin = 10;
+                                    let taskbar_height = 50; // Approximate taskbar height
+
+                                    let x = screen_size.width as i32
+                                        - window_size.width as i32
+                                        - margin;
+                                    let y = screen_size.height as i32
+                                        - window_size.height as i32
+                                        - taskbar_height;
+
+                                    let _ = window.set_position(PhysicalPosition { x, y });
+                                }
 
                                 let _ = window.show();
                                 let _ = window.set_focus();
@@ -130,10 +144,20 @@ pub fn run() {
         if let WindowEvent::CloseRequested { api, .. } = event {
             // Check if we should minimize to tray
             let should_minimize = db::get_settings().minimize_to_tray;
-
-            if should_minimize {
+            // Check if main window
+            if window.label() == "main" && should_minimize {
                 api.prevent_close();
                 let _ = window.hide();
+            }
+        } else if let WindowEvent::Focused(focused) = event {
+            // Hide tray when it loses focus (user clicks elsewhere)
+            if window.label() == "tray" && !*focused {
+                // Use a small delay to handle race conditions
+                let window_clone = window.clone();
+                std::thread::spawn(move || {
+                    std::thread::sleep(std::time::Duration::from_millis(100));
+                    let _ = window_clone.hide();
+                });
             }
         }
     });
@@ -178,17 +202,14 @@ pub fn run() {
             commands::download_file,
             commands::save_local_file,
             commands::list_drive_files,
+            commands::show_main_window_cmd,
+            commands::emit_navigate_cmd,
+            commands::quit_app_cmd,
             #[cfg(target_os = "android")]
             commands::check_usage_permission,
             #[cfg(target_os = "android")]
             commands::request_usage_permission,
-            // Timer
-            commands::start_timer_cmd,
-            commands::cancel_timer_cmd,
             commands::get_timer_status_cmd,
-            // Tray
-            commands::quit_app_cmd,
-            commands::show_window_cmd,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

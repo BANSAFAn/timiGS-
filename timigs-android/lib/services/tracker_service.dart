@@ -10,6 +10,7 @@ import 'package:app_usage/app_usage.dart';
 import 'package:workmanager/workmanager.dart';
 import 'dart:async';
 import 'database_service.dart';
+import 'notification_service.dart';
 
 class TrackerService {
   static final TrackerService instance = TrackerService._init();
@@ -71,6 +72,9 @@ class TrackerService {
 
     _isTracking = true;
 
+    // Show persistent notification
+    await NotificationService.instance.showTrackingNotification();
+
     // Start periodic tracking (every 5 seconds)
     _trackingTimer = Timer.periodic(Duration(seconds: 5), (timer) async {
       await _trackCurrentApp();
@@ -94,6 +98,9 @@ class TrackerService {
     _isTracking = false;
     _trackingTimer?.cancel();
     _trackingTimer = null;
+
+    // Hide notification
+    await NotificationService.instance.hideTrackingNotification();
 
     // End current session if exists (calls Rust backend)
     if (_currentSessionId != null) {

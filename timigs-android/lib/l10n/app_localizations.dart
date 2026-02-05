@@ -128,6 +128,12 @@ abstract class AppLocalizations {
   /// **'Tools'**
   String get tools;
 
+  /// No description provided for @transfer.
+  ///
+  /// In en, this message translates to:
+  /// **'Transfer'**
+  String get transfer;
+
   /// No description provided for @settings.
   ///
   /// In en, this message translates to:

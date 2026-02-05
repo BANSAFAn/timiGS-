@@ -11,6 +11,7 @@ import 'screens/tools_screen.dart';
 import 'screens/settings_screen.dart';
 import 'services/database_service.dart';
 import 'services/tracker_service.dart';
+import 'services/notification_service.dart';
 import 'models/settings.dart';
 import 'l10n/app_localizations.dart';
 
@@ -19,6 +20,9 @@ void main() async {
 
   // Initialize Rust backend and database
   await DatabaseService.instance.initialize();
+
+  // Initialize notification service
+  await NotificationService.instance.initialize();
 
   // Initialize workmanager for background tasks
   await Workmanager().initialize(callbackDispatcher, isInDebugMode: false);

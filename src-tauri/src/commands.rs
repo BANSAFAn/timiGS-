@@ -371,9 +371,16 @@ pub fn quit_app_cmd(app: tauri::AppHandle) {
 }
 
 #[command]
-pub fn show_window_cmd(app: tauri::AppHandle) {
+pub fn show_main_window_cmd(app: tauri::AppHandle) {
     if let Some(window) = app.get_webview_window("main") {
         let _ = window.show();
         let _ = window.set_focus();
     }
+}
+
+use tauri::Emitter;
+
+#[command]
+pub fn emit_navigate_cmd(app: tauri::AppHandle, path: String) {
+    let _ = app.emit("navigate", path);
 }

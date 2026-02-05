@@ -24,6 +24,9 @@ class AppLocalizationsUk extends AppLocalizations {
   String get tools => 'Інструменти';
 
   @override
+  String get transfer => 'Передача';
+
+  @override
   String get settings => 'Налаштування';
 
   @override

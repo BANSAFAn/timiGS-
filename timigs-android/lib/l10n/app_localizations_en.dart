@@ -24,6 +24,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tools => 'Tools';
 
   @override
+  String get transfer => 'Transfer';
+
+  @override
   String get settings => 'Settings';
 
   @override
