@@ -1,5 +1,38 @@
 # Changelog
 
+## [1.22.0](https://github.com/BANSAFAn/timiGS-/compare/v1.21.0...v1.22.0) (2026-02-05)
+
+
+### Features
+
+* Add Android app scaffold and JNI fixes ([1393d03](https://github.com/BANSAFAn/timiGS-/commit/1393d034e521c3bd3bf85fc0e3975652e145ee2c))
+* fix android weather input, add tracking permission UI, new tools screens, and configure app icons ([1983bc2](https://github.com/BANSAFAn/timiGS-/commit/1983bc259aa775fb203cde31a8147772cddaa68e))
+* Implement Android app usage tracking with background services, persistent notifications, and a dashboard. ([473e381](https://github.com/BANSAFAn/timiGS-/commit/473e381f8987270e37f2cbdac733481b4c570ac6))
+* Implement P2P file transfer for database export/import and integrate Google Drive functionality across mobile and desktop platforms. ([c17275b](https://github.com/BANSAFAn/timiGS-/commit/c17275b986841fe5e322b7e6b552c8d833418ce5))
+* Introduce a new Tools view, implement a shutdown timer, and add Google authentication functionality. ([a699ec5](https://github.com/BANSAFAn/timiGS-/commit/a699ec51dbb11a93fa8eca18484981026ab45320))
+
+
+### Bug Fixes
+
+* Add adaptive launcher icon and update manifest ([ef84264](https://github.com/BANSAFAn/timiGS-/commit/ef842643829f5d4d6d8646dda56c755ebdfbbc3b))
+* build.gradle ([0056913](https://github.com/BANSAFAn/timiGS-/commit/00569132591eb000c339d19b06a28f963c6350ef))
+* ci/cli ([0baca21](https://github.com/BANSAFAn/timiGS-/commit/0baca210bc5c60a690d0940e5f704d770cff6aa0))
+* replace usage_stats with app_usage 4.0.1 and update build config ([118db91](https://github.com/BANSAFAn/timiGS-/commit/118db911a011c2246b94cb4926845fde9ff3db26))
+* upgrade compileSdk to 36 and file_picker to 8.0.0 to fix build errors ([47e10aa](https://github.com/BANSAFAn/timiGS-/commit/47e10aa8f05d8c2be4510b8a1288d366c2fb0414))
+* version ([a10e4a4](https://github.com/BANSAFAn/timiGS-/commit/a10e4a4d1735d2e3f7f5ae3fa1b76d540603f3b3))
+
+
+### CI/CD
+
+* Add Android docs, bump SDK, update theme ([577968c](https://github.com/BANSAFAn/timiGS-/commit/577968cc54e996ca8d97581c5fbebe247f927415))
+* fix jekyll ([906beaa](https://github.com/BANSAFAn/timiGS-/commit/906beaac85d39401344265064559e0ce4fe7d8e0))
+* Update ([abd8e55](https://github.com/BANSAFAn/timiGS-/commit/abd8e55ad9528021a45cc4bbbc3e518d61fcc488))
+
+
+### Build System
+
+* **deps:** bump bytes ([5c060d0](https://github.com/BANSAFAn/timiGS-/commit/5c060d07600eb161edfe70b92a64312a74f0fb69))
+
 ## [1.21.0](https://github.com/BANSAFAn/timiGS-/compare/v1.20.0...v1.21.0) (2026-01-25)
 
 
