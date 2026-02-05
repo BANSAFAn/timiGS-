@@ -1,10 +1,13 @@
-# Sample workflow for building and deploying a Jekyll site to GitHub Pages
-name: Deploy Jekyll with GitHub Pages dependencies preinstalled
+# Workflow for building and deploying an Astro site to GitHub Pages
+name: Deploy Astro to GitHub Pages
 
 on:
   # Runs on pushes targeting the default branch
   push:
     branches: ["main"]
+    paths:
+      - "site/**"
+      - ".github/workflows/jekyll-gh-pages.yml"
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -15,30 +18,40 @@ permissions:
   pages: write
   id-token: write
 
-# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
-# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+# Allow only one concurrent deployment
 concurrency:
   group: "pages"
   cancel-in-progress: false
 
 jobs:
-  # Build job
   build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-      - name: Build with Jekyll
-        uses: actions/jekyll-build-pages@v1
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
-          source: ./
-          destination: ./_site
+          node-version: "20"
+
+      - name: Setup Pages
+        id: pages
+        uses: actions/configure-pages@v5
+
+      - name: Install dependencies
+        working-directory: ./site
+        run: npm ci
+
+      - name: Build Astro site
+        working-directory: ./site
+        run: npm run build
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./site/dist
 
-  # Deployment job
   deploy:
     environment:
       name: github-pages
