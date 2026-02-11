@@ -38,8 +38,13 @@ class _TimeoutScreenState extends State<TimeoutScreen>
     );
   }
 
+import '../services/tracker_service.dart';
+
   @override
   void dispose() {
+    if (_isOnBreak) {
+       TrackerService.instance.stopLockTask();
+    }
     _timer?.cancel();
     _bounceController.dispose();
     _passwordController.dispose();
@@ -69,6 +74,7 @@ class _TimeoutScreenState extends State<TimeoutScreen>
       if (_isOnBreak) {
         if (_breakRemaining <= 0) {
           // Break over, back to work
+          TrackerService.instance.stopLockTask(); // UNLOCK
           setState(() {
             _isOnBreak = false;
             _nextBreakIn = _intervalMinutes * 60;
@@ -83,6 +89,7 @@ class _TimeoutScreenState extends State<TimeoutScreen>
       } else {
         if (_nextBreakIn <= 0) {
           // Time for a break!
+          TrackerService.instance.startLockTask(); // LOCK
           setState(() {
             _isOnBreak = true;
             _breakRemaining = _breakMinutes * 60;
@@ -102,6 +109,7 @@ class _TimeoutScreenState extends State<TimeoutScreen>
     }
     _timer?.cancel();
     _bounceController.stop();
+    TrackerService.instance.stopLockTask(); // UNLOCK
     setState(() {
       _isActive = false;
       _isOnBreak = false;

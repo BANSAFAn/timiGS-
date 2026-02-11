@@ -1,11 +1,4 @@
-/// Tracker service for Android activity tracking
-///
-/// This service uses Android's UsageStats API to track app usage.
-/// The data is then sent to the Rust backend for storage.
-///
-/// Note: UsageStats is Android-specific and must remain in Dart.
-/// Only the data storage is handled by Rust.
-
+import 'package:flutter/services.dart';
 import 'package:app_usage/app_usage.dart';
 import 'package:workmanager/workmanager.dart';
 import 'dart:async';
@@ -14,6 +7,8 @@ import 'notification_service.dart';
 
 class TrackerService {
   static final TrackerService instance = TrackerService._init();
+  static const platform =
+      MethodChannel('com.timigs.timigs_android/app_control');
 
   TrackerService._init();
 
@@ -170,6 +165,33 @@ class TrackerService {
     } catch (e) {
       print('Error getting current app: $e');
       return null;
+    }
+  }
+
+  /// Lock the app (App Pinning)
+  Future<void> startLockTask() async {
+    try {
+      await platform.invokeMethod('startLockTask');
+    } catch (e) {
+      print('Error locking task: $e');
+    }
+  }
+
+  /// Unlock the app
+  Future<void> stopLockTask() async {
+    try {
+      await platform.invokeMethod('stopLockTask');
+    } catch (e) {
+      print('Error unlocking task: $e');
+    }
+  }
+
+  /// Minimize the app
+  Future<void> minimizeApp() async {
+    try {
+      await platform.invokeMethod('minimizeApp');
+    } catch (e) {
+      print('Error minimizing app: $e');
     }
   }
 }

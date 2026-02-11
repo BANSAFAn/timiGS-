@@ -5,9 +5,46 @@ import 'google_drive_screen.dart';
 import 'p2p_transfer_screen.dart';
 import 'focus_screen.dart';
 import 'timeout_screen.dart';
+import '../services/tracker_service.dart';
 
-class ToolsScreen extends StatelessWidget {
+class ToolsScreen extends StatefulWidget {
   const ToolsScreen({super.key});
+
+  @override
+  State<ToolsScreen> createState() => _ToolsScreenState();
+}
+
+class _ToolsScreenState extends State<ToolsScreen> with WidgetsBindingObserver {
+  bool _hasUsagePermission = true;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _checkPermission();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _checkPermission();
+    }
+  }
+
+  Future<void> _checkPermission() async {
+    final hasPerm = await TrackerService.instance.hasPermission();
+    if (mounted) {
+      setState(() {
+        _hasUsagePermission = hasPerm;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,6 +57,27 @@ class ToolsScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          // Permission Warning Card
+          if (!_hasUsagePermission)
+            Card(
+              color: theme.colorScheme.errorContainer,
+              margin: const EdgeInsets.only(bottom: 16),
+              child: ListTile(
+                leading:
+                    Icon(Icons.warning_amber, color: theme.colorScheme.error),
+                title: const Text('Usage Stats Permission Needed'),
+                subtitle:
+                    const Text('To track app usage, please grant permission.'),
+                trailing: TextButton(
+                  onPressed: () async {
+                    await TrackerService.instance.requestPermission();
+                    // Permission check happens in didChangeAppLifecycleState
+                  },
+                  child: const Text('GRANT'),
+                ),
+              ),
+            ),
+
           // Tasks Card
           Card(
             child: InkWell(
