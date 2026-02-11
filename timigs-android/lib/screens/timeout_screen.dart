@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../l10n/app_localizations.dart';
+import '../services/tracker_service.dart';
 
 /// Time OUT screen for Android.
 /// Provides break reminders with a visual timer.
@@ -38,12 +39,10 @@ class _TimeoutScreenState extends State<TimeoutScreen>
     );
   }
 
-import '../services/tracker_service.dart';
-
   @override
   void dispose() {
     if (_isOnBreak) {
-       TrackerService.instance.stopLockTask();
+      TrackerService.instance.stopLockTask();
     }
     _timer?.cancel();
     _bounceController.dispose();

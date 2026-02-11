@@ -412,7 +412,7 @@ class _FocusScreenState extends State<FocusScreen>
                 Icon(icon, color: isDark ? Colors.white38 : Colors.black38),
             hintText: hint,
             hintStyle:
-                TextStyle(color: isDark ? Colors.white24 : Colors.black24),
+                TextStyle(color: isDark ? Colors.white24 : Colors.black26),
             filled: true,
             fillColor: isDark
                 ? Colors.white.withOpacity(0.05)
