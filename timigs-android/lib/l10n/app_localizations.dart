@@ -349,6 +349,26 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Tomorrow'**
   String get tomorrow;
+
+  String get focusTitle;
+  String get focusSelectApp;
+  String get focusDuration;
+  String get focusPassword;
+  String get focusStart;
+  String get focusCancel;
+  String get focusActive;
+  String get focusMessage;
+  String get focusWrongPassword;
+  String get timeoutTitle;
+  String get timeoutWorkInterval;
+  String get timeoutBreakDuration;
+  String get timeoutPassword;
+  String get timeoutStart;
+  String get timeoutCancel;
+  String get timeoutBreakTitle;
+  String get timeoutBreakMessage;
+  String get timeoutNextBreak;
+  String get timeoutWorking;
 }
 
 class _AppLocalizationsDelegate

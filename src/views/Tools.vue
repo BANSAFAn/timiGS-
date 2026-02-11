@@ -34,6 +34,34 @@
           </div>
         </div>
 
+        <!-- Focus Mode Card -->
+        <div class="tool-card focus-card">
+          <div class="card-bg-glow"></div>
+          <div class="card-header">
+            <div class="header-icon-box focus-icon">
+              <span>🎯</span>
+            </div>
+            <h3>{{ $t('focus.title', 'Focus Mode') }}</h3>
+          </div>
+          <div class="card-body">
+            <FocusMode />
+          </div>
+        </div>
+
+        <!-- Time OUT Card -->
+        <div class="tool-card timeout-card">
+          <div class="card-bg-glow"></div>
+          <div class="card-header">
+            <div class="header-icon-box timeout-icon">
+              <span>☕</span>
+            </div>
+            <h3>{{ $t('timeout.title', 'Time OUT') }}</h3>
+          </div>
+          <div class="card-body">
+            <TimeOut />
+          </div>
+        </div>
+
         <!-- P2P Transfer Card -->
         <div class="tool-card p2p-card" @click="$router.push('/transfer')">
           <div class="card-header">
@@ -135,6 +163,8 @@
 import { ref, onMounted } from 'vue'; // removed unused 'computed'
 import ShutdownTimer from '../components/ShutdownTimer.vue';
 import TasksWidget from '../components/TasksWidget.vue';
+import FocusMode from '../components/FocusMode.vue';
+import TimeOut from '../components/TimeOut.vue';
 import { useDebounceFn } from '@vueuse/core';
 
 interface Note {
@@ -302,6 +332,20 @@ onMounted(() => {
 .task-icon { background: rgba(59, 130, 246, 0.15); color: #3b82f6; }
 .note-icon { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
 .p2p-icon { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+.focus-icon { background: rgba(139, 92, 246, 0.15); color: #8b5cf6; }
+.timeout-icon { background: rgba(20, 184, 166, 0.15); color: #14b8a6; }
+
+.focus-card {
+  background: linear-gradient(145deg, rgba(139, 92, 246, 0.05), rgba(255, 255, 255, 0.02));
+  border-color: rgba(139, 92, 246, 0.1);
+}
+.focus-card:hover { border-color: rgba(139, 92, 246, 0.3); }
+
+.timeout-card {
+  background: linear-gradient(145deg, rgba(20, 184, 166, 0.05), rgba(255, 255, 255, 0.02));
+  border-color: rgba(20, 184, 166, 0.1);
+}
+.timeout-card:hover { border-color: rgba(20, 184, 166, 0.3); }
 
 .tool-card h3 {
   font-size: 1.1rem;

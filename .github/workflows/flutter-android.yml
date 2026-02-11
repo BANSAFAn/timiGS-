@@ -51,6 +51,12 @@ jobs:
           channel: "stable"
           cache: true
 
+      # Decode google-services.json from secret
+      - name: Create google-services.json
+        run: |
+          echo "${{ secrets.GOOGLE_SERVICES_JSON }}" | base64 -d > timigs-android/android/app/google-services.json
+        if: ${{ secrets.GOOGLE_SERVICES_JSON != '' }}
+
       # Build Rust library for Android
       - name: Build Rust library
         working-directory: timigs-android/rust

@@ -144,6 +144,29 @@
   "weather": {
     "title": "Weather & Activity"
   },
+  "focus": {
+    "title": "Focus Mode",
+    "selectApp": "Select Application",
+    "duration": "Duration",
+    "password": "Lock Password",
+    "start": "Start Focus Mode",
+    "cancel": "Cancel Focus",
+    "message": "All other apps will be minimized",
+    "wrongPassword": "Wrong password",
+    "focusedApp": "Focused Application"
+  },
+  "timeout": {
+    "title": "Time OUT",
+    "workInterval": "Work Interval",
+    "breakDuration": "Break Duration",
+    "password": "Lock Password",
+    "start": "Activate Time OUT",
+    "cancel": "Cancel Time OUT",
+    "breakTitle": "Time to relax!",
+    "breakMessage": "Take a break, drink some tea, stretch!",
+    "nextBreak": "Next break in",
+    "working": "Working"
+  },
   "common": {
     "loading": "Loading...",
     "error": "An error occurred",

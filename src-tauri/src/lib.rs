@@ -10,9 +10,11 @@ mod discord;
 mod drive;
 mod icons;
 
+mod focus;
 mod p2p;
 mod picker;
 mod tasks;
+mod timeout;
 mod timer;
 
 #[cfg(target_os = "windows")]
@@ -210,6 +212,14 @@ pub fn run() {
             #[cfg(target_os = "android")]
             commands::request_usage_permission,
             commands::get_timer_status_cmd,
+            // Focus Mode
+            commands::start_focus_cmd,
+            commands::stop_focus_cmd,
+            commands::get_focus_status_cmd,
+            // Time OUT
+            commands::start_timeout_cmd,
+            commands::stop_timeout_cmd,
+            commands::get_timeout_status_cmd,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

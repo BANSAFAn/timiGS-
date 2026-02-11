@@ -384,3 +384,47 @@ use tauri::Emitter;
 pub fn emit_navigate_cmd(app: tauri::AppHandle, path: String) {
     let _ = app.emit("navigate", path);
 }
+
+// ── Focus Mode Commands ──
+
+#[command]
+pub fn start_focus_cmd(
+    app_name: String,
+    exe_path: String,
+    duration_secs: u64,
+    password: String,
+) -> Result<(), String> {
+    crate::focus::start_focus(&app_name, &exe_path, duration_secs, &password)
+}
+
+#[command]
+pub fn stop_focus_cmd(password: String) -> Result<(), String> {
+    crate::focus::stop_focus(&password)
+}
+
+#[command]
+pub fn get_focus_status_cmd() -> Option<crate::focus::FocusStatus> {
+    crate::focus::get_focus_status()
+}
+
+// ── Time OUT Commands ──
+
+#[command]
+pub fn start_timeout_cmd(
+    app: tauri::AppHandle,
+    interval_secs: u64,
+    break_duration_secs: u64,
+    password: String,
+) -> Result<(), String> {
+    crate::timeout::start_timeout(interval_secs, break_duration_secs, &password, app)
+}
+
+#[command]
+pub fn stop_timeout_cmd(app: tauri::AppHandle, password: String) -> Result<(), String> {
+    crate::timeout::stop_timeout(&password, &app)
+}
+
+#[command]
+pub fn get_timeout_status_cmd() -> Option<crate::timeout::TimeoutStatus> {
+    crate::timeout::get_timeout_status()
+}

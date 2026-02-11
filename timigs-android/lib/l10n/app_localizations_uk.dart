@@ -134,4 +134,43 @@ class AppLocalizationsUk extends AppLocalizations {
 
   @override
   String get tomorrow => 'Завтра';
+
+  @override
+  String get focusTitle => 'Режим фокусу';
+  @override
+  String get focusSelectApp => 'Обрати програму';
+  @override
+  String get focusDuration => 'Тривалість';
+  @override
+  String get focusPassword => 'Пароль блокування';
+  @override
+  String get focusStart => 'Запустити фокус';
+  @override
+  String get focusCancel => 'Скасувати фокус';
+  @override
+  String get focusActive => 'Фокус активний';
+  @override
+  String get focusMessage => 'Зосередся на завданні!';
+  @override
+  String get focusWrongPassword => 'Невірний пароль';
+  @override
+  String get timeoutTitle => 'Тайм-Аут';
+  @override
+  String get timeoutWorkInterval => 'Інтервал роботи (хвилини)';
+  @override
+  String get timeoutBreakDuration => 'Тривалість перерви (хвилини)';
+  @override
+  String get timeoutPassword => 'Пароль блокування';
+  @override
+  String get timeoutStart => 'Активувати Тайм-Аут';
+  @override
+  String get timeoutCancel => 'Скасувати Тайм-Аут';
+  @override
+  String get timeoutBreakTitle => 'Час відпочити!';
+  @override
+  String get timeoutBreakMessage => 'Зроби перерву, випий чаю, розімнись!';
+  @override
+  String get timeoutNextBreak => 'Наступна перерва через';
+  @override
+  String get timeoutWorking => 'Працюємо';
 }
