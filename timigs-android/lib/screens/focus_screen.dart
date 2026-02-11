@@ -147,8 +147,8 @@ class _FocusScreenState extends State<FocusScreen>
                   TextStyle(color: isDark ? Colors.white38 : Colors.black38),
               filled: true,
               fillColor: isDark
-                  ? Colors.white.withValues(alpha: 0.05)
-                  : Colors.black.withValues(alpha: 0.05),
+                  ? Colors.white.withOpacity(0.05)
+                  : Colors.black.withOpacity(0.05),
               border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
                   borderSide: BorderSide.none),
@@ -191,8 +191,8 @@ class _FocusScreenState extends State<FocusScreen>
                   TextStyle(color: isDark ? Colors.white38 : Colors.black38),
               filled: true,
               fillColor: isDark
-                  ? Colors.white.withValues(alpha: 0.05)
-                  : Colors.black.withValues(alpha: 0.05),
+                  ? Colors.white.withOpacity(0.05)
+                  : Colors.black.withOpacity(0.05),
               border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
                   borderSide: BorderSide.none),
@@ -222,9 +222,9 @@ class _FocusScreenState extends State<FocusScreen>
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.amber.withValues(alpha: 0.1),
+            color: Colors.amber.withOpacity(0.1),
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: Colors.amber.withValues(alpha: 0.3)),
+            border: Border.all(color: Colors.amber.withOpacity(0.3)),
           ),
           child: Row(
             children: [
@@ -256,12 +256,12 @@ class _FocusScreenState extends State<FocusScreen>
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                Colors.deepPurple.withValues(alpha: 0.15),
-                Colors.deepPurple.withValues(alpha: 0.05)
+                Colors.deepPurple.withOpacity(0.15),
+                Colors.deepPurple.withOpacity(0.05)
               ],
             ),
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Colors.deepPurple.withValues(alpha: 0.3)),
+            border: Border.all(color: Colors.deepPurple.withOpacity(0.3)),
           ),
           child: Row(
             children: [
@@ -347,8 +347,8 @@ class _FocusScreenState extends State<FocusScreen>
                 TextStyle(color: isDark ? Colors.white38 : Colors.black38),
             filled: true,
             fillColor: isDark
-                ? Colors.white.withValues(alpha: 0.05)
-                : Colors.black.withValues(alpha: 0.05),
+                ? Colors.white.withOpacity(0.05)
+                : Colors.black.withOpacity(0.05),
             border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(14),
                 borderSide: BorderSide.none),
@@ -403,8 +403,8 @@ class _FocusScreenState extends State<FocusScreen>
     return Container(
       decoration: BoxDecoration(
         color: isDark
-            ? Colors.white.withValues(alpha: 0.05)
-            : Colors.black.withValues(alpha: 0.05),
+            ? Colors.white.withOpacity(0.05)
+            : Colors.black.withOpacity(0.05),
         borderRadius: BorderRadius.circular(14),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),

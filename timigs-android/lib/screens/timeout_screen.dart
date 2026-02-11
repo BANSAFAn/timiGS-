@@ -170,8 +170,8 @@ class _TimeoutScreenState extends State<TimeoutScreen>
                   TextStyle(color: isDark ? Colors.white38 : Colors.black38),
               filled: true,
               fillColor: isDark
-                  ? Colors.white.withValues(alpha: 0.05)
-                  : Colors.black.withValues(alpha: 0.05),
+                  ? Colors.white.withOpacity(0.05)
+                  : Colors.black.withOpacity(0.05),
               border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
                   borderSide: BorderSide.none),
@@ -198,9 +198,9 @@ class _TimeoutScreenState extends State<TimeoutScreen>
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.teal.withValues(alpha: 0.1),
+            color: Colors.teal.withOpacity(0.1),
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: Colors.teal.withValues(alpha: 0.3)),
+            border: Border.all(color: Colors.teal.withOpacity(0.3)),
           ),
           child: Row(
             children: [
@@ -229,9 +229,9 @@ class _TimeoutScreenState extends State<TimeoutScreen>
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
           decoration: BoxDecoration(
-            color: Colors.teal.withValues(alpha: 0.15),
+            color: Colors.teal.withOpacity(0.15),
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: Colors.teal.withValues(alpha: 0.3)),
+            border: Border.all(color: Colors.teal.withOpacity(0.3)),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -293,8 +293,8 @@ class _TimeoutScreenState extends State<TimeoutScreen>
                 TextStyle(color: isDark ? Colors.white38 : Colors.black38),
             filled: true,
             fillColor: isDark
-                ? Colors.white.withValues(alpha: 0.05)
-                : Colors.black.withValues(alpha: 0.05),
+                ? Colors.white.withOpacity(0.05)
+                : Colors.black.withOpacity(0.05),
             border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(14),
                 borderSide: BorderSide.none),
@@ -336,8 +336,8 @@ class _TimeoutScreenState extends State<TimeoutScreen>
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            Colors.amber.shade900.withValues(alpha: 0.3),
-            Colors.black.withValues(alpha: 0.95),
+            Colors.amber.shade900.withOpacity(0.3),
+            Colors.black.withOpacity(0.95),
           ],
         ),
       ),
@@ -414,7 +414,7 @@ class _TimeoutScreenState extends State<TimeoutScreen>
                 hintText: 'Password to cancel...',
                 hintStyle: TextStyle(color: Colors.white38),
                 filled: true,
-                fillColor: Colors.white.withValues(alpha: 0.1),
+                fillColor: Colors.white.withOpacity(0.1),
                 border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(14),
                     borderSide: BorderSide.none),
@@ -490,8 +490,8 @@ class _TimeoutScreenState extends State<TimeoutScreen>
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       decoration: BoxDecoration(
         color: isDark
-            ? Colors.white.withValues(alpha: 0.05)
-            : Colors.black.withValues(alpha: 0.05),
+            ? Colors.white.withOpacity(0.05)
+            : Colors.black.withOpacity(0.05),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(

@@ -1,132 +1,174 @@
-# TimiGS - Intelligent Activity Tracker
+<div align="center">
 
-![TimiGS Banner](https://via.placeholder.com/1200x400?text=TimiGS+Activity+Tracker)
+# ⏱️ TimiGS — Intelligent Activity Tracker
 
-**TimiGS** is a modern, privacy-focused activity tracking application for **Desktop (Windows/macOS/Linux)** and **Android**. It helps you understand how you spend your time by tracking active windows/apps, generating detailed analytics, and visualizing your productivity trends.
+[![Release](https://img.shields.io/github/v/release/BANSAFAn/timiGS-?style=for-the-badge&color=8b5cf6)](https://github.com/BANSAFAn/timiGS-/releases)
+[![License](https://img.shields.io/badge/License-TPL_1.0-blue?style=for-the-badge)](LICENSE)
+[![Stars](https://img.shields.io/github/stars/BANSAFAn/timiGS-?style=for-the-badge&color=fbbf24)](https://github.com/BANSAFAn/timiGS-/stargazers)
+[![CI](https://img.shields.io/github/actions/workflow/status/BANSAFAn/timiGS-/release.yml?style=for-the-badge&label=Desktop%20CI)](https://github.com/BANSAFAn/timiGS-/actions/workflows/release.yml)
+[![Flutter CI](https://img.shields.io/github/actions/workflow/status/BANSAFAn/timiGS-/flutter-android.yml?style=for-the-badge&label=Android%20CI)](https://github.com/BANSAFAn/timiGS-/actions/workflows/flutter-android.yml)
 
-> **Privacy First**: All data is stored locally on your device in an SQLite database. No personal data is ever sent to the cloud unless you explicitly choose to sync it.
+**A modern, privacy-first activity tracker for Desktop & Android.**
+Track your app usage, visualize productivity, manage tasks, and stay focused — all with your data stored locally.
+
+[📥 Download](https://github.com/BANSAFAn/timiGS-/releases) · [🌐 Website](https://bansafan.github.io/timiGS-/) · [🐛 Report Bug](https://github.com/BANSAFAn/timiGS-/issues)
+
+</div>
 
 ---
 
 ## 📱 Platforms
 
-| Platform | Technology | Status |
-|----------|------------|--------|
-| **Windows** | Tauri v2 + Rust + Vue 3 | ✅ Stable |
-| **macOS** | Tauri v2 + Rust + Vue 3 | Nuh uh  |
-| **Linux** | Tauri v2 + Rust + Vue 3 |  Nuh uh  |
-| **Android** | Flutter + Dart + Rust | 🟥 Nuh uh |
+<!-- STATUS_TABLE_START -->
+| Platform    | Technology                    | Status        |
+| ----------- | ----------------------------- | ------------- |
+| **Windows** | Tauri v2 + Rust + Vue 3       | ✅ Passing |
+| **macOS**   | Tauri v2 + Rust + Vue 3       | ✅ Passing |
+| **Linux**   | Tauri v2 + Rust + Vue 3       | ✅ Passing |
+| **Android** | Flutter 3.24 + Dart + Rust    | ✅ Passing |
+<!-- STATUS_TABLE_END -->
 
 ---
 
-## 🚀 Key Features
+## 🚀 Features
 
-### Desktop & Android
-- 📊 **Real-time Tracking** - Automatically tracks active windows/apps and duration
-- 📈 **Analytics Dashboard** - Visualize your data with Donut, Pie, and Bar charts
-- 📅 **Timeline View** - Browse your activity history day-by-day
-- 🎯 **Tasks & Goals** - Set app usage goals and track progress
-- 🌍 **Multi-language** - English and Ukrainian support
-- 🎨 **Dark & Light Modes** - Choose the theme that fits your workflow
-- 💾 **Local Database** - All data stored locally with SQLite
-- 📤 **Data Export** - Export your data for backup
+### 📊 Tracking & Analytics
+- **Real-time Activity Tracking** — automatically tracks active windows and apps with duration
+- **Analytics Dashboard** — Donut, Pie, and Bar charts powered by Chart.js
+- **Timeline View** — browse your activity history day-by-day with detailed breakdowns
+- **Compare Mode** — compare your usage across different days and periods
 
-### Desktop Only
-- 🖥️ **Window Title Tracking** - Track specific window titles, not just apps
-- ☁️ **Google Drive Sync** - Cloud backup and sync
-- 🔔 **Discord RPC** - Show your activity status in Discord
-- ⏰ **Shutdown Timer** - Schedule automatic shutdown
+### 🎯 Productivity
+- **Focus Mode** — lock your PC to a single application; blocks all other apps from opening (password-protected)
+- **Time OUT** — enforced break reminders with fullscreen overlay, always-on-top blocking (hours/minutes/seconds configurable)
+- **Tasks & Goals** — set app usage goals and track progress
+- **Shutdown Timer** — schedule automatic system shutdown
 
-### Android Only
-- 📲 **Usage Stats API** - Native Android app usage tracking
-- 🔄 **Background Service** - Continuous tracking with foreground notification
+### ☁️ Sync & Transfer
+- **Google Drive Sync** — cloud backup and restore of your activity data
+- **P2P Transfer** — direct peer-to-peer file transfer between devices via WebRTC (PeerJS)
+- **Data Export/Import** — export and import your database for manual backup
+
+### 🔧 Tools
+- **Weather Widget** — integrated weather display with 5-day forecast
+- **Notepad** — quick notes directly in the app
+- **Screen Share Picker** — custom screen/window picker for sharing
+- **Discord Rich Presence** — show your current activity status in Discord
+
+### 🌍 Localization & Themes
+- **Multi-language** — English and Ukrainian
+- **Dark & Light Modes** — choose your preferred theme
+- **System Tray** — minimize to tray with popup widget
+
+### 📱 Android-Specific
+- **Native Usage Stats API** — real-time Android app usage tracking
+- **Background Tracking** — WorkManager-based continuous tracking with foreground notification
+- **Focus Mode & Time OUT** — visual timer modes with password-protected cancellation
 
 ---
 
 ## 🛠️ Technology Stack
 
-### Desktop (src-tauri)
-- **Core**: [Tauri v2](https://v2.tauri.app/) (Rust)
-- **Frontend**: [Vue 3](https://vuejs.org/) + [TypeScript](https://www.typescriptlang.org/)
-- **Build Tool**: [Vite](https://vitejs.dev/)
-- **State Management**: [Pinia](https://pinia.vuejs.org/)
-- **Database**: [SQLite](https://www.sqlite.org/) (via `rusqlite`)
-- **Visualizations**: [Chart.js](https://www.chartjs.org/) + [vue-chartjs](https://vue-chartjs.org/)
+### Desktop (`src-tauri/`)
+| Layer       | Technology                                                                 |
+| ----------- | -------------------------------------------------------------------------- |
+| **Backend** | [Tauri v2](https://v2.tauri.app/) · [Rust](https://www.rust-lang.org/)     |
+| **Frontend**| [Vue 3](https://vuejs.org/) · [TypeScript](https://www.typescriptlang.org/) · [Vite](https://vitejs.dev/) |
+| **State**   | [Pinia](https://pinia.vuejs.org/)                                          |
+| **Charts**  | [Chart.js](https://www.chartjs.org/) + [vue-chartjs](https://vue-chartjs.org/) |
+| **Database**| [SQLite](https://www.sqlite.org/) via `rusqlite`                           |
+| **i18n**    | [vue-i18n](https://vue-i18n.intlify.dev/)                                 |
+| **P2P**     | [PeerJS](https://peerjs.com/) (WebRTC)                                    |
 
-### Android (timigs-android)
-- **Framework**: Flutter 3.x
-- **Language**: Dart
-- **Database**: SQLite (sqflite)
-- **Charts**: fl_chart
-- **State Management**: Provider
-- **Background Tasks**: WorkManager
+### Android (`timigs-android/`)
+| Layer       | Technology                                                                 |
+| ----------- | -------------------------------------------------------------------------- |
+| **Framework** | [Flutter 3.24](https://flutter.dev/) · [Dart](https://dart.dev/)        |
+| **Native**  | [Rust](https://www.rust-lang.org/) via [flutter_rust_bridge](https://github.com/aspect-build/aspect-cli) |
+| **Database**| SQLite via `rusqlite` (Rust backend)                                       |
+| **Charts**  | [fl_chart](https://pub.dev/packages/fl_chart)                             |
+| **State**   | [Provider](https://pub.dev/packages/provider)                             |
+| **Background** | [WorkManager](https://pub.dev/packages/workmanager)                    |
+
+### Website (`site/`)
+| Layer       | Technology                                                                 |
+| ----------- | -------------------------------------------------------------------------- |
+| **Framework** | [Astro](https://astro.build/)                                           |
+| **Components** | [React](https://react.dev/) (interactive islands)                     |
 
 ---
 
-## 💻 Getting Started - Desktop
+## 💻 Getting Started — Desktop
 
 ### Prerequisites
 
-1. **Node.js** (v18 or newer) - [Download](https://nodejs.org/)
-2. **Rust** (latest stable) - [Download](https://www.rust-lang.org/tools/install)
-3. **C++ Build Tools** (Visual Studio Build Tools for Windows)
+- **Node.js** v18+ — [Download](https://nodejs.org/)
+- **Rust** (latest stable) — [Download](https://www.rust-lang.org/tools/install)
+- **C++ Build Tools** — Visual Studio Build Tools (Windows) / `build-essential` (Linux)
+- **Linux only**: `libgtk-3-dev libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf`
 
-### Installation
+### Install & Run
 
 ```bash
+# Clone
 git clone https://github.com/BANSAFAn/timiGS-.git
 cd timiGS-
+
+# Install frontend dependencies
 npm install
-```
 
-### Running
-
-```bash
-# Development mode
+# Run in development mode
 npm run tauri dev
 
-# Production build
+# Build for production
 npm run tauri build
 ```
 
-Output artifacts will be in `src-tauri/target/release/bundle/`.
+Build output: `src-tauri/target/release/bundle/`
 
 ---
 
-## 📱 Getting Started - Android
+## 📱 Getting Started — Android
 
-### Requirements
+### Install from APK
 
-- **Android 6.0 (API 23) or higher**
-- **Usage Stats Permission** (granted manually in Settings)
+1. Download the latest APK from [Releases](https://github.com/BANSAFAn/timiGS-/releases)
+2. Enable "Install from Unknown Sources" in Android settings
+3. Install and grant **Usage Stats** permission when prompted
 
-### Installation from APK
+### Build from Source
 
-1. Download the latest `app-release.apk` from [Releases](../../releases)
-2. Enable "Install from Unknown Sources" in your Android settings
-3. Install the APK
-4. Open the app and grant Usage Stats permission when prompted
-
-### Building from Source
+**Prerequisites:** Flutter 3.24+, Rust (stable), Android NDK r26b, Java 17
 
 ```bash
 cd timigs-android
+
+# Install Rust Android targets
+rustup target add aarch64-linux-android armv7-linux-androideabi x86_64-linux-android i686-linux-android
+cargo install cargo-ndk
+
+# Build Rust native library
+cd rust
+cargo ndk -t arm64-v8a -t armeabi-v7a -t x86_64 -t x86 -o ../android/app/src/main/jniLibs build --release
+cd ..
+
+# Build Flutter APK
 flutter pub get
 flutter build apk --release
 ```
 
-See [timigs-android/BUILD_INSTRUCTIONS.md](timigs-android/BUILD_INSTRUCTIONS.md) for detailed instructions.
+See [BUILD_INSTRUCTIONS.md](timigs-android/BUILD_INSTRUCTIONS.md) for detailed instructions.
 
 ### Android Permissions
 
-| Permission | Purpose |
-|------------|---------|
-| `PACKAGE_USAGE_STATS` | Required for tracking app usage |
-| `INTERNET` | For Google Drive sync feature |
-| `FOREGROUND_SERVICE` | For background tracking |
-| `POST_NOTIFICATIONS` | For tracking status notifications |
+| Permission             | Purpose                              |
+| ---------------------- | ------------------------------------ |
+| `PACKAGE_USAGE_STATS`  | Required for tracking app usage      |
+| `INTERNET`             | Google Drive sync & weather          |
+| `FOREGROUND_SERVICE`   | Background activity tracking         |
+| `POST_NOTIFICATIONS`   | Tracking status notifications        |
 
-**To grant Usage Stats permission**: Settings → Apps → Special app access → Usage access → Enable for TimiGS
+> **Usage Stats**: Settings → Apps → Special app access → Usage access → Enable for TimiGS
 
 ---
 
@@ -134,79 +176,104 @@ See [timigs-android/BUILD_INSTRUCTIONS.md](timigs-android/BUILD_INSTRUCTIONS.md)
 
 ```
 timiGS-/
-├── src/                    # Desktop Frontend (Vue 3)
-│   ├── assets/            # Images and static assets
-│   ├── components/        # Reusable UI components
-│   ├── locales/           # Translation JSON files
-│   ├── stores/            # Pinia state stores
-│   ├── styles/            # Global CSS variables & themes
-│   ├── views/             # Main application pages
-│   ├── App.vue            # Root component
-│   └── main.ts            # Entry point
+├── src/                        # Desktop Frontend (Vue 3 + TypeScript)
+│   ├── components/             # FocusMode, TimeOut, ShutdownTimer, Tasks...
+│   ├── views/                  # Dashboard, Analytics, Timeline, Tools, Weather...
+│   ├── locales/                # en.json, uk.json
+│   ├── stores/                 # Pinia state stores
+│   ├── styles/                 # Global CSS & themes
+│   └── router.ts               # Vue Router config
 │
-├── src-tauri/              # Desktop Backend (Rust)
-│   ├── src/
-│   │   ├── commands.rs    # Tauri commands
-│   │   ├── db.rs          # Database schema & queries
-│   │   ├── tracker.rs     # Active window tracking logic
-│   │   └── lib.rs         # Application entry & setup
-│   ├── Cargo.toml         # Rust dependencies
-│   └── tauri.conf.json    # Tauri configuration
+├── src-tauri/                  # Desktop Backend (Rust)
+│   └── src/
+│       ├── lib.rs              # App entry & plugin setup
+│       ├── commands.rs         # Tauri IPC commands
+│       ├── db.rs               # SQLite database
+│       ├── tracker.rs          # Active window tracking (Win32 API)
+│       ├── focus.rs            # Focus Mode (app blocking)
+│       ├── timeout.rs          # Time OUT (break enforcement)
+│       ├── discord.rs          # Discord Rich Presence
+│       ├── drive.rs            # Google Drive sync
+│       ├── auth.rs             # Google OAuth
+│       ├── p2p.rs              # P2P file transfer server
+│       ├── timer.rs            # Shutdown timer
+│       ├── tasks.rs            # Task/goal management
+│       ├── icons.rs            # App icon extraction
+│       └── picker.rs           # Screen share picker
 │
-├── timigs-android/         # Android App (Flutter)
+├── timigs-android/             # Android App (Flutter + Dart + Rust)
 │   ├── lib/
-│   │   ├── models/        # Data models
-│   │   ├── screens/       # UI screens
-│   │   ├── services/      # Business logic
-│   │   └── widgets/       # Reusable widgets
-│   ├── android/           # Android-specific config
-│   └── pubspec.yaml       # Flutter dependencies
+│   │   ├── screens/            # 13 screens (Dashboard, Focus, TimeOut, Weather...)
+│   │   ├── models/             # Data models
+│   │   ├── services/           # Business logic
+│   │   └── l10n/               # Localization (en, uk)
+│   ├── rust/                   # Rust native backend (flutter_rust_bridge)
+│   └── android/                # Android-specific config & Gradle
 │
-├── site/                   # Marketing website (Astro)
+├── site/                       # Marketing Website (Astro + React)
+│   └── src/
+│       ├── layouts/            # Astro layouts
+│       ├── components/         # React interactive components
+│       └── pages/              # Docs, Releases, About...
 │
-└── package.json            # Node.js dependencies
+├── .github/workflows/          # CI/CD
+│   ├── release.yml             # Desktop builds (Win/Mac/Linux)
+│   ├── flutter-android.yml     # Android APK builds
+│   └── ci.yml                  # Lint, format, security audit
+│
+└── package.json                # v1.21.0
 ```
 
 ---
 
 ## 🌍 Localization
 
-TimiGS supports English and Ukrainian. To add a new language:
+TimiGS supports **English** and **Ukrainian** on both platforms.
 
-### Desktop
-1. Create `src/locales/{lang}.json`
+### Adding a New Language
+
+**Desktop:**
+1. Create `src/locales/{lang}.json` based on `en.json`
 2. Register in `src/i18n.ts`
-3. Add option to `src/views/Settings.vue`
+3. Add selector option in `src/views/Settings.vue`
 
-### Android
-1. Create `timigs-android/lib/l10n/app_{lang}.arb`
-2. Update `pubspec.yaml` generate settings
+**Android:**
+1. Create `timigs-android/lib/l10n/app_localizations_{lang}.dart`
+2. Add the locale to `app_localizations.dart`
 
 ---
 
-## 🗺️ Roadmap
+## 🔒 Privacy
 
-### Desktop
-- [ ] macOS native notifications
-- [ ] Linux system tray improvements
-- [ ] More chart types
-
-### Android
-- [ ] Google Drive sync implementation
-- [ ] Home screen widget
-- [ ] Focus mode
-- [ ] App blocking
+**All data stays on your device.** TimiGS stores activity data in a local SQLite database. Nothing is transmitted to any server unless you explicitly use Google Drive sync. See [Privacy Policy](timigs-android/PRIVACY.md) for details.
 
 ---
 
 ## 📜 License
 
-[Your License Here]
+Licensed under the [TimiGS Public License (TPL) v1.0](LICENSE).
+
+- ✅ Free to use, modify, and distribute
+- ✅ Must include attribution to **BANSAFAn**
+- ❌ Cannot rename/rebrand the software for redistribution
 
 ---
 
 ## 🤝 Contributing
 
-Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+Contributions are welcome! Please:
 
-For issues and feature requests, please use the [GitHub Issues](../../issues) page.
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feat/your-feature`)
+3. Commit your changes
+4. Open a Pull Request
+
+For issues and feature requests, use [GitHub Issues](https://github.com/BANSAFAn/timiGS-/issues).
+
+---
+
+<div align="center">
+
+**Made with ❤️ by [BANSAFAn](https://github.com/BANSAFAn)**
+
+</div>
