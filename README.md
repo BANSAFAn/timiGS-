@@ -25,7 +25,7 @@ Track your app usage, visualize productivity, manage tasks, and stay focused —
 | **Windows** | Tauri v2 + Rust + Vue 3       | ✅ Passing |
 | **macOS**   | Tauri v2 + Rust + Vue 3       | ✅ Passing |
 | **Linux**   | Tauri v2 + Rust + Vue 3       | ✅ Passing |
-| **Android** | Flutter 3.24 + Dart + Rust    | ❌ Failing |
+| **Android** | Flutter 3.24 + Dart + Rust    | ✅ Passing |
 <!-- STATUS_TABLE_END -->
 
 ---
