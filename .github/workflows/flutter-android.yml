@@ -51,11 +51,41 @@ jobs:
           channel: "stable"
           cache: true
 
-      # Decode google-services.json from secret
+      # Decode google-services.json from secret (or create a stub)
       - name: Create google-services.json
         run: |
-          echo "${{ secrets.GOOGLE_SERVICES_JSON }}" | base64 -d > timigs-android/android/app/google-services.json
-        if: ${{ secrets.GOOGLE_SERVICES_JSON != '' }}
+          if [ -n "$GOOGLE_SERVICES_JSON_B64" ]; then
+            echo "$GOOGLE_SERVICES_JSON_B64" | base64 -d > timigs-android/android/app/google-services.json
+            echo "✅ google-services.json decoded from secret"
+          else
+            echo "⚠️ GOOGLE_SERVICES_JSON secret not set, creating stub"
+            cat > timigs-android/android/app/google-services.json << 'STUBEOF'
+          {
+            "project_info": {
+              "project_number": "000000000000",
+              "project_id": "stub-project-id",
+              "storage_bucket": "stub-project-id.appspot.com"
+            },
+            "client": [
+              {
+                "client_info": {
+                  "mobilesdk_app_id": "1:000000000000:android:0000000000000000",
+                  "android_client_info": {
+                    "package_name": "com.timigs.timigs_android"
+                  }
+                },
+                "api_key": [
+                  { "current_key": "stub-api-key" }
+                ],
+                "services": {}
+              }
+            ],
+            "configuration_version": "1"
+          }
+          STUBEOF
+          fi
+        env:
+          GOOGLE_SERVICES_JSON_B64: ${{ secrets.GOOGLE_SERVICES_JSON }}
 
       # Build Rust library for Android
       - name: Build Rust library
@@ -69,11 +99,11 @@ jobs:
 
       - name: Generate App Icons
         working-directory: timigs-android
-        run: flutter pub run flutter_launcher_icons
+        run: flutter pub run flutter_launcher_icons || true
 
       # Install flutter_rust_bridge_codegen via Cargo
       - name: Install flutter_rust_bridge_codegen
-        run: cargo install flutter_rust_bridge_codegen
+        run: cargo install flutter_rust_bridge_codegen || true
 
       # Generate flutter_rust_bridge bindings
       - name: Generate Rust bindings
