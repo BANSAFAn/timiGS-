@@ -17,6 +17,7 @@ class _GoogleDriveScreenState extends State<GoogleDriveScreen> {
   bool _isLoading = false;
   GoogleSignInAccount? _currentUser;
   List<drive.File> _backupFiles = [];
+  String? _errorMessage;
 
   @override
   void initState() {
@@ -25,29 +26,30 @@ class _GoogleDriveScreenState extends State<GoogleDriveScreen> {
   }
 
   Future<void> _checkSignIn() async {
-    final user = _driveService.currentUser;
+    setState(() => _isLoading = true);
+    // Try silent sign-in first (no UI popup)
+    final user = await _driveService.signInSilently();
+    setState(() {
+      _currentUser = user;
+      _isLoading = false;
+    });
     if (user != null) {
-      setState(() => _currentUser = user);
       _loadBackups();
-    } else {
-      // Try silent sign in
-      final account =
-          await _driveService.signIn(); // This might trigger UI, so be careful.
-      // Actually signIn() triggers interactive flow.
-      // Usually checking current user is enough if instance persists, but here it's new.
-      // GoogleSignIn has signInSilently()
-      // Let's rely on manual connect for now or check if package supports silent.
-      // The service wrapper I wrote calls signIn() which is interactive.
-      // I'll leave it manual for now to avoid popping up windows unexpectedly.
     }
   }
 
   Future<void> _signIn() async {
-    setState(() => _isLoading = true);
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
     final user = await _driveService.signIn();
     setState(() {
       _currentUser = user;
       _isLoading = false;
+      if (user == null) {
+        _errorMessage = _driveService.lastError ?? 'Sign-in failed';
+      }
     });
     if (user != null) {
       _loadBackups();
@@ -59,16 +61,24 @@ class _GoogleDriveScreenState extends State<GoogleDriveScreen> {
     setState(() {
       _currentUser = null;
       _backupFiles = [];
+      _errorMessage = null;
     });
   }
 
   Future<void> _loadBackups() async {
     setState(() => _isLoading = true);
-    final files = await _driveService.listFiles("TimiGS Backups");
-    setState(() {
-      _backupFiles = files;
-      _isLoading = false;
-    });
+    try {
+      final files = await _driveService.listFiles("TimiGS Backups");
+      setState(() {
+        _backupFiles = files;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+        _errorMessage = 'Failed to load backups: $e';
+      });
+    }
   }
 
   Future<void> _backup() async {
@@ -127,8 +137,7 @@ class _GoogleDriveScreenState extends State<GoogleDriveScreen> {
 
     setState(() => _isLoading = true);
     try {
-      final dbPath =
-          await DatabaseService.instance.exportDatabase(); // Get path
+      final dbPath = await DatabaseService.instance.exportDatabase();
 
       // Close DB before overwriting
       await DatabaseService.instance.close();
@@ -159,6 +168,8 @@ class _GoogleDriveScreenState extends State<GoogleDriveScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Google Drive Backup'),
@@ -175,49 +186,77 @@ class _GoogleDriveScreenState extends State<GoogleDriveScreen> {
           ? const Center(child: CircularProgressIndicator())
           : _currentUser == null
               ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.add_to_drive,
-                          size: 80, color: Colors.blue),
-                      const SizedBox(height: 16),
-                      const Text(
-                        'Keep your data safe',
-                        style: TextStyle(
-                            fontSize: 24, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 8),
-                      const Text(
-                        'Connect Google Drive to backup & sync\nyour activity stats.',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                      const SizedBox(height: 32),
-                      ElevatedButton.icon(
-                        onPressed: _signIn,
-                        icon: const Icon(Icons.login),
-                        label: const Text('Connect Google Drive'),
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 32, vertical: 16),
+                  child: Padding(
+                    padding: const EdgeInsets.all(32),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.add_to_drive,
+                            size: 80, color: Colors.blue),
+                        const SizedBox(height: 16),
+                        const Text(
+                          'Keep your data safe',
+                          style: TextStyle(
+                              fontSize: 24, fontWeight: FontWeight.bold),
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 8),
+                        const Text(
+                          'Connect Google Drive to backup & sync\nyour activity stats.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                        const SizedBox(height: 32),
+                        ElevatedButton.icon(
+                          onPressed: _signIn,
+                          icon: const Icon(Icons.login),
+                          label: const Text('Connect Google Drive'),
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 32, vertical: 16),
+                          ),
+                        ),
+                        // Error message
+                        if (_errorMessage != null) ...[
+                          const SizedBox(height: 24),
+                          Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.errorContainer,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(Icons.error_outline,
+                                    color: theme.colorScheme.error),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    _errorMessage!,
+                                    style: TextStyle(
+                                      color: theme.colorScheme.onErrorContainer,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
                   ),
                 )
               : Column(
                   children: [
                     Container(
                       padding: const EdgeInsets.all(16),
-                      color: Theme.of(context)
-                          .colorScheme
-                          .primaryContainer
-                          .withOpacity(0.1),
+                      color:
+                          theme.colorScheme.primaryContainer.withOpacity(0.1),
                       child: Row(
                         children: [
                           CircleAvatar(
-                            backgroundImage:
-                                NetworkImage(_currentUser?.photoUrl ?? ''),
+                            backgroundImage: _currentUser?.photoUrl != null
+                                ? NetworkImage(_currentUser!.photoUrl!)
+                                : null,
                             child: _currentUser?.photoUrl == null
                                 ? const Icon(Icons.person)
                                 : null,
@@ -240,7 +279,7 @@ class _GoogleDriveScreenState extends State<GoogleDriveScreen> {
                           ElevatedButton.icon(
                             onPressed: _backup,
                             icon: const Icon(Icons.cloud_upload),
-                            label: const Text('Backup Now'),
+                            label: const Text('Backup'),
                           ),
                         ],
                       ),

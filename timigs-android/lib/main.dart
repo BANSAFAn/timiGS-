@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:workmanager/workmanager.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'screens/dashboard_screen.dart';
 import 'screens/timeline_screen.dart';
 import 'screens/analytics_screen.dart';
@@ -18,7 +19,7 @@ import 'l10n/app_localizations.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize Rust backend and database
+  // Initialize database (SQLite)
   await DatabaseService.instance.initialize();
 
   // Initialize notification service
@@ -46,6 +47,7 @@ class _MyAppState extends State<MyApp> {
     super.initState();
     _loadSettings();
     _initializeTracking();
+    _requestPermissions();
   }
 
   Future<void> _loadSettings() async {
@@ -66,6 +68,15 @@ class _MyAppState extends State<MyApp> {
     // Auto-start tracking
     if (!TrackerService.instance.isTracking) {
       await TrackerService.instance.startTracking();
+    }
+  }
+
+  /// Request necessary Android permissions at startup
+  Future<void> _requestPermissions() async {
+    // Request notification permission (Android 13+)
+    final notificationStatus = await Permission.notification.status;
+    if (!notificationStatus.isGranted) {
+      await Permission.notification.request();
     }
   }
 
@@ -203,11 +214,7 @@ class _MainScreenState extends State<MainScreen> {
           NavigationDestination(
             icon: const Icon(Icons.swap_horiz_outlined),
             selectedIcon: const Icon(Icons.swap_horiz),
-            label:
-                'Transfer', // Not in ARB? Adding it now in replacement if needed or hardcoded?
-            // Wait, Transfer isn't in arb. I should check arb again.
-            // app_en.arb has: dashboard, timeline, analytics, tools, settings.
-            // missing: transfer
+            label: 'Transfer',
           ),
           NavigationDestination(
             icon: const Icon(Icons.build_outlined),

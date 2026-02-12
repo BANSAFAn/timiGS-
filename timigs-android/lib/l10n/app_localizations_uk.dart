@@ -136,41 +136,59 @@ class AppLocalizationsUk extends AppLocalizations {
   String get tomorrow => 'Завтра';
 
   @override
-  String get focusTitle => 'Режим фокусу';
+  String get focusTitle => 'Focus Mode';
+
   @override
-  String get focusSelectApp => 'Обрати програму';
+  String get focusSelectApp => 'Select Application';
+
   @override
-  String get focusDuration => 'Тривалість';
+  String get focusDuration => 'Duration';
+
   @override
-  String get focusPassword => 'Пароль блокування';
+  String get focusPassword => 'Lock Password';
+
   @override
-  String get focusStart => 'Запустити фокус';
+  String get focusStart => 'Start Focus Mode';
+
   @override
-  String get focusCancel => 'Скасувати фокус';
+  String get focusCancel => 'Cancel Focus';
+
   @override
-  String get focusActive => 'Фокус активний';
+  String get focusActive => 'Focus Active';
+
   @override
-  String get focusMessage => 'Зосередся на завданні!';
+  String get focusMessage => 'Stay focused on your task!';
+
   @override
-  String get focusWrongPassword => 'Невірний пароль';
+  String get focusWrongPassword => 'Wrong password';
+
   @override
-  String get timeoutTitle => 'Тайм-Аут';
+  String get timeoutTitle => 'Time OUT';
+
   @override
-  String get timeoutWorkInterval => 'Інтервал роботи (хвилини)';
+  String get timeoutWorkInterval => 'Work Interval (minutes)';
+
   @override
-  String get timeoutBreakDuration => 'Тривалість перерви (хвилини)';
+  String get timeoutBreakDuration => 'Break Duration (minutes)';
+
   @override
-  String get timeoutPassword => 'Пароль блокування';
+  String get timeoutPassword => 'Lock Password';
+
   @override
-  String get timeoutStart => 'Активувати Тайм-Аут';
+  String get timeoutStart => 'Activate Time OUT';
+
   @override
-  String get timeoutCancel => 'Скасувати Тайм-Аут';
+  String get timeoutCancel => 'Cancel Time OUT';
+
   @override
-  String get timeoutBreakTitle => 'Час відпочити!';
+  String get timeoutBreakTitle => 'Time to relax!';
+
   @override
-  String get timeoutBreakMessage => 'Зроби перерву, випий чаю, розімнись!';
+  String get timeoutBreakMessage => 'Take a break, drink some tea, stretch!';
+
   @override
-  String get timeoutNextBreak => 'Наступна перерва через';
+  String get timeoutNextBreak => 'Next break in';
+
   @override
-  String get timeoutWorking => 'Працюємо';
+  String get timeoutWorking => 'Working';
 }

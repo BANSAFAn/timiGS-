@@ -20,19 +20,20 @@ class AppUsageSummary {
     };
   }
 
+  /// Create from SQLite aggregation query row
   factory AppUsageSummary.fromMap(Map<String, dynamic> map) {
     return AppUsageSummary(
       appName: map['app_name'] as String,
-      exePath: map['exe_path'] as String,
-      totalSeconds: map['total_seconds'] as int,
-      sessionCount: map['session_count'] as int,
+      exePath: map['exe_path'] as String? ?? '',
+      totalSeconds: (map['total_seconds'] as int?) ?? 0,
+      sessionCount: (map['session_count'] as int?) ?? 0,
     );
   }
 
   String get formattedDuration {
     final hours = totalSeconds ~/ 3600;
     final minutes = (totalSeconds % 3600) ~/ 60;
-    
+
     if (hours > 0) {
       return '${hours}h ${minutes}m';
     } else {

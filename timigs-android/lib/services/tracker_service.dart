@@ -3,7 +3,6 @@ import 'package:app_usage/app_usage.dart';
 import 'package:workmanager/workmanager.dart';
 import 'dart:async';
 import 'database_service.dart';
-import 'notification_service.dart';
 
 class TrackerService {
   static final TrackerService instance = TrackerService._init();
@@ -22,21 +21,22 @@ class TrackerService {
   /// Request usage stats permission (Android-specific)
   Future<bool> requestPermission() async {
     try {
-      // app_usage automatically opens permission settings when needed
-      // Try to get usage to trigger permission request
-      final DateTime endDate = DateTime.now();
-      final DateTime startDate = endDate.subtract(Duration(hours: 1));
-
-      try {
-        await AppUsage().getAppUsage(startDate, endDate);
-        return true;
-      } catch (e) {
-        // Permission not granted, the plugin will have opened settings
-        return false;
-      }
+      // Open usage stats settings directly via native code
+      await platform.invokeMethod('openUsageAccessSettings');
+      // Wait a moment then check
+      await Future.delayed(const Duration(seconds: 2));
+      return await hasPermission();
     } catch (e) {
       print('Error requesting permission: $e');
-      return false;
+      // Fallback: try via app_usage plugin
+      try {
+        final DateTime endDate = DateTime.now();
+        final DateTime startDate = endDate.subtract(Duration(hours: 1));
+        await AppUsage().getAppUsage(startDate, endDate);
+        return true;
+      } catch (_) {
+        return false;
+      }
     }
   }
 
@@ -55,6 +55,45 @@ class TrackerService {
     }
   }
 
+  /// Request battery optimization exemption
+  Future<void> requestBatteryOptimization() async {
+    try {
+      await platform.invokeMethod('requestBatteryOptimization');
+    } catch (e) {
+      print('Error requesting battery optimization: $e');
+    }
+  }
+
+  /// Check if battery optimization is disabled for this app
+  Future<bool> isBatteryOptimizationDisabled() async {
+    try {
+      final result =
+          await platform.invokeMethod<bool>('isBatteryOptimizationDisabled');
+      return result ?? false;
+    } catch (e) {
+      print('Error checking battery optimization: $e');
+      return false;
+    }
+  }
+
+  /// Start the native foreground service
+  Future<void> _startForegroundService() async {
+    try {
+      await platform.invokeMethod('startForegroundService');
+    } catch (e) {
+      print('Error starting foreground service: $e');
+    }
+  }
+
+  /// Stop the native foreground service
+  Future<void> _stopForegroundService() async {
+    try {
+      await platform.invokeMethod('stopForegroundService');
+    } catch (e) {
+      print('Error stopping foreground service: $e');
+    }
+  }
+
   /// Start tracking
   Future<void> startTracking() async {
     if (_isTracking) return;
@@ -67,8 +106,11 @@ class TrackerService {
 
     _isTracking = true;
 
-    // Show persistent notification
-    await NotificationService.instance.showTrackingNotification();
+    // Start native foreground service (keeps app alive in background)
+    await _startForegroundService();
+
+    // Request battery optimization exemption
+    await requestBatteryOptimization();
 
     // Start periodic tracking (every 5 seconds)
     _trackingTimer = Timer.periodic(Duration(seconds: 5), (timer) async {
@@ -78,11 +120,14 @@ class TrackerService {
     // Initial track
     await _trackCurrentApp();
 
-    // Register background work
+    // Register background work as backup (in case foreground service is killed)
     await Workmanager().registerPeriodicTask(
       'tracking_task',
       'trackingTask',
       frequency: Duration(minutes: 15),
+      constraints: Constraints(
+        networkType: NetworkType.not_required,
+      ),
     );
   }
 
@@ -94,10 +139,10 @@ class TrackerService {
     _trackingTimer?.cancel();
     _trackingTimer = null;
 
-    // Hide notification
-    await NotificationService.instance.hideTrackingNotification();
+    // Stop native foreground service
+    await _stopForegroundService();
 
-    // End current session if exists (calls Rust backend)
+    // End current session if exists
     if (_currentSessionId != null) {
       await DatabaseService.instance.endSession(_currentSessionId!);
       _currentSessionId = null;
@@ -106,7 +151,7 @@ class TrackerService {
     await Workmanager().cancelByUniqueName('tracking_task');
   }
 
-  /// Track current app (Android-specific, stores via Rust)
+  /// Track current app (Android-specific, stores via SQLite)
   Future<void> _trackCurrentApp() async {
     try {
       final DateTime endDate = DateTime.now();
@@ -127,12 +172,12 @@ class TrackerService {
 
       // Check if app changed
       if (appName != _currentApp) {
-        // End previous session (via Rust)
+        // End previous session
         if (_currentSessionId != null) {
           await DatabaseService.instance.endSession(_currentSessionId!);
         }
 
-        // Start new session (via Rust backend)
+        // Start new session
         _currentApp = appName;
         _currentSessionId = await DatabaseService.instance.startSession(
           appName: currentUsage.appName,
@@ -199,7 +244,7 @@ class TrackerService {
 /// Background task callback
 ///
 /// This runs periodically in the background to track app usage.
-/// Data is stored via the Rust backend.
+/// Data is stored via SQLite.
 @pragma('vm:entry-point')
 void callbackDispatcher() {
   Workmanager().executeTask((task, inputData) async {
@@ -222,7 +267,7 @@ void callbackDispatcher() {
 
         final AppUsageInfo currentUsage = usageStats.first;
 
-        // Save to Rust backend
+        // Save to SQLite
         final sessionId = await DatabaseService.instance.startSession(
           appName: currentUsage.appName,
           windowTitle: currentUsage.appName,

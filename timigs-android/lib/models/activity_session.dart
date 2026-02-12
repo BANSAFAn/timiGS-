@@ -23,23 +23,31 @@ class ActivitySession {
       'app_name': appName,
       'window_title': windowTitle,
       'exe_path': exePath,
-      'start_time': startTime.toIso8601String(),
-      'end_time': endTime?.toIso8601String(),
+      'start_time': startTime.millisecondsSinceEpoch,
+      'end_time': endTime?.millisecondsSinceEpoch,
       'duration_seconds': durationSeconds,
     };
   }
 
+  /// Create from SQLite row (timestamps stored as milliseconds)
   factory ActivitySession.fromMap(Map<String, dynamic> map) {
+    final startMs = map['start_time'] as int;
+    final endMs = map['end_time'] as int?;
+    final start = DateTime.fromMillisecondsSinceEpoch(startMs);
+    final end =
+        endMs != null ? DateTime.fromMillisecondsSinceEpoch(endMs) : null;
+    final duration = end != null
+        ? end.difference(start).inSeconds
+        : DateTime.now().difference(start).inSeconds;
+
     return ActivitySession(
       id: map['id'] as int?,
       appName: map['app_name'] as String,
       windowTitle: map['window_title'] as String,
       exePath: map['exe_path'] as String,
-      startTime: DateTime.parse(map['start_time'] as String),
-      endTime: map['end_time'] != null 
-          ? DateTime.parse(map['end_time'] as String) 
-          : null,
-      durationSeconds: map['duration_seconds'] as int,
+      startTime: start,
+      endTime: end,
+      durationSeconds: duration,
     );
   }
 
@@ -47,7 +55,7 @@ class ActivitySession {
     final hours = durationSeconds ~/ 3600;
     final minutes = (durationSeconds % 3600) ~/ 60;
     final seconds = durationSeconds % 60;
-    
+
     if (hours > 0) {
       return '${hours}h ${minutes}m ${seconds}s';
     } else if (minutes > 0) {

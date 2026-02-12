@@ -27,29 +27,87 @@ class GoogleDriveService {
 
   GoogleSignInAccount? _currentUser;
   drive.DriveApi? _driveApi;
+  String? _lastError;
 
-  Future<GoogleSignInAccount?> signIn() async {
+  GoogleSignInAccount? get currentUser => _currentUser;
+  String? get lastError => _lastError;
+
+  /// Try silent sign-in (no UI popup)
+  Future<GoogleSignInAccount?> signInSilently() async {
     try {
-      _currentUser = await _googleSignIn.signIn();
+      _lastError = null;
+      _currentUser = await _googleSignIn.signInSilently();
       if (_currentUser != null) {
-        final authHeaders = await _currentUser!.authHeaders;
-        final authenticateClient = GoogleAuthClient(authHeaders);
-        _driveApi = drive.DriveApi(authenticateClient);
+        await _initDriveApi();
       }
       return _currentUser;
     } catch (e) {
-      print('Google Sign In Error: $e');
+      print('Silent sign-in failed: $e');
+      _lastError = e.toString();
       return null;
     }
   }
 
-  Future<void> signOut() async {
-    await _googleSignIn.disconnect();
-    _currentUser = null;
-    _driveApi = null;
+  /// Interactive sign-in
+  Future<GoogleSignInAccount?> signIn() async {
+    try {
+      _lastError = null;
+      _currentUser = await _googleSignIn.signIn();
+      if (_currentUser != null) {
+        await _initDriveApi();
+      }
+      return _currentUser;
+    } catch (e) {
+      print('Google Sign In Error: $e');
+      _lastError = _parseError(e.toString());
+      return null;
+    }
   }
 
-  GoogleSignInAccount? get currentUser => _currentUser;
+  /// Initialize Drive API with auth headers
+  Future<void> _initDriveApi() async {
+    if (_currentUser == null) return;
+    try {
+      final authHeaders = await _currentUser!.authHeaders;
+      final authenticateClient = GoogleAuthClient(authHeaders);
+      _driveApi = drive.DriveApi(authenticateClient);
+    } catch (e) {
+      print('Error initializing Drive API: $e');
+      _lastError = 'Failed to initialize Drive API: $e';
+    }
+  }
+
+  /// Parse error messages into user-friendly text
+  String _parseError(String error) {
+    if (error.contains('sign_in_canceled')) {
+      return 'Sign-in was cancelled';
+    } else if (error.contains('network_error')) {
+      return 'Network error. Check your internet connection.';
+    } else if (error.contains('sign_in_failed')) {
+      return 'Sign-in failed. Make sure Google Play Services is up to date.';
+    } else if (error.contains('ApiException: 10')) {
+      return 'Configuration error. App needs Google Cloud Console setup.';
+    } else if (error.contains('ApiException: 12500')) {
+      return 'Google Play Services needs to be updated.';
+    } else if (error.contains('ApiException: 7')) {
+      return 'Network error. Check your internet connection.';
+    }
+    return 'Sign-in error: $error';
+  }
+
+  Future<void> signOut() async {
+    try {
+      await _googleSignIn.disconnect();
+    } catch (e) {
+      print('Error disconnecting: $e');
+    }
+    _currentUser = null;
+    _driveApi = null;
+    _lastError = null;
+  }
+
+  /// Check if signed in
+  bool get isSignedIn => _currentUser != null && _driveApi != null;
 
   Future<String?> _getFolderName(String folderName) async {
     if (_driveApi == null) return null;
@@ -72,7 +130,9 @@ class GoogleDriveService {
   }
 
   Future<void> uploadFile(File file, String folderName) async {
-    if (_driveApi == null) return;
+    if (_driveApi == null) {
+      throw Exception('Not signed in to Google Drive');
+    }
 
     String? folderId = await _getFolderName(folderName);
     folderId ??= await _createFolder(folderName);
@@ -103,7 +163,9 @@ class GoogleDriveService {
   }
 
   Future<void> downloadFile(String fileId, String savePath) async {
-    if (_driveApi == null) return;
+    if (_driveApi == null) {
+      throw Exception('Not signed in to Google Drive');
+    }
 
     final drive.Media file = await _driveApi!.files.get(
       fileId,
@@ -113,12 +175,10 @@ class GoogleDriveService {
     final saveFile = File(savePath);
     final List<int> dataStore = [];
 
-    await file.stream.listen((data) {
+    await for (final data in file.stream) {
       dataStore.addAll(data);
-    }, onDone: () async {
-      await saveFile.writeAsBytes(dataStore);
-    }, onError: (error) {
-      print('Download Error: $error');
-    }).asFuture();
+    }
+
+    await saveFile.writeAsBytes(dataStore);
   }
 }

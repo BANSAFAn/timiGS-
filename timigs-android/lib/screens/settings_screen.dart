@@ -4,6 +4,7 @@ import '../services/database_service.dart';
 import '../services/tracker_service.dart';
 import '../main.dart';
 import '../models/settings.dart';
+import 'google_drive_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -14,11 +15,23 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   bool _isTracking = false;
+  bool _batteryOptimizationDisabled = false;
 
   @override
   void initState() {
     super.initState();
     _isTracking = TrackerService.instance.isTracking;
+    _checkBatteryOptimization();
+  }
+
+  Future<void> _checkBatteryOptimization() async {
+    final disabled =
+        await TrackerService.instance.isBatteryOptimizationDisabled();
+    if (mounted) {
+      setState(() {
+        _batteryOptimizationDisabled = disabled;
+      });
+    }
   }
 
   @override
@@ -26,7 +39,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final theme = Theme.of(context);
     final settingsNotifier = Provider.of<SettingsNotifier>(context);
     final settings = settingsNotifier.settings;
-    
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Settings'),
@@ -48,18 +61,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  
+
                   // Language
                   ListTile(
                     leading: const Icon(Icons.language),
                     title: const Text('Language'),
-                    subtitle: Text(settings.language == 'en' ? 'English' : 'Українська'),
+                    subtitle: Text(
+                        settings.language == 'en' ? 'English' : 'Українська'),
                     trailing: DropdownButton<String>(
                       value: settings.language,
                       underline: const SizedBox(),
                       items: const [
                         DropdownMenuItem(value: 'en', child: Text('English')),
-                        DropdownMenuItem(value: 'uk', child: Text('Українська')),
+                        DropdownMenuItem(
+                            value: 'uk', child: Text('Українська')),
                       ],
                       onChanged: (value) {
                         if (value != null) {
@@ -70,9 +85,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       },
                     ),
                   ),
-                  
+
                   const Divider(),
-                  
+
                   // Theme
                   ListTile(
                     leading: const Icon(Icons.palette),
@@ -98,9 +113,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
             ),
           ),
-          
+
           const SizedBox(height: 16),
-          
+
           // Tracking Section
           Card(
             child: Padding(
@@ -115,16 +130,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  
+
                   ListTile(
                     leading: Icon(
                       _isTracking ? Icons.play_circle : Icons.pause_circle,
                       color: _isTracking ? Colors.green : Colors.orange,
                     ),
-                    title: Text(_isTracking ? 'Tracking Active' : 'Tracking Paused'),
+                    title: Text(
+                        _isTracking ? 'Tracking Active' : 'Tracking Paused'),
                     subtitle: Text(
-                      _isTracking 
-                          ? 'Activity is being tracked' 
+                      _isTracking
+                          ? 'Activity is being tracked'
                           : 'Activity tracking is paused',
                     ),
                     trailing: Switch(
@@ -141,9 +157,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       },
                     ),
                   ),
-                  
+
                   const Divider(),
-                  
+
                   ListTile(
                     leading: const Icon(Icons.security),
                     title: const Text('Usage Stats Permission'),
@@ -155,13 +171,43 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       child: const Text('Grant'),
                     ),
                   ),
+
+                  const Divider(),
+
+                  // Battery optimization
+                  ListTile(
+                    leading: Icon(
+                      Icons.battery_saver,
+                      color: _batteryOptimizationDisabled
+                          ? Colors.green
+                          : Colors.orange,
+                    ),
+                    title: const Text('Battery Optimization'),
+                    subtitle: Text(
+                      _batteryOptimizationDisabled
+                          ? 'Disabled (background tracking works)'
+                          : 'Enabled (may stop background tracking)',
+                    ),
+                    trailing: _batteryOptimizationDisabled
+                        ? const Icon(Icons.check_circle, color: Colors.green)
+                        : ElevatedButton(
+                            onPressed: () async {
+                              await TrackerService.instance
+                                  .requestBatteryOptimization();
+                              // Re-check after a short delay
+                              await Future.delayed(const Duration(seconds: 2));
+                              _checkBatteryOptimization();
+                            },
+                            child: const Text('Disable'),
+                          ),
+                  ),
                 ],
               ),
             ),
           ),
-          
+
           const SizedBox(height: 16),
-          
+
           // Data Management Section
           Card(
             child: Padding(
@@ -176,30 +222,29 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  
                   ListTile(
                     leading: const Icon(Icons.cloud_upload),
                     title: const Text('Google Drive Sync'),
                     subtitle: const Text('Backup and restore data'),
                     trailing: const Icon(Icons.chevron_right),
                     onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Google Drive sync coming soon'),
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const GoogleDriveScreen(),
                         ),
                       );
                     },
                   ),
-                  
                   const Divider(),
-                  
                   ListTile(
                     leading: const Icon(Icons.download),
                     title: const Text('Export Data'),
                     subtitle: const Text('Export database to file'),
                     trailing: const Icon(Icons.chevron_right),
                     onTap: () async {
-                      final path = await DatabaseService.instance.exportDatabase();
+                      final path =
+                          await DatabaseService.instance.exportDatabase();
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
@@ -214,9 +259,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
             ),
           ),
-          
+
           const SizedBox(height: 16),
-          
+
           // About Section
           Card(
             child: Padding(
@@ -231,15 +276,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  
                   ListTile(
                     leading: const Icon(Icons.info),
                     title: const Text('Version'),
                     subtitle: const Text('1.0.0'),
                   ),
-                  
                   const Divider(),
-                  
                   ListTile(
                     leading: const Icon(Icons.code),
                     title: const Text('TimiGS Android'),

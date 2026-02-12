@@ -350,24 +350,118 @@ abstract class AppLocalizations {
   /// **'Tomorrow'**
   String get tomorrow;
 
+  /// No description provided for @focusTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Focus Mode'**
   String get focusTitle;
+
+  /// No description provided for @focusSelectApp.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Application'**
   String get focusSelectApp;
+
+  /// No description provided for @focusDuration.
+  ///
+  /// In en, this message translates to:
+  /// **'Duration'**
   String get focusDuration;
+
+  /// No description provided for @focusPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Lock Password'**
   String get focusPassword;
+
+  /// No description provided for @focusStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Focus Mode'**
   String get focusStart;
+
+  /// No description provided for @focusCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel Focus'**
   String get focusCancel;
+
+  /// No description provided for @focusActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Focus Active'**
   String get focusActive;
+
+  /// No description provided for @focusMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Stay focused on your task!'**
   String get focusMessage;
+
+  /// No description provided for @focusWrongPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Wrong password'**
   String get focusWrongPassword;
+
+  /// No description provided for @timeoutTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Time OUT'**
   String get timeoutTitle;
+
+  /// No description provided for @timeoutWorkInterval.
+  ///
+  /// In en, this message translates to:
+  /// **'Work Interval (minutes)'**
   String get timeoutWorkInterval;
+
+  /// No description provided for @timeoutBreakDuration.
+  ///
+  /// In en, this message translates to:
+  /// **'Break Duration (minutes)'**
   String get timeoutBreakDuration;
+
+  /// No description provided for @timeoutPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Lock Password'**
   String get timeoutPassword;
+
+  /// No description provided for @timeoutStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Activate Time OUT'**
   String get timeoutStart;
+
+  /// No description provided for @timeoutCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel Time OUT'**
   String get timeoutCancel;
+
+  /// No description provided for @timeoutBreakTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Time to relax!'**
   String get timeoutBreakTitle;
+
+  /// No description provided for @timeoutBreakMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Take a break, drink some tea, stretch!'**
   String get timeoutBreakMessage;
+
+  /// No description provided for @timeoutNextBreak.
+  ///
+  /// In en, this message translates to:
+  /// **'Next break in'**
   String get timeoutNextBreak;
+
+  /// No description provided for @timeoutWorking.
+  ///
+  /// In en, this message translates to:
+  /// **'Working'**
   String get timeoutWorking;
 }
 

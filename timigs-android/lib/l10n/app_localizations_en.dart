@@ -137,40 +137,58 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get focusTitle => 'Focus Mode';
+
   @override
   String get focusSelectApp => 'Select Application';
+
   @override
   String get focusDuration => 'Duration';
+
   @override
   String get focusPassword => 'Lock Password';
+
   @override
   String get focusStart => 'Start Focus Mode';
+
   @override
   String get focusCancel => 'Cancel Focus';
+
   @override
   String get focusActive => 'Focus Active';
+
   @override
   String get focusMessage => 'Stay focused on your task!';
+
   @override
   String get focusWrongPassword => 'Wrong password';
+
   @override
   String get timeoutTitle => 'Time OUT';
+
   @override
   String get timeoutWorkInterval => 'Work Interval (minutes)';
+
   @override
   String get timeoutBreakDuration => 'Break Duration (minutes)';
+
   @override
   String get timeoutPassword => 'Lock Password';
+
   @override
   String get timeoutStart => 'Activate Time OUT';
+
   @override
   String get timeoutCancel => 'Cancel Time OUT';
+
   @override
   String get timeoutBreakTitle => 'Time to relax!';
+
   @override
   String get timeoutBreakMessage => 'Take a break, drink some tea, stretch!';
+
   @override
   String get timeoutNextBreak => 'Next break in';
+
   @override
   String get timeoutWorking => 'Working';
 }

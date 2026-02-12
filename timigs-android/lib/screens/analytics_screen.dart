@@ -25,11 +25,11 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
 
   Future<void> _loadData() async {
     setState(() => _isLoading = true);
-    
+
     final summary = await DatabaseService.instance.getTodaySummary();
     final weekly = await DatabaseService.instance.getWeeklyStats();
     final totalTime = await DatabaseService.instance.getTotalTimeToday();
-    
+
     if (mounted) {
       setState(() {
         _topApps = summary;
@@ -43,7 +43,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Analytics'),
@@ -88,18 +88,18 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                             ),
                             const SizedBox(height: 16),
                             ..._topApps.take(5).map((app) => _buildLegendItem(
-                              context,
-                              app.appName,
-                              app.formattedDuration,
-                              _getColorForIndex(_topApps.indexOf(app)),
-                            )),
+                                  context,
+                                  app.appName,
+                                  app.formattedDuration,
+                                  _getColorForIndex(_topApps.indexOf(app)),
+                                )),
                           ],
                         ),
                       ),
                     ),
                     const SizedBox(height: 16),
                   ],
-                  
+
                   // Weekly Bar Chart
                   if (_weeklyStats.isNotEmpty) ...[
                     Card(
@@ -128,9 +128,11 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                                       sideTitles: SideTitles(
                                         showTitles: true,
                                         getTitlesWidget: (value, meta) {
-                                          if (value.toInt() < _weeklyStats.length) {
-                                            final stat = _weeklyStats[value.toInt()];
-                                            final date = DateTime.parse(stat.date);
+                                          if (value.toInt() <
+                                              _weeklyStats.length) {
+                                            final stat =
+                                                _weeklyStats[value.toInt()];
+                                            final date = stat.date;
                                             return Text(
                                               '${date.day}/${date.month}',
                                               style: theme.textTheme.bodySmall,
@@ -169,7 +171,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                       ),
                     ),
                   ],
-                  
+
                   if (_topApps.isEmpty && _weeklyStats.isEmpty)
                     Center(
                       child: Padding(
@@ -179,13 +181,15 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                             Icon(
                               Icons.analytics_outlined,
                               size: 64,
-                              color: theme.colorScheme.onSurface.withOpacity(0.3),
+                              color:
+                                  theme.colorScheme.onSurface.withOpacity(0.3),
                             ),
                             const SizedBox(height: 16),
                             Text(
                               'No data available yet',
                               style: theme.textTheme.bodyLarge?.copyWith(
-                                color: theme.colorScheme.onSurface.withOpacity(0.6),
+                                color: theme.colorScheme.onSurface
+                                    .withOpacity(0.6),
                               ),
                             ),
                           ],
@@ -200,11 +204,11 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
 
   List<PieChartSectionData> _buildPieSections() {
     final total = _topApps.fold<int>(0, (sum, app) => sum + app.totalSeconds);
-    
+
     return _topApps.take(5).map((app) {
       final percentage = (app.totalSeconds / total * 100);
       final index = _topApps.indexOf(app);
-      
+
       return PieChartSectionData(
         value: app.totalSeconds.toDouble(),
         title: '${percentage.toStringAsFixed(1)}%',
@@ -237,9 +241,8 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
 
   int _getMaxWeeklyTime() {
     if (_weeklyStats.isEmpty) return 3600;
-    return _weeklyStats.fold<int>(0, (max, stat) => 
-      stat.totalSeconds > max ? stat.totalSeconds : max
-    );
+    return _weeklyStats.fold<int>(
+        0, (max, stat) => stat.totalSeconds > max ? stat.totalSeconds : max);
   }
 
   Color _getColorForIndex(int index) {
@@ -253,9 +256,10 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     return colors[index % colors.length];
   }
 
-  Widget _buildLegendItem(BuildContext context, String label, String value, Color color) {
+  Widget _buildLegendItem(
+      BuildContext context, String label, String value, Color color) {
     final theme = Theme.of(context);
-    
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Row(
