@@ -101,6 +101,10 @@ jobs:
       - name: Install frontend dependencies
         run: npm install
 
+      - name: Generate installer assets (Windows)
+        if: matrix.platform == 'windows-latest'
+        run: node scripts/generate-installer-assets.js
+
       - name: Build Tauri app
         uses: tauri-apps/tauri-action@v0
         env:

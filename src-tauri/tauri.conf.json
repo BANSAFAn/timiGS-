@@ -57,7 +57,10 @@
         "languages": ["English", "Ukrainian", "German", "French", "SimpChinese", "Arabic"],
         "installerIcon": "icons/icon.ico",
         "headerImage": "icons/nsis-header.bmp",
-        "sidebarImage": "icons/nsis-sidebar.bmp"
+        "sidebarImage": "icons/nsis-sidebar.bmp",
+        "installerHooks": "windows/hooks.nsh",
+        "startMenuFolder": "TimiGS",
+        "compression": "lzma"
       }
     },
     "shortDescription": "Track your PC activity",
