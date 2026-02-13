@@ -39,6 +39,9 @@ dependencies:
   share_plus: ^7.2.1
   file_picker: ^8.0.0
 
+  # P2P Transfer (PeerJS-compatible)
+  peerdart: ^1.5.1
+
   # Path utilities
   path_provider: ^2.1.1
   path: ^1.8.3

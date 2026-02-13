@@ -90,6 +90,11 @@ pub fn run() {
         #[cfg(desktop)]
         {
             let _tray = TrayIconBuilder::new()
+                .icon(
+                    tauri::image::Image::from_bytes(include_bytes!("../icons/icon.png"))
+                        .expect("failed to load tray icon"),
+                )
+                .tooltip("TimiGS")
                 .show_menu_on_left_click(false)
                 .on_tray_icon_event(|tray, event| {
                     if let tauri::tray::TrayIconEvent::Click {

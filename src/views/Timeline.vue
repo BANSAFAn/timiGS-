@@ -47,7 +47,8 @@
           </div>
           <div class="timeline-content">
             <div class="timeline-app" :class="{ 'is-clickable': isBrowser(session.app_name) }">
-              <div class="app-icon-small" :style="{ background: getAppColor(session.app_name) }">
+              <img v-if="appIcons[session.exe_path]" :src="appIcons[session.exe_path]" class="app-icon-img" :alt="session.app_name" />
+              <div v-else class="app-icon-small" :style="{ background: getAppColor(session.app_name) }">
                 {{ session.app_name.charAt(0).toUpperCase() }}
               </div>
               <div class="timeline-app-info">
@@ -96,6 +97,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { invoke } from '@tauri-apps/api/core';
 import { useActivityStore, type ActivitySession } from '../stores/activity';
 
 const { t } = useI18n();
@@ -106,6 +108,7 @@ const dateInput = ref(formatDateForInput(new Date()));
 const dateInputRef = ref<HTMLInputElement | null>(null);
 const sessions = ref<ActivitySession[]>([]);
 const searchQuery = ref('');
+const appIcons = ref<Record<string, string>>({});
 
 // Browser Modal Logic
 const showBrowserModal = ref(false);
@@ -264,10 +267,26 @@ async function fetchSessions() {
   sessions.value = await store.getActivityRange(dateStr, dateStr);
 }
 
+async function loadIcons(sessionList: ActivitySession[]) {
+  const paths = [...new Set(sessionList.map(s => s.exe_path).filter(Boolean))];
+  for (const exePath of paths) {
+    if (appIcons.value[exePath]) continue;
+    try {
+      const base64: string | null = await invoke('get_app_icon', { path: exePath });
+      if (base64) {
+        appIcons.value[exePath] = `data:image/png;base64,${base64}`;
+      }
+    } catch { /* icon not available, fallback to letter */ }
+  }
+}
+
+watch(sessions, (newSessions) => {
+  if (newSessions.length > 0) loadIcons(newSessions);
+});
+
 watch(selectedDate, fetchSessions);
 
 onMounted(async () => {
-  // For today, use the store's data
   if (isToday.value) {
     await store.fetchTodayData();
     sessions.value = store.todaySessions;
@@ -423,6 +442,14 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   gap: 16px;
+}
+.app-icon-img {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  flex-shrink: 0;
+  object-fit: cover;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 .app-icon-small {
   width: 40px;

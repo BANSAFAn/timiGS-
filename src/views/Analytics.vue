@@ -6,9 +6,17 @@
           <h2>{{ $t('analytics.title') }}</h2>
           <p class="subtitle">Insights into your productivity patterns</p>
         </div>
-        <div class="date-range-badge">
-          <span class="range-icon">📅</span>
-          <span>Last 7 Days</span>
+        <div class="week-nav">
+          <button class="nav-btn" @click="prevWeek">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <div class="date-range-badge">
+            <span class="range-icon">📅</span>
+            <span>{{ weekRangeLabel }}</span>
+          </div>
+          <button class="nav-btn" @click="nextWeek" :disabled="weekOffset >= 0">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
         </div>
       </div>
 
@@ -111,7 +119,7 @@
       </div>
     </div>
 
-    <!-- Detail Modal -->
+    <!-- Detail Modal (App Breakdown) -->
     <Teleport to="body">
       <div v-if="showDetailModal" class="modal-overlay" @click.self="showDetailModal = false">
         <div class="modal-content animate-enter">
@@ -151,21 +159,138 @@
         </div>
       </div>
     </Teleport>
+
+    <!-- Daily Detail Modal -->
+    <Teleport to="body">
+      <div v-if="showDayDetail" class="modal-overlay" @click.self="showDayDetail = false">
+        <div class="modal-content animate-enter" style="max-width: 700px;">
+          <div class="modal-header">
+            <h3>📋 {{ dayDetailDate }}</h3>
+            <button class="close-btn" @click="showDayDetail = false">×</button>
+          </div>
+          <div class="modal-body custom-scrollbar" style="max-height: 60vh;">
+            <div v-if="dayDetailSessions.length === 0" class="empty-day">No activity recorded</div>
+            <div v-else class="day-sessions">
+              <div v-for="s in dayDetailSessions" :key="s.id" class="day-session-item">
+                <div class="day-session-icon" :style="{ background: getAppColor(s.app_name) }">
+                  {{ s.app_name.charAt(0).toUpperCase() }}
+                </div>
+                <div class="day-session-info">
+                  <div class="day-session-app">{{ s.app_name }}</div>
+                  <div class="day-session-title">{{ s.window_title }}</div>
+                </div>
+                <div class="day-session-time">
+                  <div class="day-session-dur">{{ formatDuration(s.duration_seconds) }}</div>
+                  <div class="day-session-range">{{ formatTimeShort(s.start_time) }} – {{ s.end_time ? formatTimeShort(s.end_time) : 'Now' }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Teleport>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
-import { useActivityStore } from '../stores/activity';
+import { useActivityStore, type ActivitySession } from '../stores/activity';
 import { Bar, Pie, Line } from 'vue-chartjs';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, ArcElement, PointElement, LineElement, Tooltip, Legend, Filler } from 'chart.js';
+import { useI18n } from 'vue-i18n';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, PointElement, LineElement, Tooltip, Legend, Filler);
 
+const { t } = useI18n();
 const store = useActivityStore();
-const weeklyStats = computed(() => store.weeklyStats);
 const showDetailModal = ref(false);
 
+// --- Week Navigation ---
+const weekOffset = ref(0); // 0 = current week, -1 = last week, etc.
+interface DailyStatLocal { date: string; total_seconds: number; app_count: number; }
+const customWeeklyStats = ref<DailyStatLocal[]>([]);
+
+const weeklyStats = computed(() => {
+  if (weekOffset.value === 0) return store.weeklyStats;
+  return customWeeklyStats.value;
+});
+
+function getWeekRange(offset: number): { from: string; to: string } {
+  const now = new Date();
+  const to = new Date(now);
+  to.setDate(to.getDate() + offset * 7);
+  const from = new Date(to);
+  from.setDate(from.getDate() - 6);
+  return {
+    from: from.toISOString().split('T')[0],
+    to: to.toISOString().split('T')[0]
+  };
+}
+
+const weekRangeLabel = computed(() => {
+  if (weekOffset.value === 0) return t('analytics.last7Days') || 'This Week';
+  const { from, to } = getWeekRange(weekOffset.value);
+  const fmt = (d: string) => new Date(d).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  return `${fmt(from)} – ${fmt(to)}`;
+});
+
+async function fetchWeekData() {
+  if (weekOffset.value === 0) {
+    await store.fetchTodayData();
+    await store.fetchWeeklyStats();
+    return;
+  }
+  const { from, to } = getWeekRange(weekOffset.value);
+  const sessions = await store.getActivityRange(from, to);
+  // Aggregate sessions into daily stats
+  const daily: Record<string, DailyStatLocal> = {};
+  for (const s of sessions) {
+    const dateKey = s.start_time.split('T')[0];
+    if (!daily[dateKey]) {
+      daily[dateKey] = { date: dateKey, total_seconds: 0, app_count: 0 };
+    }
+    daily[dateKey].total_seconds += s.duration_seconds;
+  }
+  // Count unique apps per day
+  const appsPerDay: Record<string, Set<string>> = {};
+  for (const s of sessions) {
+    const dateKey = s.start_time.split('T')[0];
+    if (!appsPerDay[dateKey]) appsPerDay[dateKey] = new Set();
+    appsPerDay[dateKey].add(s.app_name);
+  }
+  for (const d of Object.keys(daily)) {
+    daily[d].app_count = appsPerDay[d]?.size || 0;
+  }
+  // Fill in missing days
+  const result: DailyStatLocal[] = [];
+  const start = new Date(from);
+  const end = new Date(to);
+  for (let d = new Date(end); d >= start; d.setDate(d.getDate() - 1)) {
+    const key = d.toISOString().split('T')[0];
+    result.push(daily[key] || { date: key, total_seconds: 0, app_count: 0 });
+  }
+  customWeeklyStats.value = result;
+}
+
+function prevWeek() { weekOffset.value--; fetchWeekData(); }
+function nextWeek() { if (weekOffset.value < 0) { weekOffset.value++; fetchWeekData(); } }
+
+// --- Daily Detail ---
+const showDayDetail = ref(false);
+const dayDetailDate = ref('');
+const dayDetailSessions = ref<ActivitySession[]>([]);
+
+async function openDayDetail(dateStr: string) {
+  dayDetailDate.value = new Date(dateStr).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  dayDetailSessions.value = await store.getActivityRange(dateStr, dateStr);
+  showDayDetail.value = true;
+}
+
+function formatTimeShort(timeStr: string): string {
+  return new Date(timeStr).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+}
+
+// --- Colors & Formatting ---
 const appColors: Record<string, string> = {};
 const colorPalette = ['#6366f1', '#06b6d4', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981'];
 let colorIndex = 0;
@@ -194,7 +319,7 @@ function calculatePercentage(seconds: number): string {
 const totalWeekTime = computed(() => weeklyStats.value.reduce((acc, d) => acc + d.total_seconds, 0));
 const dailyAverage = computed(() => weeklyStats.value.length ? Math.round(totalWeekTime.value / weeklyStats.value.length) : 0);
 
-// Charts
+// --- Charts ---
 const weeklyChartData = computed(() => ({
   labels: weeklyStats.value.map(d => new Date(d.date).toLocaleDateString(undefined, { weekday: 'short' })).reverse(),
   datasets: [{ 
@@ -257,7 +382,16 @@ const commonOptions = {
   }
 };
 
-const barChartOptions = { ...commonOptions };
+const barChartOptions = {
+  ...commonOptions,
+  onClick: (_event: any, elements: any[]) => {
+    if (elements.length > 0) {
+      const idx = elements[0].index;
+      const dates = [...weeklyStats.value].reverse();
+      if (dates[idx]) openDayDetail(dates[idx].date);
+    }
+  }
+};
 const lineChartOptions = { ...commonOptions };
 
 const pieChartOptions = { 
@@ -273,7 +407,7 @@ const pieChartOptions = {
   }
 };
 
-onMounted(async () => { await store.fetchTodayData(); await store.fetchWeeklyStats(); });
+onMounted(async () => { await fetchWeekData(); });
 </script>
 
 <style scoped>
@@ -288,6 +422,32 @@ onMounted(async () => { await store.fetchTodayData(); await store.fetchWeeklySta
 
 .subtitle { color: var(--text-muted); font-size: 0.95rem; margin-top: 4px; }
 
+.week-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.week-nav .nav-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.week-nav .nav-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+.week-nav .nav-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
 .date-range-badge {
   display: flex;
   align-items: center;
@@ -298,6 +458,8 @@ onMounted(async () => { await store.fetchTodayData(); await store.fetchWeeklySta
   font-size: 0.85rem;
   color: var(--text-muted);
   border: 1px solid rgba(255, 255, 255, 0.05);
+  min-width: 140px;
+  justify-content: center;
 }
 
 /* Stats Row */
@@ -587,4 +749,70 @@ onMounted(async () => { await store.fetchTodayData(); await store.fetchWeeklySta
 
 .animate-enter { animation: fadeSlideIn 0.5s ease forwards; opacity: 0; }
 @keyframes fadeSlideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Daily Detail Modal */
+.empty-day {
+  text-align: center;
+  padding: 40px;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+.day-sessions {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.day-session-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 20px;
+  transition: background 0.15s;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+}
+.day-session-item:hover {
+  background: rgba(255,255,255,0.03);
+}
+.day-session-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.95rem;
+  flex-shrink: 0;
+}
+.day-session-info {
+  flex: 1;
+  min-width: 0;
+}
+.day-session-app {
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-bottom: 2px;
+}
+.day-session-title {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.day-session-time {
+  text-align: right;
+  flex-shrink: 0;
+}
+.day-session-dur {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--color-primary);
+}
+.day-session-range {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-feature-settings: "tnum";
+}
 </style>
