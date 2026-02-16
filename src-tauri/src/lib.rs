@@ -27,6 +27,9 @@ mod android_tracker;
 use tauri::{tray::TrayIconBuilder, Manager, WindowEvent};
 
 #[cfg(desktop)]
+static TRAY_LAST_SHOWN: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+
+#[cfg(desktop)]
 use tauri_plugin_autostart::MacosLauncher;
 
 #[cfg(target_os = "windows")]
@@ -133,6 +136,15 @@ pub fn run() {
                                     let _ = window.set_position(PhysicalPosition { x, y });
                                 }
 
+                                // Record the time we're showing the tray
+                                TRAY_LAST_SHOWN.store(
+                                    std::time::SystemTime::now()
+                                        .duration_since(std::time::UNIX_EPOCH)
+                                        .unwrap_or_default()
+                                        .as_millis() as u64,
+                                    std::sync::atomic::Ordering::SeqCst,
+                                );
+
                                 let _ = window.show();
                                 let _ = window.set_focus();
                             }
@@ -159,11 +171,21 @@ pub fn run() {
         } else if let WindowEvent::Focused(focused) = event {
             // Hide tray when it loses focus (user clicks elsewhere)
             if window.label() == "tray" && !*focused {
-                // Use a small delay to handle race conditions
                 let window_clone = window.clone();
                 std::thread::spawn(move || {
-                    std::thread::sleep(std::time::Duration::from_millis(100));
-                    let _ = window_clone.hide();
+                    // Wait a bit before hiding
+                    std::thread::sleep(std::time::Duration::from_millis(200));
+
+                    // Don't hide if the tray was just shown (prevents race condition)
+                    let shown_at = TRAY_LAST_SHOWN.load(std::sync::atomic::Ordering::SeqCst);
+                    let now = std::time::SystemTime::now()
+                        .duration_since(std::time::UNIX_EPOCH)
+                        .unwrap_or_default()
+                        .as_millis() as u64;
+
+                    if now.saturating_sub(shown_at) > 300 {
+                        let _ = window_clone.hide();
+                    }
                 });
             }
         }
@@ -217,6 +239,11 @@ pub fn run() {
             #[cfg(target_os = "android")]
             commands::request_usage_permission,
             commands::get_timer_status_cmd,
+            // P2P Transfer
+            commands::start_p2p_server,
+            commands::stop_p2p_server,
+            commands::get_local_ip,
+            commands::send_p2p_file,
             // Focus Mode
             commands::start_focus_cmd,
             commands::stop_focus_cmd,

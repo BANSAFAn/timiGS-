@@ -9,7 +9,8 @@
     "analytics": "分析",
     "tools": "工具",
     "github": "GitHub",
-    "settings": "设置"
+    "settings": "设置",
+    "compare": "团队"
   },
   "github": {
     "connection": "GitHub 连接",
@@ -40,15 +41,15 @@
     "title": "活动时间轴",
     "today": "今天",
     "yesterday": "昨天",
+    "searchPlaceholder": "搜索应用...",
     "selectDate": "选择日期",
     "duration": "持续时间",
     "startTime": "开始时间",
     "endTime": "结束时间",
     "noSessions": "此日期无会话",
-    "searchPlaceholder": "搜索应用...",
-    "noSearchResults": "未找到应用",
     "websites": "网站",
     "noWebsites": "无可用网站数据",
+    "noSearchResults": "未找到应用",
     "websiteStats": "浏览器统计"
   },
   "analytics": {
@@ -76,6 +77,8 @@
     "themeLight": "浅色",
     "autostart": "随 Windows 启动",
     "minimizeToTray": "最小化到系统托盘",
+    "discordRpc": "Discord Rich Presence",
+    "discordRpcDesc": "在 Discord 个人资料中显示活动",
     "tracking": "追踪",
     "startTracking": "开始追踪",
     "stopTracking": "停止追踪",
@@ -90,6 +93,10 @@
     "dataSync": "数据同步",
     "syncGoogle": "Google 帐户同步",
     "syncGoogleDesc": "将您的活动数据同步到 Google 云端硬盘",
+    "googleDrive": "Google 云端硬盘",
+    "googleClientId": "客户端 ID",
+    "googleClientSecret": "客户端密钥",
+    "connectAccount": "连接帐户",
     "connectGoogle": "连接 Google",
     "connected": "已连接",
     "localStorage": "本地存储",
@@ -100,12 +107,22 @@
     "emailPlaceholder": "your@email.com",
     "sendReport": "发送报告",
     "system": "系统",
+    "subtitle": "管理您的应用程序偏好设置",
+    "dark": "深色",
+    "light": "浅色",
+    "importData": "导入数据",
+    "updates": "更新",
+    "checkForUpdates": "检查更新",
     "checkUpdates": "检查更新",
     "checkNow": "立即检查",
     "checking": "检查中..."
   },
   "tools": {
     "timer": "关机定时器",
+    "shutdownTimer": {
+      "title": "电脑关机定时器",
+      "start": "启动定时器"
+    },
     "notepad": "记事本",
     "notepadPlaceholder": "在此输入您的笔记...",
     "newNote": "新建笔记",
@@ -113,13 +130,55 @@
     "noNotes": "暂无笔记",
     "untitled": "无标题"
   },
+  "tasks": {
+    "title": "任务与目标",
+    "addTask": "添加任务",
+    "noTasks": "没有活动任务",
+    "appName": "应用名称",
+    "description": "描述",
+    "hours": "小时",
+    "create": "创建",
+    "cancel": "取消",
+    "goal": "目标"
+  },
+  "weather": {
+    "title": "天气与活动"
+  },
+  "focus": {
+    "title": "专注模式",
+    "selectApp": "选择应用",
+    "duration": "持续时间",
+    "password": "锁定密码",
+    "start": "启动专注模式",
+    "cancel": "取消专注",
+    "message": "所有其他应用将被最小化",
+    "wrongPassword": "密码错误",
+    "focusedApp": "专注的应用"
+  },
+  "timeout": {
+    "title": "休息时间",
+    "workInterval": "工作间隔",
+    "breakDuration": "休息时长",
+    "password": "锁定密码",
+    "start": "激活休息提醒",
+    "cancel": "取消休息提醒",
+    "breakTitle": "该休息了！",
+    "breakMessage": "休息一下，喝杯茶，伸展一下！",
+    "nextBreak": "下次休息在",
+    "working": "工作中"
+  },
   "common": {
     "loading": "加载中...",
     "error": "发生错误",
     "retry": "重试",
     "save": "保存",
+    "saved": "已保存",
+    "saving": "保存中...",
     "cancel": "取消",
     "confirm": "确认",
-    "close": "关闭"
+    "close": "关闭",
+    "hours": "小时",
+    "minutes": "分钟",
+    "seconds": "秒"
   }
 }

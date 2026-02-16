@@ -5,6 +5,7 @@ import 'package:peerdart/peerdart.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import 'dart:typed_data';
+import '../services/p2p_service.dart';
 
 class TransferScreen extends StatefulWidget {
   const TransferScreen({super.key});
@@ -42,16 +43,27 @@ class _TransferScreenState extends State<TransferScreen>
   // History
   final List<Map<String, dynamic>> _transferHistory = [];
 
+  // IP Mode
+  bool _isIpMode = false;
+  final P2PService _p2pService = P2PService();
+  String _ipAddress = '';
+  String _targetIp = '';
+  bool _ipServerRunning = false;
+  bool _ipSending = false;
+  String _ipStatus = '';
+
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
     _initPeer();
+    _loadIpAddress();
   }
 
   @override
   void dispose() {
     _peer?.dispose();
+    _p2pService.stopServer();
     _tabController.dispose();
     super.dispose();
   }
@@ -59,11 +71,13 @@ class _TransferScreenState extends State<TransferScreen>
   void _initPeer() {
     _peer = Peer(
       options: PeerOptions(
-        config: PeerConfig(iceServers: [
-          IceServer(urls: ['stun:stun.l.google.com:19302']),
-          IceServer(urls: ['stun:stun1.l.google.com:19302']),
-          IceServer(urls: ['stun:stun2.l.google.com:19302']),
-        ]),
+        config: {
+          'iceServers': [
+            {'urls': 'stun:stun.l.google.com:19302'},
+            {'urls': 'stun:stun1.l.google.com:19302'},
+            {'urls': 'stun:stun2.l.google.com:19302'},
+          ],
+        },
       ),
     );
 
@@ -83,11 +97,59 @@ class _TransferScreenState extends State<TransferScreen>
     });
   }
 
+  Future<void> _loadIpAddress() async {
+    final ip = await _p2pService.getIpAddress();
+    if (mounted) setState(() => _ipAddress = ip ?? 'Unknown');
+  }
+
+  Future<void> _toggleIpServer() async {
+    if (_ipServerRunning) {
+      _p2pService.stopServer();
+      setState(() {
+        _ipServerRunning = false;
+        _ipStatus = 'Server stopped';
+      });
+    } else {
+      await _p2pService.startServer();
+      setState(() {
+        _ipServerRunning = true;
+        _ipStatus = 'Server running on port 4444';
+      });
+    }
+  }
+
+  Future<void> _sendFileViaIp() async {
+    if (_selectedFile == null || _targetIp.isEmpty) return;
+    setState(() {
+      _ipSending = true;
+      _ipStatus = 'Sending...';
+    });
+
+    try {
+      await _p2pService.sendFile(_targetIp, _selectedFile!);
+      setState(() {
+        _ipStatus = 'File sent successfully! \u2713';
+        _transferHistory.insert(0, {
+          'name': _selectedFile!.path.split('/').last,
+          'size': _selectedFile!.lengthSync(),
+          'type': 'sent',
+          'date': DateTime.now(),
+          'status': 'completed',
+        });
+        _selectedFile = null;
+      });
+    } catch (e) {
+      setState(() => _ipStatus = 'Error: $e');
+    } finally {
+      if (mounted) setState(() => _ipSending = false);
+    }
+  }
+
   void _connectToPeer() {
     if (_targetPeerId.isEmpty || _peer == null) return;
     setState(() => _connectionError = '');
 
-    _conn = _peer!.connect(_targetPeerId, PeerConnectOption(reliable: true));
+    _conn = _peer!.connect(_targetPeerId);
 
     _conn!.on('open').listen((_) {
       if (mounted) {
@@ -368,35 +430,22 @@ class _TransferScreenState extends State<TransferScreen>
           children: [
             const Text('P2P Transfer'),
             const Spacer(),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-              decoration: BoxDecoration(
-                color: _isConnected
-                    ? Colors.green.withOpacity(0.15)
-                    : Colors.grey.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    width: 8,
-                    height: 8,
-                    decoration: BoxDecoration(
-                      color: _isConnected ? Colors.green : Colors.grey,
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    _isConnected ? 'Connected' : 'Offline',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: _isConnected ? Colors.green : Colors.grey,
-                    ),
-                  ),
-                ],
-              ),
+            // Mode toggle
+            ToggleButtons(
+              borderRadius: BorderRadius.circular(20),
+              constraints: const BoxConstraints(minHeight: 32, minWidth: 60),
+              textStyle:
+                  const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+              isSelected: [!_isIpMode, _isIpMode],
+              onPressed: (i) => setState(() => _isIpMode = i == 1),
+              children: const [
+                Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 8),
+                    child: Text('\ud83d\udd11 Token')),
+                Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 8),
+                    child: Text('\ud83c\udf10 IP')),
+              ],
             ),
           ],
         ),
@@ -411,10 +460,232 @@ class _TransferScreenState extends State<TransferScreen>
       body: TabBarView(
         controller: _tabController,
         children: [
-          _buildSendTab(primary),
-          _buildReceiveTab(primary),
+          _isIpMode ? _buildIpSendTab(primary) : _buildSendTab(primary),
+          _isIpMode ? _buildIpReceiveTab(primary) : _buildReceiveTab(primary),
         ],
       ),
+    );
+  }
+
+  // ── IP Mode: Send Tab ──
+  Widget _buildIpSendTab(Color primary) {
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        Card(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(children: [
+                  Icon(Icons.language, color: primary),
+                  const SizedBox(width: 10),
+                  Text('Send via IP',
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleMedium
+                          ?.copyWith(fontWeight: FontWeight.bold)),
+                ]),
+                const SizedBox(height: 8),
+                Text(
+                    'Enter the target device\'s IP address. Both devices must be on the same Wi-Fi network.',
+                    style: Theme.of(context).textTheme.bodySmall),
+                const SizedBox(height: 16),
+                TextField(
+                  onChanged: (v) => _targetIp = v,
+                  decoration: InputDecoration(
+                    hintText: 'e.g. 192.168.1.42',
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                    prefixIcon: const Icon(Icons.computer),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+
+        // File picker
+        GestureDetector(
+          onTap: _pickFile,
+          child: Container(
+            height: 150,
+            decoration: BoxDecoration(
+              border: Border.all(color: primary, width: 2),
+              borderRadius: BorderRadius.circular(16),
+              color: primary.withOpacity(0.05),
+            ),
+            child: _selectedFile == null
+                ? Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.upload_file, size: 48, color: primary),
+                      const SizedBox(height: 12),
+                      Text('Tap to select file',
+                          style: Theme.of(context).textTheme.titleMedium),
+                    ],
+                  )
+                : Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      children: [
+                        Icon(Icons.insert_drive_file, size: 40, color: primary),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(_selectedFile!.path.split('/').last,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style:
+                                      Theme.of(context).textTheme.titleSmall),
+                              const SizedBox(height: 4),
+                              Text(
+                                  _formatFileSize(_selectedFile!.lengthSync())),
+                            ],
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.close),
+                          onPressed: () => setState(() => _selectedFile = null),
+                        ),
+                      ],
+                    ),
+                  ),
+          ),
+        ),
+
+        if (_ipSending) ...[
+          const SizedBox(height: 16),
+          const LinearProgressIndicator(),
+        ],
+
+        if (_selectedFile != null && !_ipSending) ...[
+          const SizedBox(height: 20),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton.icon(
+              onPressed: _targetIp.isNotEmpty ? _sendFileViaIp : null,
+              icon: const Icon(Icons.send),
+              label: const Text('Send File'),
+              style: FilledButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16)),
+            ),
+          ),
+        ],
+
+        if (_ipStatus.isNotEmpty) ...[
+          const SizedBox(height: 12),
+          Text(_ipStatus,
+              style: TextStyle(
+                color: _ipStatus.contains('\u2713') ? Colors.green : null,
+                fontWeight: FontWeight.w500,
+              )),
+        ],
+      ],
+    );
+  }
+
+  // ── IP Mode: Receive Tab ──
+  Widget _buildIpReceiveTab(Color primary) {
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        Card(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              children: [
+                Row(children: [
+                  Icon(Icons.language, color: primary),
+                  const SizedBox(width: 10),
+                  Text('Receive via IP',
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleMedium
+                          ?.copyWith(fontWeight: FontWeight.bold)),
+                ]),
+                const SizedBox(height: 8),
+                Text(
+                    'Start the server to receive files from other devices on the same network.',
+                    style: Theme.of(context).textTheme.bodySmall),
+                const SizedBox(height: 20),
+
+                // IP display
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: primary.withOpacity(0.08),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: primary.withOpacity(0.2)),
+                  ),
+                  child: Column(
+                    children: [
+                      Text('YOUR IP ADDRESS',
+                          style: TextStyle(
+                              fontSize: 10,
+                              color: primary,
+                              letterSpacing: 1,
+                              fontWeight: FontWeight.w600)),
+                      const SizedBox(height: 8),
+                      GestureDetector(
+                        onTap: () {
+                          if (_ipAddress.isNotEmpty) {
+                            Clipboard.setData(ClipboardData(text: _ipAddress));
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text('IP copied!'),
+                                    duration: Duration(seconds: 1)));
+                          }
+                        },
+                        child: Text(
+                            _ipAddress.isEmpty ? 'Detecting...' : _ipAddress,
+                            style: TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: 'monospace',
+                                color: primary)),
+                      ),
+                      const SizedBox(height: 4),
+                      Text('Port: 4444',
+                          style: Theme.of(context).textTheme.bodySmall),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    onPressed: _toggleIpServer,
+                    icon:
+                        Icon(_ipServerRunning ? Icons.stop : Icons.play_arrow),
+                    label:
+                        Text(_ipServerRunning ? 'Stop Server' : 'Start Server'),
+                    style: FilledButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      backgroundColor: _ipServerRunning ? Colors.red : null,
+                    ),
+                  ),
+                ),
+
+                if (_ipStatus.isNotEmpty) ...[
+                  const SizedBox(height: 12),
+                  Text(_ipStatus, style: const TextStyle(fontSize: 13)),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 

@@ -543,6 +543,7 @@ const availableLanguages = [
   { code: "uk", name: "Українська", flag: "" },
   { code: "de", name: "Deutsch", flag: "" },
   { code: "fr", name: "Français", flag: "" },
+  { code: "es", name: "Español", flag: "" },
   { code: "zh-CN", name: "中文 (简体)", flag: "" },
   { code: "ar", name: "العربية", flag: "" },
 ];

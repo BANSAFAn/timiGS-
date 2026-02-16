@@ -9,7 +9,8 @@
     "analytics": "Analytik",
     "tools": "Werkzeuge",
     "github": "GitHub",
-    "settings": "Einstellungen"
+    "settings": "Einstellungen",
+    "compare": "Teams"
   },
   "github": {
     "connection": "GitHub-Verbindung",
@@ -40,11 +41,16 @@
     "title": "Aktivitätszeitachse",
     "today": "Heute",
     "yesterday": "Gestern",
+    "searchPlaceholder": "Apps suchen...",
     "selectDate": "Datum auswählen",
     "duration": "Dauer",
     "startTime": "Startzeit",
     "endTime": "Endzeit",
-    "noSessions": "Keine Sitzungen für dieses Datum"
+    "noSessions": "Keine Sitzungen für dieses Datum",
+    "websites": "Webseiten",
+    "noWebsites": "Keine Webseitendaten gefunden",
+    "noSearchResults": "Nicht gefunden",
+    "websiteStats": "Web-Statistiken"
   },
   "analytics": {
     "title": "Analytik",
@@ -71,6 +77,8 @@
     "themeLight": "Hell",
     "autostart": "Mit Windows starten",
     "minimizeToTray": "In System-Tray minimieren",
+    "discordRpc": "Discord Rich Presence",
+    "discordRpcDesc": "Aktivität im Discord-Profil anzeigen",
     "tracking": "Verfolgung",
     "startTracking": "Verfolgung starten",
     "stopTracking": "Verfolgung stoppen",
@@ -85,6 +93,10 @@
     "dataSync": "Datensynchronisierung",
     "syncGoogle": "Google-Konto-Sync",
     "syncGoogleDesc": "Synchronisieren Sie Ihre Aktivitätsdaten mit Google Drive",
+    "googleDrive": "Google Drive",
+    "googleClientId": "Client-ID",
+    "googleClientSecret": "Client-Geheimnis",
+    "connectAccount": "Konto verbinden",
     "connectGoogle": "Google verbinden",
     "connected": "Verbunden",
     "localStorage": "Lokaler Speicher",
@@ -95,12 +107,22 @@
     "emailPlaceholder": "ihre@email.de",
     "sendReport": "Bericht senden",
     "system": "System",
+    "subtitle": "Verwalten Sie Ihre Anwendungseinstellungen",
+    "dark": "Dunkel",
+    "light": "Hell",
+    "importData": "Daten importieren",
+    "updates": "Updates",
+    "checkForUpdates": "Nach Updates suchen",
     "checkUpdates": "Nach Updates suchen",
     "checkNow": "Jetzt prüfen",
     "checking": "Prüfe..."
   },
   "tools": {
     "timer": "Ausschalt-Timer",
+    "shutdownTimer": {
+      "title": "PC-Ausschalt-Timer",
+      "start": "Timer starten"
+    },
     "notepad": "Notizblock",
     "notepadPlaceholder": "Geben Sie Ihre Notizen ein...",
     "newNote": "Neue Notiz",
@@ -108,13 +130,55 @@
     "noNotes": "Noch keine Notizen",
     "untitled": "Ohne Titel"
   },
+  "tasks": {
+    "title": "Aufgaben & Ziele",
+    "addTask": "Aufgabe hinzufügen",
+    "noTasks": "Keine aktiven Aufgaben",
+    "appName": "App-Name",
+    "description": "Beschreibung",
+    "hours": "Stunden",
+    "create": "Erstellen",
+    "cancel": "Abbrechen",
+    "goal": "Ziel"
+  },
+  "weather": {
+    "title": "Wetter & Aktivität"
+  },
+  "focus": {
+    "title": "Fokus-Modus",
+    "selectApp": "Anwendung auswählen",
+    "duration": "Dauer",
+    "password": "Sperrpasswort",
+    "start": "Fokus-Modus starten",
+    "cancel": "Fokus abbrechen",
+    "message": "Alle anderen Apps werden minimiert",
+    "wrongPassword": "Falsches Passwort",
+    "focusedApp": "Fokussierte Anwendung"
+  },
+  "timeout": {
+    "title": "Time OUT",
+    "workInterval": "Arbeitsintervall",
+    "breakDuration": "Pausendauer",
+    "password": "Sperrpasswort",
+    "start": "Time OUT aktivieren",
+    "cancel": "Time OUT abbrechen",
+    "breakTitle": "Zeit zum Entspannen!",
+    "breakMessage": "Mach eine Pause, trink einen Tee, dehn dich!",
+    "nextBreak": "Nächste Pause in",
+    "working": "Arbeiten"
+  },
   "common": {
     "loading": "Wird geladen...",
     "error": "Ein Fehler ist aufgetreten",
     "retry": "Wiederholen",
     "save": "Speichern",
+    "saved": "Gespeichert",
+    "saving": "Speichern...",
     "cancel": "Abbrechen",
     "confirm": "Bestätigen",
-    "close": "Schließen"
+    "close": "Schließen",
+    "hours": "Stunden",
+    "minutes": "Minuten",
+    "seconds": "Sekunden"
   }
 }

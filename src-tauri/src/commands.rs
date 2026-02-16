@@ -351,6 +351,18 @@ pub async fn stop_p2p_server() -> Result<(), String> {
 }
 
 #[command]
+pub fn get_local_ip() -> Result<String, String> {
+    crate::p2p::get_local_ip()
+}
+
+#[command]
+pub async fn send_p2p_file(target_ip: String, file_path: String) -> Result<String, String> {
+    tokio::task::spawn_blocking(move || crate::p2p::send_file_to_ip(&target_ip, &file_path))
+        .await
+        .map_err(|e| e.to_string())?
+}
+
+#[command]
 pub fn start_timer_cmd(app: tauri::AppHandle, duration_secs: u64) {
     crate::timer::start_timer(duration_secs, app);
 }

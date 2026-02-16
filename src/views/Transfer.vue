@@ -7,9 +7,16 @@
           <h2>P2P Transfer</h2>
           <p class="subtitle">Secure direct file transfer between devices</p>
         </div>
-        <div class="connection-indicator" :class="{ connected: isConnected }">
-          <span class="indicator-dot"></span>
-          <span>{{ isConnected ? 'Connected' : 'Disconnected' }}</span>
+        <div class="header-right">
+          <!-- Mode Toggle -->
+          <div class="mode-toggle">
+            <button class="mode-btn" :class="{ active: transferMode === 'token' }" @click="transferMode = 'token'">🔑 Token</button>
+            <button class="mode-btn" :class="{ active: transferMode === 'ip' }" @click="switchToIpMode">🌐 IP</button>
+          </div>
+          <div class="connection-indicator" :class="{ connected: transferMode === 'token' ? isConnected : ipServerRunning }">
+            <span class="indicator-dot"></span>
+            <span>{{ (transferMode === 'token' ? isConnected : ipServerRunning) ? 'Online' : 'Offline' }}</span>
+          </div>
         </div>
       </div>
 
@@ -43,6 +50,54 @@
         <!-- SEND TAB -->
         <transition name="slide-fade" mode="out-in">
           <div v-if="activeTab === 'send'" key="send" class="panel send-panel">
+
+            <!-- ===== IP MODE - SEND ===== -->
+            <template v-if="transferMode === 'ip'">
+              <div class="section-card">
+                <div class="card-header">
+                  <span class="card-icon">🌐</span>
+                  <h3>Send via IP</h3>
+                </div>
+                <p class="ip-hint">Enter the target device's IP (shown on their Receive tab). Both devices must be on the same Wi-Fi network.</p>
+                <div class="input-row" style="margin-top: 16px;">
+                  <input v-model="targetIp" type="text" placeholder="e.g. 192.168.1.42" class="input-field" />
+                </div>
+                <div class="drop-zone" :class="{ 'has-file': selectedFile, 'dragging': isDragging }" @click="triggerFileSelect" @drop.prevent="onDrop" @dragover.prevent="isDragging = true" @dragleave="isDragging = false" style="margin-top: 20px;">
+                  <div v-if="!selectedFile" class="drop-content">
+                    <div class="drop-icon">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+                    </div>
+                    <p class="drop-text">Drop file here or click to browse</p>
+                  </div>
+                  <div v-else class="file-preview">
+                    <div class="file-icon">{{ getFileIcon(selectedFile.name) }}</div>
+                    <div class="file-info">
+                      <span class="file-name">{{ selectedFile.name }}</span>
+                      <span class="file-size">{{ formatFileSize(selectedFile.size) }}</span>
+                    </div>
+                    <button class="remove-file" @click.stop="selectedFile = null">×</button>
+                  </div>
+                </div>
+                <input type="file" ref="fileInput" @change="onFileSelected" class="hidden-input" />
+
+                <div v-if="ipTransferring" class="progress-section">
+                  <div class="progress-header">
+                    <span>Sending...</span>
+                  </div>
+                  <div class="progress-track">
+                    <div class="progress-fill" style="width:100%; animation: pulse-bar 1.5s infinite;"></div>
+                  </div>
+                </div>
+
+                <button class="btn-send" @click="sendViaIp" :disabled="!selectedFile || !targetIp || ipTransferring" v-if="selectedFile" style="margin-top: 20px;">
+                  📤 {{ ipTransferring ? 'Sending...' : 'Send File' }}
+                </button>
+                <p v-if="ipStatus" class="status-text" :class="{ success: ipStatus.includes('success') }">{{ ipStatus }}</p>
+              </div>
+            </template>
+
+            <!-- ===== TOKEN MODE - SEND (existing) ===== -->
+            <template v-else>
             <!-- Connection Section -->
             <div class="connect-section" v-if="!isConnected">
               <div class="section-card">
@@ -139,10 +194,45 @@
                 {{ transferStatus }}
               </p>
             </div>
+            </template>
           </div>
 
           <!-- RECEIVE TAB -->
           <div v-else-if="activeTab === 'receive'" key="receive" class="panel receive-panel">
+
+            <!-- ===== IP MODE - RECEIVE ===== -->
+            <template v-if="transferMode === 'ip'">
+              <div class="section-card">
+                <div class="card-header">
+                  <span class="card-icon">🌐</span>
+                  <h3>Receive via IP</h3>
+                </div>
+                <p class="ip-hint">Start the server so other devices can send files to this PC. Files are saved to your Downloads folder.</p>
+
+                <div class="ip-info-card" style="margin-top: 16px;">
+                  <div class="ip-label">Your IP Address</div>
+                  <div class="ip-value" @click="copyIp">{{ localIp || 'Detecting...' }} <span v-if="localIp" class="copy-hint">📋</span></div>
+                  <div class="ip-port">Port: 4444</div>
+                </div>
+
+                <div style="margin-top: 20px; display: flex; gap: 12px;">
+                  <button class="btn-connect" :class="{ 'btn-stop': ipServerRunning }" @click="toggleIpServer" style="flex: 1;">
+                    {{ ipServerRunning ? '⏹ Stop Server' : '▶ Start Server' }}
+                  </button>
+                </div>
+
+                <!-- Logs -->
+                <div v-if="ipLogs.length > 0" class="ip-logs" style="margin-top: 20px;">
+                  <h4 style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px;">Logs</h4>
+                  <div class="log-area">
+                    <div v-for="(log, i) in ipLogs" :key="i" class="log-line">{{ log }}</div>
+                  </div>
+                </div>
+              </div>
+            </template>
+
+            <!-- ===== TOKEN MODE - RECEIVE (existing) ===== -->
+            <template v-else>
             <!-- Token Section -->
             <div class="section-card token-card">
               <div class="card-header">
@@ -241,6 +331,7 @@
                 </div>
               </div>
             </div>
+            </template>
           </div>
         </transition>
       </div>
@@ -255,6 +346,17 @@ import { invoke } from "@tauri-apps/api/core";
 import { useNotificationStore } from "../stores/notifications";
 
 const notifications = useNotificationStore();
+
+// ── Mode ──
+const transferMode = ref<'token' | 'ip'>('token');
+
+// ── IP Mode State ──
+const localIp = ref('');
+const targetIp = ref('');
+const ipServerRunning = ref(false);
+const ipTransferring = ref(false);
+const ipStatus = ref('');
+const ipLogs = ref<string[]>([]);
 
 // State
 const activeTab = ref("send");
@@ -293,11 +395,90 @@ let receivedSize = 0;
 
 onMounted(() => {
   initPeer();
+  fetchLocalIp();
 });
 
 onUnmounted(() => {
   peer?.destroy();
 });
+
+// ── IP Mode Functions ──
+async function fetchLocalIp() {
+  try {
+    localIp.value = await invoke('get_local_ip') as string;
+  } catch (e) {
+    localIp.value = '(could not detect)';
+  }
+}
+
+function switchToIpMode() {
+  transferMode.value = 'ip';
+  if (!localIp.value || localIp.value.startsWith('(')) fetchLocalIp();
+}
+
+async function toggleIpServer() {
+  try {
+    if (ipServerRunning.value) {
+      await invoke('stop_p2p_server');
+      ipServerRunning.value = false;
+      addIpLog('Server stopped');
+    } else {
+      const res = await invoke('start_p2p_server') as string;
+      ipServerRunning.value = true;
+      addIpLog(res);
+    }
+  } catch (e) {
+    addIpLog('Error: ' + e);
+  }
+}
+
+function addIpLog(msg: string) {
+  ipLogs.value.push(`[${new Date().toLocaleTimeString()}] ${msg}`);
+  if (ipLogs.value.length > 50) ipLogs.value.shift();
+}
+
+async function sendViaIp() {
+  if (!selectedFile.value || !targetIp.value) return;
+  ipTransferring.value = true;
+  ipStatus.value = '';
+
+  try {
+    // Read the file, then save it temporarily and invoke the command
+    const arrayBuffer = await selectedFile.value.arrayBuffer();
+    const bytes = Array.from(new Uint8Array(arrayBuffer));
+    
+    // Save to temp first
+    const tmpPath = await invoke('save_local_file', {
+      filename: '_p2p_send_' + selectedFile.value.name,
+      data: bytes,
+      targetFolder: null
+    }) as string;
+
+    // Send via Rust
+    const result = await invoke('send_p2p_file', {
+      targetIp: targetIp.value,
+      filePath: tmpPath
+    }) as string;
+
+    ipStatus.value = '✓ ' + result;
+    notifications.success(result);
+    addIpLog('Sent: ' + selectedFile.value.name);
+    selectedFile.value = null;
+  } catch (e) {
+    ipStatus.value = 'Error: ' + e;
+    notifications.error('Transfer failed: ' + e);
+    addIpLog('Error: ' + e);
+  } finally {
+    ipTransferring.value = false;
+  }
+}
+
+function copyIp() {
+  if (localIp.value) {
+    navigator.clipboard.writeText(localIp.value);
+    notifications.success('IP copied!');
+  }
+}
 
 function initPeer() {
   peer = new Peer({
@@ -578,8 +759,124 @@ function rejectTransfer() {
 </script>
 
 <style scoped>
+@keyframes pulse-bar {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
 .transfer-page {
   padding-bottom: 40px;
+}
+
+/* Mode Toggle */
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.mode-toggle {
+  display: flex;
+  background: rgba(255,255,255,0.05);
+  border-radius: 12px;
+  padding: 4px;
+  gap: 2px;
+}
+
+.mode-btn {
+  padding: 8px 16px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.mode-btn.active {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.mode-btn:hover:not(.active) {
+  color: var(--text-color);
+}
+
+/* IP Mode */
+.ip-hint {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.ip-info-card {
+  background: rgba(99, 102, 241, 0.08);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  border-radius: 16px;
+  padding: 20px;
+  text-align: center;
+}
+
+.ip-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+}
+
+.ip-value {
+  font-family: 'Fira Code', 'Consolas', monospace;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #818cf8;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.ip-value:hover {
+  opacity: 0.8;
+}
+
+.copy-hint {
+  font-size: 0.9rem;
+  vertical-align: middle;
+}
+
+.ip-port {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-top: 6px;
+}
+
+.btn-stop {
+  background: #ef4444 !important;
+}
+
+.btn-stop:hover {
+  background: #dc2626 !important;
+}
+
+.ip-logs {
+  max-height: 160px;
+}
+
+.log-area {
+  background: rgba(0,0,0,0.3);
+  border-radius: 10px;
+  padding: 12px;
+  max-height: 130px;
+  overflow-y: auto;
+  font-family: 'Fira Code', 'Consolas', monospace;
+  font-size: 0.75rem;
+}
+
+.log-line {
+  color: var(--text-muted);
+  padding: 2px 0;
+  line-height: 1.5;
 }
 
 .page-header {

@@ -9,7 +9,8 @@
     "analytics": "Аналітика",
     "tools": "Інструменти",
     "github": "GitHub",
-    "settings": "Налаштування"
+    "settings": "Налаштування",
+    "compare": "Команди"
   },
   "github": {
     "connection": "Підключення GitHub",
@@ -76,6 +77,8 @@
     "themeLight": "Світла",
     "autostart": "Запускати з Windows",
     "minimizeToTray": "Згортати в системний трей",
+    "discordRpc": "Discord Rich Presence",
+    "discordRpcDesc": "Показувати активність у профілі Discord",
     "tracking": "Відстеження",
     "startTracking": "Почати відстеження",
     "stopTracking": "Зупинити відстеження",
@@ -90,6 +93,10 @@
     "dataSync": "Синхронізація даних",
     "syncGoogle": "Синхронізація з Google",
     "syncGoogleDesc": "Синхронізуйте дані активності на Google Drive",
+    "googleDrive": "Google Диск",
+    "googleClientId": "Ідентифікатор клієнта",
+    "googleClientSecret": "Секрет клієнта",
+    "connectAccount": "Підключити акаунт",
     "connectGoogle": "Підключити Google",
     "connected": "Підключено",
     "localStorage": "Локальне сховище",
@@ -100,18 +107,42 @@
     "emailPlaceholder": "ваша@пошта.com",
     "sendReport": "Надіслати звіт",
     "system": "Система",
+    "subtitle": "Керуйте налаштуваннями програми",
+    "dark": "Темна",
+    "light": "Світла",
+    "importData": "Імпортувати дані",
+    "updates": "Оновлення",
+    "checkForUpdates": "Перевірити оновлення",
     "checkUpdates": "Перевірити оновлення",
     "checkNow": "Перевірити",
     "checking": "Перевірка..."
   },
   "tools": {
     "timer": "Таймер вимкнення",
+    "shutdownTimer": {
+      "title": "Таймер вимкнення ПК",
+      "start": "Запустити таймер"
+    },
     "notepad": "Нотатки",
     "notepadPlaceholder": "Введіть текст...",
     "newNote": "Нова нотатка",
     "deleteNote": "Видалити",
     "noNotes": "Нотаток ще немає",
     "untitled": "Без назви"
+  },
+  "tasks": {
+    "title": "Завдання та цілі",
+    "addTask": "Додати завдання",
+    "noTasks": "Немає активних завдань",
+    "appName": "Назва програми",
+    "description": "Опис",
+    "hours": "Годин",
+    "create": "Створити",
+    "cancel": "Скасувати",
+    "goal": "Ціль"
+  },
+  "weather": {
+    "title": "Погода та активність"
   },
   "focus": {
     "title": "Режим фокусу",
@@ -145,6 +176,9 @@
     "saving": "Збереження...",
     "cancel": "Скасувати",
     "confirm": "Підтвердити",
-    "close": "Закрити"
+    "close": "Закрити",
+    "hours": "Годин",
+    "minutes": "Хвилин",
+    "seconds": "Секунд"
   }
 }

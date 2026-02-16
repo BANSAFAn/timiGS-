@@ -9,7 +9,8 @@
     "analytics": "التحليلات",
     "tools": "الأدوات",
     "github": "GitHub",
-    "settings": "الإعدادات"
+    "settings": "الإعدادات",
+    "compare": "الفِرَق"
   },
   "github": {
     "connection": "اتصال GitHub",
@@ -40,11 +41,16 @@
     "title": "الجدول الزمني للنشاط",
     "today": "اليوم",
     "yesterday": "أمس",
+    "searchPlaceholder": "البحث عن التطبيقات...",
     "selectDate": "اختر التاريخ",
     "duration": "المدة",
     "startTime": "وقت البدء",
     "endTime": "وقت النهاية",
-    "noSessions": "لا توجد جلسات لهذا التاريخ"
+    "noSessions": "لا توجد جلسات لهذا التاريخ",
+    "websites": "المواقع الإلكترونية",
+    "noWebsites": "لا توجد بيانات عن المواقع",
+    "noSearchResults": "لم يتم العثور على نتائج",
+    "websiteStats": "إحصائيات الويب"
   },
   "analytics": {
     "title": "التحليلات",
@@ -71,6 +77,8 @@
     "themeLight": "فاتح",
     "autostart": "ابدأ مع Windows",
     "minimizeToTray": "تصغير إلى علبة النظام",
+    "discordRpc": "Discord Rich Presence",
+    "discordRpcDesc": "عرض النشاط في ملف Discord الشخصي",
     "tracking": "التتبع",
     "startTracking": "بدء التتبع",
     "stopTracking": "إيقاف التتبع",
@@ -85,6 +93,10 @@
     "dataSync": "مزامنة البيانات",
     "syncGoogle": "مزامنة حساب Google",
     "syncGoogleDesc": "مزامنة بيانات نشاطك مع Google Drive",
+    "googleDrive": "Google Drive",
+    "googleClientId": "معرّف العميل",
+    "googleClientSecret": "سر العميل",
+    "connectAccount": "ربط الحساب",
     "connectGoogle": "ربط Google",
     "connected": "متصل",
     "localStorage": "التخزين المحلي",
@@ -95,12 +107,22 @@
     "emailPlaceholder": "بريدك@email.com",
     "sendReport": "إرسال التقرير",
     "system": "النظام",
+    "subtitle": "إدارة تفضيلات التطبيق",
+    "dark": "داكن",
+    "light": "فاتح",
+    "importData": "استيراد البيانات",
+    "updates": "التحديثات",
+    "checkForUpdates": "البحث عن تحديثات",
     "checkUpdates": "البحث عن تحديثات",
     "checkNow": "تحقق الآن",
     "checking": "جاري التحقق..."
   },
   "tools": {
     "timer": "مؤقت الإغلاق",
+    "shutdownTimer": {
+      "title": "مؤقت إيقاف الكمبيوتر",
+      "start": "بدء المؤقت"
+    },
     "notepad": "المفكرة",
     "notepadPlaceholder": "اكتب ملاحظاتك هنا...",
     "newNote": "ملاحظة جديدة",
@@ -108,13 +130,55 @@
     "noNotes": "لا توجد ملاحظات بعد",
     "untitled": "بدون عنوان"
   },
+  "tasks": {
+    "title": "المهام والأهداف",
+    "addTask": "إضافة مهمة",
+    "noTasks": "لا توجد مهام نشطة",
+    "appName": "اسم التطبيق",
+    "description": "الوصف",
+    "hours": "ساعات",
+    "create": "إنشاء",
+    "cancel": "إلغاء",
+    "goal": "الهدف"
+  },
+  "weather": {
+    "title": "الطقس والنشاط"
+  },
+  "focus": {
+    "title": "وضع التركيز",
+    "selectApp": "اختر التطبيق",
+    "duration": "المدة",
+    "password": "كلمة مرور القفل",
+    "start": "بدء وضع التركيز",
+    "cancel": "إلغاء التركيز",
+    "message": "سيتم تصغير جميع التطبيقات الأخرى",
+    "wrongPassword": "كلمة مرور خاطئة",
+    "focusedApp": "التطبيق المركّز عليه"
+  },
+  "timeout": {
+    "title": "وقت الراحة",
+    "workInterval": "فترة العمل",
+    "breakDuration": "مدة الاستراحة",
+    "password": "كلمة مرور القفل",
+    "start": "تفعيل وقت الراحة",
+    "cancel": "إلغاء وقت الراحة",
+    "breakTitle": "حان وقت الاسترخاء!",
+    "breakMessage": "خذ استراحة، اشرب شايا، تمدد!",
+    "nextBreak": "الاستراحة التالية بعد",
+    "working": "قيد العمل"
+  },
   "common": {
     "loading": "جار التحميل...",
     "error": "حدث خطأ",
     "retry": "إعادة المحاولة",
     "save": "حفظ",
+    "saved": "تم الحفظ",
+    "saving": "جاري الحفظ...",
     "cancel": "إلغاء",
     "confirm": "تأكيد",
-    "close": "إغلاق"
+    "close": "إغلاق",
+    "hours": "ساعات",
+    "minutes": "دقائق",
+    "seconds": "ثواني"
   }
 }

@@ -9,7 +9,8 @@
     "analytics": "Analyses",
     "tools": "Outils",
     "github": "GitHub",
-    "settings": "Paramètres"
+    "settings": "Paramètres",
+    "compare": "Équipes"
   },
   "github": {
     "connection": "Connexion GitHub",
@@ -40,15 +41,15 @@
     "title": "Chronologie de l'activité",
     "today": "Aujourd'hui",
     "yesterday": "Hier",
+    "searchPlaceholder": "Rechercher des applications...",
     "selectDate": "Sélectionner une date",
     "duration": "Durée",
     "startTime": "Heure de début",
     "endTime": "Heure de fin",
     "noSessions": "Aucune session pour cette date",
-    "searchPlaceholder": "Rechercher des applications...",
-    "noSearchResults": "Aucune application trouvée",
     "websites": "Sites Web",
     "noWebsites": "Aucune donnée de site Web disponible",
+    "noSearchResults": "Aucune application trouvée",
     "websiteStats": "Statistiques du navigateur"
   },
   "analytics": {
@@ -76,6 +77,8 @@
     "themeLight": "Clair",
     "autostart": "Démarrer avec Windows",
     "minimizeToTray": "Réduire dans la barre d'état système",
+    "discordRpc": "Discord Rich Presence",
+    "discordRpcDesc": "Afficher l'activité sur le profil Discord",
     "tracking": "Suivi",
     "startTracking": "Commencer le suivi",
     "stopTracking": "Arrêter le suivi",
@@ -90,6 +93,10 @@
     "dataSync": "Synchronisation des données",
     "syncGoogle": "Synchronisation compte Google",
     "syncGoogleDesc": "Synchronisez vos données d'activité avec Google Drive",
+    "googleDrive": "Google Drive",
+    "googleClientId": "Identifiant client",
+    "googleClientSecret": "Secret client",
+    "connectAccount": "Connecter le compte",
     "connectGoogle": "Connecter Google",
     "connected": "Connecté",
     "localStorage": "Stockage local",
@@ -100,12 +107,22 @@
     "emailPlaceholder": "votre@email.com",
     "sendReport": "Envoyer le rapport",
     "system": "Système",
+    "subtitle": "Gérez les préférences de votre application",
+    "dark": "Sombre",
+    "light": "Clair",
+    "importData": "Importer des données",
+    "updates": "Mises à jour",
+    "checkForUpdates": "Vérifier les mises à jour",
     "checkUpdates": "Vérifier les mises à jour",
     "checkNow": "Vérifier maintenant",
     "checking": "Vérification..."
   },
   "tools": {
     "timer": "Minuterie d'arrêt",
+    "shutdownTimer": {
+      "title": "Minuterie d'arrêt du PC",
+      "start": "Démarrer la minuterie"
+    },
     "notepad": "Bloc-notes",
     "notepadPlaceholder": "Tapez vos notes ici...",
     "newNote": "Nouvelle note",
@@ -113,13 +130,55 @@
     "noNotes": "Aucune note pour le moment",
     "untitled": "Sans titre"
   },
+  "tasks": {
+    "title": "Tâches et objectifs",
+    "addTask": "Ajouter une tâche",
+    "noTasks": "Aucune tâche active",
+    "appName": "Nom de l'application",
+    "description": "Description",
+    "hours": "Heures",
+    "create": "Créer",
+    "cancel": "Annuler",
+    "goal": "Objectif"
+  },
+  "weather": {
+    "title": "Météo et activité"
+  },
+  "focus": {
+    "title": "Mode concentration",
+    "selectApp": "Sélectionner l'application",
+    "duration": "Durée",
+    "password": "Mot de passe de verrouillage",
+    "start": "Démarrer le mode concentration",
+    "cancel": "Annuler la concentration",
+    "message": "Toutes les autres applications seront réduites",
+    "wrongPassword": "Mot de passe incorrect",
+    "focusedApp": "Application en cours de concentration"
+  },
+  "timeout": {
+    "title": "Time OUT",
+    "workInterval": "Intervalle de travail",
+    "breakDuration": "Durée de la pause",
+    "password": "Mot de passe de verrouillage",
+    "start": "Activer Time OUT",
+    "cancel": "Annuler Time OUT",
+    "breakTitle": "C'est l'heure de se détendre !",
+    "breakMessage": "Faites une pause, buvez du thé, étirez-vous !",
+    "nextBreak": "Prochaine pause dans",
+    "working": "En cours de travail"
+  },
   "common": {
     "loading": "Chargement...",
     "error": "Une erreur s'est produite",
     "retry": "Réessayer",
     "save": "Enregistrer",
+    "saved": "Enregistré",
+    "saving": "Enregistrement...",
     "cancel": "Annuler",
     "confirm": "Confirmer",
-    "close": "Fermer"
+    "close": "Fermer",
+    "hours": "Heures",
+    "minutes": "Minutes",
+    "seconds": "Secondes"
   }
 }

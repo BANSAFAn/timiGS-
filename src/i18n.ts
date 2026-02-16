@@ -5,6 +5,7 @@ import de from "./locales/de.json";
 import ar from "./locales/ar.json";
 import fr from "./locales/fr.json";
 import zh from "./locales/zh.json";
+import es from "./locales/es.json";
 
 // Get saved language or default to English
 const savedLang = localStorage.getItem("timigs-language") || "en";
@@ -19,12 +20,13 @@ export const i18n = createI18n({
     de,
     ar,
     fr,
-    zh
+    zh,
+    es
   },
 });
 
 export function setLanguage(lang: string) {
-  i18n.global.locale.value = lang as "en" | "uk" | "de" | "ar" | "fr" | "zh";
+  i18n.global.locale.value = lang as "en" | "uk" | "de" | "ar" | "fr" | "zh" | "es";
   localStorage.setItem("timigs-language", lang);
 }
 
