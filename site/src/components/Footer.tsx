@@ -22,7 +22,7 @@ const Footer: React.FC<FooterProps> = ({ t }) => {
   }, []);
 
   return (
-    <footer className="w-full mt-auto border-t border-white/5 bg-apple-gray-950/30 backdrop-blur-xl z-20 relative overflow-hidden">
+    <footer className="w-full mt-auto border-t border-white/5 bg-apple-gray-950/30 backdrop-blur-sm md:backdrop-blur-xl z-20 relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
           {/* Brand */}

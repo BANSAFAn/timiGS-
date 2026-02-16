@@ -13,17 +13,21 @@ const ParticleBackground: React.FC = () => {
     let animationFrameId: number;
     let width = window.innerWidth;
     let height = window.innerHeight;
+    let isMobile = window.matchMedia('(max-width: 768px)').matches;
 
     const resizeCanvas = () => {
       width = window.innerWidth;
       height = window.innerHeight;
+      isMobile = window.matchMedia('(max-width: 768px)').matches;
       canvas.width = width;
       canvas.height = height;
       initParticles();
     };
 
     const initParticles = () => {
-      const particleCount = Math.min(Math.floor(width * height / 12000), 100);
+      // Reduce particles on mobile for better performance
+      const density = isMobile ? 25000 : 12000;
+      const particleCount = Math.min(Math.floor(width * height / density), isMobile ? 30 : 100);
       particles = [];
       for (let i = 0; i < particleCount; i++) {
         particles.push({
@@ -56,21 +60,23 @@ const ParticleBackground: React.FC = () => {
         ctx.fillStyle = `rgba(56, 189, 248, ${p.alpha})`; // sky-400
         ctx.fill();
         
-        // Connect close particles
-        for (let j = i + 1; j < particles.length; j++) {
-            const p2 = particles[j];
-            const dx = p.x - p2.x;
-            const dy = p.y - p2.y;
-            const distance = Math.sqrt(dx * dx + dy * dy);
-            const maxDistance = 120;
-            
-            if (distance < maxDistance) {
-                ctx.beginPath();
-                ctx.strokeStyle = `rgba(56, 189, 248, ${0.15 * (1 - distance/maxDistance)})`;
-                ctx.lineWidth = 0.5;
-                ctx.moveTo(p.x, p.y);
-                ctx.lineTo(p2.x, p2.y);
-                ctx.stroke();
+        // Connect close particles - ONLY on desktop
+        if (!isMobile) {
+            for (let j = i + 1; j < particles.length; j++) {
+                const p2 = particles[j];
+                const dx = p.x - p2.x;
+                const dy = p.y - p2.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                const maxDistance = 120;
+                
+                if (distance < maxDistance) {
+                    ctx.beginPath();
+                    ctx.strokeStyle = `rgba(56, 189, 248, ${0.15 * (1 - distance/maxDistance)})`;
+                    ctx.lineWidth = 0.5;
+                    ctx.moveTo(p.x, p.y);
+                    ctx.lineTo(p2.x, p2.y);
+                    ctx.stroke();
+                }
             }
         }
       });

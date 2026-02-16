@@ -13,7 +13,10 @@ const CustomCursor = () => {
     const isTouchDevice = 
       'ontouchstart' in window || 
       navigator.maxTouchPoints > 0 ||
-      window.matchMedia('(pointer: coarse)').matches;
+      'ontouchstart' in window || 
+      navigator.maxTouchPoints > 0 ||
+      window.matchMedia('(pointer: coarse)').matches ||
+      window.innerWidth < 1024; // Also disable on smaller screens (tablets/mobile)
     
     if (isTouchDevice) {
       return; // Exit early on touch devices

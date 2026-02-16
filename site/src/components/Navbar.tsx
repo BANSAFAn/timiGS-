@@ -80,7 +80,7 @@ const Navbar: React.FC<NavbarProps> = ({ lang, t, pathname }) => {
     <nav 
       className={`fixed w-full z-50 top-0 start-0 transition-all duration-500 ${
         scrolled || isMenuOpen
-          ? 'bg-apple-gray-950/70 backdrop-blur-md border-b border-white/5 supports-[backdrop-filter]:bg-apple-gray-950/40' 
+          ? 'bg-apple-gray-950/70 backdrop-blur-sm md:backdrop-blur-md border-b border-white/5 supports-[backdrop-filter]:bg-apple-gray-950/40' 
           : 'bg-transparent border-b border-transparent py-2'
       }`}
     >
