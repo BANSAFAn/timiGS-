@@ -17,6 +17,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _isTracking = false;
   bool _batteryOptimizationDisabled = false;
 
+  String _getLanguageName(String code) {
+    switch (code) {
+      case 'en': return 'English';
+      case 'uk': return 'Українська';
+      case 'de': return 'Deutsch';
+      case 'fr': return 'Français';
+      case 'es': return 'Español';
+      default: return 'English';
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -66,15 +77,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ListTile(
                     leading: const Icon(Icons.language),
                     title: const Text('Language'),
-                    subtitle: Text(
-                        settings.language == 'en' ? 'English' : 'Українська'),
+                    subtitle: Text(_getLanguageName(settings.language)),
                     trailing: DropdownButton<String>(
                       value: settings.language,
                       underline: const SizedBox(),
                       items: const [
                         DropdownMenuItem(value: 'en', child: Text('English')),
-                        DropdownMenuItem(
-                            value: 'uk', child: Text('Українська')),
+                        DropdownMenuItem(value: 'uk', child: Text('Українська')),
+                        DropdownMenuItem(value: 'de', child: Text('Deutsch')),
+                        DropdownMenuItem(value: 'fr', child: Text('Français')),
+                        DropdownMenuItem(value: 'es', child: Text('Español')),
                       ],
                       onChanged: (value) {
                         if (value != null) {

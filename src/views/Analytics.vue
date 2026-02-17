@@ -1,95 +1,131 @@
 <template>
   <div class="page page-shell analytics-page">
-    <div class="page-container">
-      <div class="page-header">
+    <div class="page-container analytics-page-modern">
+      <div class="page-header modern-header">
         <div class="header-left">
-          <h2>{{ $t('analytics.title') }}</h2>
-          <p class="subtitle">Insights into your productivity patterns</p>
+          <div class="header-icon-wrapper">
+            <span class="header-icon">📊</span>
+          </div>
+          <div>
+            <h2>{{ $t('analytics.title') }}</h2>
+            <p class="header-subtitle">Insights into your productivity patterns</p>
+          </div>
         </div>
-        <div class="week-nav">
-          <button class="nav-btn" @click="prevWeek">
+        <div class="week-nav modern-week-nav">
+          <button class="nav-btn-modern" @click="prevWeek" title="Previous week">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
           </button>
-          <div class="date-range-badge">
+          <div class="date-range-badge-modern">
             <span class="range-icon">📅</span>
             <span>{{ weekRangeLabel }}</span>
           </div>
-          <button class="nav-btn" @click="nextWeek" :disabled="weekOffset >= 0">
+          <button class="nav-btn-modern" @click="nextWeek" :disabled="weekOffset >= 0" title="Next week">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
           </button>
         </div>
       </div>
 
-      <div class="analytics-dashboard">
+      <div class="analytics-dashboard-modern">
         <!-- Key Metrics Row -->
-        <div class="stats-row animate-enter">
-          <div class="stat-card premium-card purple">
-            <div class="stat-bg-icon">⏱️</div>
+        <div class="stats-row-modern animate-enter">
+          <div class="stat-card-modern purple">
+            <div class="stat-icon-bg">⏱️</div>
             <div class="stat-content">
               <span class="stat-label">{{ $t('analytics.totalWeek') }}</span>
               <span class="stat-value">{{ formatDuration(totalWeekTime) }}</span>
+              <span class="stat-trend-positive">This week</span>
             </div>
           </div>
-          <div class="stat-card premium-card blue">
-            <div class="stat-bg-icon">📊</div>
+          <div class="stat-card-modern blue">
+            <div class="stat-icon-bg">📈</div>
             <div class="stat-content">
               <span class="stat-label">{{ $t('analytics.dailyAverage') }}</span>
               <span class="stat-value">{{ formatDuration(dailyAverage) }}</span>
-            </div>
-            <div class="stat-trend">
-               <span>Based on 7 days</span>
+              <span class="stat-trend-neutral">Per day</span>
             </div>
           </div>
-          <div class="stat-card premium-card orange">
-            <div class="stat-bg-icon">🔥</div>
+          <div class="stat-card-modern orange">
+            <div class="stat-icon-bg">🔥</div>
             <div class="stat-content">
               <span class="stat-label">{{ $t('analytics.mostUsed') }}</span>
-              <span class="stat-value text-ellipsis" :title="store.topApps[0]?.app_name">{{ store.topApps[0]?.app_name || '-' }}</span>
+              <span class="stat-value top-app-name">{{ store.topApps[0]?.app_name || '-' }}</span>
+              <span class="stat-trend-negative">Top app</span>
+            </div>
+          </div>
+          <div class="stat-card-modern green">
+            <div class="stat-icon-bg">💻</div>
+            <div class="stat-content">
+              <span class="stat-label">Active Days</span>
+              <span class="stat-value">{{ activeDaysCount }}</span>
+              <span class="stat-trend-positive">Last 7 days</span>
             </div>
           </div>
         </div>
 
         <!-- Main Charts Grid -->
-        <div class="charts-grid animate-enter" style="animation-delay: 0.1s">
+        <div class="charts-grid-modern animate-enter" style="animation-delay: 0.1s">
           <!-- Activity Trend (Large) -->
-          <div class="chart-card large-chart">
-            <div class="card-header">
-              <h3>{{ $t('analytics.trend') }}</h3>
+          <div class="chart-card-modern large-chart-modern">
+            <div class="card-header-modern">
+              <div class="card-title-wrapper">
+                <span class="card-icon">📉</span>
+                <h3>{{ $t('analytics.trend') }}</h3>
+              </div>
+              <div class="card-actions">
+                <span class="card-badge">7 days</span>
+              </div>
             </div>
-            <div class="chart-container">
+            <div class="chart-container-modern">
               <Line v-if="weeklyStats.length > 0" :data="lineChartData" :options="lineChartOptions" />
+              <div v-else class="chart-empty-state">
+                <span class="empty-icon">📊</span>
+                <p>No data available for this period</p>
+              </div>
             </div>
           </div>
 
           <!-- Weekly Distribution -->
-          <div class="chart-card">
-            <div class="card-header">
-              <h3>Weekly Distribution</h3>
+          <div class="chart-card-modern">
+            <div class="card-header-modern">
+              <div class="card-title-wrapper">
+                <span class="card-icon">📊</span>
+                <h3>Weekly Distribution</h3>
+              </div>
             </div>
-            <div class="chart-container">
+            <div class="chart-container-modern">
               <Bar v-if="weeklyStats.length > 0" :data="weeklyChartData" :options="barChartOptions" />
+              <div v-else class="chart-empty-state">
+                <span class="empty-icon">📊</span>
+                <p>No data available</p>
+              </div>
             </div>
           </div>
 
           <!-- App Breakdown -->
-          <div class="chart-card">
-            <div class="card-header flex-between">
-              <h3>{{ $t('analytics.breakdownByApp') }}</h3>
-              <button class="btn-icon" @click="showDetailModal = true" title="View Details">
+          <div class="chart-card-modern">
+            <div class="card-header-modern flex-between">
+              <div class="card-title-wrapper">
+                <span class="card-icon">🥧</span>
+                <h3>{{ $t('analytics.breakdownByApp') }}</h3>
+              </div>
+              <button class="btn-icon-modern" @click="showDetailModal = true" title="View Details">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
               </button>
             </div>
-            <div class="chart-container pie-container">
-               <div class="pie-wrapper">
+            <div class="chart-container-modern pie-container-modern">
+               <div class="pie-wrapper-modern">
                   <Pie v-if="store.topApps.length > 0" :data="appChartData" :options="pieChartOptions" />
                </div>
-               
+
                <!-- Custom Legend -->
-               <div class="custom-legend">
-                 <div v-for="(app, i) in store.topApps.slice(0, 4)" :key="app.app_name" class="legend-item">
-                    <span class="legend-dot" :style="{ background: appChartData.datasets[0].backgroundColor[i] }"></span>
-                    <span class="legend-name">{{ app.app_name }}</span>
-                    <span class="legend-percent">{{ calculatePercentage(app.total_seconds) }}%</span>
+               <div class="custom-legend-modern">
+                 <div v-for="(app, i) in store.topApps.slice(0, 5)" :key="app.app_name" class="legend-item-modern">
+                    <span class="legend-dot-modern" :style="{ background: appChartData.datasets[0].backgroundColor[i] }"></span>
+                    <span class="legend-name-modern">{{ app.app_name }}</span>
+                    <span class="legend-percent-modern">{{ calculatePercentage(app.total_seconds) }}%</span>
+                 </div>
+                 <div v-if="store.topApps.length > 5" class="legend-more">
+                   +{{ store.topApps.length - 5 }} more
                  </div>
                </div>
             </div>
@@ -318,6 +354,7 @@ function calculatePercentage(seconds: number): string {
 
 const totalWeekTime = computed(() => weeklyStats.value.reduce((acc, d) => acc + d.total_seconds, 0));
 const dailyAverage = computed(() => weeklyStats.value.length ? Math.round(totalWeekTime.value / weeklyStats.value.length) : 0);
+const activeDaysCount = computed(() => weeklyStats.value.filter(d => d.total_seconds > 0).length);
 
 // --- Charts ---
 const weeklyChartData = computed(() => ({
@@ -814,5 +851,360 @@ onMounted(async () => { await fetchWeekData(); });
   font-size: 0.75rem;
   color: var(--text-muted);
   font-feature-settings: "tnum";
+}
+
+/* === Modern Analytics UI Styles === */
+.analytics-page-modern { padding-bottom: 40px; }
+
+.modern-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.modern-header .header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.header-icon-wrapper {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.15));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  border: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+.header-subtitle {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin-top: 4px;
+}
+
+.modern-week-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 6px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.nav-btn-modern {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.nav-btn-modern:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  transform: scale(1.05);
+}
+
+.nav-btn-modern:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.date-range-badge-modern {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  min-width: 140px;
+  justify-content: center;
+  font-weight: 500;
+}
+
+/* Modern Stats Row */
+.stats-row-modern {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+  margin-bottom: 32px;
+}
+
+.stat-card-modern {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02));
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 20px;
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(10px);
+}
+
+.stat-card-modern:hover {
+  transform: translateY(-4px);
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+}
+
+.stat-card-modern.purple { border-left: 3px solid rgba(99, 102, 241, 0.5); }
+.stat-card-modern.blue { border-left: 3px solid rgba(6, 182, 212, 0.5); }
+.stat-card-modern.orange { border-left: 3px solid rgba(249, 115, 22, 0.5); }
+.stat-card-modern.green { border-left: 3px solid rgba(16, 185, 129, 0.5); }
+
+.stat-icon-bg {
+  position: absolute;
+  right: 20px;
+  top: 20px;
+  font-size: 3rem;
+  opacity: 0.08;
+  transform: rotate(-10deg);
+}
+
+.stat-card-modern .stat-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 500;
+}
+
+.stat-card-modern .stat-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.2;
+}
+
+.stat-card-modern .stat-value.top-app-name {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 1.2rem;
+}
+
+.stat-trend-positive, .stat-trend-neutral, .stat-trend-negative {
+  font-size: 0.7rem;
+  padding: 4px 8px;
+  border-radius: 6px;
+  width: fit-content;
+  font-weight: 500;
+}
+
+.stat-trend-positive {
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.1);
+}
+
+.stat-trend-neutral {
+  color: #6b7280;
+  background: rgba(107, 114, 128, 0.1);
+}
+
+.stat-trend-negative {
+  color: #f59e0b;
+  background: rgba(245, 158, 11, 0.1);
+}
+
+/* Modern Charts Grid */
+.charts-grid-modern {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+@media (max-width: 1024px) {
+  .charts-grid-modern {
+    grid-template-columns: 1fr;
+  }
+  
+  .large-chart-modern {
+    grid-column: 1 / -1;
+  }
+}
+
+.chart-card-modern {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 20px;
+  padding: 24px;
+  transition: all 0.3s;
+  backdrop-filter: blur(10px);
+}
+
+.chart-card-modern:hover {
+  border-color: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.large-chart-modern {
+  grid-column: 1 / -1;
+}
+
+.card-header-modern {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.card-title-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.card-icon {
+  font-size: 1.2rem;
+}
+
+.card-title-wrapper h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+  margin: 0;
+}
+
+.card-badge {
+  background: rgba(99, 102, 241, 0.15);
+  color: #818cf8;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+.chart-container-modern {
+  height: 280px;
+  position: relative;
+}
+
+.pie-container-modern {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  align-items: center;
+}
+
+@media (max-width: 640px) {
+  .pie-container-modern {
+    grid-template-columns: 1fr;
+  }
+}
+
+.pie-wrapper-modern {
+  height: 220px;
+  position: relative;
+}
+
+.chart-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--text-muted);
+  gap: 12px;
+}
+
+.empty-icon {
+  font-size: 3rem;
+  opacity: 0.3;
+}
+
+/* Modern Custom Legend */
+.custom-legend-modern {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.legend-item-modern {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.02);
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.legend-item-modern:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.legend-dot-modern {
+  width: 12px;
+  height: 12px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.legend-name-modern {
+  flex: 1;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.legend-percent-modern {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #fff;
+  font-feature-settings: "tnum";
+}
+
+.legend-more {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 8px;
+}
+
+/* Modern Button Icon */
+.btn-icon-modern {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-icon-modern:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  transform: scale(1.05);
 }
 </style>

@@ -1,192 +1,233 @@
 <template>
-  <div class="page page-shell">
-    <div class="page-container settings-page">
-      <div class="page-header modern-header">
-        <div class="header-content">
-          <div class="header-icon">⚙️</div>
+  <div class="page page-shell settings-page-modern">
+    <div class="main-content">
+      <div class="page-header-modern">
+        <div class="header-content-modern">
+          <div class="header-icon-wrapper">
+            <span class="header-icon">⚙️</span>
+          </div>
           <div>
-            <h2>{{ $t("settings.title") }}</h2>
-            <p class="header-subtitle">
+            <h2 class="page-title">{{ $t("settings.title") }}</h2>
+            <p class="page-subtitle">
               {{ $t("settings.subtitle") || "Customize your experience" }}
             </p>
           </div>
         </div>
       </div>
 
-      <!-- Live Debug (Hidden in Prod usually, but good for now) -->
-      <!-- <div v-if="globalError" class="glass-card" style="border-color: var(--color-danger); margin-bottom: 20px;">
-        <h4 style="color: var(--color-danger)">Debug Info</h4>
-        <pre style="font-size: 10px; overflow: auto; max-height: 100px;">{{ globalError }}</pre>
-      </div> -->
-
       <!-- Loading State -->
       <div
         v-if="!isReady"
-        class="glass-card flex-center"
-        style="
-          min-height: 400px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          flex-direction: column;
-        "
+        class="loading-container"
       >
-        <div class="spinner"></div>
-        <p class="text-muted" style="margin-top: 20px">Loading settings...</p>
+        <div class="loading-spinner"></div>
+        <p class="loading-text">Loading settings...</p>
       </div>
 
       <!-- Settings Content -->
-      <div v-else class="settings-grid animate-enter">
-        <!-- Appearance -->
-        <div class="modern-card">
+      <div v-else class="settings-content">
+        
+        <!-- Appearance Card -->
+        <div class="settings-card-modern">
           <div class="card-header-modern">
-            <div class="card-icon">🎨</div>
-            <div>
-              <h3 class="card-title-modern">{{ $t("settings.appearance") }}</h3>
-              <p class="card-subtitle">Personalize your interface</p>
+            <div class="card-title-section">
+              <span class="card-icon">🎨</span>
+              <div>
+                <h3 class="card-title">{{ $t("settings.appearance") }}</h3>
+                <p class="card-description">Personalize your interface</p>
+              </div>
             </div>
           </div>
 
-          <div class="settings-group">
-            <div class="setting-item">
-              <div class="setting-left">
-                <div class="setting-icon">🌐</div>
-                <div class="setting-content">
+          <div class="settings-section">
+            <!-- Language -->
+            <div class="setting-row-modern">
+              <div class="setting-info">
+                <div class="setting-icon-wrapper">
+                  <span class="setting-icon">🌐</span>
+                </div>
+                <div class="setting-text">
                   <label class="setting-label">{{ $t("settings.language") }}</label>
-                  <p class="setting-description">Choose your preferred language</p>
+                  <p class="setting-hint">Choose your preferred language</p>
                 </div>
               </div>
-              <div
-                class="custom-select modern-select"
-                :class="{ open: langOpen }"
-                @click="langOpen = !langOpen"
-              >
-                <div class="selected-option">
-                  <span class="flag-icon">{{ currentLangFlag }}</span>
-                  <span class="lang-name">{{ currentLangName }}</span>
-                  <span class="chevron">▼</span>
-                </div>
-                <div class="options-list" v-show="langOpen">
-                  <div
-                    v-for="lang in availableLanguages"
-                    :key="lang.code"
-                    class="option-item"
-                    @click.stop="changeLanguage(lang.code)"
-                  >
-                    <span class="flag-icon">{{ lang.flag }}</span>
-                    {{ lang.name }}
+              <div class="setting-control">
+                <div class="dropdown-modern" :class="{ open: langOpen }" v-click-outside="() => langOpen = false">
+                  <button class="dropdown-trigger" @click="toggleLangDropdown">
+                    <span class="flag-icon">{{ currentLangFlag }}</span>
+                    <span class="dropdown-value">{{ currentLangName }}</span>
+                    <span class="dropdown-arrow">▼</span>
+                  </button>
+                  <div class="dropdown-menu">
+                    <!-- Search -->
+                    <div class="dropdown-search">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"/>
+                        <path d="m21 21-4.35-4.35"/>
+                      </svg>
+                      <input 
+                        type="text" 
+                        v-model="langSearch" 
+                        placeholder="Search languages..." 
+                        @click.stop
+                        ref="searchInput"
+                      />
+                    </div>
+                    
+                    <!-- Language List -->
+                    <div class="dropdown-items">
+                      <button
+                        v-for="lang in filteredLanguages"
+                        :key="lang.code"
+                        class="dropdown-item"
+                        @click="selectLanguage(lang.code)"
+                      >
+                        <span class="flag-icon">{{ lang.flag }}</span>
+                        {{ lang.name }}
+                        <span v-if="lang.code === localSettings.language" class="check-icon">✓</span>
+                      </button>
+                      <div v-if="filteredLanguages.length === 0" class="no-results">
+                        No languages found
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div class="setting-item">
-              <div class="setting-left">
-                <div class="setting-icon">🌓</div>
-                <div class="setting-content">
+            <!-- Theme -->
+            <div class="setting-row-modern">
+              <div class="setting-info">
+                <div class="setting-icon-wrapper">
+                  <span class="setting-icon">🌓</span>
+                </div>
+                <div class="setting-text">
                   <label class="setting-label">{{ $t("settings.theme") }}</label>
-                  <p class="setting-description">Switch between dark and light mode</p>
+                  <p class="setting-hint">Switch between dark and light mode</p>
                 </div>
               </div>
-              <div class="theme-switcher-modern">
-                 <button 
-                   class="theme-btn-modern" 
-                   :class="{ active: localSettings.theme === 'dark' }"
-                   @click="setTheme('dark')"
-                 >
-                   <span class="theme-icon">🌙</span>
-                   <span class="theme-label">Dark</span>
-                 </button>
-                 <button 
-                   class="theme-btn-modern" 
-                   :class="{ active: localSettings.theme === 'light' }"
-                   @click="setTheme('light')"
-                 >
-                   <span class="theme-icon">☀️</span>
-                   <span class="theme-label">Light</span>
-                 </button>
+              <div class="setting-control">
+                <div class="theme-segmented">
+                  <button
+                    class="segment-btn"
+                    :class="{ active: localSettings.theme === 'dark' }"
+                    @click="setTheme('dark')"
+                  >
+                    <span class="segment-icon">🌙</span>
+                    <span class="segment-label">Dark</span>
+                  </button>
+                  <button
+                    class="segment-btn"
+                    :class="{ active: localSettings.theme === 'light' }"
+                    @click="setTheme('light')"
+                  >
+                    <span class="segment-icon">☀️</span>
+                    <span class="segment-label">Light</span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- System -->
-        <div class="modern-card">
+        <!-- System Card -->
+        <div class="settings-card-modern">
           <div class="card-header-modern">
-            <div class="card-icon">⚙️</div>
-            <div>
-              <h3 class="card-title-modern">{{ $t("settings.system") }}</h3>
-              <p class="card-subtitle">Manage app behavior</p>
+            <div class="card-title-section">
+              <span class="card-icon">⚙️</span>
+              <div>
+                <h3 class="card-title">{{ $t("settings.system") }}</h3>
+                <p class="card-description">Manage app behavior</p>
+              </div>
             </div>
           </div>
 
-          <div class="settings-group">
-
-            <div class="setting-item">
-              <div class="setting-left">
-                <div class="setting-icon">📊</div>
-                <div class="setting-content">
+          <div class="settings-section">
+            <!-- Tracking -->
+            <div class="setting-row-modern">
+              <div class="setting-info">
+                <div class="setting-icon-wrapper">
+                  <span class="setting-icon">📊</span>
+                </div>
+                <div class="setting-text">
                   <label class="setting-label">{{ $t("settings.tracking") }}</label>
-                  <p class="setting-description">{{ isTracking ? "Active" : "Paused" }}</p>
+                  <p class="setting-hint">{{ isTracking ? "Active" : "Paused" }}</p>
                 </div>
               </div>
-              <button
-                class="btn"
-                :class="isTracking ? 'btn-danger' : 'btn-success'"
-                @click="toggleTracking"
-              >
-                {{ isTracking ? $t("settings.stopTracking") : $t("settings.startTracking") }}
-              </button>
+              <div class="setting-control">
+                <button
+                  class="btn-modern"
+                  :class="isTracking ? 'btn-danger' : 'btn-success'"
+                  @click="toggleTracking"
+                >
+                  {{ isTracking ? $t("settings.stopTracking") : $t("settings.startTracking") }}
+                </button>
+              </div>
             </div>
 
-            <div class="setting-item">
-              <div class="setting-left">
-                <div class="setting-icon">🚀</div>
-                <div class="setting-content">
+            <!-- Autostart -->
+            <div class="setting-row-modern">
+              <div class="setting-info">
+                <div class="setting-icon-wrapper">
+                  <span class="setting-icon">🚀</span>
+                </div>
+                <div class="setting-text">
                   <label class="setting-label">{{ $t("settings.autostart") }}</label>
-                  <p class="setting-description">Launch TimiGS on system startup</p>
+                  <p class="setting-hint">Launch TimiGS on system startup</p>
                 </div>
               </div>
-              <div
-                class="toggle-switch"
-                :class="{ checked: localSettings.autostart }"
-                @click="toggleAutostart"
-              >
-                <div class="toggle-thumb"></div>
+              <div class="setting-control">
+                <div
+                  class="toggle-switch-modern"
+                  :class="{ checked: localSettings.autostart }"
+                  @click="toggleAutostart"
+                >
+                  <div class="toggle-thumb"></div>
+                </div>
               </div>
             </div>
 
-            <div class="setting-item">
-              <div class="setting-left">
-                <div class="setting-icon">📌</div>
-                <div class="setting-content">
+            <!-- Minimize to Tray -->
+            <div class="setting-row-modern">
+              <div class="setting-info">
+                <div class="setting-icon-wrapper">
+                  <span class="setting-icon">📌</span>
+                </div>
+                <div class="setting-text">
                   <label class="setting-label">{{ $t("settings.minimizeToTray") }}</label>
-                  <p class="setting-description">Keep running in background</p>
+                  <p class="setting-hint">Keep running in background</p>
                 </div>
               </div>
-              <div
-                class="toggle-switch"
-                :class="{ checked: localSettings.minimize_to_tray }"
-                @click="toggleMinimize"
-              >
-                <div class="toggle-thumb"></div>
+              <div class="setting-control">
+                <div
+                  class="toggle-switch-modern"
+                  :class="{ checked: localSettings.minimize_to_tray }"
+                  @click="toggleMinimize"
+                >
+                  <div class="toggle-thumb"></div>
+                </div>
               </div>
             </div>
 
-            <div class="setting-item">
-              <div class="setting-left">
-                <div class="setting-icon">🎮</div>
-                <div class="setting-content">
+            <!-- Discord RPC -->
+            <div class="setting-row-modern">
+              <div class="setting-info">
+                <div class="setting-icon-wrapper">
+                  <span class="setting-icon">🎮</span>
+                </div>
+                <div class="setting-text">
                   <label class="setting-label">{{ $t("settings.discordRpc") || "Discord Rich Presence" }}</label>
-                  <p class="setting-description">{{ $t("settings.discordRpcDesc") || "Show activity on Discord profile" }}</p>
+                  <p class="setting-hint">{{ $t("settings.discordRpcDesc") || "Show activity on Discord profile" }}</p>
                 </div>
               </div>
-              <div
-                class="toggle-switch"
-                :class="{ checked: localSettings.discord_rpc }"
-                @click="toggleDiscord"
-              >
-                <div class="toggle-thumb"></div>
+              <div class="setting-control">
+                <div
+                  class="toggle-switch-modern"
+                  :class="{ checked: localSettings.discord_rpc }"
+                  @click="toggleDiscord"
+                >
+                  <div class="toggle-thumb"></div>
+                </div>
               </div>
             </div>
           </div>
@@ -523,7 +564,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, reactive, computed } from "vue";
+import { ref, onMounted, reactive, computed, nextTick } from "vue";
 import { useI18n } from "vue-i18n";
 import { invoke } from "@tauri-apps/api/core";
 import { useActivityStore } from "../stores/activity";
@@ -538,15 +579,26 @@ const notifications = useNotificationStore();
 
 // Language State
 const langOpen = ref(false);
+const langSearch = ref("");
+const searchInput = ref<HTMLInputElement | null>(null);
+
 const availableLanguages = [
-  { code: "en", name: "English", flag: "" },
-  { code: "uk", name: "Українська", flag: "" },
-  { code: "de", name: "Deutsch", flag: "" },
-  { code: "fr", name: "Français", flag: "" },
-  { code: "es", name: "Español", flag: "" },
-  { code: "zh-CN", name: "中文 (简体)", flag: "" },
-  { code: "ar", name: "العربية", flag: "" },
+  { code: "en", name: "English", flag: "🇬🇧" },
+  { code: "uk", name: "Українська", flag: "🇺🇦" },
+  { code: "de", name: "Deutsch", flag: "🇩🇪" },
+  { code: "fr", name: "Français", flag: "🇫🇷" },
+  { code: "es", name: "Español", flag: "🇪🇸" },
+  { code: "zh-CN", name: "中文 (简体)", flag: "🇨🇳" },
+  { code: "ar", name: "العربية", flag: "🇸🇦" },
 ];
+
+const filteredLanguages = computed(() => {
+  if (!langSearch.value) return availableLanguages;
+  return availableLanguages.filter(lang => 
+    lang.name.toLowerCase().includes(langSearch.value.toLowerCase()) ||
+    lang.code.toLowerCase().includes(langSearch.value.toLowerCase())
+  );
+});
 
 const currentLangFlag = computed(
   () =>
@@ -559,10 +611,22 @@ const currentLangName = computed(
     "Language"
 );
 
-function changeLanguage(code: string) {
+function toggleLangDropdown() {
+  langOpen.value = !langOpen.value;
+  if (langOpen.value) {
+    nextTick(() => {
+      searchInput.value?.focus();
+    });
+  } else {
+    langSearch.value = "";
+  }
+}
+
+function selectLanguage(code: string) {
   localSettings.language = code;
   saveSettings();
   langOpen.value = false;
+  langSearch.value = "";
 }
 
 function setTheme(theme: string) {
@@ -1003,6 +1067,8 @@ onMounted(() => {
 </script>
 
 <style scoped>
+@import "../styles/settings-modern.css";
+
 .page-shell {
   padding-bottom: 80px; /* Space for mobile nav */
 }

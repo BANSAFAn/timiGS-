@@ -8,7 +8,9 @@
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
     "tauri": "tauri",
-    "generate-installer": "node scripts/generate-installer-assets.js"
+    "generate-installer": "node scripts/generate-installer-assets.js",
+    "build:portable": "powershell -ExecutionPolicy Bypass -File scripts/build-portable.ps1",
+    "build:portable:debug": "powershell -ExecutionPolicy Bypass -File scripts/build-portable.ps1 -Release:$false"
   },
   "dependencies": {
     "@tauri-apps/api": "^2",

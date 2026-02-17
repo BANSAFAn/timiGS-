@@ -1,11 +1,16 @@
 <template>
   <div class="tray-container">
     <div class="tray-menu">
+      <div class="tray-header">
+        <span class="tray-title">TimiGS</span>
+        <button class="btn-icon-close" @click="hideTray" title="Close">✕</button>
+      </div>
+
       <button class="menu-item" @click="navigateTo('/')">
         <span class="icon">🏠</span>
         <span>Dashboard</span>
       </button>
-      
+
       <button class="menu-item" @click="navigateTo('/tools')">
         <span class="icon">🛠️</span>
         <span>Tools</span>
@@ -14,6 +19,11 @@
       <button class="menu-item" @click="navigateTo('/settings')">
           <span class="icon">⚙️</span>
           <span>Settings</span>
+      </button>
+
+      <button class="menu-item" @click="navigateTo('/analytics')">
+          <span class="icon">📊</span>
+          <span>Analytics</span>
       </button>
 
       <div class="divider"></div>
@@ -50,7 +60,6 @@ async function quitApp() {
 <style scoped>
 .tray-container {
   width: 100%;
-  /* Height auto to fit content */
   height: auto;
   padding: 0;
   margin: 0;
@@ -68,6 +77,42 @@ async function quitApp() {
   border-radius: 8px;
   padding: 6px;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  min-width: 180px;
+}
+
+.tray-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 8px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid #334155;
+}
+
+.tray-title {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: #f1f5f9;
+}
+
+.btn-icon-close {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  font-size: 1rem;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+}
+
+.btn-icon-close:hover {
+  background: #334155;
+  color: #f1f5f9;
 }
 
 .menu-item {

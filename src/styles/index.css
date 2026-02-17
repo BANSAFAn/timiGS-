@@ -84,6 +84,16 @@ body {
   background: var(--text-muted);
 }
 
+/* Global Dropdown Fix */
+.dropdown-modern,
+[data-dropdown] {
+  z-index: 9999 !important;
+}
+
+.dropdown-menu {
+  z-index: 9999 !important;
+}
+
 /* --- APP SHELL LAYOUT --- */
 .app-shell {
   display: flex;

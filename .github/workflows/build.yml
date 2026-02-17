@@ -1,0 +1,107 @@
+name: 'Build and Release'
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*'
+  pull_request:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            args: ''
+          - os: ubuntu-22.04
+            target: x86_64-unknown-linux-gnu
+            args: ''
+          - os: macos-latest
+            target: x86_64-apple-darwin
+            args: ''
+          - os: macos-latest
+            target: aarch64-apple-darwin
+            args: ''
+
+    runs-on: ${{ matrix.platform.os }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.platform.target }}
+
+      - name: Install dependencies (Ubuntu only)
+        if: matrix.platform.os == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Build Tauri App
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        with:
+          tagName: v__VERSION__
+          releaseName: 'TimiGS v__VERSION__'
+          releaseBody: 'See the assets to download this version and install.'
+          releaseDraft: true
+          prerelease: false
+          args: --target ${{ matrix.platform.target }}
+
+      # Build Portable ZIP for Windows
+      - name: Build Portable Version (Windows)
+        if: matrix.platform.os == 'windows-latest'
+        shell: pwsh
+        run: |
+          npm run build:portable
+          
+      - name: Upload Portable ZIP (Windows)
+        if: matrix.platform.os == 'windows-latest' && startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: TimiGS-Portable.zip
+          tag_name: ${{ github.ref_name }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Upload artifacts for PR builds
+      - name: Upload Artifacts (PR)
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: timigs-${{ matrix.platform.os }}-${{ github.run_id }}
+          path: |
+            src-tauri/target/${{ matrix.platform.target }}/release/bundle/**/*.exe
+            src-tauri/target/${{ matrix.platform.target }}/release/bundle/**/*.msi
+            src-tauri/target/${{ matrix.platform.target }}/release/bundle/**/*.deb
+            src-tauri/target/${{ matrix.platform.target }}/release/bundle/**/*.rpm
+            src-tauri/target/${{ matrix.platform.target }}/release/bundle/**/*.AppImage
+            src-tauri/target/${{ matrix.platform.target }}/release/bundle/**/*.dmg
+            src-tauri/target/${{ matrix.platform.target }}/release/bundle/**/*.app
+            TimiGS-Portable.zip
+          if-no-files-found: ignore

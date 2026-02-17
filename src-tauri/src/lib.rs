@@ -173,8 +173,8 @@ pub fn run() {
             if window.label() == "tray" && !*focused {
                 let window_clone = window.clone();
                 std::thread::spawn(move || {
-                    // Wait a bit before hiding
-                    std::thread::sleep(std::time::Duration::from_millis(200));
+                    // Wait a bit before hiding (increased to 500ms for better UX)
+                    std::thread::sleep(std::time::Duration::from_millis(500));
 
                     // Don't hide if the tray was just shown (prevents race condition)
                     let shown_at = TRAY_LAST_SHOWN.load(std::sync::atomic::Ordering::SeqCst);
@@ -183,8 +183,14 @@ pub fn run() {
                         .unwrap_or_default()
                         .as_millis() as u64;
 
-                    if now.saturating_sub(shown_at) > 300 {
-                        let _ = window_clone.hide();
+                    // Only hide if it's been more than 600ms since shown (gives user time to click)
+                    if now.saturating_sub(shown_at) > 600 {
+                        // Double-check it's still not focused
+                        if let Ok(is_focused) = window_clone.is_focused() {
+                            if !is_focused {
+                                let _ = window_clone.hide();
+                            }
+                        }
                     }
                 });
             }

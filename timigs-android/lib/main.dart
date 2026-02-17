@@ -108,7 +108,13 @@ class _MyAppState extends State<MyApp> {
                 ? ThemeMode.dark
                 : ThemeMode.light,
             locale: Locale(settingsNotifier.settings.language),
-            supportedLocales: const [Locale('en'), Locale('uk')],
+            supportedLocales: const [
+              Locale('en'), 
+              Locale('uk'),
+              Locale('de'),
+              Locale('fr'),
+              Locale('es'),
+            ],
             localizationsDelegates: const [
               AppLocalizations.delegate,
               GlobalMaterialLocalizations.delegate,
@@ -131,6 +137,7 @@ class _MyAppState extends State<MyApp> {
       colorScheme: ColorScheme.fromSeed(
         seedColor: const Color(0xFF6366F1),
         brightness: brightness,
+        surfaceTint: Colors.transparent,
       ),
       scaffoldBackgroundColor:
           isDark ? const Color(0xFF0F0F1E) : const Color(0xFFF5F5F7),
@@ -140,6 +147,31 @@ class _MyAppState extends State<MyApp> {
         backgroundColor:
             isDark ? const Color(0xFF0F0F1E) : const Color(0xFFF5F5F7),
         foregroundColor: isDark ? Colors.white : Colors.black,
+        titleTextStyle: TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.w600,
+          color: isDark ? Colors.white : Colors.black,
+        ),
+      ),
+      cardTheme: CardTheme(
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        color: isDark ? const Color(0xFF1A1A2E) : Colors.white,
+      ),
+      navigationBarTheme: NavigationBarThemeData(
+        height: 80,
+        elevation: 0,
+        indicatorColor: const Color(0xFF6366F1).withOpacity(0.15),
+        labelTextStyle: WidgetStateProperty.resolveWith((states) {
+          return TextStyle(
+            fontSize: 12,
+            fontWeight: states.contains(WidgetState.selected)
+                ? FontWeight.w600
+                : FontWeight.normal,
+          );
+        }),
       ),
     );
   }

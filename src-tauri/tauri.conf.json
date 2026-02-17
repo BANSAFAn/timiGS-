@@ -42,9 +42,8 @@
   },
   "bundle": {
     "active": true,
-    "targets": ["nsis", "msi", "deb", "rpm", "appimage", "dmg", "app"],
+    "targets": ["nsis", "msi", "deb", "rpm", "appimage", "dmg"],
     "icon": [
-
       "icons/128x128.png",
       "icons/128x128@2x.png",
       "icons/icon.icns",
@@ -58,7 +57,6 @@
         "installerIcon": "icons/icon.ico",
         "headerImage": "icons/nsis-header.bmp",
         "sidebarImage": "icons/nsis-sidebar.bmp",
-        "installerHooks": "windows/hooks.nsh",
         "startMenuFolder": "TimiGS",
         "compression": "lzma"
       }
