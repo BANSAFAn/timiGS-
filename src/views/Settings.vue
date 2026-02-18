@@ -52,13 +52,13 @@
                 </div>
               </div>
               <div class="setting-control">
-                <div class="dropdown-modern" :class="{ open: langOpen }" v-click-outside="() => langOpen = false">
+                <div class="dropdown-modern" :class="{ open: langOpen }">
                   <button class="dropdown-trigger" @click="toggleLangDropdown">
                     <span class="flag-icon">{{ currentLangFlag }}</span>
                     <span class="dropdown-value">{{ currentLangName }}</span>
                     <span class="dropdown-arrow">▼</span>
                   </button>
-                  <div class="dropdown-menu">
+                  <div v-if="langOpen" class="dropdown-menu">
                     <!-- Search -->
                     <div class="dropdown-search">
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -622,11 +622,15 @@ function toggleLangDropdown() {
   }
 }
 
+function closeLangDropdown() {
+  langOpen.value = false;
+  langSearch.value = "";
+}
+
 function selectLanguage(code: string) {
   localSettings.language = code;
   saveSettings();
-  langOpen.value = false;
-  langSearch.value = "";
+  closeLangDropdown();
 }
 
 function setTheme(theme: string) {
