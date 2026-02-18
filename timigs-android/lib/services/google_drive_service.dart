@@ -84,9 +84,10 @@ class GoogleDriveService {
     } else if (error.contains('network_error')) {
       return 'Network error. Check your internet connection.';
     } else if (error.contains('sign_in_failed')) {
-      return 'Sign-in failed. Make sure Google Play Services is up to date.';
+      return 'Sign-in failed. Check if google-services.json is missing or invalid.';
     } else if (error.contains('ApiException: 10')) {
-      return 'Configuration error. App needs Google Cloud Console setup.';
+      // Common error when SHA-1 is wrong or google-services.json is missing
+      return 'Configuration error (Code 10). verify google-services.json and SHA-1 fingerprints in Firebase.';
     } else if (error.contains('ApiException: 12500')) {
       return 'Google Play Services needs to be updated.';
     } else if (error.contains('ApiException: 7')) {

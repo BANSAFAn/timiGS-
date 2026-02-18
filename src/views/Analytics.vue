@@ -11,7 +11,7 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
           </button>
           <div class="date-range-badge">
-            <span class="range-icon">📅</span>
+            <span class="range-icon" v-html="Icons.timeline"></span>
             <span>{{ weekRangeLabel }}</span>
           </div>
           <button class="nav-btn" @click="nextWeek" :disabled="weekOffset >= 0">
@@ -24,14 +24,14 @@
         <!-- Key Metrics Row -->
         <div class="stats-row animate-enter">
           <div class="stat-card premium-card purple">
-            <div class="stat-bg-icon">⏱️</div>
+            <div class="stat-bg-icon" v-html="Icons.clock"></div>
             <div class="stat-content">
               <span class="stat-label">{{ $t('analytics.totalWeek') }}</span>
               <span class="stat-value">{{ formatDuration(totalWeekTime) }}</span>
             </div>
           </div>
           <div class="stat-card premium-card blue">
-            <div class="stat-bg-icon">📊</div>
+            <div class="stat-bg-icon" v-html="Icons.chart"></div>
             <div class="stat-content">
               <span class="stat-label">{{ $t('analytics.dailyAverage') }}</span>
               <span class="stat-value">{{ formatDuration(dailyAverage) }}</span>
@@ -41,7 +41,7 @@
             </div>
           </div>
           <div class="stat-card premium-card orange">
-            <div class="stat-bg-icon">🔥</div>
+            <div class="stat-bg-icon" v-html="Icons.fire"></div>
             <div class="stat-content">
               <span class="stat-label">{{ $t('analytics.mostUsed') }}</span>
               <span class="stat-value text-ellipsis" :title="store.topApps[0]?.app_name">{{ store.topApps[0]?.app_name || '-' }}</span>
@@ -116,6 +116,13 @@
              </div>
            </div>
         </div>
+
+        <!-- Empty State -->
+        <div v-if="weeklyStats.length === 0 && store.topApps.length === 0 && !store.isLoading" class="empty-state animate-enter">
+          <div class="empty-icon">📊</div>
+          <h3>No Data Available Yet</h3>
+          <p>Start using your applications to see analytics here.</p>
+        </div>
       </div>
     </div>
 
@@ -165,7 +172,7 @@
       <div v-if="showDayDetail" class="modal-overlay" @click.self="showDayDetail = false">
         <div class="modal-content animate-enter" style="max-width: 700px;">
           <div class="modal-header">
-            <h3>📋 {{ dayDetailDate }}</h3>
+            <h3><span style="margin-right:8px" v-html="Icons.timeline"></span> {{ dayDetailDate }}</h3>
             <button class="close-btn" @click="showDayDetail = false">×</button>
           </div>
           <div class="modal-body custom-scrollbar" style="max-height: 60vh;">
@@ -195,9 +202,10 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
 import { useActivityStore, type ActivitySession } from '../stores/activity';
-import { Bar, Pie, Line } from 'vue-chartjs';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, ArcElement, PointElement, LineElement, Tooltip, Legend, Filler } from 'chart.js';
+import { Line, Bar, Pie } from 'vue-chartjs';
 import { useI18n } from 'vue-i18n';
+import { Icons } from '../components/icons/IconMap';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, PointElement, LineElement, Tooltip, Legend, Filler);
 
@@ -493,9 +501,17 @@ onMounted(async () => { await fetchWeekData(); });
   position: absolute;
   right: -10px;
   bottom: -10px;
-  font-size: 5rem;
-  opacity: 0.05;
+  width: 80px;
+  height: 80px;
+  opacity: 0.1;
   transform: rotate(-15deg);
+  pointer-events: none;
+}
+.stat-bg-icon :deep(svg) {
+  width: 100%;
+  height: 100%;
+  stroke: currentColor;
+  fill: currentColor;
 }
 
 .stat-label { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 4px; display: block; }

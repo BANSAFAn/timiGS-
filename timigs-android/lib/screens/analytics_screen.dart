@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../services/database_service.dart';
 import '../models/app_usage_summary.dart';
 import '../models/daily_stats.dart';
@@ -49,8 +50,14 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
         title: const Text('Analytics'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _loadData,
+            icon: SvgPicture.asset('assets/icons/update.svg',
+                width: 24,
+                height: 24,
+                colorFilter: ColorFilter.mode(
+                    Theme.of(context).iconTheme.color!, BlendMode.srcIn)),
+            onPressed: () {
+              _loadData();
+            },
           ),
         ],
       ),
@@ -178,11 +185,13 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                         padding: const EdgeInsets.all(40),
                         child: Column(
                           children: [
-                            Icon(
-                              Icons.analytics_outlined,
-                              size: 64,
-                              color:
+                            SvgPicture.asset(
+                              'assets/icons/analytics.svg',
+                              width: 64,
+                              height: 64,
+                              colorFilter: ColorFilter.mode(
                                   theme.colorScheme.onSurface.withOpacity(0.3),
+                                  BlendMode.srcIn),
                             ),
                             const SizedBox(height: 16),
                             Text(

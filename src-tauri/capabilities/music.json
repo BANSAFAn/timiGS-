@@ -1,0 +1,16 @@
+{
+  "identifier": "music-access",
+  "description": "Allow playback of bundled music",
+  "local": true,
+  "windows": ["main"],
+  "permissions": [
+    {
+      "identifier": "fs:allow-read-dir",
+      "allow": [{ "path": "$RESOURCE/music" }, { "path": "$RESOURCE/music/*" }]
+    },
+    {
+      "identifier": "fs:allow-read-file",
+      "allow": [{ "path": "$RESOURCE/music/*" }]
+    }
+  ]
+}

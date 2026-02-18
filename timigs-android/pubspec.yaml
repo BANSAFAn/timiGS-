@@ -55,6 +55,7 @@ dependencies:
 
   # UI
   cupertino_icons: ^1.0.2
+  flutter_svg: ^2.0.0
 
   # Notifications
   flutter_local_notifications: ^17.0.0
@@ -79,3 +80,4 @@ flutter:
 
   assets:
     - assets/images/
+    - assets/icons/

@@ -45,6 +45,16 @@
       </div>
 
       <div class="setup-section">
+        <label class="section-label">🎵 Background Music</label>
+        <div class="folder-selection">
+          <div class="folder-display">
+            <span class="folder-path">Using built-in music folder (public/music)</span>
+          </div>
+        </div>
+        <p class="hint">Place MP3/WAV files in the 'public/music' folder to play them.</p>
+      </div>
+
+      <div class="setup-section">
         <label class="section-label">🔒 Lock Password</label>
         <input type="password" v-model="password" class="password-input" placeholder="Password to cancel..." />
       </div>
@@ -132,6 +142,7 @@ import { useI18n } from 'vue-i18n';
 import { invoke } from '@tauri-apps/api/core';
 import { listen } from '@tauri-apps/api/event';
 
+
 useI18n();
 
 interface TimeoutStatus {
@@ -156,6 +167,8 @@ const cancelError = ref('');
 const overlayCancelError = ref('');
 const status = ref<TimeoutStatus | null>(null);
 let pollInterval: number | null = null;
+
+
 
 const workTotalSecs = computed(() => (workHours.value || 0) * 3600 + (workMinutes.value || 0) * 60 + (workSeconds.value || 0));
 const breakTotalSecs = computed(() => (breakHours.value || 0) * 3600 + (breakMinutes.value || 0) * 60 + (breakSeconds.value || 0));
@@ -338,6 +351,53 @@ onUnmounted(() => {
   font-size: 0.8rem;
   color: var(--text-muted);
   margin: 0;
+}
+
+/* Music Folder Styles */
+.folder-selection {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.folder-display {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 10px 12px;
+  border-radius: 10px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+
+.folder-path {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.9rem;
+  color: #10b981;
+}
+
+.folder-placeholder {
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 0.9rem;
+  font-style: italic;
+}
+
+.btn-browse {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  padding: 10px 16px;
+  border-radius: 10px;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.btn-browse:hover {
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .password-input {

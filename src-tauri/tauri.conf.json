@@ -63,6 +63,9 @@
         "compression": "lzma"
       }
     },
+    "resources": [
+      "../public/music"
+    ],
     "shortDescription": "Track your PC activity",
     "longDescription": "TimiGS is a lightweight activity tracker that monitors which programs you use and provides detailed analytics about your computer usage.",
     "copyright": "© 2024 TimiGS",

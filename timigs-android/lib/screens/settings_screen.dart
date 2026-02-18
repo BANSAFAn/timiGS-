@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../services/database_service.dart';
 import '../services/tracker_service.dart';
 import '../main.dart';
@@ -64,7 +65,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
                   // Language
                   ListTile(
-                    leading: const Icon(Icons.language),
+                    leading: SvgPicture.asset('assets/icons/language.svg',
+                        width: 24,
+                        height: 24,
+                        colorFilter: ColorFilter.mode(
+                            Theme.of(context).iconTheme.color!,
+                            BlendMode.srcIn)),
                     title: const Text('Language'),
                     subtitle: Text(
                         settings.language == 'en' ? 'English' : 'Українська'),
@@ -90,7 +96,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
                   // Theme
                   ListTile(
-                    leading: const Icon(Icons.palette),
+                    leading: SvgPicture.asset('assets/icons/theme.svg',
+                        width: 24,
+                        height: 24,
+                        colorFilter: ColorFilter.mode(
+                            Theme.of(context).iconTheme.color!,
+                            BlendMode.srcIn)),
                     title: const Text('Theme'),
                     subtitle: Text(settings.theme == 'dark' ? 'Dark' : 'Light'),
                     trailing: DropdownButton<String>(
@@ -132,10 +143,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   const SizedBox(height: 16),
 
                   ListTile(
-                    leading: Icon(
-                      _isTracking ? Icons.play_circle : Icons.pause_circle,
-                      color: _isTracking ? Colors.green : Colors.orange,
-                    ),
+                    leading: SvgPicture.asset('assets/icons/tracking.svg',
+                        width: 24,
+                        height: 24,
+                        colorFilter: ColorFilter.mode(
+                            _isTracking ? Colors.green : Colors.orange,
+                            BlendMode.srcIn)),
                     title: Text(
                         _isTracking ? 'Tracking Active' : 'Tracking Paused'),
                     subtitle: Text(
@@ -161,7 +174,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   const Divider(),
 
                   ListTile(
-                    leading: const Icon(Icons.security),
+                    leading: SvgPicture.asset('assets/icons/system.svg',
+                        width: 24,
+                        height: 24,
+                        colorFilter: ColorFilter.mode(
+                            Theme.of(context).iconTheme.color!,
+                            BlendMode.srcIn)),
                     title: const Text('Usage Stats Permission'),
                     subtitle: const Text('Required for activity tracking'),
                     trailing: ElevatedButton(
@@ -176,12 +194,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
                   // Battery optimization
                   ListTile(
-                    leading: Icon(
-                      Icons.battery_saver,
-                      color: _batteryOptimizationDisabled
-                          ? Colors.green
-                          : Colors.orange,
-                    ),
+                    leading: SvgPicture.asset('assets/icons/tools.svg',
+                        width: 24,
+                        height: 24,
+                        colorFilter: ColorFilter.mode(
+                            _batteryOptimizationDisabled
+                                ? Colors.green
+                                : Colors.orange,
+                            BlendMode.srcIn)),
                     title: const Text('Battery Optimization'),
                     subtitle: Text(
                       _batteryOptimizationDisabled
@@ -223,7 +243,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                   const SizedBox(height: 16),
                   ListTile(
-                    leading: const Icon(Icons.cloud_upload),
+                    leading: SvgPicture.asset('assets/icons/drive.svg',
+                        width: 24,
+                        height: 24,
+                        colorFilter: ColorFilter.mode(
+                            Theme.of(context).iconTheme.color!,
+                            BlendMode.srcIn)),
                     title: const Text('Google Drive Sync'),
                     subtitle: const Text('Backup and restore data'),
                     trailing: const Icon(Icons.chevron_right),
@@ -238,7 +263,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                   const Divider(),
                   ListTile(
-                    leading: const Icon(Icons.download),
+                    leading: SvgPicture.asset('assets/icons/transfer.svg',
+                        width: 24,
+                        height: 24,
+                        colorFilter: ColorFilter.mode(
+                            Theme.of(context).iconTheme.color!,
+                            BlendMode.srcIn)),
                     title: const Text('Export Data'),
                     subtitle: const Text('Export database to file'),
                     trailing: const Icon(Icons.chevron_right),
@@ -277,13 +307,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                   const SizedBox(height: 16),
                   ListTile(
-                    leading: const Icon(Icons.info),
+                    leading: SvgPicture.asset('assets/icons/about.svg',
+                        width: 24,
+                        height: 24,
+                        colorFilter: ColorFilter.mode(
+                            Theme.of(context).iconTheme.color!,
+                            BlendMode.srcIn)),
                     title: const Text('Version'),
                     subtitle: const Text('1.0.0'),
                   ),
                   const Divider(),
                   ListTile(
-                    leading: const Icon(Icons.code),
+                    leading: SvgPicture.asset('assets/icons/github.svg',
+                        width: 24,
+                        height: 24,
+                        colorFilter: ColorFilter.mode(
+                            Theme.of(context).iconTheme.color!,
+                            BlendMode.srcIn)),
                     title: const Text('TimiGS Android'),
                     subtitle: const Text('Activity Tracker for Android'),
                   ),

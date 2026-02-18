@@ -7,6 +7,9 @@
     "core:default",
     "opener:default",
     "shell:allow-open",
-    "process:default"
+    "process:default",
+    "fs:default",
+
+    "dialog:default"
   ]
 }

@@ -7,74 +7,33 @@
       </div>
       <nav class="sidebar-nav">
         <router-link to="/" class="nav-link" active-class="active">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="20"
-            height="20"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <rect x="3" y="3" width="7" height="7" stroke-width="2" />
-            <rect x="14" y="3" width="7" height="7" stroke-width="2" />
-            <rect x="14" y="14" width="7" height="7" stroke-width="2" />
-            <rect x="3" y="14" width="7" height="7" stroke-width="2" />
-          </svg>
+          <div class="nav-icon" v-html="Icons.dashboard"></div>
           <span>{{ $t("nav.dashboard") }}</span>
         </router-link>
 
         <router-link to="/timeline" class="nav-link" active-class="active">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="20"
-            height="20"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <circle cx="12" cy="12" r="10" stroke-width="2" />
-            <polyline points="12 6 12 12 16 14" stroke-width="2" />
-          </svg>
+          <div class="nav-icon" v-html="Icons.timeline"></div>
           <span>{{ $t("nav.timeline") }}</span>
         </router-link>
 
         <router-link to="/analytics" class="nav-link" active-class="active">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="20"
-            height="20"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <line x1="18" y1="20" x2="18" y2="10" stroke-width="2" />
-            <line x1="12" y1="20" x2="12" y2="4" stroke-width="2" />
-            <line x1="6" y1="20" x2="6" y2="14" stroke-width="2" />
-          </svg>
+          <div class="nav-icon" v-html="Icons.analytics"></div>
           <span>{{ $t("nav.analytics") }}</span>
         </router-link>
 
-        <router-link to="/tools" class="nav-link" active-class="active">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="20"
-            height="20"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <polyline points="4 7 4 4 20 4 20 7" stroke-width="2" />
-            <line x1="9" y1="20" x2="15" y2="20" stroke-width="2" />
-            <line x1="12" y1="4" x2="12" y2="20" stroke-width="2" />
-          </svg>
-          <span>{{ $t("nav.tools") }}</span>
+        <router-link to="/weather" class="nav-link" active-class="active">
+          <div class="nav-icon" v-html="Icons.weather"></div>
+          <span>Weather</span>
+        </router-link>
+        
+        <router-link to="/transfer" class="nav-link" active-class="active">
+          <div class="nav-icon" v-html="Icons.transfer"></div>
+          <span>Transfer</span>
         </router-link>
 
-        <router-link to="/weather" class="nav-link" active-class="active">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 0 0 4 4h.9a5 5 0 1 0 5.15-8.7A6 6 0 1 0 3 15z" />
-          </svg>
-          <span>Weather</span>
+        <router-link to="/tools" class="nav-link" active-class="active">
+          <div class="nav-icon" v-html="Icons.tools"></div>
+          <span>{{ $t("nav.tools") }}</span>
         </router-link>
 
         <router-link
@@ -83,48 +42,12 @@
           class="nav-link"
           active-class="active"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="20"
-            height="20"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-          </svg>
+          <div class="nav-icon" v-html="Icons.github"></div>
           <span>{{ $t("nav.github") }}</span>
         </router-link>
 
-        <router-link to="/transfer" class="nav-link" active-class="active">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-          </svg>
-          <span>Transfer</span>
-        </router-link>
-
-
-
         <router-link to="/settings" class="nav-link" active-class="active">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="20"
-            height="20"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <circle cx="12" cy="12" r="3" stroke-width="2" />
-            <path
-              d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"
-              stroke-width="2"
-            />
-          </svg>
+          <div class="nav-icon" v-html="Icons.settings"></div>
           <span>{{ $t("nav.settings") }}</span>
         </router-link>
       </nav>
@@ -142,30 +65,12 @@
     <!-- Mobile Bottom Navigation -->
     <nav class="bottom-nav" v-if="shouldShowNav">
       <router-link to="/" class="bottom-nav-item" active-class="active">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <rect x="3" y="3" width="7" height="7" stroke-width="2" />
-          <rect x="14" y="3" width="7" height="7" stroke-width="2" />
-          <rect x="14" y="14" width="7" height="7" stroke-width="2" />
-          <rect x="3" y="14" width="7" height="7" stroke-width="2" />
-        </svg>
+        <div class="nav-icon-mobile" v-html="Icons.dashboard"></div>
         <span>DB</span>
       </router-link>
 
       <router-link to="/timeline" class="bottom-nav-item" active-class="active">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <circle cx="12" cy="12" r="10" stroke-width="2" />
-          <polyline points="12 6 12 12 16 14" stroke-width="2" />
-        </svg>
+        <div class="nav-icon-mobile" v-html="Icons.timeline"></div>
         <span>Time</span>
       </router-link>
 
@@ -174,59 +79,22 @@
         class="bottom-nav-item"
         active-class="active"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <line x1="18" y1="20" x2="18" y2="10" stroke-width="2" />
-          <line x1="12" y1="20" x2="12" y2="4" stroke-width="2" />
-          <line x1="6" y1="20" x2="6" y2="14" stroke-width="2" />
-        </svg>
+        <div class="nav-icon-mobile" v-html="Icons.analytics"></div>
         <span>Stats</span>
       </router-link>
-
-      <router-link to="/tools" class="bottom-nav-item" active-class="active">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <polyline points="4 7 4 4 20 4 20 7" stroke-width="2" />
-          <line x1="9" y1="20" x2="15" y2="20" stroke-width="2" />
-        </svg>
-        <span>Tools</span>
-      </router-link>
-
+      
       <router-link to="/weather" class="bottom-nav-item" active-class="active">
-         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 0 0 4 4h.9a5 5 0 1 0 5.15-8.7A6 6 0 1 0 3 15z" />
-         </svg>
+         <div class="nav-icon-mobile" v-html="Icons.weather"></div>
         <span>Weather</span>
       </router-link>
 
       <router-link to="/transfer" class="bottom-nav-item" active-class="active">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-        </svg>
+        <div class="nav-icon-mobile" v-html="Icons.transfer"></div>
         <span>Send</span>
       </router-link>
 
       <router-link to="/settings" class="bottom-nav-item" active-class="active">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <circle cx="12" cy="12" r="3" stroke-width="2" />
-          <path
-            d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"
-            stroke-width="2"
-          />
-        </svg>
+        <div class="nav-icon-mobile" v-html="Icons.settings"></div>
         <span>Setgs</span>
       </router-link>
     </nav>
@@ -242,6 +110,7 @@ import { onOpenUrl } from "@tauri-apps/plugin-deep-link";
 import { useRouter, useRoute } from "vue-router";
 import { useActivityStore } from "./stores/activity";
 import NotificationToast from "./components/NotificationToast.vue";
+import { Icons } from "./components/icons/IconMap";
 
 const store = useActivityStore();
 const isGitHubConnected = ref(false);
@@ -269,6 +138,66 @@ onMounted(async () => {
   checkGitHubConnection();
   
   const { listen } = await import('@tauri-apps/api/event');
+  const { readDir } = await import('@tauri-apps/plugin-fs');
+  const { convertFileSrc } = await import('@tauri-apps/api/core');
+
+  // Music Logic
+  let audio: HTMLAudioElement | null = null;
+
+  async function playRandomMusic() {
+    try {
+      // Resolve the 'music' folder from resources
+      const { resolveResource } = await import('@tauri-apps/api/path');
+      const resourcePath = await resolveResource('music');
+      
+      console.log("Music resource path:", resourcePath);
+
+      const entries = await readDir(resourcePath);
+      const audioFiles = entries.filter(e => 
+        e.isFile && /\.(mp3|wav|ogg|flac|m4a)$/i.test(e.name)
+      );
+
+      if (audioFiles.length > 0) {
+        const randomFile = audioFiles[Math.floor(Math.random() * audioFiles.length)];
+        
+        // Construct path consistently (handles Windows/Unix separators)
+        const { join } = await import('@tauri-apps/api/path');
+        const fullPath = await join(resourcePath, randomFile.name);
+        
+        const assetUrl = convertFileSrc(fullPath);
+        
+        if (audio) {
+            audio.pause();
+            audio = null;
+        }
+        
+        audio = new Audio(assetUrl);
+        audio.loop = true; 
+        audio.volume = 0.5;
+        await audio.play();
+        console.log("Playing background music:", randomFile.name);
+      } else {
+          console.warn("No music files found in public/music (resources)");
+      }
+    } catch (e) {
+      console.error("Failed to play music:", e);
+    }
+  }
+
+  function stopMusic() {
+    if (audio) {
+      audio.pause();
+      audio = null;
+    }
+  }
+
+  await listen('timeout-break-start', () => {
+    playRandomMusic();
+  });
+
+  await listen('timeout-break-end', () => {
+    stopMusic();
+  });
   
   await listen('navigate', (event: any) => {
       console.log("Navigating to:", event.payload);
@@ -335,12 +264,39 @@ onMounted(async () => {
   opacity: 0;
 }
 
+/* New Icon Styles */
+.nav-icon {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.nav-icon :deep(svg) {
+  width: 100%;
+  height: 100%;
+}
+
+.nav-icon-mobile {
+  width: 24px;
+  height: 24px;
+   display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2px;
+}
+.nav-icon-mobile :deep(svg) {
+  width: 100%;
+  height: 100%;
+}
+
+
 /* Hide labels on mobile bottom nav */
 @media (max-width: 768px) {
   .bottom-nav-item span {
     display: none;
   }
-  .bottom-nav-item svg {
+  .nav-icon-mobile {
     margin-bottom: 0;
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:workmanager/workmanager.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -181,52 +182,112 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      body: _screens[_selectedIndex],
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _selectedIndex,
-        onDestinationSelected: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-        },
-        destinations: [
-          NavigationDestination(
-            icon: const Icon(Icons.dashboard_outlined),
-            selectedIcon: const Icon(Icons.dashboard),
-            label: AppLocalizations.of(context)!.dashboard,
-          ),
-          NavigationDestination(
-            icon: const Icon(Icons.timeline_outlined),
-            selectedIcon: const Icon(Icons.timeline),
-            label: AppLocalizations.of(context)!.timeline,
-          ),
-          NavigationDestination(
-            icon: const Icon(Icons.analytics_outlined),
-            selectedIcon: const Icon(Icons.analytics),
-            label: AppLocalizations.of(context)!.analytics,
-          ),
-          NavigationDestination(
-            icon: const Icon(Icons.wb_sunny_outlined),
-            selectedIcon: const Icon(Icons.wb_sunny),
-            label: AppLocalizations.of(context)!.weatherTitle,
-          ),
-          NavigationDestination(
-            icon: const Icon(Icons.swap_horiz_outlined),
-            selectedIcon: const Icon(Icons.swap_horiz),
-            label: 'Transfer',
-          ),
-          NavigationDestination(
-            icon: const Icon(Icons.build_outlined),
-            selectedIcon: const Icon(Icons.build),
-            label: AppLocalizations.of(context)!.tools,
-          ),
-          NavigationDestination(
-            icon: const Icon(Icons.settings_outlined),
-            selectedIcon: const Icon(Icons.settings),
-            label: AppLocalizations.of(context)!.settings,
+      extendBody: true,
+      body: Stack(
+        children: [
+          _screens[_selectedIndex],
+          Positioned(
+            left: 16,
+            right: 16,
+            bottom: 16,
+            child: Container(
+              height: 70,
+              decoration: BoxDecoration(
+                color: (isDark ? const Color(0xFF1E1E2E) : Colors.white)
+                    .withOpacity(0.85),
+                borderRadius: BorderRadius.circular(35),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 20,
+                    offset: const Offset(0, 5),
+                  ),
+                ],
+                border: Border.all(
+                  color:
+                      (isDark ? Colors.white : Colors.black).withOpacity(0.1),
+                  width: 0.5,
+                ),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(35),
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _buildNavItem(0, 'dashboard.svg',
+                          AppLocalizations.of(context)!.dashboard),
+                      _buildNavItem(1, 'timeline.svg',
+                          AppLocalizations.of(context)!.timeline),
+                      _buildNavItem(2, 'analytics.svg',
+                          AppLocalizations.of(context)!.analytics),
+                      _buildNavItem(3, 'weather.svg', "Weather"),
+                      _buildNavItem(4, 'transfer.svg', "Transfer"),
+                      _buildNavItem(
+                          5, 'tools.svg', AppLocalizations.of(context)!.tools),
+                      _buildNavItem(6, 'settings.svg',
+                          AppLocalizations.of(context)!.settings),
+                    ],
+                  ),
+                ),
+              ),
+            ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildNavItem(int index, String iconPath, String label) {
+    final isSelected = _selectedIndex == index;
+    final theme = Theme.of(context);
+    final color = isSelected
+        ? theme.colorScheme.primary
+        : theme.colorScheme.onSurfaceVariant.withOpacity(0.6);
+
+    return GestureDetector(
+      onTap: () => setState(() => _selectedIndex = index),
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? theme.colorScheme.primary.withOpacity(0.15)
+                    : Colors.transparent,
+                shape: BoxShape.circle,
+              ),
+              child: SvgPicture.asset(
+                'assets/icons/$iconPath',
+                width: 24,
+                height: 24,
+                colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
+              ),
+            ),
+            if (isSelected) ...[
+              const SizedBox(height: 4),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w600,
+                  color: color,
+                ),
+              ),
+            ],
+          ],
+        ),
       ),
     );
   }

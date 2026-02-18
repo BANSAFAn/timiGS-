@@ -1,9 +1,9 @@
 <template>
   <div class="page page-shell">
-    <div class="page-container settings-page">
+    <div class="page-container settings-page" style="max-width: 1200px;">
       <div class="page-header modern-header">
         <div class="header-content">
-          <div class="header-icon">⚙️</div>
+          <div class="header-icon" v-html="Icons.settings"></div>
           <div>
             <h2>{{ $t("settings.title") }}</h2>
             <p class="header-subtitle">
@@ -40,7 +40,7 @@
         <!-- Appearance -->
         <div class="modern-card">
           <div class="card-header-modern">
-            <div class="card-icon">🎨</div>
+            <div class="card-icon" v-html="Icons.appearance"></div>
             <div>
               <h3 class="card-title-modern">{{ $t("settings.appearance") }}</h3>
               <p class="card-subtitle">Personalize your interface</p>
@@ -50,7 +50,7 @@
           <div class="settings-group">
             <div class="setting-item">
               <div class="setting-left">
-                <div class="setting-icon">🌐</div>
+                <div class="setting-icon" v-html="Icons.language"></div>
                 <div class="setting-content">
                   <label class="setting-label">{{ $t("settings.language") }}</label>
                   <p class="setting-description">Choose your preferred language</p>
@@ -82,7 +82,7 @@
 
             <div class="setting-item">
               <div class="setting-left">
-                <div class="setting-icon">🌓</div>
+                <div class="setting-icon" v-html="Icons.theme"></div>
                 <div class="setting-content">
                   <label class="setting-label">{{ $t("settings.theme") }}</label>
                   <p class="setting-description">Switch between dark and light mode</p>
@@ -113,7 +113,7 @@
         <!-- System -->
         <div class="modern-card">
           <div class="card-header-modern">
-            <div class="card-icon">⚙️</div>
+            <div class="card-icon" v-html="Icons.system"></div>
             <div>
               <h3 class="card-title-modern">{{ $t("settings.system") }}</h3>
               <p class="card-subtitle">Manage app behavior</p>
@@ -124,7 +124,7 @@
 
             <div class="setting-item">
               <div class="setting-left">
-                <div class="setting-icon">📊</div>
+                <div class="setting-icon" v-html="Icons.tracking"></div>
                 <div class="setting-content">
                   <label class="setting-label">{{ $t("settings.tracking") }}</label>
                   <p class="setting-description">{{ isTracking ? "Active" : "Paused" }}</p>
@@ -141,7 +141,7 @@
 
             <div class="setting-item">
               <div class="setting-left">
-                <div class="setting-icon">🚀</div>
+                <div class="setting-icon" v-html="Icons.autostart"></div>
                 <div class="setting-content">
                   <label class="setting-label">{{ $t("settings.autostart") }}</label>
                   <p class="setting-description">Launch TimiGS on system startup</p>
@@ -158,7 +158,7 @@
 
             <div class="setting-item">
               <div class="setting-left">
-                <div class="setting-icon">📌</div>
+                <div class="setting-icon" v-html="Icons.tray"></div>
                 <div class="setting-content">
                   <label class="setting-label">{{ $t("settings.minimizeToTray") }}</label>
                   <p class="setting-description">Keep running in background</p>
@@ -175,7 +175,7 @@
 
             <div class="setting-item">
               <div class="setting-left">
-                <div class="setting-icon">🎮</div>
+                <div class="setting-icon" v-html="Icons.discord"></div>
                 <div class="setting-content">
                   <label class="setting-label">{{ $t("settings.discordRpc") || "Discord Rich Presence" }}</label>
                   <p class="setting-description">{{ $t("settings.discordRpcDesc") || "Show activity on Discord profile" }}</p>
@@ -195,7 +195,7 @@
         <!-- Cloud & Data -->
         <div class="modern-card">
           <div class="card-header-modern">
-            <div class="card-icon">☁️</div>
+            <div class="card-icon" v-html="Icons.cloud"></div>
             <div>
               <h3 class="card-title-modern">Cloud & Data</h3>
               <p class="card-subtitle">Sync and backup settings</p>
@@ -206,7 +206,7 @@
 
             <div class="setting-item">
               <div class="setting-left">
-                <div class="setting-icon">🔄</div>
+                <div class="setting-icon" v-html="Icons.update"></div>
                 <div class="setting-content">
                   <label class="setting-label">Auto Sync</label>
                   <p class="setting-description">Automatically backup data every 30 minutes</p>
@@ -226,7 +226,7 @@
         <!-- Google Drive (Multi-Account) -->
         <div class="modern-card">
           <div class="card-header-modern">
-            <div class="card-icon">💾</div>
+            <div class="card-icon" v-html="Icons.drive"></div>
             <div style="flex: 1;">
               <h3 class="card-title-modern">{{ $t("settings.googleDrive") }}</h3>
               <p class="card-subtitle">Connect and manage cloud storage</p>
@@ -308,7 +308,7 @@
         <!-- Updates -->
         <div class="modern-card">
           <div class="card-header-modern">
-            <div class="card-icon">🚀</div>
+            <div class="card-icon" v-html="Icons.update"></div>
             <div>
               <h3 class="card-title-modern">{{ $t("settings.updates") }}</h3>
               <p class="card-subtitle">v{{ appVersion }}</p>
@@ -325,7 +325,7 @@
         <!-- About & License (Mandatory Attribution) -->
         <div class="modern-card">
           <div class="card-header-modern">
-            <div class="card-icon">ℹ️</div>
+            <div class="card-icon" v-html="Icons.about"></div>
             <div>
               <h3 class="card-title-modern">About & License</h3>
               <p class="card-subtitle">Software information</p>
@@ -367,7 +367,7 @@
       >
         <div class="update-modal">
           <div class="update-modal-header">
-            <div class="update-icon">🚀</div>
+            <div class="update-icon" v-html="Icons.update"></div>
             <h2>Update Available!</h2>
           </div>
           <div class="update-modal-body">
@@ -530,6 +530,7 @@ import { useActivityStore } from "../stores/activity";
 import { open } from '@tauri-apps/plugin-shell';
 import { useRouter } from "vue-router";
 import { useNotificationStore } from "../stores/notifications";
+import { Icons } from "../components/icons/IconMap";
 
 const { locale, t } = useI18n();
 const router = useRouter();
@@ -1541,6 +1542,10 @@ onMounted(() => {
   background: rgba(255, 255, 255, 0.05);
   border-radius: 10px;
   flex-shrink: 0;
+}
+.setting-icon :deep(svg) {
+  width: 24px;
+  height: 24px;
 }
 
 .setting-content {
