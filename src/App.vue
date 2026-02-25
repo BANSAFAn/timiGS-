@@ -138,8 +138,6 @@ onMounted(async () => {
   checkGitHubConnection();
   
   const { listen } = await import('@tauri-apps/api/event');
-  const { readDir } = await import('@tauri-apps/plugin-fs');
-  const { convertFileSrc } = await import('@tauri-apps/api/core');
 
   await listen('navigate', (event: any) => {
       console.log("Navigating to:", event.payload);

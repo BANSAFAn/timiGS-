@@ -927,30 +927,14 @@ async function confirmImport() {
 // File Transfer State (kept for potential future use)
 const transferFiles = ref<any[]>([]);
 const isTransferLoading = ref(false);
-const fileInput = ref<HTMLInputElement | null>(null);
 
 async function openTransfer(_accountId: number) {
   // Navigate to P2P Transfer page
   router.push('/transfer');
 }
 
-async function refreshTransferFiles(accountId: number, folderId: String) {
-  if (!folderId) return;
-  isTransferLoading.value = true;
-  try {
-    const files: any = await safeInvoke("list_drive_files", {
-      accountId,
-      folderId,
-    });
-    if (Array.isArray(files)) {
-      transferFiles.value = files;
-    }
-  } catch (e) {
-    notifications.error("Failed to list files: " + e);
-  } finally {
-    isTransferLoading.value = false;
-  }
-}
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+void transferFiles; void isTransferLoading;
 
 // Note: File transfer functionality moved to Transfer.vue page
 

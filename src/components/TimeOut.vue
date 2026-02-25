@@ -187,6 +187,27 @@ const overlayCancelError = ref('');
 const status = ref<TimeoutStatus | null>(null);
 let pollInterval: number | null = null;
 
+// Music Controls
+const isPlaying = ref(false);
+const audio = ref<HTMLAudioElement | null>(null);
+const volume = ref(0.5);
+
+function toggleMusic() {
+  if (!audio.value) return;
+  if (isPlaying.value) {
+    audio.value.pause();
+  } else {
+    audio.value.play();
+  }
+  isPlaying.value = !isPlaying.value;
+}
+
+function updateVolume() {
+  if (audio.value) {
+    audio.value.volume = volume.value;
+  }
+}
+
 
 
 const workTotalSecs = computed(() => (workHours.value || 0) * 3600 + (workMinutes.value || 0) * 60 + (workSeconds.value || 0));
