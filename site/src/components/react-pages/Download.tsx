@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { fetchReleases } from '../../services/githubService';
 import { Language } from '../../i18n/types';
 import type { GithubRelease, GithubAsset, Translation } from '../../i18n/types';
-import { Monitor, Apple, Terminal, Box, Download as DownloadIcon, AlertCircle, ExternalLink, Sparkles } from 'lucide-react';
+import { Monitor, Apple, Terminal, Smartphone, Box, Download as DownloadIcon, AlertCircle, ExternalLink, Sparkles } from 'lucide-react';
 
 interface DownloadProps {
     lang: Language;
@@ -33,6 +33,7 @@ const Download: React.FC<DownloadProps> = ({ lang, t }) => {
   const windowsAssets = getAssetsByExt(['.exe', '.msi']);
   const macAssets = getAssetsByExt(['.dmg', '.app']);
   const linuxAssets = getAssetsByExt(['.AppImage', '.rpm', '.deb']);
+  const androidAssets = getAssetsByExt(['.apk']);
 
   const formatSize = (bytes: number) => (bytes / (1024 * 1024)).toFixed(1) + ' MB';
 
@@ -43,7 +44,10 @@ const Download: React.FC<DownloadProps> = ({ lang, t }) => {
     description: string;
     accentColor: string;
     gradient: string;
-  }> = ({ title, icon, assets, description, accentColor, gradient }) => {
+    badge?: string;
+    badgeColor?: string;
+    warning?: string;
+  }> = ({ title, icon, assets, description, accentColor, gradient, badge, badgeColor, warning }) => {
     const hasAssets = assets.length > 0;
 
     return (
@@ -62,10 +66,23 @@ const Download: React.FC<DownloadProps> = ({ lang, t }) => {
             )}
           </div>
 
-          <h3 className="text-3xl font-display font-bold text-white mb-3 tracking-tight">{title}</h3>
-          <p className="text-sm text-apple-gray-400 mb-8 flex-grow leading-relaxed font-medium">
+          <h3 className="text-3xl font-display font-bold text-white mb-3 tracking-tight flex items-center gap-3">
+            {title}
+            {badge && (
+              <span className={`px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-widest ${badgeColor || 'bg-amber-500/20 text-amber-400 border border-amber-500/30'}`}>
+                {badge}
+              </span>
+            )}
+          </h3>
+          <p className="text-sm text-apple-gray-400 mb-4 flex-grow leading-relaxed font-medium">
             {description}
           </p>
+
+          {warning && (
+            <div className="mb-4 p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-300 font-medium leading-relaxed">
+              {warning}
+            </div>
+          )}
 
           <div className="space-y-3 mt-auto">
             {hasAssets ? (
@@ -143,7 +160,7 @@ const Download: React.FC<DownloadProps> = ({ lang, t }) => {
       )}
 
       {!loading && latestRelease && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12 relative z-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 relative z-10">
             <DownloadCard 
                 title={t.downloads.windows}
                 icon={<Monitor className="w-8 h-8" />}
@@ -167,6 +184,16 @@ const Download: React.FC<DownloadProps> = ({ lang, t }) => {
                 description={t.downloads.linux_desc}
                 accentColor="text-orange-400"
                 gradient="from-orange-500/20 to-red-500/20"
+            />
+            <DownloadCard 
+                title={t.downloads.android}
+                icon={<Smartphone className="w-8 h-8" />}
+                assets={androidAssets}
+                description={t.downloads.android_desc}
+                accentColor="text-green-400"
+                gradient="from-green-500/20 to-emerald-500/20"
+                badge={t.downloads.android_alpha_badge}
+                warning={t.downloads.android_alpha_warning}
             />
         </div>
       )}
