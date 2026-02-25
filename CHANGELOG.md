@@ -1,5 +1,69 @@
 # Changelog
 
+## [1.22.0](https://github.com/BANSAFAn/timiGS-/compare/v1.21.0...v1.22.0) (2026-02-25)
+
+
+### Features
+
+* Add Android app scaffold and JNI fixes ([1393d03](https://github.com/BANSAFAn/timiGS-/commit/1393d034e521c3bd3bf85fc0e3975652e145ee2c))
+* fix android weather input, add tracking permission UI, new tools screens, and configure app icons ([1983bc2](https://github.com/BANSAFAn/timiGS-/commit/1983bc259aa775fb203cde31a8147772cddaa68e))
+* Implement Android app usage tracking with background services, persistent notifications, and a dashboard. ([473e381](https://github.com/BANSAFAn/timiGS-/commit/473e381f8987270e37f2cbdac733481b4c570ac6))
+* Implement app usage tracking with background services, local data storage, and localization. ([67af831](https://github.com/BANSAFAn/timiGS-/commit/67af831217178f04614c34f5783ddfa592b50fc8))
+* Implement app usage tracking, app control, and focus session management with new services and dedicated UI screens. ([09b9e72](https://github.com/BANSAFAn/timiGS-/commit/09b9e72b6ddf573772c95b87f319a3ab11c77f28))
+* Implement focus and timeout screens for Android, enhance README with updated features, and add a CI workflow for automated build status updates. ([58e2907](https://github.com/BANSAFAn/timiGS-/commit/58e2907c5fe055428a47d21f8767e0bd51375d9f))
+* Implement P2P file transfer for database export/import and integrate Google Drive functionality across mobile and desktop platforms. ([c17275b](https://github.com/BANSAFAn/timiGS-/commit/c17275b986841fe5e322b7e6b552c8d833418ce5))
+* Introduce a new Tools view with Focus Mode and Time Out features, alongside a Flutter Android build workflow and localization support. ([a761925](https://github.com/BANSAFAn/timiGS-/commit/a761925205bae2fd47781be3aa08f41fecb711d8))
+* Introduce a new Tools view, implement a shutdown timer, and add Google authentication functionality. ([a699ec5](https://github.com/BANSAFAn/timiGS-/commit/a699ec51dbb11a93fa8eca18484981026ab45320))
+* Introduce new Settings, Weather, Analytics, and TimeOut views with French, Spanish, and German localizations. ([240c33c](https://github.com/BANSAFAn/timiGS-/commit/240c33ccf3a6ec88ec17e4a91382bcf1e0813e99))
+* Introduce P2P file transfer, internationalization support, and a comprehensive settings view. ([2cf91e8](https://github.com/BANSAFAn/timiGS-/commit/2cf91e8d09a3e58797dcd0c85dcbcb8d6c84ae34))
+
+
+### Bug Fixes
+
+* Add adaptive launcher icon and update manifest ([ef84264](https://github.com/BANSAFAn/timiGS-/commit/ef842643829f5d4d6d8646dda56c755ebdfbbc3b))
+* android focus & timeOUT ([4d5fb3d](https://github.com/BANSAFAn/timiGS-/commit/4d5fb3de30529aeb4dad6023a9866f9cd4f69f36))
+* build.gradle ([0056913](https://github.com/BANSAFAn/timiGS-/commit/00569132591eb000c339d19b06a28f963c6350ef))
+* ci/cli ([0baca21](https://github.com/BANSAFAn/timiGS-/commit/0baca210bc5c60a690d0940e5f704d770cff6aa0))
+* flutter fix ([258a6c2](https://github.com/BANSAFAn/timiGS-/commit/258a6c2449d25fe70a701df9b3bbfaf91df90a43))
+* Implement P2P file transfer screen for Android and add new Analytics, Settings, and Timeline views. ([cb152f7](https://github.com/BANSAFAn/timiGS-/commit/cb152f7cca6b4f2d528efbc03739dfc135344b40))
+* Implement Time OUT work/break timer, establish core application shell with navigation, and add a dedicated settings view. ([71f5809](https://github.com/BANSAFAn/timiGS-/commit/71f5809223b2defd34d28ddad978cfdbe084c3c1))
+* replace usage_stats with app_usage 4.0.1 and update build config ([118db91](https://github.com/BANSAFAn/timiGS-/commit/118db911a011c2246b94cb4926845fde9ff3db26))
+* upgrade compileSdk to 36 and file_picker to 8.0.0 to fix build errors ([47e10aa](https://github.com/BANSAFAn/timiGS-/commit/47e10aa8f05d8c2be4510b8a1288d366c2fb0414))
+* version ([a10e4a4](https://github.com/BANSAFAn/timiGS-/commit/a10e4a4d1735d2e3f7f5ae3fa1b76d540603f3b3))
+
+
+### Documentation
+
+* update platform build statuses [skip ci] ([88122af](https://github.com/BANSAFAn/timiGS-/commit/88122af2c16e48eed7b6c756a0f21b99870195b7))
+* update platform build statuses [skip ci] ([f25f49b](https://github.com/BANSAFAn/timiGS-/commit/f25f49b1b48f1935f5bab03f7ca9dae4abfa95c6))
+* update platform build statuses [skip ci] ([2ceb052](https://github.com/BANSAFAn/timiGS-/commit/2ceb05201a0508f64ebaf7d3d2b4230113fc318b))
+* update platform build statuses [skip ci] ([66aab81](https://github.com/BANSAFAn/timiGS-/commit/66aab81810704016c3fa34daa10ce96a340b197a))
+* update platform build statuses [skip ci] ([87cdef9](https://github.com/BANSAFAn/timiGS-/commit/87cdef9f0884ac7062e62c0dc07cf58d57631289))
+* update platform build statuses [skip ci] ([bde62e3](https://github.com/BANSAFAn/timiGS-/commit/bde62e33644c891ed01826e16a5a01dc70c1c640))
+* update platform build statuses [skip ci] ([29959a8](https://github.com/BANSAFAn/timiGS-/commit/29959a87970765d58946e243766a67270342cfc5))
+* update platform build statuses [skip ci] ([8cfa5a0](https://github.com/BANSAFAn/timiGS-/commit/8cfa5a0105390546810500216a2464e83a433c98))
+* update platform build statuses [skip ci] ([fc23900](https://github.com/BANSAFAn/timiGS-/commit/fc23900d90d2228ce44f7bae7fa613907eac4aea))
+* update platform build statuses [skip ci] ([9dd17d1](https://github.com/BANSAFAn/timiGS-/commit/9dd17d18167ca2e7d93bec66d91257da64ea445b))
+* update platform build statuses [skip ci] ([e6bc559](https://github.com/BANSAFAn/timiGS-/commit/e6bc559a125c7d7a11f02931c4106ddf2c10869e))
+* update platform build statuses [skip ci] ([455a23b](https://github.com/BANSAFAn/timiGS-/commit/455a23b26ef2bdeac66a728f101bd444a26ec2b1))
+
+
+### CI/CD
+
+* Add Android docs, bump SDK, update theme ([577968c](https://github.com/BANSAFAn/timiGS-/commit/577968cc54e996ca8d97581c5fbebe247f927415))
+* Configure Tauri application bundling, NSIS installer with custom hooks and assets, and add an installer asset generation script. ([06a6f42](https://github.com/BANSAFAn/timiGS-/commit/06a6f4299cb72e278c2225221cc71e6db8ee80c3))
+* fix androind CI/CL ([cc8b305](https://github.com/BANSAFAn/timiGS-/commit/cc8b305a209a2ffa213336305a5156648fa060a9))
+* Fix commands.rs & focus ([b2a1040](https://github.com/BANSAFAn/timiGS-/commit/b2a104096fcfeae9838c51a3f90a0974baaab60a))
+* fix jekyll ([906beaa](https://github.com/BANSAFAn/timiGS-/commit/906beaac85d39401344265064559e0ce4fe7d8e0))
+* Update ([abd8e55](https://github.com/BANSAFAn/timiGS-/commit/abd8e55ad9528021a45cc4bbbc3e518d61fcc488))
+
+
+### Build System
+
+* **deps:** bump bytes ([5c060d0](https://github.com/BANSAFAn/timiGS-/commit/5c060d07600eb161edfe70b92a64312a74f0fb69))
+* **deps:** bump devalue ([a917a9b](https://github.com/BANSAFAn/timiGS-/commit/a917a9bd9e01f22c169cf0d64bc6d3dec6dcebd3))
+* **deps:** bump the cargo group across 1 directory with 2 updates ([f069887](https://github.com/BANSAFAn/timiGS-/commit/f0698875782ea2d05b301aced4a0639794864654))
+
 ## [1.21.0](https://github.com/BANSAFAn/timiGS-/compare/v1.20.0...v1.21.0) (2026-01-25)
 
 
