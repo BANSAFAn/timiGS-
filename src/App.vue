@@ -141,64 +141,6 @@ onMounted(async () => {
   const { readDir } = await import('@tauri-apps/plugin-fs');
   const { convertFileSrc } = await import('@tauri-apps/api/core');
 
-  // Music Logic
-  let audio: HTMLAudioElement | null = null;
-
-  async function playRandomMusic() {
-    try {
-      // Resolve the 'music' folder from resources
-      const { resolveResource } = await import('@tauri-apps/api/path');
-      const resourcePath = await resolveResource('music');
-      
-      console.log("Music resource path:", resourcePath);
-
-      const entries = await readDir(resourcePath);
-      const audioFiles = entries.filter(e => 
-        e.isFile && /\.(mp3|wav|ogg|flac|m4a)$/i.test(e.name)
-      );
-
-      if (audioFiles.length > 0) {
-        const randomFile = audioFiles[Math.floor(Math.random() * audioFiles.length)];
-        
-        // Construct path consistently (handles Windows/Unix separators)
-        const { join } = await import('@tauri-apps/api/path');
-        const fullPath = await join(resourcePath, randomFile.name);
-        
-        const assetUrl = convertFileSrc(fullPath);
-        
-        if (audio) {
-            audio.pause();
-            audio = null;
-        }
-        
-        audio = new Audio(assetUrl);
-        audio.loop = true; 
-        audio.volume = 0.5;
-        await audio.play();
-        console.log("Playing background music:", randomFile.name);
-      } else {
-          console.warn("No music files found in public/music (resources)");
-      }
-    } catch (e) {
-      console.error("Failed to play music:", e);
-    }
-  }
-
-  function stopMusic() {
-    if (audio) {
-      audio.pause();
-      audio = null;
-    }
-  }
-
-  await listen('timeout-break-start', () => {
-    playRandomMusic();
-  });
-
-  await listen('timeout-break-end', () => {
-    stopMusic();
-  });
-  
   await listen('navigate', (event: any) => {
       console.log("Navigating to:", event.payload);
       router.push(event.payload);

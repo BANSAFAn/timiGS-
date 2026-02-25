@@ -363,7 +363,7 @@
       <div
         v-if="showUpdateModal"
         class="update-modal-overlay"
-        @click.self="showUpdateModal = false"
+        @click.self="!isUpdating && (showUpdateModal = false)"
       >
         <div class="update-modal">
           <div class="update-modal-header">
@@ -378,14 +378,24 @@
               A new version of TimiGS is available with new features and
               improvements.
             </p>
+            <!-- Download Progress -->
+            <div v-if="isUpdating" class="update-progress-section">
+              <div class="update-progress-header">
+                <span>{{ updateStatusText }}</span>
+                <span v-if="updateProgress > 0">{{ updateProgress }}%</span>
+              </div>
+              <div class="update-progress-track">
+                <div class="update-progress-fill" :style="{ width: updateProgress + '%' }"></div>
+              </div>
+            </div>
           </div>
           <div class="update-modal-actions">
-            <button class="btn btn-secondary" @click="showUpdateModal = false">
+            <button class="btn btn-secondary" @click="showUpdateModal = false" :disabled="isUpdating">
               Later
             </button>
-            <button class="btn btn-primary" @click="installUpdate">
+            <button class="btn btn-primary" @click="installUpdate" :disabled="isUpdating">
               <span v-if="isUpdating" class="updating-spinner"></span>
-              {{ isUpdating ? "Installing..." : "Update Now" }}
+              {{ updateButtonText }}
             </button>
           </div>
         </div>
@@ -434,87 +444,129 @@
         </div>
       </div>
 
-      <!-- File Transfer Modal -->
+      <!-- Create Folder Modal -->
       <div
-        v-if="showTransferModal"
+        v-if="showCreateFolderModal"
         class="update-modal-overlay"
-        @click.self="showTransferModal = false"
+        @click.self="showCreateFolderModal = false"
       >
-        <div
-          class="update-modal"
-          style="width: 600px; max-width: 90%; text-align: left"
-        >
-          <div class="transfer-header">
-            <h2 style="margin: 0">File Transfer</h2>
-            <button class="btn-icon" @click="showTransferModal = false">
-              ✕
+        <div class="update-modal custom-dialog">
+          <div class="dialog-header">
+            <div class="dialog-icon folder-icon-bg">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+                <line x1="12" y1="11" x2="12" y2="17"/>
+                <line x1="9" y1="14" x2="15" y2="14"/>
+              </svg>
+            </div>
+            <h2>Create New Folder</h2>
+            <p class="dialog-subtitle">Enter a name for the new Google Drive folder</p>
+          </div>
+          <div class="dialog-body">
+            <div class="dialog-input-wrapper">
+              <input 
+                type="text" 
+                v-model="newFolderName" 
+                class="dialog-input" 
+                placeholder="Folder name..." 
+                @keydown.enter="confirmCreateFolder"
+                ref="folderNameInput"
+              />
+            </div>
+          </div>
+          <div class="dialog-actions">
+            <button class="btn btn-secondary" @click="showCreateFolderModal = false">Cancel</button>
+            <button class="btn btn-primary" @click="confirmCreateFolder" :disabled="!newFolderName.trim()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Create
             </button>
           </div>
+        </div>
+      </div>
 
-          <div class="transfer-toolbar">
-            <div
-              class="text-muted sm"
-              v-if="selectedFolders[currentTransferAccount!]"
-            >
-              Current:
-              <strong>{{
-                selectedFolders[currentTransferAccount!].name
-              }}</strong>
+      <!-- Export Confirmation Modal -->
+      <div
+        v-if="showExportModal"
+        class="update-modal-overlay"
+        @click.self="showExportModal = false"
+      >
+        <div class="update-modal custom-dialog">
+          <div class="dialog-header">
+            <div class="dialog-icon export-icon-bg">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="17 8 12 3 7 8"/>
+                <line x1="12" y1="3" x2="12" y2="15"/>
+              </svg>
             </div>
-            <div class="text-muted sm" v-else>Room: Root</div>
-
-            <button
-              class="btn btn-primary btn-sm"
-              @click="triggerUpload"
-              :disabled="isTransferLoading"
-            >
-              {{ isTransferLoading ? "Uploading..." : "Upload File" }}
-            </button>
-            <input
-              type="file"
-              ref="fileInput"
-              @change="onFileSelected"
-              style="display: none"
-            />
+            <h2>Export Data</h2>
+            <p class="dialog-subtitle">Upload your activity data to Google Drive</p>
           </div>
-
-          <div class="file-list">
-            <div
-              v-if="isTransferLoading && transferFiles.length === 0"
-              class="flex-center"
-              style="padding: 20px"
-            >
-              <span class="spinner-sm" style="border-color: #777"></span>
-              Loading...
-            </div>
-            <div
-              v-else-if="transferFiles.length === 0"
-              class="text-muted"
-              style="text-align: center; padding: 20px"
-            >
-              No files found in this folder.
-            </div>
-
-            <div v-for="file in transferFiles" :key="file.id" class="file-item">
-              <div class="file-info">
-                <span style="font-size: 1.2rem">📄</span>
-                <div>
-                  <div class="file-name" :title="file.name">
-                    {{ file.name }}
-                  </div>
-                  <div class="file-size" v-if="file.size">
-                    {{ (parseInt(file.size) / 1024).toFixed(1) }} KB
-                  </div>
-                </div>
+          <div class="dialog-body">
+            <div class="dialog-info-card">
+              <div class="info-row">
+                <span class="info-label">📁 Target Folder</span>
+                <span class="info-value">{{ exportFolderName }}</span>
               </div>
-              <button
-                class="btn-icon-action"
-                title="Download"
-                @click="downloadFile(file)"
-              >
-                ⬇️
-              </button>
+              <div class="info-row">
+                <span class="info-label">📧 Account</span>
+                <span class="info-value">{{ getAccountEmail(pendingExportId) }}</span>
+              </div>
             </div>
+          </div>
+          <div class="dialog-actions">
+            <button class="btn btn-secondary" @click="showExportModal = false">Cancel</button>
+            <button class="btn btn-primary" @click="confirmExport">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              Export
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Import Confirmation Modal -->
+      <div
+        v-if="showImportModal"
+        class="update-modal-overlay"
+        @click.self="showImportModal = false"
+      >
+        <div class="update-modal custom-dialog">
+          <div class="dialog-header">
+            <div class="dialog-icon import-icon-bg">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+            </div>
+            <h2>Import Data</h2>
+            <p class="dialog-subtitle">Download and restore activity data from Google Drive</p>
+          </div>
+          <div class="dialog-body">
+            <div class="dialog-info-card">
+              <div class="info-row">
+                <span class="info-label">📁 Source Folder</span>
+                <span class="info-value">{{ importFolderName }}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">📧 Account</span>
+                <span class="info-value">{{ getAccountEmail(pendingImportId) }}</span>
+              </div>
+            </div>
+            <div class="dialog-warning">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+              </svg>
+              <span>Current local data will be replaced!</span>
+            </div>
+          </div>
+          <div class="dialog-actions">
+            <button class="btn btn-secondary" @click="showImportModal = false">Cancel</button>
+            <button class="btn btn-danger" @click="confirmImport">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Import
+            </button>
           </div>
         </div>
       </div>
@@ -523,11 +575,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, reactive, computed } from "vue";
+import { ref, onMounted, reactive, computed, nextTick } from "vue";
 import { useI18n } from "vue-i18n";
 import { invoke } from "@tauri-apps/api/core";
 import { useActivityStore } from "../stores/activity";
-import { open } from '@tauri-apps/plugin-shell';
+import { check } from '@tauri-apps/plugin-updater';
+import { relaunch } from '@tauri-apps/plugin-process';
 import { useRouter } from "vue-router";
 import { useNotificationStore } from "../stores/notifications";
 import { Icons } from "../components/icons/IconMap";
@@ -766,15 +819,42 @@ async function unlinkAccount(id: number) {
   }
 }
 
+// Custom Dialog State
+const showCreateFolderModal = ref(false);
+const showExportModal = ref(false);
+const showImportModal = ref(false);
+const newFolderName = ref('');
+const pendingFolderAccountId = ref<number | null>(null);
+const pendingExportId = ref<number | null>(null);
+const pendingImportId = ref<number | null>(null);
+const exportFolderName = ref('');
+const importFolderName = ref('');
+const folderNameInput = ref<HTMLInputElement | null>(null);
+
+function getAccountEmail(accountId: number | null): string {
+  if (!accountId) return '';
+  const acc = cloudAccounts.value.find((a: any) => a.id === accountId);
+  return acc ? acc.email : '';
+}
+
 async function promptCreateFolder(accountId: number) {
-  const name = prompt("Enter folder name:");
-  if (name) {
-    try {
-      await safeInvoke("create_drive_folder", { accountId, name });
-      notifications.success(`Folder '${name}' created successfully!`);
-    } catch (e) {
-      notifications.error("Failed to create folder: " + e);
-    }
+  pendingFolderAccountId.value = accountId;
+  newFolderName.value = '';
+  showCreateFolderModal.value = true;
+  await nextTick();
+  folderNameInput.value?.focus();
+}
+
+async function confirmCreateFolder() {
+  const name = newFolderName.value.trim();
+  const accountId = pendingFolderAccountId.value;
+  if (!name || !accountId) return;
+  showCreateFolderModal.value = false;
+  try {
+    await safeInvoke("create_drive_folder", { accountId, name });
+    notifications.success(`Folder '${name}' created successfully!`);
+  } catch (e) {
+    notifications.error("Failed to create folder: " + e);
   }
 }
 
@@ -803,57 +883,55 @@ function selectFolder(folder: any) {
 
 async function backupToAccount(accountId: number) {
   const folder = selectedFolders[accountId];
-  const folderName = folder ? folder.name : "Default (TimiGS Logs)";
-  const folderId = folder ? folder.id : null;
+  exportFolderName.value = folder ? folder.name : "Default (TimiGS Logs)";
+  pendingExportId.value = accountId;
+  showExportModal.value = true;
+}
 
-  if (confirm(`Export data to this account?\nTarget Folder: ${folderName}`)) {
-    try {
-      const githubToken = localStorage.getItem("github_token");
-      await safeInvoke("backup_data", { accountId, githubToken, folderId });
-      notifications.success("Export successful!");
-    } catch (e) {
-      notifications.error("Export failed: " + e);
-    }
+async function confirmExport() {
+  const accountId = pendingExportId.value;
+  if (!accountId) return;
+  const folder = selectedFolders[accountId];
+  const folderId = folder ? folder.id : null;
+  showExportModal.value = false;
+  try {
+    const githubToken = localStorage.getItem("github_token");
+    await safeInvoke("backup_data", { accountId, githubToken, folderId });
+    notifications.success("Export successful!");
+  } catch (e) {
+    notifications.error("Export failed: " + e);
   }
 }
 
 async function restoreFromAccount(accountId: number) {
   const folder = selectedFolders[accountId];
-  const folderName = folder ? folder.name : "Default (Global Search)";
-  const folderId = folder ? folder.id : null;
+  importFolderName.value = folder ? folder.name : "Default (Global Search)";
+  pendingImportId.value = accountId;
+  showImportModal.value = true;
+}
 
-  if (
-    confirm(
-      `Import data from this account?\nSource Folder: ${folderName}\nWARNING: Current local data will be replaced!`
-    )
-  ) {
-    try {
-      await safeInvoke("restore_data", { accountId, folderId });
-      notifications.success("Import successful! Please restart the app.");
-    } catch (e) {
-      notifications.error("Import failed: " + e);
-    }
+async function confirmImport() {
+  const accountId = pendingImportId.value;
+  if (!accountId) return;
+  const folder = selectedFolders[accountId];
+  const folderId = folder ? folder.id : null;
+  showImportModal.value = false;
+  try {
+    await safeInvoke("restore_data", { accountId, folderId });
+    notifications.success("Import successful! Please restart the app.");
+  } catch (e) {
+    notifications.error("Import failed: " + e);
   }
 }
 
-// File Transfer State
-const showTransferModal = ref(false);
+// File Transfer State (kept for potential future use)
 const transferFiles = ref<any[]>([]);
-const currentTransferAccount = ref<number | null>(null);
 const isTransferLoading = ref(false);
 const fileInput = ref<HTMLInputElement | null>(null);
 
-async function openTransfer(accountId: number) {
-  currentTransferAccount.value = accountId;
-  const folder = selectedFolders[accountId];
-  const folderId = folder ? folder.id : "root"; // Default to root or handle missing folder
-
-  if (!folder) {
-    if (!confirm("No target folder selected. Using root folder?")) return;
-  }
-
-  showTransferModal.value = true;
-  await refreshTransferFiles(accountId, folderId);
+async function openTransfer(_accountId: number) {
+  // Navigate to P2P Transfer page
+  router.push('/transfer');
 }
 
 async function refreshTransferFiles(accountId: number, folderId: String) {
@@ -874,81 +952,7 @@ async function refreshTransferFiles(accountId: number, folderId: String) {
   }
 }
 
-function triggerUpload() {
-  fileInput.value?.click();
-}
-
-async function onFileSelected(event: Event) {
-  const input = event.target as HTMLInputElement;
-  if (!input.files?.length || currentTransferAccount.value === null) return;
-
-  const file = input.files[0];
-  const accountId = currentTransferAccount.value;
-  const folder = selectedFolders[accountId];
-  const folderId = folder ? folder.id : "root";
-
-  // Read file as ArrayBuffer
-  const reader = new FileReader();
-  reader.onload = async (e) => {
-    if (e.target?.result) {
-      const arrayBuffer = e.target.result as ArrayBuffer;
-      const bytes = Array.from(new Uint8Array(arrayBuffer));
-
-      isTransferLoading.value = true;
-      try {
-        await safeInvoke("upload_file_with_data", {
-          accountId,
-          folderId,
-          filename: file.name,
-          mimeType: file.type || "application/octet-stream",
-          data: bytes,
-        });
-        await refreshTransferFiles(accountId, folderId);
-        notifications.success("Upload successful!");
-      } catch (err) {
-        notifications.error("Upload failed: " + err);
-        isTransferLoading.value = false;
-      }
-    }
-  };
-  reader.readAsArrayBuffer(file);
-
-  // Reset input
-  input.value = "";
-}
-
-async function downloadFile(file: any) {
-  if (currentTransferAccount.value === null) return;
-  // For now, assume Downloads folder or show generic error if not working
-  // We need a path.
-  // Let's rely on backend storing it in Downloads/TimiGS/[filename]
-  const accountId = currentTransferAccount.value;
-
-  // Need to construct a path.
-  // Since we don't have dialog, we can't let user pick.
-  // We'll trust the user has a "Downloads" folder.
-  // Or we just alert "Feature needs Tweak".
-  // Let's try downloading to "Downloads" via `tauri-plugin-shell` if possible?
-  // No, `download_file` in Rust expects a path.
-  // I will call `download_file` with a guessed path like "C:/Users/.../Downloads/filename" ?? No that's hard.
-  // I'll update backend to support default download dir or just implement basic download.
-
-  // Actually, let's use the Rust command `download_file` but pass a simple filename and let backend handle path?
-  // No, I defined `dest_path`.
-  // I'll assume for now I can't easily download without dialog.
-  // I'll alert "Download not fully implemented without Dialog plugin" or try something clever.
-  notifications.info("Downloading... (Check your app folder or Downloads)");
-
-  // Hack: Use `download_file` with a relative path?
-  // "downloads/filename" -> relative to CWD.
-  await safeInvoke("download_file", {
-    accountId,
-    fileId: file.id,
-    destPath: file.name, // Saves in app directory?
-  })
-    .then(() => notifications.success("Saved to App Directory: " + file.name))
-    .catch((e) => notifications.error("Download failed: " + e));
-}
+// Note: File transfer functionality moved to Transfer.vue page
 
 // GitHub
 function checkGitHubStatus() {
@@ -963,38 +967,99 @@ function openGitHubLogin() {
 const isUpdating = ref(false);
 const showUpdateModal = ref(false);
 const updateVersion = ref("");
-const updateUrl = ref("");
+const updateProgress = ref(0);
+const updateStatusText = ref('Preparing...');
+let cachedUpdate: any = null;
+
+const updateButtonText = computed(() => {
+  if (!isUpdating.value) return 'Update Now';
+  if (updateProgress.value > 0 && updateProgress.value < 100) return `Downloading... ${updateProgress.value}%`;
+  if (updateProgress.value >= 100) return 'Installing...';
+  return 'Preparing...';
+});
 
 async function checkForUpdates() {
   try {
+    // Primary: GitHub API (reliable, always has releases)
     const response = await window.fetch("https://api.github.com/repos/BANSAFAn/timiGS-/releases/latest");
-    if (!response.ok) throw new Error("Failed to fetch releases");
-    
+    if (!response.ok) throw new Error("GitHub API unavailable");
     const data = await response.json();
     const latestVersion = data.tag_name.replace("v", "");
-    
-    // Simple version compare
     if (latestVersion !== appVersion.value) {
-        updateVersion.value = latestVersion;
-        // Find asset URL (exe or msi)
-        const asset = data.assets.find((a: any) => a.name.endsWith(".exe") || a.name.endsWith(".msi"));
-        updateUrl.value = asset ? asset.browser_download_url : data.html_url;
-        showUpdateModal.value = true;
+      updateVersion.value = latestVersion;
+      // Try to get Tauri updater handle for downloadAndInstall
+      try {
+        const update = await check();
+        if (update) cachedUpdate = update;
+      } catch { /* Tauri updater not available, will use browser fallback */ }
+      showUpdateModal.value = true;
     } else {
-        alert(t('settings.noUpdates', "You are using the latest version."));
+      notifications.info(t('settings.noUpdates', 'You are using the latest version.'));
     }
   } catch (error) {
-    console.error("Update check failed:", error);
-    alert("Failed to check for updates: " + error);
+    console.error("GitHub API check failed:", error);
+    // Fallback: Tauri updater plugin
+    try {
+      const update = await check();
+      if (update) {
+        updateVersion.value = update.version;
+        cachedUpdate = update;
+        showUpdateModal.value = true;
+      } else {
+        notifications.info(t('settings.noUpdates', 'You are using the latest version.'));
+      }
+    } catch (e2) {
+      notifications.error('Failed to check for updates. Please check your internet connection.');
+    }
   }
 }
 
 async function installUpdate() {
-   if (updateUrl.value) {
-       await open(updateUrl.value);
-       showUpdateModal.value = false;
-   }
-   isUpdating.value = false;
+  isUpdating.value = true;
+  updateProgress.value = 0;
+  updateStatusText.value = 'Downloading update...';
+
+  try {
+    // Re-check if we don't have cached update
+    if (!cachedUpdate) {
+      cachedUpdate = await check();
+    }
+
+    if (cachedUpdate) {
+      let contentLength = 0;
+      let downloaded = 0;
+
+      await cachedUpdate.downloadAndInstall((event: any) => {
+        switch (event.event) {
+          case 'Started':
+            contentLength = event.data.contentLength || 0;
+            updateStatusText.value = 'Downloading...';
+            break;
+          case 'Progress':
+            downloaded += event.data.chunkLength || 0;
+            if (contentLength > 0) {
+              updateProgress.value = Math.round((downloaded / contentLength) * 100);
+            }
+            break;
+          case 'Finished':
+            updateProgress.value = 100;
+            updateStatusText.value = 'Installing...';
+            break;
+        }
+      });
+
+      updateStatusText.value = 'Restarting...';
+      await relaunch();
+    } else {
+      notifications.error('No update available to install.');
+      isUpdating.value = false;
+    }
+  } catch (error) {
+    console.error('Update installation failed:', error);
+    notifications.error('Update failed: ' + error);
+    isUpdating.value = false;
+    updateProgress.value = 0;
+  }
 }
 
 onMounted(() => {
@@ -1722,5 +1787,194 @@ onMounted(() => {
 .file-size {
   color: var(--text-muted);
   font-size: 0.8rem;
+}
+
+/* Custom Dialog Modals */
+.custom-dialog {
+  text-align: center;
+  max-width: 420px;
+}
+
+.dialog-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.dialog-header h2 {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.dialog-subtitle {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.dialog-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+
+.folder-icon-bg {
+  background: linear-gradient(135deg, rgba(99,102,241,0.2), rgba(139,92,246,0.15));
+  color: #818cf8;
+}
+
+.export-icon-bg {
+  background: linear-gradient(135deg, rgba(34,197,94,0.2), rgba(16,185,129,0.15));
+  color: #4ade80;
+}
+
+.import-icon-bg {
+  background: linear-gradient(135deg, rgba(245,158,11,0.2), rgba(251,191,36,0.15));
+  color: #fbbf24;
+}
+
+.dialog-body {
+  margin-bottom: 20px;
+}
+
+.dialog-input-wrapper {
+  position: relative;
+}
+
+.dialog-input {
+  width: 100%;
+  padding: 14px 16px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 12px;
+  color: var(--text-color);
+  font-size: 0.95rem;
+  outline: none;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.dialog-input::placeholder {
+  color: var(--text-muted);
+}
+
+.dialog-input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
+}
+
+.dialog-info-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  padding: 16px;
+  text-align: left;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+}
+
+.info-row + .info-row {
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+
+.info-label {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.info-value {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text-color);
+}
+
+.dialog-warning {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: rgba(239,68,68,0.1);
+  border: 1px solid rgba(239,68,68,0.2);
+  border-radius: 10px;
+  color: #f87171;
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-top: 12px;
+  text-align: left;
+}
+
+.dialog-warning svg {
+  flex-shrink: 0;
+  color: #ef4444;
+}
+
+.dialog-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.dialog-actions .btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px 20px;
+}
+
+.btn-danger {
+  background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+  color: white !important;
+}
+
+.btn-danger:hover {
+  background: linear-gradient(135deg, #dc2626, #b91c1c) !important;
+  box-shadow: 0 4px 12px rgba(239,68,68,0.3);
+}
+
+/* Update Progress Bar */
+.update-progress-section {
+  margin-top: 16px;
+  padding: 16px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.update-progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.update-progress-track {
+  width: 100%;
+  height: 6px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.update-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-primary), #818cf8);
+  border-radius: 3px;
+  transition: width 0.3s ease;
 }
 </style>

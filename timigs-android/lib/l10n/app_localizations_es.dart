@@ -108,8 +108,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get permissionRequired => 'Acceso de uso requerido';
 
   @override
-  String get permissionMsg =>
-      'Para rastrear el uso de aplicaciones, otorga el permiso de acceso en los ajustes.';
+  String get permissionMsg => 'Para rastrear el uso de aplicaciones, otorga el permiso de acceso en los ajustes.';
 
   @override
   String get grantPermission => 'Otorgar permiso';
@@ -184,8 +183,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get timeoutBreakTitle => '¡Hora de relajarse!';
 
   @override
-  String get timeoutBreakMessage =>
-      '¡Tómate un descanso, bebe un té, estírate!';
+  String get timeoutBreakMessage => '¡Tómate un descanso, bebe un té, estírate!';
 
   @override
   String get timeoutNextBreak => 'Próximo descanso en';

@@ -229,6 +229,17 @@
               </div>
             </div>
 
+            <div class="form-group">
+              <button class="btn-geolocation" @click="showGeoPrompt = true" :disabled="isGeolocating">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="3"/>
+                  <path d="M12 2v4M12 18v4M2 12h4M18 12h4"/>
+                </svg>
+                {{ isGeolocating ? 'Detecting...' : '📍 Use My Location' }}
+              </button>
+              <p class="geo-hint" v-if="geoError">{{ geoError }}</p>
+            </div>
+
             <div class="current-location" v-if="config.name">
               <label>Current Location</label>
               <div class="location-value">📍 {{ config.name }}, {{ config.country }}</div>
@@ -296,12 +307,145 @@
         </div>
       </div>
     </Teleport>
+
+    <!-- Geolocation Pre-Prompt Modal -->
+    <Teleport to="body">
+      <div v-if="showGeoPrompt" class="geo-modal-overlay" @click.self="showGeoPrompt = false">
+        <div class="geo-modal animate-geo-enter">
+          <div class="geo-modal-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M12 2v4M12 18v4M2 12h4M18 12h4"/>
+            </svg>
+          </div>
+          <h3 class="geo-modal-title">Allow Location Access</h3>
+          <p class="geo-modal-desc">TimiGS would like to use your location to automatically detect your city and show local weather data.</p>
+          <div class="geo-modal-info">
+            <div class="geo-info-item">
+              <span class="geo-info-icon">🛡️</span>
+              <span>Your location is never stored on any server</span>
+            </div>
+            <div class="geo-info-item">
+              <span class="geo-info-icon">🌍</span>
+              <span>Used only to find your city name</span>
+            </div>
+          </div>
+          <div class="geo-modal-actions">
+            <button class="geo-btn geo-btn-cancel" @click="showGeoPrompt = false">Cancel</button>
+            <button class="geo-btn geo-btn-allow" @click="confirmLocation">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg>
+              Allow
+            </button>
+          </div>
+        </div>
+      </div>
+    </Teleport>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, reactive } from 'vue';
 import { invoke } from '@tauri-apps/api/core';
+
+// Geolocation state
+const isGeolocating = ref(false);
+const geoError = ref('');
+const showGeoPrompt = ref(false);
+
+function confirmLocation() {
+  showGeoPrompt.value = false;
+  useMyLocation();
+}
+
+async function useMyLocation() {
+  isGeolocating.value = true;
+  geoError.value = '';
+
+  if (!navigator.geolocation) {
+    // No browser geolocation — go straight to IP-based
+    console.warn('navigator.geolocation not available, using IP-based fallback');
+    await ipBasedGeolocation();
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    async (position) => {
+      const lat = position.coords.latitude;
+      const lon = position.coords.longitude;
+
+      try {
+        // Reverse geocode to get city name
+        const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=&latitude=${lat}&longitude=${lon}&count=1&format=json`);
+        const data = await res.json();
+
+        // Fallback: use coordinates directly
+        config.latitude = lat;
+        config.longitude = lon;
+
+        if (data.results && data.results.length > 0) {
+          config.name = data.results[0].name;
+          config.country = data.results[0].country;
+        } else {
+          // If reverse geocode fails, try nearby search
+          const res2 = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=10`);
+          const data2 = await res2.json();
+          config.name = data2.address?.city || data2.address?.town || data2.address?.village || `${lat.toFixed(2)}, ${lon.toFixed(2)}`;
+          config.country = data2.address?.country || '';
+        }
+
+        saveConfig();
+        fetchWeather();
+        searchQuery.value = '';
+        searchResults.value = [];
+      } catch (e) {
+        geoError.value = 'Failed to detect location name';
+        // Still set coordinates so weather works
+        config.latitude = lat;
+        config.longitude = lon;
+        config.name = `${lat.toFixed(2)}, ${lon.toFixed(2)}`;
+        config.country = '';
+        saveConfig();
+        fetchWeather();
+      } finally {
+        isGeolocating.value = false;
+      }
+    },
+    (error) => {
+      // Browser geolocation failed (common in Tauri WebView2) — fall back to IP-based
+      console.warn('Browser geolocation failed, using IP-based fallback:', error.message);
+      ipBasedGeolocation();
+    },
+    { enableHighAccuracy: true, timeout: 5000 }
+  );
+}
+
+async function ipBasedGeolocation() {
+  try {
+    const res = await fetch('http://ip-api.com/json/?fields=city,country,lat,lon,status,message');
+    const data = await res.json();
+
+    if (data.status === 'fail') {
+      geoError.value = 'Failed to detect location';
+      isGeolocating.value = false;
+      return;
+    }
+
+    config.latitude = data.lat;
+    config.longitude = data.lon;
+    config.name = data.city || `${data.lat.toFixed(2)}, ${data.lon.toFixed(2)}`;
+    config.country = data.country || '';
+
+    saveConfig();
+    fetchWeather();
+    searchQuery.value = '';
+    searchResults.value = [];
+  } catch (e) {
+    geoError.value = 'Failed to detect location';
+    console.error('IP-based geolocation failed:', e);
+  } finally {
+    isGeolocating.value = false;
+  }
+}
 
 const isEnabled = ref(true);
 const showSettings = ref(false);
@@ -532,15 +676,16 @@ import { useActivityStore } from '../stores/activity';
 const activityStore = useActivityStore();
 
 const appIcons = ref<Record<string, string>>({});
+const exePathMap = ref<Record<string, string>>({}); // app_name -> exe_path mapping
 
 async function loadIcon(appName: string) {
   if (appIcons.value[appName]) return;
+  const exePath = exePathMap.value[appName];
+  if (!exePath) return;
   try {
-     // Try to get icon (assuming backend has this command, typical for Tauri apps)
-     // If not, we fall back to initals in template
-     const icon = await invoke('get_app_icon', { path: appName }); // simplified, usually need full path or app name
-     if (typeof icon === 'string' && icon.length > 0) {
-        appIcons.value[appName] = icon;
+     const icon = await invoke<string | null>('get_app_icon', { path: exePath });
+     if (icon && icon.length > 0) {
+        appIcons.value[appName] = `data:image/png;base64,${icon}`;
      }
   } catch (e) {
      // Silent fail
@@ -587,6 +732,13 @@ async function loadHistory() {
    const sessions = await activityStore.getActivityRange(fromStr, toStr);
    const newHistory: HistoryEntry[] = [];
 
+   // Build exe_path map from sessions
+   sessions.forEach(s => {
+     if (s.exe_path && !exePathMap.value[s.app_name]) {
+       exePathMap.value[s.app_name] = s.exe_path;
+     }
+   });
+
    for (let i = 0; i < days; i++) {
       const date = new Date(today);
       date.setDate(date.getDate() - i);
@@ -607,7 +759,7 @@ async function loadHistory() {
       const topApps = sortedApps.slice(0, 4);
       const moreCount = Math.max(0, sortedApps.length - 4);
       
-      // Load icons
+      // Load icons (now using exe_path from map)
       topApps.forEach(app => loadIcon(app.name));
 
       const forecastDay = forecast.value.find(d => d.date === dateStr);
@@ -1775,5 +1927,183 @@ onMounted(() => {
   overflow: hidden;
   text-overflow: ellipsis;
   font-size: 0.8rem;
+}
+
+/* Geolocation Button */
+.btn-geolocation {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(139,92,246,0.12));
+  border: 1px solid rgba(99,102,241,0.25);
+  border-radius: 12px;
+  color: var(--text-color);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  justify-content: center;
+}
+
+.btn-geolocation:hover:not(:disabled) {
+  background: linear-gradient(135deg, rgba(99,102,241,0.25), rgba(139,92,246,0.2));
+  border-color: rgba(99,102,241,0.4);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(99,102,241,0.2);
+}
+
+.btn-geolocation:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-geolocation svg {
+  flex-shrink: 0;
+}
+
+.geo-hint {
+  font-size: 0.8rem;
+  color: #ef4444;
+  margin-top: 8px;
+  text-align: center;
+}
+
+/* Geolocation Pre-Prompt Modal */
+.geo-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(12px);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: geoFadeIn 0.2s ease;
+}
+
+.geo-modal {
+  background: linear-gradient(145deg, rgba(30, 30, 46, 0.98), rgba(24, 24, 37, 0.98));
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  padding: 36px 32px 28px;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5), 0 0 80px rgba(99, 102, 241, 0.08);
+}
+
+.geo-modal-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.15));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  color: #818cf8;
+  animation: geoPulse 2s ease-in-out infinite;
+}
+
+.geo-modal-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 8px;
+}
+
+.geo-modal-desc {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.5;
+  margin: 0 0 20px;
+}
+
+.geo-modal-info {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.geo-info-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.7);
+  text-align: left;
+}
+
+.geo-info-icon {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.geo-modal-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.geo-btn {
+  flex: 1;
+  padding: 12px 20px;
+  border-radius: 14px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.geo-btn-cancel {
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.geo-btn-cancel:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.geo-btn-allow {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+}
+
+.geo-btn-allow:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+}
+
+@keyframes geoFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes geoPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.2); }
+  50% { box-shadow: 0 0 0 12px rgba(99, 102, 241, 0); }
+}
+
+.animate-geo-enter {
+  animation: geoSlideUp 0.3s ease;
+}
+
+@keyframes geoSlideUp {
+  from { transform: translateY(20px) scale(0.95); opacity: 0; }
+  to { transform: translateY(0) scale(1); opacity: 1; }
 }
 </style>

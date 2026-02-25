@@ -59,6 +59,8 @@
         <input type="password" v-model="password" class="password-input" placeholder="Password to cancel..." />
       </div>
 
+
+
       <button @click="startTimeout" class="btn-start" :disabled="!canStart">
         ☕ Activate Time OUT
       </button>
@@ -126,6 +128,23 @@
         <h2>Time to Rest!</h2>
         <p>Take a break, drink some tea, and relax.</p>
         <div class="overlay-timer">{{ breakFormattedTime }}</div>
+        
+        <!-- Music Controls -->
+        <div class="music-controls" v-if="isPlaying || audio">
+          <button class="music-btn" @click="toggleMusic">
+            {{ isPlaying ? '⏸️' : '▶️' }}
+          </button>
+          <input 
+            type="range" 
+            min="0" 
+            max="1" 
+            step="0.05" 
+            v-model.number="volume" 
+            @input="updateVolume" 
+            class="volume-slider"
+          >
+        </div>
+
         <div class="overlay-cancel">
           <input type="password" v-model="overlayCancelPassword" class="overlay-input" placeholder="Enter password to cancel..." @keydown.enter="stopTimeoutOverlay" />
           <button @click="stopTimeoutOverlay" class="overlay-btn">Cancel</button>
@@ -267,6 +286,8 @@ function startPolling() {
     }
   }, 1000);
 }
+
+
 
 onMounted(async () => {
   loadStatus();
@@ -637,6 +658,36 @@ circle {
   color: white;
   font-variant-numeric: tabular-nums;
   margin: 20px 0;
+}
+
+.music-controls {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 10px 20px;
+  border-radius: 30px;
+  margin-bottom: 20px;
+}
+
+.music-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: white;
+  display: flex;
+  align-items: center;
+}
+
+.music-btn:hover {
+  transform: scale(1.1);
+}
+
+.volume-slider {
+  width: 100px;
+  accent-color: #fbbf24;
+  cursor: pointer;
 }
 .overlay-cancel {
   display: flex;
