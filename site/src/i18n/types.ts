@@ -75,6 +75,10 @@ export interface Translation {
     mac_desc: string;
     linux: string;
     linux_desc: string;
+    android: string;
+    android_desc: string;
+    android_alpha_badge: string;
+    android_alpha_warning: string;
     source: string;
     source_title: string;
     source_desc: string;
