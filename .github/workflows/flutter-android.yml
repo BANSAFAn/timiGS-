@@ -97,6 +97,10 @@ jobs:
         working-directory: timigs-android
         run: flutter pub get
 
+      - name: Generate Localizations
+        working-directory: timigs-android
+        run: flutter gen-l10n
+
       - name: Generate App Icons
         working-directory: timigs-android
         run: flutter pub run flutter_launcher_icons || true
