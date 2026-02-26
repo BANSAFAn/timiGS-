@@ -40,6 +40,7 @@ export interface Translation {
     terms: string;
     docs: string;
     notes: string;
+    testing: string;
   };
   hero: {
     new_version: string;
@@ -110,5 +111,53 @@ export interface Translation {
     rights: string;
     created_by: string;
     built_with: string;
+  };
+  testing: {
+    title: string;
+    subtitle: string;
+    latest_commit: string;
+    recent_changes: string;
+    test_builds: string;
+    commit_by: string;
+    no_commits: string;
+    download_debug: string;
+    alpha_warning: string;
+  };
+  home: {
+    badge: string;
+    hero_line1: string;
+    hero_line2: string;
+    unique_title: string;
+    unique_subtitle: string;
+    feat_focus_title: string;
+    feat_focus_desc: string;
+    feat_timeout_title: string;
+    feat_timeout_desc: string;
+    feat_weather_title: string;
+    feat_weather_desc: string;
+    feat_gdrive_title: string;
+    feat_gdrive_desc: string;
+    feat_privacy_title: string;
+    feat_privacy_desc: string;
+    feat_analytics_title: string;
+    feat_analytics_desc: string;
+    compare_title: string;
+    compare_subtitle: string;
+    compare_free: string;
+    compare_opensource: string;
+    compare_focus: string;
+    compare_local: string;
+    compare_notelemetry: string;
+    compare_desktop: string;
+    compare_android: string;
+    compare_breaks: string;
+    compare_weather: string;
+    compare_gdrive: string;
+    platform_label: string;
+    platform_title: string;
+    platform_desc: string;
+    platform_tech: string;
+    cta_title: string;
+    cta_subtitle: string;
   };
 }

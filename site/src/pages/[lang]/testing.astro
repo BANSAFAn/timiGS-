@@ -1,0 +1,18 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { Language } from '../../i18n/types';
+import { useTranslations } from '../../i18n/utils';
+import Testing from '../../components/react-pages/Testing';
+
+const { lang } = Astro.params;
+const currentLang = (lang as Language) || Language.EN;
+const t = useTranslations(currentLang);
+
+export function getStaticPaths() {
+  return Object.values(Language).map(lang => ({ params: { lang } }));
+}
+---
+
+<Layout title={`${t.testing.title} — TimiGS`}>
+  <Testing client:load lang={currentLang} t={t} />
+</Layout>

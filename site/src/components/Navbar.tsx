@@ -78,10 +78,10 @@ const Navbar: React.FC<NavbarProps> = ({ lang, t, pathname }) => {
   return (
     <>
     <nav
-      className={`fixed w-full z-50 top-0 start-0 transition-all duration-500 ${
+      className={`fixed w-full z-50 top-0 start-0 transition-all duration-300 ${
         scrolled || isMenuOpen
-          ? 'bg-apple-gray-950/70 backdrop-blur-sm md:backdrop-blur-md border-b border-white/5 supports-[backdrop-filter]:bg-apple-gray-950/40'
-          : 'bg-transparent border-b border-transparent py-2'
+          ? 'bg-apple-gray-950/90 backdrop-blur-none md:backdrop-blur-md border-b border-white/5'
+          : 'bg-apple-gray-950/50 md:bg-transparent border-b border-transparent py-2'
       }`}
     >
       <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
@@ -89,9 +89,9 @@ const Navbar: React.FC<NavbarProps> = ({ lang, t, pathname }) => {
 
           {/* Logo */}
           <a href={`/${lang}/`} className="flex items-center space-x-2 sm:space-x-3 rtl:space-x-reverse group z-50">
-            <div className="relative flex items-center justify-center p-1.5 sm:p-2 rounded-xl transition-all duration-500 overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-tr from-apple-blue to-purple-500 opacity-20 group-hover:opacity-100 transition-opacity duration-500 blur-lg"></div>
-              <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-white group-hover:scale-110 transition-transform duration-500 relative z-10" />
+            <div className="relative flex items-center justify-center p-1.5 sm:p-2 rounded-xl transition-all duration-300 overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-tr from-apple-blue to-purple-500 opacity-20 group-hover:opacity-100 transition-opacity duration-300 blur-md md:blur-lg"></div>
+              <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-white group-hover:scale-110 transition-transform duration-300 relative z-10" />
             </div>
             <span className="text-lg sm:text-xl font-display font-bold text-white tracking-tight">TimiGS</span>
           </a>
@@ -180,23 +180,23 @@ const Navbar: React.FC<NavbarProps> = ({ lang, t, pathname }) => {
       </div>
     </nav>
 
-    {/* Mobile Overlay Menu */}
-    <div className={`fixed inset-0 z-40 md:hidden transition-all duration-500 ${
+    {/* Mobile Overlay Menu - Simplified for performance */}
+    <div className={`fixed inset-0 z-40 md:hidden transition-opacity duration-300 ${
         isMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
     }`} role="dialog" aria-modal="true">
-        <div className="absolute inset-0 bg-apple-gray-950/90 backdrop-blur-2xl" onClick={() => setIsMenuOpen(false)}></div>
-        <div className={`relative h-full flex flex-col justify-start pt-24 pb-8 px-6 transition-all duration-500 ${
-            isMenuOpen ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
+        <div className="absolute inset-0 bg-apple-gray-950" onClick={() => setIsMenuOpen(false)}></div>
+        <div className={`relative h-full flex flex-col justify-start pt-20 pb-8 px-6 transition-transform duration-300 ${
+            isMenuOpen ? 'translate-y-0' : '-translate-y-full'
         }`}>
             {/* Navigation Links */}
             <nav className="flex-1 overflow-y-auto">
-                <ul className="flex flex-col space-y-3">
+                <ul className="flex flex-col space-y-2">
                     {navLinks.map((link, index) => (
-                    <li key={link.path} style={{ transitionDelay: isMenuOpen ? `${index * 50}ms` : '0ms' }}>
+                    <li key={link.path}>
                         <a
                         href={getLinkHref(link.path)}
                         onClick={() => setIsMenuOpen(false)}
-                        className={`block text-2xl font-display font-medium tracking-tight py-4 px-4 rounded-2xl transition-all duration-300 ${
+                        className={`block text-xl font-display font-medium tracking-tight py-4 px-4 rounded-xl transition-all duration-200 ${
                             isActive(link.path) 
                                 ? 'text-apple-blue bg-white/5' 
                                 : 'text-white hover:bg-white/5'
@@ -210,10 +210,10 @@ const Navbar: React.FC<NavbarProps> = ({ lang, t, pathname }) => {
             </nav>
 
             {/* Action Buttons */}
-            <div className="mt-auto pt-8 border-t border-white/10 space-y-4">
+            <div className="mt-auto pt-6 border-t border-white/10 space-y-3">
                 <a
                     href={getLinkHref('/download')}
-                    className="flex justify-center items-center gap-3 px-6 py-4 rounded-2xl bg-apple-blue text-white font-semibold shadow-lg shadow-apple-blue/20 active:scale-95 transition-transform"
+                    className="flex justify-center items-center gap-3 px-6 py-4 rounded-xl bg-apple-blue text-white font-semibold active:scale-95 transition-transform"
                     onClick={() => setIsMenuOpen(false)}
                 >
                     <Download className="w-5 h-5" />
@@ -225,7 +225,7 @@ const Navbar: React.FC<NavbarProps> = ({ lang, t, pathname }) => {
                     <label htmlFor="mobile-lang-select" className="sr-only">Select Language</label>
                     <select
                         id="mobile-lang-select"
-                        className="w-full px-6 py-4 rounded-2xl bg-white/10 text-white font-semibold appearance-none outline-none focus:ring-2 focus:ring-apple-blue/50 active:bg-white/15 transition-all"
+                        className="w-full px-6 py-4 rounded-xl bg-white/10 text-white font-semibold appearance-none outline-none focus:ring-2 focus:ring-apple-blue/50 active:bg-white/15 transition-all"
                         onChange={(e) => {
                             switchLanguage(e.target.value as Language);
                             setIsMenuOpen(false);
@@ -244,7 +244,7 @@ const Navbar: React.FC<NavbarProps> = ({ lang, t, pathname }) => {
                     href="https://github.com/BANSAFAn/timiGS-"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex justify-center items-center gap-2 px-6 py-4 rounded-2xl bg-white/5 text-white font-medium border border-white/10 active:bg-white/10 transition-all"
+                    className="flex justify-center items-center gap-2 px-6 py-4 rounded-xl bg-white/5 text-white font-medium border border-white/10 active:bg-white/10 transition-all"
                     onClick={() => setIsMenuOpen(false)}
                 >
                     <Star className="w-4 h-4 fill-current" />
