@@ -77,23 +77,23 @@ const Navbar: React.FC<NavbarProps> = ({ lang, t, pathname }) => {
 
   return (
     <>
-    <nav 
+    <nav
       className={`fixed w-full z-50 top-0 start-0 transition-all duration-500 ${
         scrolled || isMenuOpen
-          ? 'bg-apple-gray-950/70 backdrop-blur-sm md:backdrop-blur-md border-b border-white/5 supports-[backdrop-filter]:bg-apple-gray-950/40' 
+          ? 'bg-apple-gray-950/70 backdrop-blur-sm md:backdrop-blur-md border-b border-white/5 supports-[backdrop-filter]:bg-apple-gray-950/40'
           : 'bg-transparent border-b border-transparent py-2'
       }`}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-wrap items-center justify-between py-4">
-          
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
+        <div className="flex flex-wrap items-center justify-between py-3 sm:py-4">
+
           {/* Logo */}
-          <a href={`/${lang}/`} className="flex items-center space-x-3 rtl:space-x-reverse group z-50">
-            <div className="relative flex items-center justify-center p-2 rounded-xl transition-all duration-500 overflow-hidden">
+          <a href={`/${lang}/`} className="flex items-center space-x-2 sm:space-x-3 rtl:space-x-reverse group z-50">
+            <div className="relative flex items-center justify-center p-1.5 sm:p-2 rounded-xl transition-all duration-500 overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-tr from-apple-blue to-purple-500 opacity-20 group-hover:opacity-100 transition-opacity duration-500 blur-lg"></div>
-              <Clock className="w-6 h-6 text-white group-hover:scale-110 transition-transform duration-500 relative z-10" />
+              <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-white group-hover:scale-110 transition-transform duration-500 relative z-10" />
             </div>
-            <span className="text-xl font-display font-bold text-white tracking-tight">TimiGS</span>
+            <span className="text-lg sm:text-xl font-display font-bold text-white tracking-tight">TimiGS</span>
           </a>
 
           {/* Desktop Nav */}
@@ -132,7 +132,7 @@ const Navbar: React.FC<NavbarProps> = ({ lang, t, pathname }) => {
                     </span>
                 </div>
                 </a>
-                
+
                 {/* Language Selector - Minimalist */}
                 <div className="relative group">
                     <button className="p-2 rounded-full text-apple-gray-400 hover:text-white hover:bg-white/10 transition-all">
@@ -145,8 +145,8 @@ const Navbar: React.FC<NavbarProps> = ({ lang, t, pathname }) => {
                             key={l.code}
                             onClick={() => switchLanguage(l.code)}
                             className={`block w-full text-left px-4 py-2.5 text-sm transition-all ${
-                            lang === l.code 
-                                ? 'text-apple-blue font-medium bg-apple-blue/10 border-l-2 border-apple-blue' 
+                            lang === l.code
+                                ? 'text-apple-blue font-medium bg-apple-blue/10 border-l-2 border-apple-blue'
                                 : 'text-apple-gray-300 hover:text-white hover:bg-white/5 border-l-2 border-transparent'
                             }`}
                         >
@@ -156,7 +156,7 @@ const Navbar: React.FC<NavbarProps> = ({ lang, t, pathname }) => {
                     </div>
                 </div>
 
-                <a 
+                <a
                     href={getLinkHref('/download')}
                     className="ml-2 flex items-center gap-2 px-4 py-2 rounded-full bg-apple-blue hover:bg-apple-blue-dark text-white text-sm font-medium transition-all shadow-lg shadow-apple-blue/20 hover:scale-105 active:scale-95"
                 >
@@ -170,7 +170,8 @@ const Navbar: React.FC<NavbarProps> = ({ lang, t, pathname }) => {
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             type="button"
-            className="inline-flex items-center justify-center p-2 rounded-full text-white md:hidden hover:bg-white/10 transition-colors z-50 relative"
+            className="inline-flex items-center justify-center p-2 rounded-full text-white md:hidden hover:bg-white/10 transition-colors z-50 relative touch-manipulation"
+            aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
           >
             <span className="sr-only">Open main menu</span>
             {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -178,44 +179,53 @@ const Navbar: React.FC<NavbarProps> = ({ lang, t, pathname }) => {
         </div>
       </div>
     </nav>
-    
+
     {/* Mobile Overlay Menu */}
     <div className={`fixed inset-0 z-40 md:hidden transition-all duration-500 ${
         isMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
-    }`}>
-        <div className="absolute inset-0 bg-apple-gray-950/80 backdrop-blur-2xl"></div>
-        <div className={`relative h-full flex flex-col justify-center px-8 transition-all duration-700 delay-100 ${
+    }`} role="dialog" aria-modal="true">
+        <div className="absolute inset-0 bg-apple-gray-950/90 backdrop-blur-2xl" onClick={() => setIsMenuOpen(false)}></div>
+        <div className={`relative h-full flex flex-col justify-start pt-24 pb-8 px-6 transition-all duration-500 ${
             isMenuOpen ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
         }`}>
-            <ul className="flex flex-col space-y-6">
-                {navLinks.map((link) => (
-                <li key={link.path}>
-                    <a
-                    href={getLinkHref(link.path)}
-                    onClick={() => setIsMenuOpen(false)}
-                    className={`text-3xl font-display font-medium tracking-tight ${
-                        isActive(link.path) ? 'text-apple-blue' : 'text-white'
-                    }`}
-                    >
-                    {link.label}
-                    </a>
-                </li>
-                ))}
-            </ul>
+            {/* Navigation Links */}
+            <nav className="flex-1 overflow-y-auto">
+                <ul className="flex flex-col space-y-3">
+                    {navLinks.map((link, index) => (
+                    <li key={link.path} style={{ transitionDelay: isMenuOpen ? `${index * 50}ms` : '0ms' }}>
+                        <a
+                        href={getLinkHref(link.path)}
+                        onClick={() => setIsMenuOpen(false)}
+                        className={`block text-2xl font-display font-medium tracking-tight py-4 px-4 rounded-2xl transition-all duration-300 ${
+                            isActive(link.path) 
+                                ? 'text-apple-blue bg-white/5' 
+                                : 'text-white hover:bg-white/5'
+                        }`}
+                        >
+                        {link.label}
+                        </a>
+                    </li>
+                    ))}
+                </ul>
+            </nav>
 
-            <div className="mt-12 pt-12 border-t border-white/10 grid grid-cols-2 gap-4">
+            {/* Action Buttons */}
+            <div className="mt-auto pt-8 border-t border-white/10 space-y-4">
                 <a
                     href={getLinkHref('/download')}
-                    className="flex justify-center items-center gap-2 px-6 py-4 rounded-xl bg-apple-blue text-white font-medium shadow-lg"
+                    className="flex justify-center items-center gap-3 px-6 py-4 rounded-2xl bg-apple-blue text-white font-semibold shadow-lg shadow-apple-blue/20 active:scale-95 transition-transform"
                     onClick={() => setIsMenuOpen(false)}
                 >
                     <Download className="w-5 h-5" />
                     {t.nav.download}
                 </a>
-                
+
+                {/* Language Selector */}
                 <div className="relative">
-                    <select 
-                        className="w-full px-6 py-4 rounded-xl bg-white/10 text-white font-medium appearance-none outline-none"
+                    <label htmlFor="mobile-lang-select" className="sr-only">Select Language</label>
+                    <select
+                        id="mobile-lang-select"
+                        className="w-full px-6 py-4 rounded-2xl bg-white/10 text-white font-semibold appearance-none outline-none focus:ring-2 focus:ring-apple-blue/50 active:bg-white/15 transition-all"
                         onChange={(e) => {
                             switchLanguage(e.target.value as Language);
                             setIsMenuOpen(false);
@@ -223,11 +233,27 @@ const Navbar: React.FC<NavbarProps> = ({ lang, t, pathname }) => {
                         value={lang}
                     >
                         {languages.map(l => (
-                            <option key={l.code} value={l.code} className="bg-apple-gray-900">{l.label}</option>
+                            <option key={l.code} value={l.code} className="bg-apple-gray-900 text-white">{l.label}</option>
                         ))}
                     </select>
                     <Globe className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/50 pointer-events-none" />
                 </div>
+
+                {/* GitHub Stars (Mobile) */}
+                <a
+                    href="https://github.com/BANSAFAn/timiGS-"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex justify-center items-center gap-2 px-6 py-4 rounded-2xl bg-white/5 text-white font-medium border border-white/10 active:bg-white/10 transition-all"
+                    onClick={() => setIsMenuOpen(false)}
+                >
+                    <Star className="w-4 h-4 fill-current" />
+                    <span>
+                        {stars !== null ? (
+                            stars >= 1000 ? `${(stars / 1000).toFixed(1)}k stars` : `${stars} stars`
+                        ) : 'Loading...'}
+                    </span>
+                </a>
             </div>
         </div>
     </div>

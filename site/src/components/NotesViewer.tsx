@@ -122,26 +122,26 @@ export default function NotesViewer({ lang = "en" }: { lang?: string }) {
     <div className="flex flex-col md:flex-row min-h-screen bg-apple-gray-950 text-white">
       {/* Sidebar - Sticky & Glass */}
       <aside className="w-full md:w-80 flex-shrink-0 border-r border-white/5 bg-apple-gray-900/50 backdrop-blur-xl md:h-screen sticky top-0 overflow-y-auto z-20">
-        <div className="p-6 md:p-8">
+        <div className="p-4 sm:p-6 md:p-8">
             {/* Header with icon */}
-            <div className="flex items-center gap-3 mb-2">
+            <div className="flex items-center gap-2 sm:gap-3 mb-2">
                 <div className="p-2 rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-500/20 border border-amber-500/20">
-                    <PenLine className="w-5 h-5 text-amber-400" />
+                    <PenLine className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400" />
                 </div>
-                <h2 className="text-xl md:text-2xl font-display font-bold text-white tracking-tight">
+                <h2 className="text-lg sm:text-xl md:text-2xl font-display font-bold text-white tracking-tight">
                     Dev Notes
                 </h2>
             </div>
-            <p className="text-sm text-apple-gray-400 mb-8 ml-12">
+            <p className="text-xs sm:text-sm text-apple-gray-400 mb-6 sm:mb-8 ml-10 sm:ml-12">
                 Developer Diary
             </p>
-            
+
             <nav className="flex flex-col space-y-2">
             {notes.map((note) => (
                 <button
                 key={note.id}
                 onClick={() => setActiveNote(note.id)}
-                className={`text-left px-4 py-4 rounded-xl transition-all duration-300 text-sm border group ${
+                className={`text-left px-3 sm:px-4 py-3 sm:py-4 rounded-lg sm:rounded-xl transition-all duration-300 text-xs sm:text-sm border group ${
                     activeNote === note.id
                     ? "bg-white/10 border-white/10 shadow-lg shadow-black/5"
                     : "border-transparent hover:bg-white/5"
@@ -151,9 +151,9 @@ export default function NotesViewer({ lang = "en" }: { lang?: string }) {
                         <span className={`font-medium ${activeNote === note.id ? 'text-white' : 'text-apple-gray-300 group-hover:text-white'}`}>
                             {note.title}
                         </span>
-                        <ChevronRight className={`w-4 h-4 transition-transform ${activeNote === note.id ? 'text-white translate-x-0.5' : 'text-apple-gray-500 group-hover:text-white'}`} />
+                        <ChevronRight className={`w-3.5 h-3.5 sm:w-4 sm:h-4 transition-transform ${activeNote === note.id ? 'text-white translate-x-0.5' : 'text-apple-gray-500 group-hover:text-white'}`} />
                     </div>
-                    <div className="flex items-center gap-1.5 mt-1.5 text-xs text-apple-gray-500">
+                    <div className="flex items-center gap-1.5 mt-1.5 text-[10px] sm:text-xs text-apple-gray-500">
                         <Calendar className="w-3 h-3" />
                         <span>{formatDate(note.date)}</span>
                     </div>
@@ -161,11 +161,11 @@ export default function NotesViewer({ lang = "en" }: { lang?: string }) {
             ))}
             </nav>
         </div>
-        
+
         {/* Footer in sidebar */}
-        <div className="p-6 mt-auto border-t border-white/5">
-            <div className="flex items-center gap-2 text-xs text-apple-gray-500">
-                <BookOpen className="w-4 h-4" />
+        <div className="p-4 sm:p-6 mt-auto border-t border-white/5">
+            <div className="flex items-center gap-2 text-[10px] sm:text-xs text-apple-gray-500">
+                <BookOpen className="w-3 h-3 sm:w-4 sm:h-4" />
                 <span>Personal Development Journal</span>
             </div>
         </div>
@@ -174,32 +174,33 @@ export default function NotesViewer({ lang = "en" }: { lang?: string }) {
       {/* Content Area */}
       <main className="flex-1 relative min-h-screen">
         {/* Background Gradients */}
-        <div className="absolute top-0 inset-x-0 h-96 bg-gradient-to-b from-amber-500/5 to-transparent pointer-events-none" />
-        
-        <div className="max-w-4xl mx-auto p-8 md:p-16 relative z-10">
+        <div className="absolute top-0 inset-x-0 h-64 sm:h-80 md:h-96 bg-gradient-to-b from-amber-500/5 to-transparent pointer-events-none" />
+
+        <div className="max-w-4xl mx-auto p-4 sm:p-6 md:p-8 lg:p-12 xl:p-16 relative z-10">
             {loading ? (
-                <div className="space-y-6 animate-pulse">
-                    <div className="h-14 bg-white/5 rounded-2xl w-3/4"></div>
-                    <div className="h-4 bg-white/5 rounded w-full"></div>
-                    <div className="h-4 bg-white/5 rounded w-5/6"></div>
-                    <div className="h-64 bg-white/5 rounded-2xl w-full mt-12"></div>
+                <div className="space-y-4 sm:space-y-6 animate-pulse">
+                    <div className="h-10 sm:h-14 bg-white/5 rounded-xl sm:rounded-2xl w-3/4"></div>
+                    <div className="h-3 sm:h-4 bg-white/5 rounded w-full"></div>
+                    <div className="h-3 sm:h-4 bg-white/5 rounded w-5/6"></div>
+                    <div className="h-48 sm:h-64 bg-white/5 rounded-xl sm:rounded-2xl w-full mt-8 sm:mt-12"></div>
                 </div>
             ) : (
-                <article 
+                <article
                     ref={contentRef}
-                    className="prose prose-invert prose-lg max-w-none 
+                    className="prose prose-invert prose-sm sm:prose-base md:prose-lg max-w-none
                     font-body
                     prose-headings:font-display prose-headings:font-bold prose-headings:tracking-tight prose-headings:text-white
-                    prose-h1:text-4xl md:prose-h1:text-5xl prose-h1:mb-8 
-                    prose-h2:text-2xl md:prose-h2:text-3xl prose-h2:mt-16 prose-h2:mb-6 prose-h2:border-b prose-h2:border-white/10 prose-h2:pb-4 prose-h2:text-white
-                    prose-h3:text-xl prose-h3:mt-8 prose-h3:text-white
-                    prose-p:text-apple-gray-300 prose-p:leading-relaxed prose-p:text-base md:prose-p:text-lg
+                    prose-h1:text-2xl sm:text-3xl md:text-4xl lg:text-5xl prose-h1:mb-6 sm:mb-8
+                    prose-h2:text-lg sm:text-xl md:text-2xl lg:text-3xl prose-h2:mt-10 sm:mt-12 md:mt-16 prose-h2:mb-4 sm:mb-6 prose-h2:border-b prose-h2:border-white/10 prose-h2:pb-3 sm:pb-4 prose-h2:text-white
+                    prose-h3:text-base sm:text-lg md:text-xl prose-h3:mt-6 sm:mt-8 prose-h3:text-white
+                    prose-p:text-apple-gray-300 prose-p:leading-relaxed prose-p:text-xs sm:text-sm md:text-base
                     prose-a:text-amber-400 prose-a:no-underline hover:prose-a:text-amber-300 hover:prose-a:underline
-                    prose-pre:bg-[#1a1a1a] prose-pre:border prose-pre:border-white/5 prose-pre:rounded-2xl prose-pre:shadow-2xl prose-pre:shadow-black/20
-                    prose-code:text-amber-300 prose-code:bg-white/5 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-md prose-code:before:content-none prose-code:after:content-none prose-code:font-mono prose-code:text-sm
+                    prose-pre:bg-[#1a1a1a] prose-pre:border prose-pre:border-white/5 prose-pre:rounded-xl sm:rounded-2xl prose-pre:shadow-2xl prose-pre:shadow-black/20 prose-pre:p-3 sm:p-4
+                    prose-code:text-amber-300 prose-code:bg-white/5 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-md prose-code:before:content-none prose-code:after:content-none prose-code:font-mono prose-code:text-xs sm:text-sm
                     prose-strong:text-white prose-strong:font-bold
-                    prose-ul:list-disc prose-ul:pl-6 prose-li:marker:text-apple-gray-500
-                    prose-img:rounded-3xl prose-img:shadow-2xl prose-img:shadow-black/20 prose-img:border prose-img:border-white/5 prose-img:my-8"
+                    prose-ul:list-disc prose-ul:pl-4 sm:pl-6 prose-li:marker:text-apple-gray-500
+                    prose-img:rounded-xl sm:rounded-2xl md:rounded-3xl prose-img:shadow-2xl prose-img:shadow-black/20 prose-img:border prose-img:border-white/5 prose-img:my-6 sm:my-8
+                    prose-blockquote:border-l-4 prose-blockquote:border-amber-500/50 prose-blockquote:pl-3 sm:pl-4 prose-blockquote:text-apple-gray-300 prose-blockquote:italic"
                     dangerouslySetInnerHTML={{ __html: content }}
                 />
             )}

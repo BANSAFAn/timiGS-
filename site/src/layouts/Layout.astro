@@ -23,20 +23,33 @@ const dir = currentLang === Language.AR ? 'rtl' : 'ltr';
 <html lang={currentLang} dir={dir} class="scroll-smooth">
 	<head>
         <SEOHead title={title} />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
+        <meta name="theme-color" content="#030712" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <style is:global>
             :root {
                 --sidebar-width: 280px;
                 --header-height: 64px;
             }
-            
+
             body {
                 @apply bg-apple-gray-950 text-apple-gray-50 antialiased font-sans selection:bg-apple-blue/30;
                 overflow-x: hidden;
+                -webkit-tap-highlight-color: transparent;
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+            }
+
+            /* Prevent horizontal scroll */
+            * {
+                box-sizing: border-box;
             }
 
             /* Premium Scrollbar */
             ::-webkit-scrollbar {
-                width: 10px;
+                width: 8px;
+                height: 8px;
             }
             ::-webkit-scrollbar-track {
                 @apply bg-transparent;
@@ -44,12 +57,12 @@ const dir = currentLang === Language.AR ? 'rtl' : 'ltr';
             ::-webkit-scrollbar-thumb {
                 @apply bg-white/10 rounded-full border-[3px] border-solid border-transparent bg-clip-content hover:bg-white/20 transition-colors;
             }
-            
+
             /* Glass Utilities */
             .glass {
                 @apply bg-white/10 backdrop-blur-xl border border-white/10 shadow-lg;
             }
-            
+
             .glass-panel {
                 @apply bg-apple-gray-900/60 backdrop-blur-2xl border border-white/5 shadow-2xl ring-1 ring-white/5;
             }
@@ -58,27 +71,49 @@ const dir = currentLang === Language.AR ? 'rtl' : 'ltr';
             h1, h2, h3, h4, h5, h6 {
                 @apply font-display tracking-tight text-white;
             }
+
+            /* Mobile Optimizations */
+            @media (max-width: 768px) {
+                /* Reduce animation intensity on mobile */
+                .animate-float,
+                .animate-float-delayed {
+                    animation: none !important;
+                }
+                
+                /* Disable particle effects on mobile for performance */
+                canvas[aria-label="particles"] {
+                    opacity: 0.3;
+                }
+            }
+
+            /* Touch-friendly interactive elements */
+            @media (max-width: 768px) {
+                button, a {
+                    min-height: 44px;
+                    min-width: 44px;
+                }
+            }
         </style>
 	</head>
 	<body class="min-h-screen flex flex-col relative">
-        
+
         {/* Dynamic Backgrounds */}
         <div class="fixed inset-0 -z-10 h-full w-full pointer-events-none overflow-hidden" aria-hidden="true">
             <ParticleBackground client:only="react" />
-            
-            {/* Subtle Grid */ }
-            <div class="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] [background-size:100px_100px] [background-position:center] opacity-20"></div>
-            
-            {/* Ambient Glows */ }
-            <div class="absolute top-[-20%] left-[20%] w-[600px] h-[600px] bg-apple-blue/20 rounded-full mix-blend-screen blur-[120px] animate-float opacity-40"></div>
-            <div class="absolute bottom-[-10%] right-[10%] w-[500px] h-[500px] bg-purple-500/10 rounded-full mix-blend-screen blur-[100px] animate-float-delayed opacity-30"></div>
+
+            {/* Subtle Grid - Hidden on mobile for performance */}
+            <div class="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] [background-size:100px_100px] [background-position:center] opacity-20 hidden sm:block"></div>
+
+            {/* Ambient Glows - Reduced on mobile */}
+            <div class="absolute top-[-20%] left-[20%] w-[600px] h-[600px] bg-apple-blue/20 rounded-full mix-blend-screen blur-[120px] animate-float opacity-40 sm:opacity-40 opacity-20"></div>
+            <div class="absolute bottom-[-10%] right-[10%] w-[500px] h-[500px] bg-purple-500/10 rounded-full mix-blend-screen blur-[100px] animate-float-delayed opacity-30 sm:opacity-30 opacity-15"></div>
         </div>
 
         <CustomCursor client:load />
 
 		<Navbar client:load lang={currentLang} t={t} pathname={pathname} />
-        
-        <main class="flex-grow pt-32 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full z-10 transition-all duration-500 ease-out">
+
+        <main class="flex-grow pt-20 sm:pt-24 md:pt-28 lg:pt-32 pb-16 sm:pb-20 px-3 sm:px-4 md:px-6 lg:px-8 max-w-7xl mx-auto w-full z-10 transition-all duration-500 ease-out">
 		    <slot />
         </main>
 
