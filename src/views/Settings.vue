@@ -581,6 +581,7 @@ import { invoke } from "@tauri-apps/api/core";
 import { useActivityStore } from "../stores/activity";
 import { check } from '@tauri-apps/plugin-updater';
 import { relaunch } from '@tauri-apps/plugin-process';
+import { getVersion } from '@tauri-apps/api/app';
 import { useRouter } from "vue-router";
 import { useNotificationStore } from "../stores/notifications";
 import { Icons } from "../components/icons/IconMap";
@@ -627,7 +628,7 @@ function setTheme(theme: string) {
 const isReady = ref(false);
 const globalError = ref("");
 const isTracking = ref(false);
-const appVersion = ref("1.1.0");
+const appVersion = ref("...");
 
 const isGitHubConnected = ref(false);
 
@@ -691,6 +692,13 @@ async function initSettings() {
     // 2. Fetch system state
     await store.fetchTrackingStatus().catch(() => {});
     isTracking.value = store.isTracking;
+
+    // 2.5 Fetch real app version
+    try {
+      appVersion.value = await getVersion();
+    } catch {
+      appVersion.value = "unknown";
+    }
 
     // 3. Status checks
     fetchCloudAccounts();
