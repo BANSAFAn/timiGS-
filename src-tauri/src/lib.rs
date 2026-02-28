@@ -4,6 +4,7 @@
 mod auth;
 mod commands;
 mod db;
+mod github_auth;
 
 #[cfg(desktop)]
 mod discord;
@@ -254,6 +255,11 @@ pub fn run() {
             commands::start_timeout_cmd,
             commands::stop_timeout_cmd,
             commands::get_timeout_status_cmd,
+            // GitHub OAuth
+            commands::login_github,
+            commands::exchange_github_code,
+            commands::get_github_account_cmd,
+            commands::remove_github_account_cmd,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

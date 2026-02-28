@@ -46,6 +46,11 @@
           <span>{{ $t("nav.github") }}</span>
         </router-link>
 
+        <router-link to="/projects" class="nav-link" active-class="active">
+          <div class="nav-icon" v-html="Icons.projects"></div>
+          <span>{{ $t("projects.title") || "Projects" }}</span>
+        </router-link>
+
         <router-link to="/settings" class="nav-link" active-class="active">
           <div class="nav-icon" v-html="Icons.settings"></div>
           <span>{{ $t("nav.settings") }}</span>
@@ -91,6 +96,11 @@
       <router-link to="/transfer" class="bottom-nav-item" active-class="active">
         <div class="nav-icon-mobile" v-html="Icons.transfer"></div>
         <span>Send</span>
+      </router-link>
+
+      <router-link to="/projects" class="bottom-nav-item" active-class="active">
+        <div class="nav-icon-mobile" v-html="Icons.projects"></div>
+        <span>Projects</span>
       </router-link>
 
       <router-link to="/settings" class="bottom-nav-item" active-class="active">

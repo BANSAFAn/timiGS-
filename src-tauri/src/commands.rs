@@ -440,3 +440,29 @@ pub fn stop_timeout_cmd(app: tauri::AppHandle, password: String) -> Result<(), S
 pub fn get_timeout_status_cmd() -> Option<crate::timeout::TimeoutStatus> {
     crate::timeout::get_timeout_status()
 }
+
+// ── GitHub OAuth Commands ──
+
+#[command]
+pub async fn login_github() -> Result<String, String> {
+    tokio::task::spawn_blocking(|| crate::github_auth::start_github_auth_flow())
+        .await
+        .map_err(|e| e.to_string())?
+}
+
+#[command]
+pub async fn exchange_github_code(code: String) -> Result<String, String> {
+    tokio::task::spawn_blocking(move || crate::github_auth::exchange_github_auth_code(code))
+        .await
+        .map_err(|e| e.to_string())?
+}
+
+#[command]
+pub fn get_github_account_cmd() -> Option<serde_json::Value> {
+    crate::github_auth::get_github_account()
+}
+
+#[command]
+pub fn remove_github_account_cmd() -> Result<(), String> {
+    crate::github_auth::remove_github_account()
+}

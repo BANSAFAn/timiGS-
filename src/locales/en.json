@@ -145,6 +145,27 @@
   "weather": {
     "title": "Weather & Activity"
   },
+  "projects": {
+    "title": "Projects",
+    "subtitle": "GitHub Projects & Work Statistics",
+    "connectTitle": "Connect GitHub",
+    "connectDesc": "Sign in with GitHub to manage your projects and track work statistics",
+    "signInWithGitHub": "Sign in with GitHub",
+    "credentialsNote": "You will be redirected to GitHub for authorization",
+    "createOAuthApp": "Create OAuth App",
+    "createProject": "Create project",
+    "templateDesc": "Choose a template to get started quickly",
+    "projectTemplates": "Project templates",
+    "startFromScratch": "Start from scratch",
+    "searchTemplates": "Search templates",
+    "myProjects": "My Projects",
+    "noProjects": "No projects found",
+    "noProjectsDesc": "Create a new project on GitHub to see it here",
+    "workStats": "Work Statistics",
+    "timeSpent": "time spent today",
+    "noStats": "No statistics yet",
+    "noStatsDesc": "Start working to see time tracking per repository"
+  },
   "focus": {
     "title": "Focus Mode",
     "selectApp": "Select Application",

@@ -145,6 +145,27 @@
   "weather": {
     "title": "Погода та активність"
   },
+  "projects": {
+    "title": "Проєкти",
+    "subtitle": "GitHub проєкти та статистика роботи",
+    "connectTitle": "Підключити GitHub",
+    "connectDesc": "Увійдіть через GitHub для управління проєктами та відстеження статистики",
+    "signInWithGitHub": "Увійти через GitHub",
+    "credentialsNote": "Вас буде перенаправлено на GitHub для авторизації",
+    "createOAuthApp": "Створити OAuth App",
+    "createProject": "Створити проєкт",
+    "templateDesc": "Оберіть шаблон для швидкого старту",
+    "projectTemplates": "Шаблони проєктів",
+    "startFromScratch": "Почати з нуля",
+    "searchTemplates": "Пошук шаблонів",
+    "myProjects": "Мої проєкти",
+    "noProjects": "Проєктів не знайдено",
+    "noProjectsDesc": "Створіть новий проєкт на GitHub щоб побачити його тут",
+    "workStats": "Статистика роботи",
+    "timeSpent": "витрачено сьогодні",
+    "noStats": "Статистики ще немає",
+    "noStatsDesc": "Почніть працювати для відстеження часу по репозиторіях"
+  },
   "focus": {
     "title": "Режим фокусу",
     "selectApp": "Обрати програму",

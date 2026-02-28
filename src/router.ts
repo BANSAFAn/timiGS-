@@ -41,6 +41,11 @@ const routes = [
     component: () => import("./views/Github.vue"),
   },
   {
+    path: "/projects",
+    name: "Projects",
+    component: () => import("./views/Projects.vue"),
+  },
+  {
     path: "/transfer",
     name: "Transfer",
     component: () => import("./views/Transfer.vue"),
