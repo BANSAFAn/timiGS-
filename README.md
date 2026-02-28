@@ -15,6 +15,9 @@ Track your app usage, visualize productivity, manage tasks, and stay focused —
 
 </div>
 
+
+## ⚠ The project is very rough, but there are already several versions available.
+
 ---
 
 ## 📱 Platforms
