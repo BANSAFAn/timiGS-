@@ -36,11 +36,6 @@ const routes = [
     component: () => import("./views/Tools.vue"),
   },
   {
-    path: "/github",
-    name: "Github",
-    component: () => import("./views/Github.vue"),
-  },
-  {
     path: "/projects",
     name: "Projects",
     component: () => import("./views/Projects.vue"),

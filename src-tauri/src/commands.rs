@@ -466,3 +466,80 @@ pub fn get_github_account_cmd() -> Option<serde_json::Value> {
 pub fn remove_github_account_cmd() -> Result<(), String> {
     crate::github_auth::remove_github_account()
 }
+
+// ── Project Boards ──
+
+#[command]
+pub fn create_project_board(name: String, board_type: String) -> Result<i64, String> {
+    crate::db::create_board(&name, &board_type).map_err(|e| e.to_string())
+}
+
+#[command]
+pub fn get_project_boards() -> Result<Vec<crate::db::ProjectBoard>, String> {
+    crate::db::get_boards().map_err(|e| e.to_string())
+}
+
+#[command]
+pub fn delete_project_board(id: i64) -> Result<(), String> {
+    crate::db::delete_board(id).map_err(|e| e.to_string())
+}
+
+#[command]
+pub fn get_board_items_cmd(board_id: i64) -> Result<Vec<crate::db::BoardItem>, String> {
+    crate::db::get_board_items(board_id).map_err(|e| e.to_string())
+}
+
+#[command]
+pub fn populate_board_cmd(board_id: i64) -> Result<usize, String> {
+    crate::db::populate_board_from_activity(board_id).map_err(|e| e.to_string())
+}
+
+#[command]
+pub async fn sync_board_github_cmd(board_id: i64) -> Result<String, String> {
+    // Get the GitHub token from cloud_accounts
+    let account = crate::github_auth::get_github_account()
+        .ok_or("Not connected to GitHub. Please sign in first.")?;
+    let token = account["token"]
+        .as_str()
+        .ok_or("Invalid GitHub token")?
+        .to_string();
+
+    tokio::task::spawn_blocking(move || crate::github_sync::sync_board_to_github(board_id, &token))
+        .await
+        .map_err(|e| e.to_string())?
+}
+
+// ── Project Tasks ──
+
+#[command]
+pub fn add_project_task_cmd(
+    board_id: i64,
+    title: String,
+    description: Option<String>,
+    priority: String,
+    due_date: Option<String>,
+) -> Result<i64, String> {
+    crate::db::add_project_task(
+        board_id,
+        &title,
+        description.as_deref(),
+        &priority,
+        due_date.as_deref(),
+    )
+    .map_err(|e| e.to_string())
+}
+
+#[command]
+pub fn get_project_tasks_cmd(board_id: i64) -> Result<Vec<crate::db::ProjectTask>, String> {
+    crate::db::get_project_tasks(board_id).map_err(|e| e.to_string())
+}
+
+#[command]
+pub fn update_project_task_status_cmd(id: i64, status: String) -> Result<(), String> {
+    crate::db::update_project_task_status(id, &status).map_err(|e| e.to_string())
+}
+
+#[command]
+pub fn delete_project_task_cmd(id: i64) -> Result<(), String> {
+    crate::db::delete_project_task(id).map_err(|e| e.to_string())
+}

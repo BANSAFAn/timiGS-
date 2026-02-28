@@ -125,6 +125,60 @@ pub fn init_database() -> Result<()> {
     // Migration for existing table
     let _ = conn.execute("ALTER TABLE tasks ADD COLUMN title_filter TEXT", []);
 
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS project_boards (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            board_type TEXT NOT NULL DEFAULT 'activity',
+            github_project_id TEXT,
+            github_project_url TEXT,
+            synced_at TEXT,
+            created_at TEXT NOT NULL
+        )",
+        [],
+    )?;
+
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS board_items (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            board_id INTEGER NOT NULL,
+            app_name TEXT NOT NULL,
+            window_title TEXT,
+            tracked_seconds INTEGER DEFAULT 0,
+            status TEXT DEFAULT 'recorded',
+            date TEXT NOT NULL,
+            created_at TEXT NOT NULL,
+            FOREIGN KEY (board_id) REFERENCES project_boards(id) ON DELETE CASCADE
+        )",
+        [],
+    )?;
+
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_board_items_board_id ON board_items(board_id)",
+        [],
+    )?;
+
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS project_tasks (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            board_id INTEGER NOT NULL,
+            title TEXT NOT NULL,
+            description TEXT,
+            status TEXT NOT NULL DEFAULT 'todo',
+            priority TEXT NOT NULL DEFAULT 'medium',
+            due_date TEXT,
+            created_at TEXT NOT NULL,
+            FOREIGN KEY (board_id) REFERENCES project_boards(id) ON DELETE CASCADE
+        )",
+        [],
+    )?;
+
+    // Migration: add board_type column to existing project_boards
+    let _ = conn.execute(
+        "ALTER TABLE project_boards ADD COLUMN board_type TEXT NOT NULL DEFAULT 'activity'",
+        [],
+    );
+
     *DB.lock() = Some(conn);
     Ok(())
 }
@@ -667,5 +721,269 @@ pub fn remove_cloud_account(id: i64) -> Result<()> {
     let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
 
     conn.execute("DELETE FROM cloud_accounts WHERE id = ?1", params![id])?;
+    Ok(())
+}
+
+// Project Boards
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ProjectBoard {
+    pub id: i64,
+    pub name: String,
+    pub board_type: String,
+    pub github_project_id: Option<String>,
+    pub github_project_url: Option<String>,
+    pub synced_at: Option<String>,
+    pub created_at: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct BoardItem {
+    pub id: i64,
+    pub board_id: i64,
+    pub app_name: String,
+    pub window_title: Option<String>,
+    pub tracked_seconds: i64,
+    pub status: String,
+    pub date: String,
+    pub created_at: String,
+}
+
+pub fn create_board(name: &str, board_type: &str) -> Result<i64> {
+    let guard = DB.lock();
+    let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
+    let now = Local::now().to_rfc3339();
+
+    conn.execute(
+        "INSERT INTO project_boards (name, board_type, created_at) VALUES (?1, ?2, ?3)",
+        params![name, board_type, now],
+    )?;
+    Ok(conn.last_insert_rowid())
+}
+
+pub fn get_boards() -> Result<Vec<ProjectBoard>> {
+    let guard = DB.lock();
+    let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
+
+    let mut stmt = conn.prepare(
+        "SELECT id, name, board_type, github_project_id, github_project_url, synced_at, created_at
+         FROM project_boards ORDER BY created_at DESC",
+    )?;
+
+    let boards = stmt
+        .query_map([], |row| {
+            Ok(ProjectBoard {
+                id: row.get(0)?,
+                name: row.get(1)?,
+                board_type: row.get(2)?,
+                github_project_id: row.get(3)?,
+                github_project_url: row.get(4)?,
+                synced_at: row.get(5)?,
+                created_at: row.get(6)?,
+            })
+        })?
+        .filter_map(|r| r.ok())
+        .collect();
+
+    Ok(boards)
+}
+
+pub fn delete_board(id: i64) -> Result<()> {
+    let guard = DB.lock();
+    let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
+
+    conn.execute("DELETE FROM board_items WHERE board_id = ?1", params![id])?;
+    conn.execute("DELETE FROM project_boards WHERE id = ?1", params![id])?;
+    Ok(())
+}
+
+pub fn get_board_items(board_id: i64) -> Result<Vec<BoardItem>> {
+    let guard = DB.lock();
+    let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
+
+    let mut stmt = conn.prepare(
+        "SELECT id, board_id, app_name, window_title, tracked_seconds, status, date, created_at
+         FROM board_items WHERE board_id = ?1 ORDER BY tracked_seconds DESC",
+    )?;
+
+    let items = stmt
+        .query_map(params![board_id], |row| {
+            Ok(BoardItem {
+                id: row.get(0)?,
+                board_id: row.get(1)?,
+                app_name: row.get(2)?,
+                window_title: row.get(3)?,
+                tracked_seconds: row.get(4)?,
+                status: row.get(5)?,
+                date: row.get(6)?,
+                created_at: row.get(7)?,
+            })
+        })?
+        .filter_map(|r| r.ok())
+        .collect();
+
+    Ok(items)
+}
+
+pub fn add_board_item(
+    board_id: i64,
+    app_name: &str,
+    window_title: Option<&str>,
+    tracked_seconds: i64,
+    date: &str,
+) -> Result<i64> {
+    let guard = DB.lock();
+    let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
+    let now = Local::now().to_rfc3339();
+
+    conn.execute(
+        "INSERT INTO board_items (board_id, app_name, window_title, tracked_seconds, date, created_at)
+         VALUES (?1, ?2, ?3, ?4, ?5, ?6)",
+        params![board_id, app_name, window_title, tracked_seconds, date, now],
+    )?;
+    Ok(conn.last_insert_rowid())
+}
+
+pub fn populate_board_from_activity(board_id: i64) -> Result<usize> {
+    let today = Local::now().format("%Y-%m-%d").to_string();
+    let sessions = get_today_sessions()?;
+
+    // Group sessions by app_name
+    let mut app_map: std::collections::HashMap<String, (i64, String)> =
+        std::collections::HashMap::new();
+
+    for session in &sessions {
+        let entry = app_map
+            .entry(session.app_name.clone())
+            .or_insert((0, session.window_title.clone()));
+        entry.0 += session.duration_seconds;
+    }
+
+    // Clear old items for today to avoid duplicates
+    {
+        let guard = DB.lock();
+        let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
+        conn.execute(
+            "DELETE FROM board_items WHERE board_id = ?1 AND date = ?2",
+            params![board_id, today],
+        )?;
+    }
+
+    let mut count = 0;
+    for (app_name, (seconds, window)) in &app_map {
+        if *seconds > 0 {
+            add_board_item(board_id, app_name, Some(window), *seconds, &today)?;
+            count += 1;
+        }
+    }
+
+    Ok(count)
+}
+
+pub fn update_board_github(
+    board_id: i64,
+    github_project_id: &str,
+    github_project_url: &str,
+) -> Result<()> {
+    let guard = DB.lock();
+    let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
+    let now = Local::now().to_rfc3339();
+
+    conn.execute(
+        "UPDATE project_boards SET github_project_id = ?1, github_project_url = ?2, synced_at = ?3 WHERE id = ?4",
+        params![github_project_id, github_project_url, now, board_id],
+    )?;
+    Ok(())
+}
+
+pub fn update_board_synced_at(board_id: i64) -> Result<()> {
+    let guard = DB.lock();
+    let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
+    let now = Local::now().to_rfc3339();
+
+    conn.execute(
+        "UPDATE project_boards SET synced_at = ?1 WHERE id = ?2",
+        params![now, board_id],
+    )?;
+    Ok(())
+}
+
+// Project Tasks (for table & roadmap boards)
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ProjectTask {
+    pub id: i64,
+    pub board_id: i64,
+    pub title: String,
+    pub description: Option<String>,
+    pub status: String,
+    pub priority: String,
+    pub due_date: Option<String>,
+    pub created_at: String,
+}
+
+pub fn add_project_task(
+    board_id: i64,
+    title: &str,
+    description: Option<&str>,
+    priority: &str,
+    due_date: Option<&str>,
+) -> Result<i64> {
+    let guard = DB.lock();
+    let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
+    let now = Local::now().to_rfc3339();
+
+    conn.execute(
+        "INSERT INTO project_tasks (board_id, title, description, priority, due_date, created_at)
+         VALUES (?1, ?2, ?3, ?4, ?5, ?6)",
+        params![board_id, title, description, priority, due_date, now],
+    )?;
+    Ok(conn.last_insert_rowid())
+}
+
+pub fn get_project_tasks(board_id: i64) -> Result<Vec<ProjectTask>> {
+    let guard = DB.lock();
+    let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
+
+    let mut stmt = conn.prepare(
+        "SELECT id, board_id, title, description, status, priority, due_date, created_at
+         FROM project_tasks WHERE board_id = ?1 ORDER BY created_at ASC",
+    )?;
+
+    let tasks = stmt
+        .query_map(params![board_id], |row| {
+            Ok(ProjectTask {
+                id: row.get(0)?,
+                board_id: row.get(1)?,
+                title: row.get(2)?,
+                description: row.get(3)?,
+                status: row.get(4)?,
+                priority: row.get(5)?,
+                due_date: row.get(6)?,
+                created_at: row.get(7)?,
+            })
+        })?
+        .filter_map(|r| r.ok())
+        .collect();
+
+    Ok(tasks)
+}
+
+pub fn update_project_task_status(id: i64, status: &str) -> Result<()> {
+    let guard = DB.lock();
+    let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
+
+    conn.execute(
+        "UPDATE project_tasks SET status = ?1 WHERE id = ?2",
+        params![status, id],
+    )?;
+    Ok(())
+}
+
+pub fn delete_project_task(id: i64) -> Result<()> {
+    let guard = DB.lock();
+    let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
+
+    conn.execute("DELETE FROM project_tasks WHERE id = ?1", params![id])?;
     Ok(())
 }

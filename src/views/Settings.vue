@@ -127,15 +127,15 @@
                 <div class="setting-icon" v-html="Icons.tracking"></div>
                 <div class="setting-content">
                   <label class="setting-label">{{ $t("settings.tracking") }}</label>
-                  <p class="setting-description">{{ isTracking ? "Active" : "Paused" }}</p>
+                  <p class="setting-description">{{ store.isTracking ? "Active" : "Paused" }}</p>
                 </div>
               </div>
-              <button
-                class="btn"
-                :class="isTracking ? 'btn-danger' : 'btn-success'"
+              <button 
+                class="btn" 
+                :class="store.isTracking ? 'btn-danger' : 'btn-success'"
                 @click="toggleTracking"
               >
-                {{ isTracking ? $t("settings.stopTracking") : $t("settings.startTracking") }}
+                {{ store.isTracking ? $t("settings.stopTracking") : $t("settings.startTracking") }}
               </button>
             </div>
 
@@ -292,18 +292,6 @@
           </div>
         </div>
 
-        <!-- GitHub -->
-        <div class="glass-card">
-          <div class="card-header">
-            <h3 class="card-title">GitHub</h3>
-            <button class="btn btn-secondary btn-sm" @click="openGitHubLogin">
-              {{ isGitHubConnected ? "Reconnect" : "Connect" }}
-            </button>
-          </div>
-          <div class="setting-desc">
-            {{ isGitHubConnected ? "Connected" : "Track coding activity" }}
-          </div>
-        </div>
 
         <!-- Updates -->
         <div class="modern-card">
@@ -627,10 +615,9 @@ function setTheme(theme: string) {
 
 const isReady = ref(false);
 const globalError = ref("");
-const isTracking = ref(false);
+
 const appVersion = ref("...");
 
-const isGitHubConnected = ref(false);
 
 const localSettings = reactive({
   language: "en",
@@ -691,7 +678,6 @@ async function initSettings() {
 
     // 2. Fetch system state
     await store.fetchTrackingStatus().catch(() => {});
-    isTracking.value = store.isTracking;
 
     // 2.5 Fetch real app version
     try {
@@ -702,7 +688,6 @@ async function initSettings() {
 
     // 3. Status checks
     fetchCloudAccounts();
-    checkGitHubStatus();
   } catch (e: any) {
     console.error("Init Settings Error:", e);
     globalError.value = e.toString();
@@ -745,12 +730,10 @@ async function toggleTracking() {
     }
   }
 
-  if (isTracking.value) {
-    safeInvoke("stop_tracking");
-    isTracking.value = false;
+  if (store.isTracking) {
+    await store.stopTracking();
   } else {
-    safeInvoke("start_tracking");
-    isTracking.value = true;
+    await store.startTracking();
   }
 }
 
@@ -946,14 +929,6 @@ void transferFiles; void isTransferLoading;
 
 // Note: File transfer functionality moved to Transfer.vue page
 
-// GitHub
-function checkGitHubStatus() {
-  isGitHubConnected.value = !!localStorage.getItem("github_token");
-}
-
-function openGitHubLogin() {
-  router.push("/github");
-}
 
 // Update modal state
 const isUpdating = ref(false);

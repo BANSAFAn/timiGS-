@@ -5,6 +5,7 @@ mod auth;
 mod commands;
 mod db;
 mod github_auth;
+mod github_sync;
 
 #[cfg(desktop)]
 mod discord;
@@ -260,6 +261,18 @@ pub fn run() {
             commands::exchange_github_code,
             commands::get_github_account_cmd,
             commands::remove_github_account_cmd,
+            // Project Boards
+            commands::create_project_board,
+            commands::get_project_boards,
+            commands::delete_project_board,
+            commands::get_board_items_cmd,
+            commands::populate_board_cmd,
+            commands::sync_board_github_cmd,
+            // Project Tasks
+            commands::add_project_task_cmd,
+            commands::get_project_tasks_cmd,
+            commands::update_project_task_status_cmd,
+            commands::delete_project_task_cmd,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
