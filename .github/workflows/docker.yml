@@ -1,0 +1,51 @@
+name: Docker Build
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: [nexting, main, master]
+
+permissions:
+  contents: read
+
+jobs:
+  docker:
+    name: 🐳 Build & Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t timigs-website-test .
+
+      - name: Start container
+        run: |
+          docker run -d --name test-site -p 8080:80 timigs-website-test
+          sleep 3
+
+      - name: Verify site is served
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/)
+          echo "HTTP status: $STATUS"
+
+          if [ "$STATUS" -eq 200 ] || [ "$STATUS" -eq 301 ] || [ "$STATUS" -eq 302 ]; then
+            echo "✅ Container is serving the site correctly"
+          else
+            echo "❌ Container returned unexpected status: $STATUS"
+            docker logs test-site
+            exit 1
+          fi
+
+      - name: Check page content
+        run: |
+          BODY=$(curl -s http://localhost:8080/)
+          if echo "$BODY" | grep -qi "timigs"; then
+            echo "✅ Page contains 'TimiGS' content"
+          else
+            echo "⚠️ Page does not contain expected content"
+          fi
+
+      - name: Cleanup
+        if: always()
+        run: docker rm -f test-site || true
