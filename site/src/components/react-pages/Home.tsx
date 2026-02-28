@@ -164,6 +164,36 @@ const Home: React.FC<HomeProps> = ({ lang, t }) => {
   const s4 = useInView();
   const s5 = useInView();
 
+  /* ── Fetch real GitHub stats ── */
+  const [ghStats, setGhStats] = useState({ stars: 0, downloads: 0 });
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        // Fetch stars
+        const repoRes = await fetch('https://api.github.com/repos/BANSAFAn/timiGS-');
+        const repoData = await repoRes.json();
+        const stars = repoData.stargazers_count || 0;
+
+        // Fetch total downloads (sum of all release asset download_count)
+        const releasesRes = await fetch('https://api.github.com/repos/BANSAFAn/timiGS-/releases?per_page=100');
+        const releasesData = await releasesRes.json();
+        let downloads = 0;
+        if (Array.isArray(releasesData)) {
+          for (const release of releasesData) {
+            for (const asset of release.assets || []) {
+              downloads += asset.download_count || 0;
+            }
+          }
+        }
+
+        setGhStats({ stars, downloads });
+      } catch {
+        // keep defaults
+      }
+    };
+    fetchStats();
+  }, []);
+
   return (
     <div className="space-y-24 md:space-y-36">
 
@@ -227,8 +257,8 @@ const Home: React.FC<HomeProps> = ({ lang, t }) => {
           {/* Stats row */}
           <div className="animate-fade-in-up flex flex-wrap gap-8 mt-16 pt-8 border-t border-white/5" style={{ animationDelay: "0.7s" }}>
             {[
-              { label: "Downloads", value: 500, suffix: "+" },
-              { label: "GitHub Stars", value: 12, suffix: "+" },
+              { label: "Downloads", value: ghStats.downloads, suffix: "+" },
+              { label: "GitHub Stars", value: ghStats.stars, suffix: "" },
               { label: "Platforms", value: 4, suffix: "" },
               { label: "Data Collected", value: 0, suffix: "", display: "Zero" },
             ].map((stat, i) => (

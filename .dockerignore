@@ -1,0 +1,12 @@
+node_modules
+dist
+.git
+.github
+src-tauri/target
+*.exe
+*.msi
+*.dmg
+*.AppImage
+*.deb
+*.rpm
+*.apk
