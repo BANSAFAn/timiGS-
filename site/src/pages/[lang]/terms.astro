@@ -12,6 +12,6 @@ const { lang } = Astro.params;
 const t = useTranslations(lang as Language);
 ---
 
-<Layout title={`TimiGS - ${t.nav.terms}`}>
-  <TermsPage t={t} />
+<Layout title={`${t.nav.terms} — TimiGS`}>
+  <TermsPage client:load t={t} />
 </Layout>

@@ -1,0 +1,88 @@
+name: Upload to SourceForge
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to upload (e.g. v2.1.0)"
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  upload-to-sourceforge:
+    name: 📦 Upload to SourceForge
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get release info
+        id: release
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            TAG="${{ github.event.inputs.tag }}"
+          else
+            TAG="${{ github.event.release.tag_name }}"
+          fi
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "📌 Release tag: $TAG"
+
+      - name: Download release assets from GitHub
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${{ steps.release.outputs.tag }}"
+          echo "📥 Downloading assets for release $TAG..."
+
+          mkdir -p release-assets
+
+          # Get release assets via GitHub API
+          ASSETS=$(curl -s -H "Authorization: token $GH_TOKEN" \
+            "https://api.github.com/repos/${{ github.repository }}/releases/tags/$TAG" \
+            | jq -r '.assets[] | .browser_download_url')
+
+          if [ -z "$ASSETS" ]; then
+            echo "❌ No assets found for tag $TAG"
+            exit 1
+          fi
+
+          for url in $ASSETS; do
+            filename=$(basename "$url")
+            echo "  ⬇️  $filename"
+            curl -sL -H "Authorization: token $GH_TOKEN" \
+              -H "Accept: application/octet-stream" \
+              "$url" -o "release-assets/$filename"
+          done
+
+          echo ""
+          echo "📋 Downloaded files:"
+          ls -lah release-assets/
+
+      - name: Upload to SourceForge via SFTP
+        env:
+          SF_USERNAME: ${{ secrets.SF_USERNAME }}
+          SF_PASSWORD: ${{ secrets.SF_PASSWORD }}
+        run: |
+          TAG="${{ steps.release.outputs.tag }}"
+
+          echo "📤 Uploading to SourceForge..."
+          echo "   Project: timigs"
+          echo "   Folder: /home/frs/project/timigs/$TAG/"
+
+          # Install sshpass for non-interactive SFTP
+          sudo apt-get update -qq && sudo apt-get install -y -qq sshpass
+
+          # Create version folder and upload all files
+          sshpass -p "$SF_PASSWORD" sftp -oBatchMode=no -oStrictHostKeyChecking=no \
+            "${SF_USERNAME}@frs.sourceforge.net" <<EOF
+          mkdir /home/frs/project/timigs/$TAG
+          cd /home/frs/project/timigs/$TAG
+          lcd release-assets
+          put *
+          bye
+          EOF
+
+          echo ""
+          echo "✅ Upload complete!"
+          echo "🔗 https://sourceforge.net/projects/timigs/files/$TAG/"

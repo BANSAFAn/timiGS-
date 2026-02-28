@@ -4,13 +4,15 @@ export interface Props {
   description?: string;
   image?: string;
   type?: 'website' | 'article';
+  keywords?: string;
 }
 
 const {
   title,
-  description = "TimiGS - Intelligent Activity Tracker. Experience the future of productivity with our premium tracking solution.",
-  image = "/og-image.jpg", // Ensure this image exists in public/
+  description = "TimiGS — Free, open-source time tracker with Focus Mode, analytics, weather widget, and Google Drive sync. Available for Windows, macOS, Linux, and Android.",
+  image = "/og-image.jpg",
   type = "website",
+  keywords = "time tracker, productivity, focus mode, activity tracker, open source, free, privacy, desktop app, Tauri, TimiGS",
 } = Astro.props;
 
 const siteURL = Astro.site ? Astro.site : new URL(Astro.url.origin);
@@ -22,6 +24,9 @@ const canonicalURL = new URL(Astro.url.pathname, siteURL);
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 <meta name="generator" content={Astro.generator} />
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+<meta name="theme-color" content="#030712" />
+<meta name="color-scheme" content="dark" />
 
 <!-- Canonical URL -->
 <link rel="canonical" href={canonicalURL} />
@@ -30,6 +35,8 @@ const canonicalURL = new URL(Astro.url.pathname, siteURL);
 <title>{title}</title>
 <meta name="title" content={title} />
 <meta name="description" content={description} />
+<meta name="keywords" content={keywords} />
+<meta name="author" content="BANSAFAn" />
 
 <!-- Open Graph / Facebook -->
 <meta property="og:type" content={type} />
@@ -37,6 +44,8 @@ const canonicalURL = new URL(Astro.url.pathname, siteURL);
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
 <meta property="og:image" content={new URL(image, Astro.url)} />
+<meta property="og:site_name" content="TimiGS" />
+<meta property="og:locale" content="en_US" />
 
 <!-- Twitter -->
 <meta property="twitter:card" content="summary_large_image" />
@@ -45,7 +54,30 @@ const canonicalURL = new URL(Astro.url.pathname, siteURL);
 <meta property="twitter:description" content={description} />
 <meta property="twitter:image" content={new URL(image, Astro.url)} />
 
-<!-- Fonts -->
+<!-- JSON-LD Structured Data -->
+<script type="application/ld+json" set:html={JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "TimiGS",
+  "description": description,
+  "url": canonicalURL.toString(),
+  "applicationCategory": "UtilitiesApplication",
+  "operatingSystem": "Windows, macOS, Linux, Android",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "author": {
+    "@type": "Person",
+    "name": "BANSAFAn",
+    "url": "https://github.com/BANSAFAn"
+  },
+  "license": "https://opensource.org/licenses/MIT",
+  "isAccessibleForFree": true
+})} />
+
+<!-- Fonts (preconnect for performance) -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=SF+Pro+Display:wght@500;700&display=swap" rel="stylesheet">

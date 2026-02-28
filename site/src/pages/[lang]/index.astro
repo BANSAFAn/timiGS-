@@ -12,6 +12,6 @@ const { lang } = Astro.params;
 const t = useTranslations(lang as Language);
 ---
 
-<Layout title="TimiGS">
-  <Home lang={lang as Language} t={t} />
+<Layout title="TimiGS — Free Open-Source Time Tracker | Focus Mode, Analytics, Privacy">
+  <Home client:load lang={lang as Language} t={t} />
 </Layout>
