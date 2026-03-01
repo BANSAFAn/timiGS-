@@ -23,6 +23,7 @@ const sectionIcons: Record<string, string> = {
   settings: "⚙️",
   "google-api": "☁️",
   "github-api": "🐙",
+  docker: "🐳",
 };
 
 const sectionDescriptions: Record<string, string> = {
@@ -33,6 +34,7 @@ const sectionDescriptions: Record<string, string> = {
   settings: "Customize your experience",
   "google-api": "Cloud backup & sync",
   "github-api": "Coding activity tracker",
+  docker: "Deploy with Docker",
 };
 
 export default function DocsViewer({ lang = "en" }: { lang?: string }) {
