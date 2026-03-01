@@ -90,6 +90,9 @@ pub fn run() {
         #[cfg(target_os = "windows")]
         tracker::start_tracking();
 
+        #[cfg(target_os = "windows")]
+        timeout::init_keyboard_hook();
+
         #[cfg(target_os = "android")]
         android_tracker::start_tracking();
 
@@ -210,11 +213,6 @@ pub fn run() {
             commands::start_tracking,
             commands::stop_tracking,
             commands::is_tracking,
-            commands::login_google,
-            commands::exchange_google_code,
-            commands::get_google_user,
-            commands::backup_data,
-            commands::restore_data,
             commands::shutdown_pc,
             commands::shutdown_pc,
             commands::get_app_icon,
@@ -225,16 +223,6 @@ pub fn run() {
             tasks::delete_task_cmd,
             tasks::get_recent_apps_cmd,
             tasks::get_task_progress_cmd,
-            // Multi-Account
-            commands::get_cloud_accounts,
-            commands::remove_cloud_account,
-            commands::create_drive_folder,
-            commands::list_drive_folders,
-            commands::upload_file,
-            commands::upload_file_with_data,
-            commands::download_file,
-            commands::save_local_file,
-            commands::list_drive_files,
             commands::show_main_window_cmd,
             commands::emit_navigate_cmd,
             commands::quit_app_cmd,

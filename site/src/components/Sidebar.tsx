@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Language } from '../i18n/types';
 import type { Translation } from '../i18n/types';
-import { Menu, X, Globe, Clock, Star, Download, Home, FileText, BookOpen, Shield, FlaskConical, Newspaper, ChevronRight } from 'lucide-react';
+import { Menu, X, Globe, Clock, Star, Download, Home, FileText, BookOpen, Shield, FlaskConical, Newspaper, ChevronRight, Music } from 'lucide-react';
 
 interface SidebarProps {
   lang: Language;
@@ -21,15 +21,16 @@ const Sidebar: React.FC<SidebarProps> = ({ lang, t, pathname }) => {
       .catch(() => {});
   }, []);
 
-  const navLinks = [
-    { path: '/', label: t.nav.home, icon: <Home className="w-5 h-5" /> },
-    { path: '/releases', label: t.nav.releases, icon: <Newspaper className="w-5 h-5" /> },
-    { path: '/download', label: t.nav.download, icon: <Download className="w-5 h-5" /> },
-    { path: '/testing', label: t.nav.testing, icon: <FlaskConical className="w-5 h-5" /> },
-    { path: '/docs', label: t.nav.docs, icon: <BookOpen className="w-5 h-5" /> },
-    { path: '/notes', label: t.nav.notes, icon: <FileText className="w-5 h-5" /> },
-    { path: '/terms', label: t.nav.terms, icon: <Shield className="w-5 h-5" /> },
-  ];
+    const navLinks = [
+      { path: '/', label: t.nav.home, icon: <Home className="w-5 h-5" /> },
+      { path: '/releases', label: t.nav.releases, icon: <Newspaper className="w-5 h-5" /> },
+      { path: '/download', label: t.nav.download, icon: <Download className="w-5 h-5" /> },
+      { path: '/testing', label: t.nav.testing, icon: <FlaskConical className="w-5 h-5" /> },
+      { path: '/docs', label: t.nav.docs, icon: <BookOpen className="w-5 h-5" /> },
+      { path: '/notes', label: t.nav.notes, icon: <FileText className="w-5 h-5" /> },
+      { path: '/music', label: t.nav.music, icon: <Music className="w-5 h-5" /> },
+      { path: '/terms', label: t.nav.terms, icon: <Shield className="w-5 h-5" /> },
+    ];
 
   const languages = [
     { code: Language.EN, label: 'English' },

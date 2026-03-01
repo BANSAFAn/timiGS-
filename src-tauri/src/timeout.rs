@@ -23,31 +23,35 @@ static mut KBD_HOOK: HHOOK = HHOOK(std::ptr::null_mut());
 
 #[cfg(target_os = "windows")]
 unsafe extern "system" fn keyboard_hook_proc(code: i32, wparam: WPARAM, lparam: LPARAM) -> LRESULT {
-    if code >= 0 && BREAK_ACTIVE.load(Ordering::SeqCst) {
+    if code >= 0 {
+        let is_break = BREAK_ACTIVE.load(Ordering::SeqCst);
         let kb = &*(lparam.0 as *const KBDLLHOOKSTRUCT);
         let vk_code = kb.vkCode;
         let flags = kb.flags.0;
         let alt_down = (flags & 32) != 0;
 
-        let mut block = false;
-        // Alt+Tab or Alt+Esc
-        if alt_down && (vk_code == 0x09 || vk_code == 0x1B) {
-            block = true;
-        }
-        // LWIN / RWIN
-        if vk_code == 0x5B || vk_code == 0x5C {
-            block = true;
-        }
+        if is_break {
+            let mut block = false;
+            // Alt+Tab or Alt+Esc
+            if alt_down && (vk_code == 0x09 || vk_code == 0x1B) {
+                block = true;
+            }
+            // LWIN / RWIN
+            if vk_code == 0x5B || vk_code == 0x5C {
+                block = true;
+            }
 
-        if block {
-            return LRESULT(1);
+            if block {
+                println!("TimeOut Hook: Blocked VK {}!", vk_code);
+                return LRESULT(1);
+            }
         }
     }
     CallNextHookEx(KBD_HOOK, code, wparam, lparam)
 }
 
 #[cfg(target_os = "windows")]
-fn manage_keyboard_hook() {
+pub fn init_keyboard_hook() {
     unsafe {
         if KBD_HOOK.0.is_null() {
             std::thread::spawn(|| {
@@ -58,6 +62,12 @@ fn manage_keyboard_hook() {
                     0,
                 )
                 .unwrap_or(HHOOK(std::ptr::null_mut()));
+
+                if hook.0.is_null() {
+                    println!("TimeOut Hook: Failed to install WH_KEYBOARD_LL!");
+                } else {
+                    println!("TimeOut Hook: Successfully installed WH_KEYBOARD_LL.");
+                }
 
                 KBD_HOOK = hook;
 
@@ -117,9 +127,6 @@ pub fn start_timeout(
     if TIMEOUT_RUNNING.load(Ordering::SeqCst) {
         return Err("Time OUT is already active".to_string());
     }
-
-    #[cfg(target_os = "windows")]
-    manage_keyboard_hook();
 
     let password_hash = simple_hash(password);
 

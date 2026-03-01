@@ -293,24 +293,82 @@ async function deleteTask(id: number) {
 }
 
 function exportCsv() {
-    const headers = ['ID', 'App', 'Target App/Site', 'Description', 'Goal (h)', 'Created At', 'Status'];
-    const rows = filteredTasks.value.map(t => [
-        t.id,
-        t.app_name,
-        t.title_filter || 'Any',
-        t.description || '',
-        (t.goal_seconds / 3600).toFixed(2),
-        new Date(t.created_at).toLocaleString(),
-        t.status
-    ]);
+    const tableStyle = `
+        <style>
+            table {
+                border-collapse: collapse;
+                width: 100%;
+                font-family: 'Segoe UI', Arial, sans-serif;
+                font-size: 14px;
+            }
+            th {
+                background-color: #1e293b;
+                color: #f8fafc;
+                text-align: left;
+                padding: 12px 16px;
+                font-weight: 600;
+                border: 1px solid #334155;
+            }
+            td {
+                padding: 10px 16px;
+                border: 1px solid #334155;
+                color: #e2e8f0;
+                background-color: #0f172a;
+            }
+            .status-active { color: #60a5fa; font-weight: bold; }
+            .status-completed { color: #4ade80; font-weight: bold; background-color: rgba(34, 197, 94, 0.1); }
+            .status-failed { color: #f87171; font-weight: bold; }
+            tr:hover td { background-color: #1e293b; }
+        </style>
+    `;
+
+    const headers = `
+        <tr>
+            <th>ID</th>
+            <th>App</th>
+            <th>Target App/Site</th>
+            <th>Description</th>
+            <th>Goal (h)</th>
+            <th>Created At</th>
+            <th>Status</th>
+        </tr>
+    `;
+
+    const rows = filteredTasks.value.map(t => `
+        <tr>
+            <td>${t.id}</td>
+            <td>${t.app_name}</td>
+            <td>${t.title_filter || 'Any'}</td>
+            <td>${t.description || ''}</td>
+            <td>${(t.goal_seconds / 3600).toFixed(2)}</td>
+            <td>${new Date(t.created_at).toLocaleString()}</td>
+            <td class="status-${t.status.toLowerCase()}">${t.status}</td>
+        </tr>
+    `).join('');
+
+    const htmlContent = `
+        <html>
+        <head>
+            <meta charset="utf-8">
+            <title>TimiGS Tasks Report</title>
+            ${tableStyle}
+        </head>
+        <body style="background-color: #0f172a; color: white;">
+            <h2 style="font-family: sans-serif; padding: 20px;">TimiGS Tasks & Goals Report</h2>
+            <table>
+                <thead>${headers}</thead>
+                <tbody>${rows}</tbody>
+            </table>
+        </body>
+        </html>
+    `;
     
-    const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
-    
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    // We export as .xls Extension so Excel opens it with the rich HTML rendering enabled automatically
+    const blob = new Blob([htmlContent], { type: 'application/vnd.ms-excel;charset=utf-8;' });
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
     link.setAttribute('href', url);
-    link.setAttribute('download', 'tasks_history.csv');
+    link.setAttribute('download', 'TimiGS_Tasks_Report.xls');
     link.style.visibility = 'hidden';
     document.body.appendChild(link);
     link.click();

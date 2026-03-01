@@ -568,31 +568,6 @@ select option {
   height: 18px;
 }
 
-/* Google Sign In Button */
-.btn-google {
-  background: white;
-  color: #1f1f1f;
-  border: 1px solid #dadce0;
-  padding: 10px 20px;
-  border-radius: var(--radius-md);
-  font-weight: 500;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  transition: all var(--transition-fast);
-}
-
-.btn-google:hover {
-  background: #f8f9fa;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.btn-google img {
-  width: 18px;
-  height: 18px;
-}
-
 /* Active App Display - Enhanced */
 .active-app-display {
   display: flex;

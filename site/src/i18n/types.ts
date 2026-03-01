@@ -41,6 +41,7 @@ export interface Translation {
     docs: string;
     notes: string;
     testing: string;
+    music: string;
   };
   hero: {
     new_version: string;

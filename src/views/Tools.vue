@@ -2,19 +2,36 @@
   <div class="page page-shell tools-page">
     <div class="page-container">
       <div class="page-header">
-        <h2>{{ $t('nav.tools', 'Tools') }}</h2>
+        <h2>{{ $t("nav.tools", "Tools") }}</h2>
         <p class="subtitle">Utilities to boost your productivity</p>
       </div>
 
-      <div class="tools-grid">
+      <!-- Tab Navigation -->
+      <div class="tools-tabs">
+        <button
+          v-for="tab in tabs"
+          :key="tab.id"
+          class="tab-btn"
+          :class="{ active: activeTab === tab.id }"
+          @click="activeTab = tab.id"
+        >
+          <span class="tab-icon" v-html="tab.icon"></span>
+          {{ $t(tab.titleKey, tab.defaultTitle) }}
+        </button>
+      </div>
+
+      <div class="tools-content">
         <!-- Shutdown Timer Card (Premium Gradient) -->
-        <div class="tool-card timer-card">
+        <div
+          v-show="activeTab === 'timer'"
+          class="tool-content-card timer-card"
+        >
           <div class="card-bg-glow"></div>
           <div class="card-header">
             <div class="header-icon-box timer-icon">
-              <span>⏲️</span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
             </div>
-            <h3>{{ $t('tools.timer', 'Shutdown Timer') }}</h3>
+            <h3>{{ $t("tools.timer", "Shutdown Timer") }}</h3>
           </div>
           <div class="card-body">
             <ShutdownTimer />
@@ -22,12 +39,15 @@
         </div>
 
         <!-- Tasks Card -->
-        <div class="tool-card tasks-card">
+        <div
+          v-show="activeTab === 'tasks'"
+          class="tool-content-card tasks-card"
+        >
           <div class="card-header">
             <div class="header-icon-box task-icon">
-              <span>✅</span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path><path d="m9 12 2 2 4-4"></path></svg>
             </div>
-            <h3>{{ $t('tasks.title', 'Tasks & Goals') }}</h3>
+            <h3>{{ $t("tasks.title", "Tasks & Goals") }}</h3>
           </div>
           <div class="card-body">
             <TasksWidget />
@@ -35,13 +55,16 @@
         </div>
 
         <!-- Focus Mode Card -->
-        <div class="tool-card focus-card">
+        <div
+          v-show="activeTab === 'focus'"
+          class="tool-content-card focus-card"
+        >
           <div class="card-bg-glow"></div>
           <div class="card-header">
             <div class="header-icon-box focus-icon">
-              <span>🎯</span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
             </div>
-            <h3>{{ $t('focus.title', 'Focus Mode') }}</h3>
+            <h3>{{ $t("focus.title", "Focus Mode") }}</h3>
           </div>
           <div class="card-body">
             <FocusMode />
@@ -49,75 +72,100 @@
         </div>
 
         <!-- Time OUT Card -->
-        <div class="tool-card timeout-card">
+        <div
+          v-show="activeTab === 'timeout'"
+          class="tool-content-card timeout-card"
+        >
           <div class="card-bg-glow"></div>
           <div class="card-header">
             <div class="header-icon-box timeout-icon">
-              <span>☕</span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"></path><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"></path><line x1="6" y1="2" x2="6" y2="4"></line><line x1="10" y1="2" x2="10" y2="4"></line><line x1="14" y1="2" x2="14" y2="4"></line></svg>
             </div>
-            <h3>{{ $t('timeout.title', 'Time OUT') }}</h3>
+            <h3>{{ $t("timeout.title", "Time OUT") }}</h3>
           </div>
           <div class="card-body">
             <TimeOut />
           </div>
         </div>
 
-        <!-- P2P Transfer Card -->
-        <div class="tool-card p2p-card" @click="$router.push('/transfer')">
-          <div class="card-header">
-            <div class="header-icon-box p2p-icon">
-              <span>📡</span>
-            </div>
-            <h3>P2P Transfer</h3>
-          </div>
-          <div class="card-body">
-            <p>Receive DB from Mobile</p>
-          </div>
-        </div>
-
         <!-- Notepad Card (Full Width) -->
-        <div class="tool-card notepad-card">
+        <div
+          v-show="activeTab === 'notepad'"
+          class="tool-content-card notepad-card"
+        >
           <div class="card-header flex-between">
             <div class="header-left">
               <div class="header-icon-box note-icon">
-                <span>📝</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><line x1="10" y1="9" x2="8" y2="9"></line></svg>
               </div>
-              <h3>{{ $t('tools.notepad', 'Notepad') }}</h3>
+              <h3>{{ $t("tools.notepad", "Notepad") }}</h3>
             </div>
             <button class="btn-new-note" @click="createNote">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
                 <line x1="12" y1="5" x2="12" y2="19"></line>
                 <line x1="5" y1="12" x2="19" y2="12"></line>
               </svg>
-              {{ $t('tools.newNote', 'New Note') }}
+              {{ $t("tools.newNote", "New Note") }}
             </button>
           </div>
-          
+
           <div class="notepad-layout">
             <!-- Sidebar -->
             <div class="notes-sidebar custom-scrollbar">
-              <div 
-                v-for="note in notes" 
-                :key="note.id" 
+              <div
+                v-for="note in notes"
+                :key="note.id"
                 class="note-item"
                 :class="{ active: selectedNote?.id === note.id }"
                 @click="selectNote(note)"
               >
                 <div class="note-item-content">
-                  <span class="note-title">{{ note.title || $t('tools.untitled', 'Untitled') }}</span>
-                  <span class="note-date">{{ formatDate(note.createdAt) }}</span>
+                  <span class="note-title">{{
+                    note.title || $t("tools.untitled", "Untitled")
+                  }}</span>
+                  <span class="note-date">{{
+                    formatDate(note.createdAt)
+                  }}</span>
                 </div>
-                <button class="btn-delete" @click.stop="deleteNote(note.id)" title="Delete">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <button
+                  class="btn-delete"
+                  @click.stop="deleteNote(note.id)"
+                  title="Delete"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
                     <polyline points="3 6 5 6 21 6"></polyline>
-                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    <path
+                      d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                    ></path>
                   </svg>
                 </button>
               </div>
-              
+
               <div v-if="notes.length === 0" class="empty-notes">
-                <div class="empty-icon">📝</div>
-                <p>{{ $t('tools.noNotes', 'No notes yet') }}</p>
+                <div class="empty-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><line x1="10" y1="9" x2="8" y2="9"></line></svg>
+                </div>
+                <p>{{ $t("tools.noNotes", "No notes yet") }}</p>
               </div>
             </div>
 
@@ -125,26 +173,32 @@
             <div class="note-editor">
               <div v-if="selectedNote" class="editor-container">
                 <div class="editor-header">
-                  <input 
-                    v-model="selectedNote.title" 
+                  <input
+                    v-model="selectedNote.title"
                     class="note-title-input"
                     :placeholder="$t('tools.untitled', 'Untitled Note')"
                     @input="handleInput"
                   />
                   <span class="save-indicator" :class="{ saved: isSaved }">
                     <span v-if="!isSaved" class="saving-spinner"></span>
-                    {{ isSaved ? $t('common.saved', 'Saved') : $t('common.saving', 'Saving...') }}
+                    {{
+                      isSaved
+                        ? $t("common.saved", "Saved")
+                        : $t("common.saving", "Saving...")
+                    }}
                   </span>
                 </div>
-                
-                <textarea 
-                  v-model="selectedNote.content" 
-                  class="notepad-area custom-scrollbar" 
-                  :placeholder="$t('tools.notepadPlaceholder', 'Type your notes here...')"
+
+                <textarea
+                  v-model="selectedNote.content"
+                  class="notepad-area custom-scrollbar"
+                  :placeholder="
+                    $t('tools.notepadPlaceholder', 'Type your notes here...')
+                  "
                   @input="handleInput"
                 ></textarea>
               </div>
-              
+
               <div v-else class="empty-editor">
                 <div class="empty-state-content">
                   <span class="select-icon">👈</span>
@@ -160,12 +214,21 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'; // removed unused 'computed'
-import ShutdownTimer from '../components/ShutdownTimer.vue';
-import TasksWidget from '../components/TasksWidget.vue';
-import FocusMode from '../components/FocusMode.vue';
-import TimeOut from '../components/TimeOut.vue';
-import { useDebounceFn } from '@vueuse/core';
+import { ref, onMounted } from "vue";
+import ShutdownTimer from "../components/ShutdownTimer.vue";
+import TasksWidget from "../components/TasksWidget.vue";
+import FocusMode from "../components/FocusMode.vue";
+import TimeOut from "../components/TimeOut.vue";
+import { useDebounceFn } from "@vueuse/core";
+
+const activeTab = ref("timeout");
+const tabs = [
+  { id: "timeout", titleKey: "timeout.title", defaultTitle: "Time OUT", icon: `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"></path><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"></path><line x1="6" y1="2" x2="6" y2="4"></line><line x1="10" y1="2" x2="10" y2="4"></line><line x1="14" y1="2" x2="14" y2="4"></line></svg>` },
+  { id: "focus", titleKey: "focus.title", defaultTitle: "Focus Mode", icon: `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>` },
+  { id: "tasks", titleKey: "tasks.title", defaultTitle: "Tasks & Goals", icon: `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path><path d="m9 12 2 2 4-4"></path></svg>` },
+  { id: "timer", titleKey: "tools.timer", defaultTitle: "Shutdown Timer", icon: `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>` },
+  { id: "notepad", titleKey: "tools.notepad", defaultTitle: "Notepad", icon: `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><line x1="10" y1="9" x2="8" y2="9"></line></svg>` },
+];
 
 interface Note {
   id: string;
@@ -178,14 +241,17 @@ const notes = ref<Note[]>([]);
 const selectedNote = ref<Note | null>(null);
 const isSaved = ref(true);
 
-const STORAGE_KEY = 'timigs_notes';
+const STORAGE_KEY = "timigs_notes";
 
 function generateId(): string {
   return Date.now().toString(36) + Math.random().toString(36).substring(2);
 }
 
 function formatDate(ts: number) {
-  return new Date(ts).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  return new Date(ts).toLocaleDateString(undefined, {
+    month: "short",
+    day: "numeric",
+  });
 }
 
 function loadNotes() {
@@ -218,9 +284,9 @@ function handleInput() {
 function createNote() {
   const newNote: Note = {
     id: generateId(),
-    title: '',
-    content: '',
-    createdAt: Date.now()
+    title: "",
+    content: "",
+    createdAt: Date.now(),
   };
   notes.value.unshift(newNote);
   selectedNote.value = newNote;
@@ -232,7 +298,7 @@ function selectNote(note: Note) {
 }
 
 function deleteNote(id: string) {
-  const index = notes.value.findIndex(n => n.id === id);
+  const index = notes.value.findIndex((n) => n.id === id);
   if (index > -1) {
     if (confirm("Delete this note?")) {
       notes.value.splice(index, 1);
@@ -264,34 +330,85 @@ onMounted(() => {
   margin-top: 4px;
 }
 
-.tools-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
+.tools-tabs {
+  display: flex;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 8px;
+  border-radius: 16px;
+  margin-bottom: 24px;
+  overflow-x: auto;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.tools-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: transparent;
+  border: none;
+  border-radius: 12px;
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.tab-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+}
+
+.tab-btn.active {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.tab-icon {
+  font-size: 1.1rem;
+}
+
+.tools-content {
   width: 100%;
 }
 
-.tool-card {
+.tool-content-card {
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 20px;
-  padding: 24px;
+  padding: 32px;
   display: flex;
   flex-direction: column;
-  transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
+  animation: fadeIn 0.3s ease;
 }
 
-.tool-card:hover {
-  transform: translateY(-2px);
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.1);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .timer-card {
-  background: linear-gradient(145deg, rgba(239, 68, 68, 0.05), rgba(255, 255, 255, 0.02));
+  background: linear-gradient(
+    145deg,
+    rgba(239, 68, 68, 0.05),
+    rgba(255, 255, 255, 0.02)
+  );
   border-color: rgba(239, 68, 68, 0.1);
 }
 
@@ -325,37 +442,66 @@ onMounted(() => {
   justify-content: center;
   font-size: 1.5rem;
   background: rgba(255, 255, 255, 0.05);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.timer-icon { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
-.task-icon { background: rgba(59, 130, 246, 0.15); color: #3b82f6; }
-.note-icon { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
-.p2p-icon { background: rgba(16, 185, 129, 0.15); color: #10b981; }
-.focus-icon { background: rgba(139, 92, 246, 0.15); color: #8b5cf6; }
-.timeout-icon { background: rgba(20, 184, 166, 0.15); color: #14b8a6; }
+.timer-icon {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+.task-icon {
+  background: rgba(59, 130, 246, 0.15);
+  color: #3b82f6;
+}
+.note-icon {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+}
+.p2p-icon {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+}
+.focus-icon {
+  background: rgba(139, 92, 246, 0.15);
+  color: #8b5cf6;
+}
+.timeout-icon {
+  background: rgba(20, 184, 166, 0.15);
+  color: #14b8a6;
+}
 
 .focus-card {
-  background: linear-gradient(145deg, rgba(139, 92, 246, 0.05), rgba(255, 255, 255, 0.02));
+  background: linear-gradient(
+    145deg,
+    rgba(139, 92, 246, 0.05),
+    rgba(255, 255, 255, 0.02)
+  );
   border-color: rgba(139, 92, 246, 0.1);
 }
-.focus-card:hover { border-color: rgba(139, 92, 246, 0.3); }
+.focus-card:hover {
+  border-color: rgba(139, 92, 246, 0.3);
+}
 
 .timeout-card {
-  background: linear-gradient(145deg, rgba(20, 184, 166, 0.05), rgba(255, 255, 255, 0.02));
+  background: linear-gradient(
+    145deg,
+    rgba(20, 184, 166, 0.05),
+    rgba(255, 255, 255, 0.02)
+  );
   border-color: rgba(20, 184, 166, 0.1);
 }
-.timeout-card:hover { border-color: rgba(20, 184, 166, 0.3); }
+.timeout-card:hover {
+  border-color: rgba(20, 184, 166, 0.3);
+}
 
-.tool-card h3 {
-  font-size: 1.1rem;
+.tool-content-card h3 {
+  font-size: 1.25rem;
   font-weight: 600;
   margin: 0;
 }
 
 /* Notepad Specifics */
 .notepad-card {
-  grid-column: span 2;
   min-height: 500px;
 }
 
@@ -586,10 +732,15 @@ onMounted(() => {
 }
 
 @media (max-width: 900px) {
-  .tools-grid { grid-template-columns: 1fr; }
-  .notepad-card { grid-column: span 1; }
-  .notepad-layout { flex-direction: column; }
-  .notes-sidebar { width: 100%; max-height: 200px; }
-  .notepad-area { min-height: 300px; }
+  .notepad-layout {
+    flex-direction: column;
+  }
+  .notes-sidebar {
+    width: 100%;
+    max-height: 200px;
+  }
+  .notepad-area {
+    min-height: 300px;
+  }
 }
 </style>

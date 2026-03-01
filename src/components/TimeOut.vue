@@ -375,6 +375,7 @@ async function stopTimeout() {
     await invoke("stop_timeout_cmd", { password: cancelPassword.value });
     cancelPassword.value = "";
     status.value = null;
+    manageAudio(false);
     if (pollInterval) {
       clearInterval(pollInterval);
       pollInterval = null;
@@ -390,6 +391,7 @@ async function stopTimeoutOverlay() {
     await invoke("stop_timeout_cmd", { password: overlayCancelPassword.value });
     overlayCancelPassword.value = "";
     status.value = null;
+    manageAudio(false);
     if (pollInterval) {
       clearInterval(pollInterval);
       pollInterval = null;

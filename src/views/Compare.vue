@@ -11,25 +11,9 @@
               <div class="panel-icon">🔑</div>
               <h1>Welcome to Teams</h1>
               <p class="subtitle">Collaborate with your team in real-time.</p>
-              
-              <div class="auth-section">
-                  <div v-if="googleAccount" class="account-preview">
-                      <div class="avatar-circle">{{ googleAccount.email[0].toUpperCase() }}</div>
-                      <div class="account-info">
-                          <span class="name">{{ googleAccount.name }}</span>
-                          <span class="email">{{ googleAccount.email }}</span>
-                      </div>
-                      <button class="btn btn-primary" @click="loginWithGoogle">Continue</button>
-                  </div>
-                  <div v-else>
-                      <button class="btn btn-google" @click="startGoogleAuth">
-                          <span>G</span> Sign in with Google
-                      </button>
-                  </div>
-              </div>
-              
+
               <div class="hero-foot">
-                  <input v-model="tempName" placeholder="Or enter a nickname..." class="input-minimal" @change="saveProfile()" />
+                  <input v-model="tempName" placeholder="Enter your nickname..." class="input-minimal" @change="saveProfile()" />
               </div>
            </div>
         </div>
@@ -440,7 +424,6 @@ const dragOffset = ref({ x: 0, y: 0 });
 // Lobby State
 const tempName = ref(store.myProfile.name);
 const joinId = ref("");
-const googleAccount = ref<any>(null);
 
 // Logic State
 const goalApp = ref("");
@@ -614,32 +597,9 @@ function kickMember(id: string) {
     store.kickMember(id);
 }
 
-// Google Auth
-async function startGoogleAuth() {
-    const { invoke } = await import("@tauri-apps/api/core");
-    await invoke("login_google");
-    const i = setInterval(async () => {
-        const accs: any = await invoke("get_cloud_accounts");
-        if(accs && accs.length) {
-            googleAccount.value = accs[0];
-            tempName.value = accs[0].name;
-            store.saveProfile(accs[0].name, accs[0].email);
-            clearInterval(i);
-        }
-    }, 2000);
-}
-
-function loginWithGoogle() {
-    if(googleAccount.value) store.saveProfile(googleAccount.value.name, googleAccount.value.email);
-}
-
 // Tracking
 let trackInt = 0;
 onMounted(async () => {
-   const { invoke } = await import("@tauri-apps/api/core");
-   const accs: any = await invoke("get_cloud_accounts");
-   if(accs && accs.length) googleAccount.value = accs[0];
-
    trackInt = window.setInterval(async () => {
        if(store.isConnected) {
            await activityStore.fetchCurrentActivity();
@@ -709,7 +669,6 @@ h1 { font-size: 2rem; margin-bottom: 8px; font-weight: 700; letter-spacing: -1px
 .btn-primary { background: #6366f1; color: white; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); }
 .btn-primary:hover { background: #4f46e5; transform: scale(1.02); }
 .btn-accent { background: #06b6d4; color: white; }
-.btn-google { background: white; color: black; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; }
 .full { width: 100%; }
 
 /* Lobby - Full Screen Centered Layout */

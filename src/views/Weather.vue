@@ -6,7 +6,9 @@
         <div class="header-left">
           <h2>{{ $t("weather.title") || "Weather & History" }}</h2>
           <div class="location-pill" v-if="isEnabled && config.name">
-            <span class="location-icon">📍</span>
+            <span class="location-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+            </span>
             <span>{{ config.name }}, {{ config.country }}</span>
           </div>
         </div>
@@ -43,7 +45,7 @@
         <div class="hero-content">
           <div class="hero-main">
             <div class="weather-icon-large">
-              <span class="icon-emoji">{{ getWeatherIcon(current.code) }}</span>
+              <span class="icon-emoji" v-html="getWeatherIcon(current.code)"></span>
               <div class="icon-glow"></div>
             </div>
             <div class="temp-block">
@@ -57,7 +59,9 @@
           
           <div class="hero-stats">
             <div class="stat-item">
-              <div class="stat-icon">💧</div>
+              <div class="stat-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"></path></svg>
+              </div>
               <div class="stat-data">
                 <span class="stat-value">{{ current.humidity }}%</span>
                 <span class="stat-label">Humidity</span>
@@ -65,7 +69,9 @@
             </div>
             <div class="stat-divider"></div>
             <div class="stat-item">
-              <div class="stat-icon">💨</div>
+              <div class="stat-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2"></path><path d="M9.6 4.6A2 2 0 1 1 11 8H2"></path><path d="M12.6 19.4A2 2 0 1 0 14 16H2"></path></svg>
+              </div>
               <div class="stat-data">
                 <span class="stat-value">{{ current.wind }}</span>
                 <span class="stat-label">km/h Wind</span>
@@ -73,7 +79,9 @@
             </div>
             <div class="stat-divider"></div>
             <div class="stat-item">
-              <div class="stat-icon">🌡️</div>
+              <div class="stat-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"></path></svg>
+              </div>
               <div class="stat-data">
                 <span class="stat-value">{{ Math.round((current.temp || 0) - 2) }}°</span>
                 <span class="stat-label">Feels Like</span>
@@ -109,8 +117,7 @@
             </div>
             
             <div class="forecast-item-center">
-              <div class="forecast-weather-icon" :class="getWeatherClass(day.code)">
-                {{ getWeatherIcon(day.code) }}
+              <div class="forecast-weather-icon" :class="getWeatherClass(day.code)" v-html="getWeatherIcon(day.code)">
               </div>
               <div class="forecast-condition">{{ getWeatherDesc(day.code) }}</div>
             </div>
@@ -146,8 +153,10 @@
           <div class="timeline-line"></div>
           <div class="history-entry" v-for="entry in history" :key="entry.date" @click="openHistoryDetail(entry)">
             <div class="timeline-dot" :class="{ 'has-weather': isEnabled }">
-              <span v-if="isEnabled">{{ getWeatherIcon(entry.weatherCode) }}</span>
-              <span v-else>📅</span>
+              <span v-if="isEnabled" v-html="getWeatherIcon(entry.weatherCode)"></span>
+              <span v-else>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+              </span>
             </div>
             
             <div class="entry-card">
@@ -242,7 +251,10 @@
 
             <div class="current-location" v-if="config.name">
               <label>Current Location</label>
-              <div class="location-value">📍 {{ config.name }}, {{ config.country }}</div>
+              <div class="location-value">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                {{ config.name }}, {{ config.country }}
+              </div>
             </div>
             
             <div class="form-group">
@@ -322,11 +334,15 @@
           <p class="geo-modal-desc">TimiGS would like to use your location to automatically detect your city and show local weather data.</p>
           <div class="geo-modal-info">
             <div class="geo-info-item">
-              <span class="geo-info-icon">🛡️</span>
+              <span class="geo-info-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+              </span>
               <span>Your location is never stored on any server</span>
             </div>
             <div class="geo-info-item">
-              <span class="geo-info-icon">🌍</span>
+              <span class="geo-info-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+              </span>
               <span>Used only to find your city name</span>
             </div>
           </div>
@@ -619,13 +635,14 @@ function getWeatherDesc(code: number) {
 }
 
 function getWeatherIcon(code: number) {
-   if (code === 0) return '☀️';
-   if (code >= 1 && code <= 3) return '⛅';
-   if (code >= 45 && code <= 48) return '🌫️';
-   if (code >= 51 && code <= 67) return '🌧️';
-   if (code >= 71 && code <= 77) return '❄️';
-   if (code >= 95) return '⚡';
-   return '🌥️';
+   // Returns SVG strings instead of emojis
+   if (code === 0) return `<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path></svg>`; // Sun
+   if (code >= 1 && code <= 3) return `<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path></svg>`; // Cloud
+   if (code >= 45 && code <= 48) return `<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="5" x2="19" y2="5"></line><line x1="5" y1="12" x2="19" y2="12"></line><line x1="5" y1="19" x2="19" y2="19"></line></svg>`; // Fog
+   if (code >= 51 && code <= 67) return `<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"></path><path d="M16 14v6"></path><path d="M8 14v6"></path><path d="M12 16v6"></path></svg>`; // Rain
+   if (code >= 71 && code <= 77) return `<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m20 17.5-5.5-3 5.5-3"></path><path d="m4 17.5 5.5-3-5.5-3"></path><path d="M12 2v20"></path><path d="m12 22 5.5-3-5.5-3"></path><path d="m12 2-5.5 3 5.5 3"></path></svg>`; // Snow
+   if (code >= 95) return `<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 16.9A5 5 0 0 0 18 7h-1.26a8 8 0 1 0-11.62 9"></path><polyline points="13 11 9 17 15 17 11 23"></polyline></svg>`; // Cloud Lightning
+   return `<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path></svg>`; // Fallback Cloud
 }
 
 // --- History ---

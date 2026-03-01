@@ -115,8 +115,6 @@
 <script setup lang="ts">
 import { ref, onMounted, watch, computed } from "vue";
 import { invoke } from "@tauri-apps/api/core";
-// @ts-ignore
-import { onOpenUrl } from "@tauri-apps/plugin-deep-link";
 import { useRouter, useRoute } from "vue-router";
 import { useActivityStore } from "./stores/activity";
 import NotificationToast from "./components/NotificationToast.vue";
@@ -159,38 +157,6 @@ onMounted(async () => {
   if (!store.isTracking) {
       console.log("Starting activity tracking...");
       await store.startTracking();
-  }
-
-  // Setup Deep Link Listener (Mobile Auth)
-  try {
-    // @ts-ignore
-    await onOpenUrl((urls: string[]) => {
-      console.log('Deep link received:', urls);
-      for (const url of urls) {
-        if (url.includes('code=')) {
-          const urlObj = new URL(url);
-          const code = urlObj.searchParams.get('code');
-          if (code) {
-             invoke('exchange_google_code', { code })
-              .then(() => {
-                // Determine if we need to notify the user. 
-                // Using a simple alert or toast if possible.
-                // Since NotificationToast is here, we could use store?
-                // For now, simple alert or console.
-                console.log("Google Login Successful via Deep Link");
-                // Refresh settings or cloud accounts if needed
-                // But cloud accounts are in a different store?
-                // Just saving to DB is enough.
-              })
-              .catch(err => console.error("Auth Exchange Error", err));
-          }
-        }
-      }
-    });
-  } catch (e) {
-    // Deep link plugin might fail on desktop if not configured or supported in this context
-    // It's safe to ignore on desktop since we use server flow there
-    console.debug('Deep Link listener init skipped or failed:', e);
   }
 
   // Block F7 key

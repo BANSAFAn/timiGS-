@@ -183,6 +183,10 @@ pub fn init_database() -> Result<()> {
     Ok(())
 }
 
+pub fn close_database() {
+    *DB.lock() = None;
+}
+
 pub fn start_session(app_name: &str, window_title: &str, exe_path: &str) -> Result<i64> {
     let guard = DB.lock();
     let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;

@@ -81,10 +81,6 @@ export const useTeamsStore = defineStore("teams", () => {
     localStorage.setItem("timigs_team_email", email);
   }
 
-  function setProfileFromGoogle(name: string, email: string) {
-     if (!myProfile.name) saveProfile(name, email);
-  }
-
   function initializePeer() {
     return new Promise<string>((resolve, reject) => {
       if (peer.value) {
@@ -670,7 +666,6 @@ export const useTeamsStore = defineStore("teams", () => {
     selectedAudioOutput,
     // Actions
     saveProfile,
-    setProfileFromGoogle,
     createTeam,
     joinTeam,
     leaveTeam,
