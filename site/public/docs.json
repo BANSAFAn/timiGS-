@@ -25,11 +25,6 @@
     "file": "settings.md"
   },
   {
-    "id": "google-api",
-    "title": "Google Drive Integration",
-    "file": "google-api.md"
-  },
-  {
     "id": "github-api",
     "title": "GitHub Integration",
     "file": "github-api.md"

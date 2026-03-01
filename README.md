@@ -48,7 +48,6 @@ Track your app usage, visualize productivity, manage tasks, and stay focused —
 - **Shutdown Timer** — schedule automatic system shutdown
 
 ### ☁️ Sync & Transfer
-- **Google Drive Sync** — cloud backup and restore of your activity data
 - **P2P Transfer** — direct peer-to-peer file transfer between devices via WebRTC (PeerJS)
 - **Data Export/Import** — export and import your database for manual backup
 
@@ -167,7 +166,7 @@ See [BUILD_INSTRUCTIONS.md](timigs-android/BUILD_INSTRUCTIONS.md) for detailed i
 | Permission             | Purpose                              |
 | ---------------------- | ------------------------------------ |
 | `PACKAGE_USAGE_STATS`  | Required for tracking app usage      |
-| `INTERNET`             | Google Drive sync & weather          |
+| `INTERNET`             | Weather widget                       |
 | `FOREGROUND_SERVICE`   | Background activity tracking         |
 | `POST_NOTIFICATIONS`   | Tracking status notifications        |
 
@@ -196,8 +195,6 @@ timiGS-/
 │       ├── focus.rs            # Focus Mode (app blocking)
 │       ├── timeout.rs          # Time OUT (break enforcement)
 │       ├── discord.rs          # Discord Rich Presence
-│       ├── drive.rs            # Google Drive sync
-│       ├── auth.rs             # Google OAuth
 │       ├── p2p.rs              # P2P file transfer server
 │       ├── timer.rs            # Shutdown timer
 │       ├── tasks.rs            # Task/goal management
@@ -248,7 +245,7 @@ TimiGS supports **English** and **Ukrainian** on both platforms.
 
 ## 🔒 Privacy
 
-**All data stays on your device.** TimiGS stores activity data in a local SQLite database. Nothing is transmitted to any server unless you explicitly use Google Drive sync. See [Privacy Policy](timigs-android/PRIVACY.md) for details.
+**All data stays on your device.** TimiGS stores activity data in a local SQLite database. Nothing is transmitted to any server. See [Privacy Policy](timigs-android/PRIVACY.md) for details.
 
 ---
 

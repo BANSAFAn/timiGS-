@@ -42,8 +42,6 @@ pub struct Settings {
     pub autostart: bool,
     pub minimize_to_tray: bool,
     pub discord_rpc: bool,
-    pub google_client_id: Option<String>,
-    pub google_client_secret: Option<String>,
 }
 
 impl Default for Settings {
@@ -54,8 +52,6 @@ impl Default for Settings {
             autostart: true,
             minimize_to_tray: true,
             discord_rpc: true,
-            google_client_id: None,
-            google_client_secret: None,
         }
     }
 }
@@ -106,18 +102,6 @@ pub fn init_database() -> Result<()> {
             created_at TEXT NOT NULL,
             status TEXT DEFAULT 'active',
             title_filter TEXT
-        )",
-        [],
-    )?;
-
-    conn.execute(
-        "CREATE TABLE IF NOT EXISTS cloud_accounts (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            email TEXT NOT NULL,
-            provider TEXT NOT NULL,
-            access_token TEXT NOT NULL,
-            refresh_token TEXT,
-            created_at TEXT NOT NULL
         )",
         [],
     )?;
@@ -423,22 +407,6 @@ pub fn get_settings() -> Settings {
             settings.discord_rpc = discord == "true";
         }
 
-        if let Ok(client_id) = conn.query_row(
-            "SELECT value FROM settings WHERE key = 'google_client_id'",
-            [],
-            |row| row.get::<_, String>(0),
-        ) {
-            settings.google_client_id = Some(client_id);
-        }
-
-        if let Ok(client_secret) = conn.query_row(
-            "SELECT value FROM settings WHERE key = 'google_client_secret'",
-            [],
-            |row| row.get::<_, String>(0),
-        ) {
-            settings.google_client_secret = Some(client_secret);
-        }
-
         settings
     } else {
         Settings::default()
@@ -477,20 +445,6 @@ pub fn save_settings(settings: &Settings) -> Result<()> {
             "false"
         }],
     )?;
-
-    if let Some(client_id) = &settings.google_client_id {
-        conn.execute(
-            "INSERT OR REPLACE INTO settings (key, value) VALUES ('google_client_id', ?1)",
-            [client_id],
-        )?;
-    }
-
-    if let Some(client_secret) = &settings.google_client_secret {
-        conn.execute(
-            "INSERT OR REPLACE INTO settings (key, value) VALUES ('google_client_secret', ?1)",
-            [client_secret],
-        )?;
-    }
 
     Ok(())
 }
@@ -641,91 +595,6 @@ pub fn get_recent_apps() -> Result<Vec<String>> {
         .collect::<Result<Vec<String>>>()?;
 
     Ok(apps)
-}
-
-// Cloud Accounts
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct CloudAccount {
-    pub id: i64,
-    pub email: String,
-    pub provider: String,
-    pub created_at: DateTime<Local>,
-}
-
-pub fn add_cloud_account(
-    email: &str,
-    provider: &str,
-    access_token: &str,
-    refresh_token: &str,
-) -> Result<()> {
-    let guard = DB.lock();
-    let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
-
-    // Check if exists, update if so
-    let exists: bool = conn
-        .query_row(
-            "SELECT EXISTS(SELECT 1 FROM cloud_accounts WHERE email = ?1 AND provider = ?2)",
-            params![email, provider],
-            |row| row.get(0),
-        )
-        .unwrap_or(false);
-
-    if exists {
-        conn.execute(
-            "UPDATE cloud_accounts SET access_token = ?1, refresh_token = ?2 WHERE email = ?3 AND provider = ?4",
-            params![access_token, refresh_token, email, provider],
-        )?;
-    } else {
-        conn.execute(
-            "INSERT INTO cloud_accounts (email, provider, access_token, refresh_token, created_at) VALUES (?1, ?2, ?3, ?4, ?5)",
-            params![email, provider, access_token, refresh_token, Local::now().to_rfc3339()],
-        )?;
-    }
-    Ok(())
-}
-
-pub fn get_cloud_accounts() -> Result<Vec<CloudAccount>> {
-    let guard = DB.lock();
-    let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
-
-    let mut stmt = conn.prepare("SELECT id, email, provider, created_at FROM cloud_accounts")?;
-    let rows = stmt.query_map([], |row| {
-        Ok(CloudAccount {
-            id: row.get(0)?,
-            email: row.get(1)?,
-            provider: row.get(2)?,
-            created_at: DateTime::parse_from_rfc3339(&row.get::<_, String>(3)?)
-                .map(|dt| dt.with_timezone(&Local))
-                .unwrap_or_else(|_| Local::now()),
-        })
-    })?;
-
-    let mut accounts = Vec::new();
-    for row in rows {
-        accounts.push(row?);
-    }
-    Ok(accounts)
-}
-
-pub fn get_cloud_token(id: i64) -> Result<(String, String)> {
-    let guard = DB.lock();
-    let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
-
-    let (access, refresh): (String, String) = conn.query_row(
-        "SELECT access_token, refresh_token FROM cloud_accounts WHERE id = ?1",
-        params![id],
-        |row| Ok((row.get(0)?, row.get(1).unwrap_or_default())),
-    )?;
-    Ok((access, refresh))
-}
-
-pub fn remove_cloud_account(id: i64) -> Result<()> {
-    let guard = DB.lock();
-    let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
-
-    conn.execute("DELETE FROM cloud_accounts WHERE id = ?1", params![id])?;
-    Ok(())
 }
 
 // Project Boards

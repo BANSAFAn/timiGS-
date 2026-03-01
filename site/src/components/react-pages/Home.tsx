@@ -11,7 +11,6 @@ import {
   Focus,
   Timer,
   CloudSun,
-  HardDrive,
   Smartphone,
   Monitor,
   Laptop,
@@ -118,14 +117,6 @@ const Home: React.FC<HomeProps> = ({ lang, t }) => {
       accent: "from-sky-500 to-cyan-600",
       glow: "rgba(14,165,233,0.15)",
       badge: "🌦️",
-    },
-    {
-      icon: <HardDrive className="w-6 h-6" />,
-      title: "Google Drive Sync",
-      desc: "Back up and sync your activity data across devices via Google Drive. Your data, your cloud, your control.",
-      accent: "from-emerald-500 to-teal-600",
-      glow: "rgba(16,185,129,0.15)",
-      badge: "☁️",
     },
     {
       icon: <Lock className="w-6 h-6" />,

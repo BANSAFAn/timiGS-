@@ -114,7 +114,6 @@
 
 <script setup lang="ts">
 import { ref, onMounted, watch, computed } from "vue";
-import { invoke } from "@tauri-apps/api/core";
 import { useRouter, useRoute } from "vue-router";
 import { useActivityStore } from "./stores/activity";
 import NotificationToast from "./components/NotificationToast.vue";
@@ -122,7 +121,7 @@ import { Icons } from "./components/icons/IconMap";
 
 const store = useActivityStore();
 const isGitHubConnected = ref(false);
-const router = useRouter(); // Move to top level
+const router = useRouter();
 const route = useRoute();
 
 const shouldShowNav = computed(() => route.path !== '/tray');

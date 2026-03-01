@@ -192,37 +192,6 @@
           </div>
         </div>
 
-        <!-- Cloud & Data -->
-        <div class="modern-card">
-          <div class="card-header-modern">
-            <div class="card-icon" v-html="Icons.cloud"></div>
-            <div>
-              <h3 class="card-title-modern">Cloud & Data</h3>
-              <p class="card-subtitle">Sync and backup settings</p>
-            </div>
-          </div>
-
-          <div class="settings-group">
-
-            <div class="setting-item">
-              <div class="setting-left">
-                <div class="setting-icon" v-html="Icons.update"></div>
-                <div class="setting-content">
-                  <label class="setting-label">Auto Sync</label>
-                  <p class="setting-description">Automatically backup data every 30 minutes</p>
-                </div>
-              </div>
-              <div
-                class="toggle-switch"
-                :class="{ checked: localSettings.auto_sync }"
-                @click="toggleAutoSync"
-              >
-                <div class="toggle-thumb"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-
         <!-- Updates -->
         <div class="modern-card">
           <div class="card-header-modern">
@@ -330,12 +299,10 @@ import { useActivityStore } from "../stores/activity";
 import { check } from '@tauri-apps/plugin-updater';
 import { relaunch } from '@tauri-apps/plugin-process';
 import { getVersion } from '@tauri-apps/api/app';
-import { useRouter } from "vue-router";
 import { useNotificationStore } from "../stores/notifications";
 import { Icons } from "../components/icons/IconMap";
 
 const { locale, t } = useI18n();
-const router = useRouter();
 const store = useActivityStore();
 const notifications = useNotificationStore();
 
@@ -385,7 +352,6 @@ const localSettings = reactive({
   autostart: true,
   minimize_to_tray: true,
   discord_rpc: true,
-  auto_sync: false,
 });
 
 // Helper for safe invokes

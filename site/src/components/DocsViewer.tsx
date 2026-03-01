@@ -21,7 +21,6 @@ const sectionIcons: Record<string, string> = {
   features: "✨",
   weather: "🌤️",
   settings: "⚙️",
-  "google-api": "☁️",
   "github-api": "🐙",
   docker: "🐳",
 };
@@ -32,7 +31,6 @@ const sectionDescriptions: Record<string, string> = {
   features: "Core capabilities",
   weather: "Weather tracking module",
   settings: "Customize your experience",
-  "google-api": "Cloud backup & sync",
   "github-api": "Coding activity tracker",
   docker: "Deploy with Docker",
 };
