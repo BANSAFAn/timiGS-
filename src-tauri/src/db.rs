@@ -163,6 +163,18 @@ pub fn init_database() -> Result<()> {
         [],
     );
 
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS cloud_accounts (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            email TEXT NOT NULL,
+            provider TEXT NOT NULL,
+            access_token TEXT NOT NULL,
+            refresh_token TEXT NOT NULL DEFAULT '',
+            created_at TEXT NOT NULL
+        )",
+        [],
+    )?;
+
     *DB.lock() = Some(conn);
     Ok(())
 }
@@ -858,5 +870,85 @@ pub fn delete_project_task(id: i64) -> Result<()> {
     let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
 
     conn.execute("DELETE FROM project_tasks WHERE id = ?1", params![id])?;
+    Ok(())
+}
+
+// Cloud Accounts
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CloudAccount {
+    pub id: i64,
+    pub email: String,
+    pub provider: String,
+    pub created_at: String,
+}
+
+pub fn add_cloud_account(
+    email: &str,
+    provider: &str,
+    access_token: &str,
+    refresh_token: &str,
+) -> Result<i64> {
+    let guard = DB.lock();
+    let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
+    let now = Local::now().to_rfc3339();
+
+    // Remove existing account for this provider to avoid duplicates
+    conn.execute(
+        "DELETE FROM cloud_accounts WHERE provider = ?1",
+        params![provider],
+    )?;
+
+    conn.execute(
+        "INSERT INTO cloud_accounts (email, provider, access_token, refresh_token, created_at)
+         VALUES (?1, ?2, ?3, ?4, ?5)",
+        params![email, provider, access_token, refresh_token, now],
+    )?;
+
+    Ok(conn.last_insert_rowid())
+}
+
+pub fn get_cloud_accounts() -> Result<Vec<CloudAccount>> {
+    let guard = DB.lock();
+    let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
+
+    let mut stmt = conn.prepare(
+        "SELECT id, email, provider, created_at FROM cloud_accounts ORDER BY created_at DESC",
+    )?;
+
+    let accounts = stmt
+        .query_map([], |row| {
+            Ok(CloudAccount {
+                id: row.get(0)?,
+                email: row.get(1)?,
+                provider: row.get(2)?,
+                created_at: row.get(3)?,
+            })
+        })?
+        .filter_map(|r| r.ok())
+        .collect();
+
+    Ok(accounts)
+}
+
+pub fn get_cloud_token(account_id: i64) -> Result<(String, String)> {
+    let guard = DB.lock();
+    let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
+
+    conn.query_row(
+        "SELECT access_token, refresh_token FROM cloud_accounts WHERE id = ?1",
+        params![account_id],
+        |row| Ok((row.get(0)?, row.get(1)?)),
+    )
+}
+
+pub fn remove_cloud_account(account_id: i64) -> Result<()> {
+    let guard = DB.lock();
+    let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
+
+    conn.execute(
+        "DELETE FROM cloud_accounts WHERE id = ?1",
+        params![account_id],
+    )?;
     Ok(())
 }

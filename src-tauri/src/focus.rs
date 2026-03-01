@@ -60,7 +60,7 @@ pub fn start_focus(
 
     FOCUS_RUNNING.store(true, Ordering::SeqCst);
 
-    let target_exe = exe_path.to_lowercase();
+    let _target_exe = exe_path.to_lowercase();
 
     thread::spawn(move || {
         while FOCUS_RUNNING.load(Ordering::SeqCst) {
@@ -73,7 +73,7 @@ pub fn start_focus(
 
             // Block access to other apps on Windows
             #[cfg(target_os = "windows")]
-            enforce_focus(&target_exe);
+            enforce_focus(&_target_exe);
 
             thread::sleep(Duration::from_millis(250));
 

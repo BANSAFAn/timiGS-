@@ -1,7 +1,7 @@
 //! Tauri IPC commands
 
 use crate::db;
-use tauri::{command, AppHandle, Manager, Window};
+use tauri::{command, Manager};
 
 #[cfg(target_os = "windows")]
 use crate::tracker;
