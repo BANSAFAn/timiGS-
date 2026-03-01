@@ -1,0 +1,396 @@
+//! Tauri IPC commands
+
+use crate::db;
+use tauri::{command, Manager};
+
+#[cfg(target_os = "windows")]
+use crate::tracker;
+
+#[cfg(target_os = "android")]
+use crate::android_tracker as tracker;
+
+#[command]
+#[cfg(any(target_os = "windows", target_os = "android"))]
+pub fn get_current_activity() -> Option<tracker::ActiveWindow> {
+    tracker::get_current_active()
+}
+
+#[command]
+#[cfg(not(any(target_os = "windows", target_os = "android")))]
+pub fn get_current_activity() -> Option<()> {
+    None
+}
+
+#[command]
+#[cfg(any(target_os = "windows", target_os = "android"))]
+pub fn get_current_session() -> Option<tracker::CurrentSession> {
+    tracker::get_current_session()
+}
+
+#[command]
+#[cfg(not(any(target_os = "windows", target_os = "android")))]
+pub fn get_current_session() -> Option<()> {
+    None
+}
+
+#[command]
+pub fn get_today_activity() -> Vec<db::ActivitySession> {
+    db::get_today_sessions().unwrap_or_default()
+}
+
+#[command]
+pub fn get_today_summary() -> Vec<db::AppUsageSummary> {
+    db::get_today_summary().unwrap_or_default()
+}
+
+#[command]
+pub fn get_weekly_stats() -> Vec<db::DailyStats> {
+    db::get_weekly_stats().unwrap_or_default()
+}
+
+#[command]
+pub fn get_activity_range(from: String, to: String) -> Vec<db::ActivitySession> {
+    use chrono::NaiveDate;
+
+    let from_date = NaiveDate::parse_from_str(&from, "%Y-%m-%d").ok();
+    let to_date = NaiveDate::parse_from_str(&to, "%Y-%m-%d").ok();
+
+    if let (Some(f), Some(t)) = (from_date, to_date) {
+        db::get_sessions_range(f, t).unwrap_or_default()
+    } else {
+        vec![]
+    }
+}
+
+#[command]
+pub fn get_settings() -> db::Settings {
+    db::get_settings()
+}
+
+#[command]
+pub fn save_settings(app: tauri::AppHandle, settings: db::Settings) -> Result<(), String> {
+    // Handle autostart (desktop only)
+    #[cfg(desktop)]
+    {
+        use tauri_plugin_autostart::ManagerExt;
+        if settings.autostart {
+            let _ = app.autolaunch().enable();
+        } else {
+            let _ = app.autolaunch().disable();
+        }
+    }
+
+    // Suppress unused variable warning on mobile
+    #[cfg(mobile)]
+    let _ = &app;
+
+    db::save_settings(&settings).map_err(|e| e.to_string())
+}
+
+#[command]
+pub fn get_setting_cmd(key: String) -> Option<String> {
+    db::get_setting(&key)
+}
+
+#[command]
+pub fn save_setting_cmd(key: String, value: String) -> Result<(), String> {
+    db::save_setting(&key, &value).map_err(|e| e.to_string())
+}
+
+#[command]
+#[cfg(any(target_os = "windows", target_os = "android"))]
+pub fn start_tracking() {
+    tracker::start_tracking();
+}
+
+#[command]
+#[cfg(not(any(target_os = "windows", target_os = "android")))]
+pub fn start_tracking() {
+    // No-op on unsupported platforms
+}
+
+#[command]
+#[cfg(any(target_os = "windows", target_os = "android"))]
+pub fn stop_tracking() {
+    tracker::stop_tracking();
+}
+
+#[command]
+#[cfg(not(any(target_os = "windows", target_os = "android")))]
+pub fn stop_tracking() {
+    // No-op on unsupported platforms
+}
+
+#[command]
+#[cfg(any(target_os = "windows", target_os = "android"))]
+pub fn is_tracking() -> bool {
+    tracker::is_tracking()
+}
+
+#[command]
+#[cfg(not(any(target_os = "windows", target_os = "android")))]
+pub fn is_tracking() -> bool {
+    false
+}
+
+#[command]
+#[cfg(target_os = "android")]
+pub fn check_usage_permission() -> bool {
+    tracker::check_permission()
+}
+
+#[command]
+#[cfg(target_os = "android")]
+pub fn request_usage_permission() -> Result<(), String> {
+    tracker::request_permission()
+}
+
+#[command]
+pub fn get_app_icon(path: String) -> Option<String> {
+    crate::icons::get_app_icon(&path)
+}
+
+#[command]
+pub fn shutdown_pc() -> Result<(), String> {
+    #[cfg(target_os = "windows")]
+    {
+        use std::process::Command;
+        Command::new("shutdown")
+            .args(["/s", "/t", "0"])
+            .spawn()
+            .map_err(|e| e.to_string())?;
+        Ok(())
+    }
+    #[cfg(not(target_os = "windows"))]
+    {
+        Err("Shutdown not supported on this OS".to_string())
+    }
+}
+
+#[command]
+pub fn get_desktop_sources() -> Vec<crate::picker::DesktopSource> {
+    crate::picker::get_sources()
+}
+
+#[command]
+pub async fn start_p2p_server() -> Result<String, String> {
+    tokio::task::spawn_blocking(move || crate::p2p::start_server())
+        .await
+        .map_err(|e| e.to_string())?
+}
+
+#[command]
+pub async fn stop_p2p_server() -> Result<(), String> {
+    tokio::task::spawn_blocking(move || {
+        crate::p2p::stop_server();
+        Ok(())
+    })
+    .await
+    .map_err(|e| e.to_string())?
+}
+
+#[command]
+pub fn get_local_ip() -> Result<String, String> {
+    crate::p2p::get_local_ip()
+}
+
+#[command]
+pub async fn send_p2p_file(target_ip: String, file_path: String) -> Result<String, String> {
+    tokio::task::spawn_blocking(move || crate::p2p::send_file_to_ip(&target_ip, &file_path))
+        .await
+        .map_err(|e| e.to_string())?
+}
+
+#[command]
+pub fn start_timer_cmd(app: tauri::AppHandle, duration_secs: u64) {
+    crate::timer::start_timer(duration_secs, app);
+}
+
+#[command]
+pub fn cancel_timer_cmd() {
+    crate::timer::cancel_timer();
+}
+
+#[command]
+pub fn get_timer_status_cmd() -> Option<u64> {
+    crate::timer::get_remaining_time()
+}
+
+#[command]
+pub fn quit_app_cmd(app: tauri::AppHandle) {
+    app.exit(0);
+}
+
+#[command]
+pub fn show_main_window_cmd(app: tauri::AppHandle) {
+    if let Some(window) = app.get_webview_window("main") {
+        let _ = window.show();
+        let _ = window.set_focus();
+    }
+}
+
+use tauri::Emitter;
+
+#[command]
+pub fn emit_navigate_cmd(app: tauri::AppHandle, path: String) {
+    let _ = app.emit("navigate", path);
+}
+
+// ── Focus Mode Commands ──
+
+#[command]
+pub fn start_focus_cmd(
+    app_name: String,
+    exe_path: String,
+    duration_secs: u64,
+    password: String,
+) -> Result<(), String> {
+    crate::focus::start_focus(&app_name, &exe_path, duration_secs, &password)
+}
+
+#[command]
+pub fn stop_focus_cmd(password: String) -> Result<(), String> {
+    crate::focus::stop_focus(&password)
+}
+
+#[command]
+pub fn get_focus_status_cmd() -> Option<crate::focus::FocusStatus> {
+    crate::focus::get_focus_status()
+}
+
+// ── Time OUT Commands ──
+
+#[command]
+pub fn start_timeout_cmd(
+    app: tauri::AppHandle,
+    interval_secs: u64,
+    break_duration_secs: u64,
+    password: String,
+) -> Result<(), String> {
+    crate::timeout::start_timeout(interval_secs, break_duration_secs, &password, app)
+}
+
+#[command]
+pub fn stop_timeout_cmd(app: tauri::AppHandle, password: String) -> Result<(), String> {
+    crate::timeout::stop_timeout(&password, &app)
+}
+
+#[command]
+pub fn get_timeout_status_cmd() -> Option<crate::timeout::TimeoutStatus> {
+    crate::timeout::get_timeout_status()
+}
+
+// ── GitHub OAuth Commands ──
+
+#[command]
+pub async fn login_github() -> Result<String, String> {
+    tokio::task::spawn_blocking(|| crate::github_auth::start_github_auth_flow())
+        .await
+        .map_err(|e| e.to_string())?
+}
+
+#[command]
+pub async fn exchange_github_code(code: String) -> Result<String, String> {
+    tokio::task::spawn_blocking(move || crate::github_auth::exchange_github_auth_code(code))
+        .await
+        .map_err(|e| e.to_string())?
+}
+
+#[command]
+pub fn get_github_account_cmd() -> Option<serde_json::Value> {
+    crate::github_auth::get_github_account()
+}
+
+#[command]
+pub fn remove_github_account_cmd() -> Result<(), String> {
+    crate::github_auth::remove_github_account()
+}
+
+// ── Project Boards ──
+
+#[command]
+pub fn create_project_board(name: String, board_type: String) -> Result<i64, String> {
+    crate::db::create_board(&name, &board_type).map_err(|e| e.to_string())
+}
+
+#[command]
+pub fn get_project_boards() -> Result<Vec<crate::db::ProjectBoard>, String> {
+    crate::db::get_boards().map_err(|e| e.to_string())
+}
+
+#[command]
+pub fn delete_project_board(id: i64) -> Result<(), String> {
+    crate::db::delete_board(id).map_err(|e| e.to_string())
+}
+
+#[command]
+pub fn get_board_items_cmd(board_id: i64) -> Result<Vec<crate::db::BoardItem>, String> {
+    crate::db::get_board_items(board_id).map_err(|e| e.to_string())
+}
+
+#[command]
+pub fn populate_board_cmd(board_id: i64) -> Result<usize, String> {
+    crate::db::populate_board_from_activity(board_id).map_err(|e| e.to_string())
+}
+
+#[command]
+pub async fn sync_board_github_cmd(board_id: i64) -> Result<String, String> {
+    // Get the GitHub token from cloud_accounts
+    let account = crate::github_auth::get_github_account()
+        .ok_or("Not connected to GitHub. Please sign in first.")?;
+    let token = account["token"]
+        .as_str()
+        .ok_or("Invalid GitHub token")?
+        .to_string();
+
+    tokio::task::spawn_blocking(move || crate::github_sync::sync_board_to_github(board_id, &token))
+        .await
+        .map_err(|e| e.to_string())?
+}
+
+// ── Project Tasks ──
+
+#[command]
+pub fn add_project_task_cmd(
+    board_id: i64,
+    title: String,
+    description: Option<String>,
+    priority: String,
+    due_date: Option<String>,
+) -> Result<i64, String> {
+    crate::db::add_project_task(
+        board_id,
+        &title,
+        description.as_deref(),
+        &priority,
+        due_date.as_deref(),
+    )
+    .map_err(|e| e.to_string())
+}
+
+#[command]
+pub fn get_project_tasks_cmd(board_id: i64) -> Result<Vec<crate::db::ProjectTask>, String> {
+    crate::db::get_project_tasks(board_id).map_err(|e| e.to_string())
+}
+
+#[command]
+pub fn update_project_task_status_cmd(id: i64, status: String) -> Result<(), String> {
+    crate::db::update_project_task_status(id, &status).map_err(|e| e.to_string())
+}
+
+#[command]
+pub fn delete_project_task_cmd(id: i64) -> Result<(), String> {
+    crate::db::delete_project_task(id).map_err(|e| e.to_string())
+}
+
+// ── Data Management ──
+
+#[command]
+pub fn reset_all_data_cmd() -> Result<(), String> {
+    crate::db::reset_all_data().map_err(|e| e.to_string())
+}
+
+#[command]
+pub fn export_data_csv_cmd(path: String) -> Result<(), String> {
+    crate::db::export_sessions_csv(&path).map_err(|e| e.to_string())
+}

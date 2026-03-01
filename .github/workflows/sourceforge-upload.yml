@@ -1,0 +1,138 @@
+name: Upload to SourceForge
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to upload (e.g. v1.22.0 or 1.22.0)"
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  upload-to-sourceforge:
+    name: 📦 Upload to SourceForge
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get release info
+        id: release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            INPUT_TAG="${{ github.event.inputs.tag }}"
+          else
+            INPUT_TAG="${{ github.event.release.tag_name }}"
+          fi
+
+          echo "📌 Input tag: $INPUT_TAG"
+
+          # Try the tag as-is first
+          RESPONSE=$(curl -s -H "Authorization: token $GH_TOKEN" \
+            "https://api.github.com/repos/${{ github.repository }}/releases/tags/$INPUT_TAG")
+
+          # Check if we got a valid response
+          HAS_ASSETS=$(echo "$RESPONSE" | jq -r '.assets // empty')
+
+          # If not found, try with 'v' prefix
+          if [ -z "$HAS_ASSETS" ]; then
+            echo "⚠️  Tag '$INPUT_TAG' not found, trying 'v$INPUT_TAG'..."
+            VTAG="v$INPUT_TAG"
+            RESPONSE=$(curl -s -H "Authorization: token $GH_TOKEN" \
+              "https://api.github.com/repos/${{ github.repository }}/releases/tags/$VTAG")
+            HAS_ASSETS=$(echo "$RESPONSE" | jq -r '.assets // empty')
+
+            if [ -z "$HAS_ASSETS" ]; then
+              echo "⚠️  Tag 'v$INPUT_TAG' not found either, trying without 'v' prefix..."
+              NOVTAG="${INPUT_TAG#v}"
+              RESPONSE=$(curl -s -H "Authorization: token $GH_TOKEN" \
+                "https://api.github.com/repos/${{ github.repository }}/releases/tags/$NOVTAG")
+              HAS_ASSETS=$(echo "$RESPONSE" | jq -r '.assets // empty')
+            fi
+          fi
+
+          # If still no response, try latest release
+          if [ -z "$HAS_ASSETS" ]; then
+            echo "⚠️  No release found for any tag variant. Listing available releases..."
+            curl -s -H "Authorization: token $GH_TOKEN" \
+              "https://api.github.com/repos/${{ github.repository }}/releases?per_page=5" \
+              | jq -r '.[] | "  - \(.tag_name) (\(.name))"'
+            echo ""
+            echo "❌ Could not find release. Check the tag name."
+            exit 1
+          fi
+
+          # Extract info
+          ACTUAL_TAG=$(echo "$RESPONSE" | jq -r '.tag_name')
+          RELEASE_NAME=$(echo "$RESPONSE" | jq -r '.name')
+          ASSET_COUNT=$(echo "$RESPONSE" | jq -r '.assets | length')
+
+          echo "✅ Found release: $RELEASE_NAME ($ACTUAL_TAG) with $ASSET_COUNT assets"
+          echo "tag=$ACTUAL_TAG" >> $GITHUB_OUTPUT
+
+      - name: Download release assets from GitHub
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${{ steps.release.outputs.tag }}"
+          echo "📥 Downloading assets for release $TAG..."
+
+          mkdir -p release-assets
+
+          # Get asset download URLs (use API URLs, not browser URLs)
+          ASSET_URLS=$(curl -s -H "Authorization: token $GH_TOKEN" \
+            "https://api.github.com/repos/${{ github.repository }}/releases/tags/$TAG" \
+            | jq -r '.assets[] | "\(.url) \(.name)"')
+
+          if [ -z "$ASSET_URLS" ]; then
+            echo "❌ No downloadable assets found"
+            exit 1
+          fi
+
+          while IFS=' ' read -r api_url filename; do
+            echo "  ⬇️  $filename"
+            curl -sL \
+              -H "Authorization: token $GH_TOKEN" \
+              -H "Accept: application/octet-stream" \
+              "$api_url" -o "release-assets/$filename"
+          done <<< "$ASSET_URLS"
+
+          echo ""
+          echo "📋 Downloaded files:"
+          ls -lah release-assets/
+
+      - name: Upload to SourceForge via SFTP
+        env:
+          SF_USERNAME: ${{ secrets.SF_USERNAME }}
+          SF_PASSWORD: ${{ secrets.SF_PASSWORD }}
+        run: |
+          TAG="${{ steps.release.outputs.tag }}"
+          # Remove 'v' prefix for folder name
+          VERSION="${TAG#v}"
+
+          echo "📤 Uploading to SourceForge..."
+          echo "   Project: timigs"
+          echo "   Folder: /home/frs/project/timigs/$VERSION/"
+
+          # Install sshpass for non-interactive SFTP
+          sudo apt-get update -qq && sudo apt-get install -y -qq sshpass > /dev/null 2>&1
+
+          # Create batch file for SFTP commands
+          cat > /tmp/sftp-batch.txt <<EOF
+          -mkdir /home/frs/project/timigs/$VERSION
+          cd /home/frs/project/timigs/$VERSION
+          lcd release-assets
+          mput *
+          bye
+          EOF
+
+          sshpass -p "$SF_PASSWORD" sftp -oBatchMode=no -oStrictHostKeyChecking=no \
+            -b /tmp/sftp-batch.txt \
+            "${SF_USERNAME}@frs.sourceforge.net"
+
+          echo ""
+          echo "✅ Upload complete!"
+          echo "🔗 https://sourceforge.net/projects/timigs/files/$VERSION/"

@@ -1,0 +1,129 @@
+name: Update README Status
+
+on:
+  workflow_run:
+    workflows: ["Release", "Flutter Android Build"]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-readme:
+    name: 📝 Update Platform Status
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_branch || github.ref_name }}
+
+      - name: Get build statuses
+        id: status
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          REPO="${{ github.repository }}"
+          BRANCH="${{ github.event.workflow_run.head_branch || github.ref_name }}"
+
+          get_job_status() {
+            local workflow_file="$1"
+            local job_filter="$2"
+
+            local run_id
+            run_id=$(gh api "repos/$REPO/actions/workflows/$workflow_file/runs?branch=$BRANCH&per_page=1&status=completed" \
+              --jq '.workflow_runs[0].id // empty' 2>/dev/null)
+
+            if [ -z "$run_id" ]; then
+              echo "unknown"
+              return
+            fi
+
+            local conclusion
+            if [ -n "$job_filter" ]; then
+              conclusion=$(gh api "repos/$REPO/actions/runs/$run_id/jobs" \
+                --jq ".jobs[] | select(.name | contains(\"$job_filter\")) | .conclusion" 2>/dev/null | head -1)
+            else
+              conclusion=$(gh api "repos/$REPO/actions/runs/$run_id" \
+                --jq '.conclusion // empty' 2>/dev/null)
+            fi
+
+            echo "${conclusion:-unknown}"
+          }
+
+          WIN=$(get_job_status "release.yml" "Windows")
+          MAC=$(get_job_status "release.yml" "macOS")
+          LNX=$(get_job_status "release.yml" "Linux")
+          ANDROID=$(get_job_status "flutter-android.yml" "")
+
+          echo "windows=$WIN" >> $GITHUB_OUTPUT
+          echo "macos=$MAC" >> $GITHUB_OUTPUT
+          echo "linux=$LNX" >> $GITHUB_OUTPUT
+          echo "android=$ANDROID" >> $GITHUB_OUTPUT
+
+          echo "::notice::Windows=$WIN macOS=$MAC Linux=$LNX Android=$ANDROID"
+
+      - name: Map statuses to badges
+        id: badges
+        run: |
+          map_status() {
+            case "$1" in
+              success)  echo "✅ Passing" ;;
+              failure)  echo "❌ Failing" ;;
+              cancelled) echo "⚠️ Cancelled" ;;
+              skipped)  echo "⏭️ Skipped" ;;
+              *)        echo "❔ Unknown" ;;
+            esac
+          }
+
+          echo "windows=$(map_status '${{ steps.status.outputs.windows }}')" >> $GITHUB_OUTPUT
+          echo "macos=$(map_status '${{ steps.status.outputs.macos }}')" >> $GITHUB_OUTPUT
+          echo "linux=$(map_status '${{ steps.status.outputs.linux }}')" >> $GITHUB_OUTPUT
+          echo "android=$(map_status '${{ steps.status.outputs.android }}')" >> $GITHUB_OUTPUT
+
+      - name: Update README
+        run: |
+          python3 << 'PYEOF'
+          import re
+
+          with open("README.md", "r", encoding="utf-8") as f:
+              content = f.read()
+
+          statuses = {
+              "windows": "${{ steps.badges.outputs.windows }}",
+              "macos": "${{ steps.badges.outputs.macos }}",
+              "linux": "${{ steps.badges.outputs.linux }}",
+              "android": "${{ steps.badges.outputs.android }}",
+          }
+
+          # Replace between markers
+          pattern = r"(<!-- STATUS_TABLE_START -->)(.*?)(<!-- STATUS_TABLE_END -->)"
+          table = """
+          | Platform    | Technology                    | Status        |
+          | ----------- | ----------------------------- | ------------- |
+          | **Windows** | Tauri v2 + Rust + Vue 3       | {windows} |
+          | **macOS**   | Tauri v2 + Rust + Vue 3       | {macos} |
+          | **Linux**   | Tauri v2 + Rust + Vue 3       | {linux} |
+          | **Android** | Flutter 3.24 + Dart + Rust    | {android} |
+          """.format(**statuses).strip()
+
+          replacement = r"\1\n" + table + r"\n\3"
+          new_content = re.sub(pattern, replacement, content, flags=re.DOTALL)
+
+          with open("README.md", "w", encoding="utf-8") as f:
+              f.write(new_content)
+
+          print("README updated successfully")
+          PYEOF
+
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add README.md
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "docs: update platform build statuses [skip ci]"
+            git push
+          fi

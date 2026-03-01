@@ -1,0 +1,102 @@
+---
+import { Language } from '../i18n/types';
+import { useTranslations } from '../i18n/utils';
+import Sidebar from '../components/Sidebar';
+import Footer from '../components/Footer';
+import SEOHead from '../components/SEOHead.astro';
+
+interface Props {
+	title: string;
+}
+
+const { title } = Astro.props;
+const { lang } = Astro.params; 
+const currentLang = (lang as Language) || Language.EN;
+const t = useTranslations(currentLang);
+const pathname = Astro.url.pathname;
+const dir = currentLang === Language.AR ? 'rtl' : 'ltr';
+---
+
+<!doctype html>
+<html lang={currentLang} dir={dir} class="scroll-smooth">
+	<head>
+        <SEOHead title={title} />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
+        <meta name="theme-color" content="#030712" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <style is:global>
+            :root {
+                --sidebar-width: 280px;
+                --header-height: 56px;
+            }
+
+            body {
+                @apply bg-apple-gray-950 text-apple-gray-50 antialiased font-sans selection:bg-apple-blue/30;
+                overflow-x: hidden;
+                -webkit-tap-highlight-color: transparent;
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+            }
+
+            * { box-sizing: border-box; }
+
+            /* Premium Scrollbar */
+            ::-webkit-scrollbar { width: 6px; height: 6px; }
+            ::-webkit-scrollbar-track { @apply bg-transparent; }
+            ::-webkit-scrollbar-thumb {
+                @apply bg-white/10 rounded-full border-[3px] border-solid border-transparent bg-clip-content hover:bg-white/20 transition-colors;
+            }
+
+            .glass {
+                @apply bg-white/10 backdrop-blur-md border border-white/10 shadow-lg;
+            }
+
+            .glass-panel {
+                @apply bg-apple-gray-900/60 backdrop-blur-md border border-white/5 shadow-2xl ring-1 ring-white/5;
+            }
+
+            h1, h2, h3, h4, h5, h6 {
+                @apply font-display tracking-tight text-white;
+            }
+
+            /* Mobile Performance */
+            @media (max-width: 768px) {
+                .animate-float, .animate-float-delayed, .animate-blob,
+                .animate-gradient-x, .animate-gradient-y, .animate-shimmer, .animate-pulse-glow {
+                    animation: none !important;
+                    transform: none !important;
+                }
+                canvas { display: none !important; }
+            }
+
+            /* Touch-friendly elements */
+            @media (max-width: 768px) {
+                button, a {
+                    min-height: 44px;
+                    min-width: 44px;
+                }
+            }
+        </style>
+	</head>
+	<body class="min-h-screen flex flex-col relative">
+
+        <!-- Subtle background - CSS only, no canvas -->
+        <div class="fixed inset-0 -z-10 pointer-events-none overflow-hidden" aria-hidden="true">
+            <div class="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.015)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.015)_1px,transparent_1px)] [background-size:80px_80px] opacity-30 hidden sm:block"></div>
+            <div class="hidden md:block absolute top-[-20%] left-[30%] w-[500px] h-[500px] bg-apple-blue/8 rounded-full blur-[150px] opacity-30"></div>
+            <div class="hidden md:block absolute bottom-[-10%] right-[15%] w-[400px] h-[400px] bg-purple-500/5 rounded-full blur-[120px] opacity-20"></div>
+        </div>
+
+		<Sidebar client:load lang={currentLang} t={t} pathname={pathname} />
+
+        <!-- Content area with sidebar offset on desktop -->
+        <div class="flex flex-col min-h-screen">
+            <main class="flex-grow pt-16 md:pt-12 pb-16 sm:pb-20 px-4 sm:px-6 md:px-8 lg:px-16 max-w-7xl mx-auto w-full z-10">
+		        <slot />
+            </main>
+
+            <Footer client:visible t={t} />
+        </div>
+	</body>
+</html>

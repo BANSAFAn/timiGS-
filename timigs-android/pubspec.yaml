@@ -1,0 +1,83 @@
+name: timigs_android
+description: TimiGS - Activity Tracker for Android
+publish_to: "none"
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  # Rust Backend Bridge
+  flutter_rust_bridge: ^2.0.0
+  ffi: ^2.1.0
+  freezed_annotation: ^2.4.1
+
+  # Charts
+  fl_chart: ^0.65.0
+
+  # State Management
+  provider: ^6.1.1
+
+  # Android Activity Tracking (maintained alternative to usage_stats)
+  app_usage: ^4.0.1
+
+  # Google Integration
+  google_sign_in: ^6.1.6
+  googleapis: ^11.4.0
+  googleapis_auth: ^1.4.1
+  http: ^1.1.0
+
+  # Background Tasks
+  workmanager: ^0.5.1
+
+  # File Sharing
+  share_plus: ^7.2.1
+  file_picker: ^8.0.0
+
+  # P2P Transfer (PeerJS-compatible)
+  peerdart: ^0.5.6
+
+  # Path utilities
+  path_provider: ^2.1.1
+  path: ^1.8.3
+
+  # Local Database
+  sqflite: ^2.3.0
+  shared_preferences: ^2.2.2
+
+  # Permissions
+  permission_handler: ^11.1.0
+
+  # UI
+  cupertino_icons: ^1.0.2
+  flutter_svg: ^2.0.0
+
+  # Notifications
+  flutter_local_notifications: ^17.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+  flutter_launcher_icons: ^0.13.1
+
+flutter_launcher_icons:
+  android: "ic_launcher"
+  image_path: "assets/icon.png"
+  min_sdk_android: 23
+
+  build_runner: ^2.4.8
+  freezed: ^2.4.7
+
+flutter:
+  uses-material-design: true
+  generate: true
+
+  assets:
+    - assets/images/
+    - assets/icons/

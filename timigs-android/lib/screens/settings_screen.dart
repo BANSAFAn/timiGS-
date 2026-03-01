@@ -1,0 +1,338 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import '../services/database_service.dart';
+import '../services/tracker_service.dart';
+import '../main.dart';
+import '../models/settings.dart';
+import 'google_drive_screen.dart';
+
+class SettingsScreen extends StatefulWidget {
+  const SettingsScreen({super.key});
+
+  @override
+  State<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends State<SettingsScreen> {
+  bool _isTracking = false;
+  bool _batteryOptimizationDisabled = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _isTracking = TrackerService.instance.isTracking;
+    _checkBatteryOptimization();
+  }
+
+  Future<void> _checkBatteryOptimization() async {
+    final disabled =
+        await TrackerService.instance.isBatteryOptimizationDisabled();
+    if (mounted) {
+      setState(() {
+        _batteryOptimizationDisabled = disabled;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final settingsNotifier = Provider.of<SettingsNotifier>(context);
+    final settings = settingsNotifier.settings;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Settings'),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          // Appearance Section
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Appearance',
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Language
+                  ListTile(
+                    leading: SvgPicture.asset('assets/icons/language.svg',
+                        width: 24,
+                        height: 24,
+                        colorFilter: ColorFilter.mode(
+                            Theme.of(context).iconTheme.color!,
+                            BlendMode.srcIn)),
+                    title: const Text('Language'),
+                    subtitle: Text(
+                        settings.language == 'en' ? 'English' : 'Українська'),
+                    trailing: DropdownButton<String>(
+                      value: settings.language,
+                      underline: const SizedBox(),
+                      items: const [
+                        DropdownMenuItem(value: 'en', child: Text('English')),
+                        DropdownMenuItem(
+                            value: 'uk', child: Text('Українська')),
+                      ],
+                      onChanged: (value) {
+                        if (value != null) {
+                          settingsNotifier.updateSettings(
+                            settings.copyWith(language: value),
+                          );
+                        }
+                      },
+                    ),
+                  ),
+
+                  const Divider(),
+
+                  // Theme
+                  ListTile(
+                    leading: SvgPicture.asset('assets/icons/theme.svg',
+                        width: 24,
+                        height: 24,
+                        colorFilter: ColorFilter.mode(
+                            Theme.of(context).iconTheme.color!,
+                            BlendMode.srcIn)),
+                    title: const Text('Theme'),
+                    subtitle: Text(settings.theme == 'dark' ? 'Dark' : 'Light'),
+                    trailing: DropdownButton<String>(
+                      value: settings.theme,
+                      underline: const SizedBox(),
+                      items: const [
+                        DropdownMenuItem(value: 'dark', child: Text('Dark')),
+                        DropdownMenuItem(value: 'light', child: Text('Light')),
+                      ],
+                      onChanged: (value) {
+                        if (value != null) {
+                          settingsNotifier.updateSettings(
+                            settings.copyWith(theme: value),
+                          );
+                        }
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 16),
+
+          // Tracking Section
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Tracking',
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  ListTile(
+                    leading: SvgPicture.asset('assets/icons/tracking.svg',
+                        width: 24,
+                        height: 24,
+                        colorFilter: ColorFilter.mode(
+                            _isTracking ? Colors.green : Colors.orange,
+                            BlendMode.srcIn)),
+                    title: Text(
+                        _isTracking ? 'Tracking Active' : 'Tracking Paused'),
+                    subtitle: Text(
+                      _isTracking
+                          ? 'Activity is being tracked'
+                          : 'Activity tracking is paused',
+                    ),
+                    trailing: Switch(
+                      value: _isTracking,
+                      onChanged: (value) async {
+                        if (value) {
+                          await TrackerService.instance.startTracking();
+                        } else {
+                          await TrackerService.instance.stopTracking();
+                        }
+                        setState(() {
+                          _isTracking = value;
+                        });
+                      },
+                    ),
+                  ),
+
+                  const Divider(),
+
+                  ListTile(
+                    leading: SvgPicture.asset('assets/icons/system.svg',
+                        width: 24,
+                        height: 24,
+                        colorFilter: ColorFilter.mode(
+                            Theme.of(context).iconTheme.color!,
+                            BlendMode.srcIn)),
+                    title: const Text('Usage Stats Permission'),
+                    subtitle: const Text('Required for activity tracking'),
+                    trailing: ElevatedButton(
+                      onPressed: () async {
+                        await TrackerService.instance.requestPermission();
+                      },
+                      child: const Text('Grant'),
+                    ),
+                  ),
+
+                  const Divider(),
+
+                  // Battery optimization
+                  ListTile(
+                    leading: SvgPicture.asset('assets/icons/tools.svg',
+                        width: 24,
+                        height: 24,
+                        colorFilter: ColorFilter.mode(
+                            _batteryOptimizationDisabled
+                                ? Colors.green
+                                : Colors.orange,
+                            BlendMode.srcIn)),
+                    title: const Text('Battery Optimization'),
+                    subtitle: Text(
+                      _batteryOptimizationDisabled
+                          ? 'Disabled (background tracking works)'
+                          : 'Enabled (may stop background tracking)',
+                    ),
+                    trailing: _batteryOptimizationDisabled
+                        ? const Icon(Icons.check_circle, color: Colors.green)
+                        : ElevatedButton(
+                            onPressed: () async {
+                              await TrackerService.instance
+                                  .requestBatteryOptimization();
+                              // Re-check after a short delay
+                              await Future.delayed(const Duration(seconds: 2));
+                              _checkBatteryOptimization();
+                            },
+                            child: const Text('Disable'),
+                          ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 16),
+
+          // Data Management Section
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Data Management',
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  ListTile(
+                    leading: SvgPicture.asset('assets/icons/drive.svg',
+                        width: 24,
+                        height: 24,
+                        colorFilter: ColorFilter.mode(
+                            Theme.of(context).iconTheme.color!,
+                            BlendMode.srcIn)),
+                    title: const Text('Google Drive Sync'),
+                    subtitle: const Text('Backup and restore data'),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const GoogleDriveScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                  const Divider(),
+                  ListTile(
+                    leading: SvgPicture.asset('assets/icons/transfer.svg',
+                        width: 24,
+                        height: 24,
+                        colorFilter: ColorFilter.mode(
+                            Theme.of(context).iconTheme.color!,
+                            BlendMode.srcIn)),
+                    title: const Text('Export Data'),
+                    subtitle: const Text('Export database to file'),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () async {
+                      final path =
+                          await DatabaseService.instance.exportDatabase();
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Database exported to: $path'),
+                            duration: const Duration(seconds: 3),
+                          ),
+                        );
+                      }
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 16),
+
+          // About Section
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'About',
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  ListTile(
+                    leading: SvgPicture.asset('assets/icons/about.svg',
+                        width: 24,
+                        height: 24,
+                        colorFilter: ColorFilter.mode(
+                            Theme.of(context).iconTheme.color!,
+                            BlendMode.srcIn)),
+                    title: const Text('Version'),
+                    subtitle: const Text('1.0.0'),
+                  ),
+                  const Divider(),
+                  ListTile(
+                    leading: SvgPicture.asset('assets/icons/github.svg',
+                        width: 24,
+                        height: 24,
+                        colorFilter: ColorFilter.mode(
+                            Theme.of(context).iconTheme.color!,
+                            BlendMode.srcIn)),
+                    title: const Text('TimiGS Android'),
+                    subtitle: const Text('Activity Tracker for Android'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

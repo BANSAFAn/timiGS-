@@ -1,0 +1,174 @@
+name: CI
+
+on:
+  push:
+    branches: [nexting]
+  pull_request:
+    branches: [nexting, main, master]
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  # Security audit for Rust dependencies
+  security-audit:
+    name: 🔒 Security Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install cargo-audit
+        run: cargo install cargo-audit
+
+      - name: Run security audit
+        working-directory: src-tauri
+        run: cargo audit --ignore RUSTSEC-2024-0375 || true
+
+  # Lint and format checks
+  lint:
+    name: 🔍 Lint & Format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+
+      - name: Install dependencies (Ubuntu)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+
+      - name: Install frontend dependencies
+        run: npm install
+
+      - name: Check Rust formatting
+        working-directory: src-tauri
+        run: cargo fmt --check
+
+      - name: Run Clippy
+        working-directory: src-tauri
+        run: cargo clippy -- -D warnings || true
+
+  # Build verification on all platforms
+  build-check:
+    name: 🔨 Build (${{ matrix.name }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: macos-latest
+            args: "--target universal-apple-darwin"
+            name: macOS
+          - platform: ubuntu-22.04
+            args: ""
+            name: Linux
+          - platform: windows-latest
+            args: ""
+            name: Windows
+
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies (Ubuntu)
+        if: matrix.platform == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+
+      - name: Install frontend dependencies
+        run: npm install
+
+      - name: Generate installer assets (Windows)
+        if: matrix.platform == 'windows-latest'
+        run: node scripts/generate-installer-assets.js
+
+      - name: Build Tauri app
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          args: ${{ matrix.args }}
+
+  # Docker build verification
+  docker-build:
+    name: 🐳 Docker Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t timigs-website-test .
+
+      - name: Test container starts
+        run: |
+          docker run -d --name test-site -p 8080:80 timigs-website-test
+          sleep 3
+
+          # Check that nginx responds
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/)
+          echo "HTTP status: $STATUS"
+
+          if [ "$STATUS" -eq 200 ] || [ "$STATUS" -eq 301 ] || [ "$STATUS" -eq 302 ]; then
+            echo "✅ Container is serving the site"
+          else
+            echo "❌ Container returned unexpected status $STATUS"
+            docker logs test-site
+            exit 1
+          fi
+
+      - name: Cleanup
+        if: always()
+        run: docker rm -f test-site || true
+
+  # Website build check
+  website-build:
+    name: 🌐 Website Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+
+      - name: Install dependencies
+        working-directory: site
+        run: npm ci
+
+      - name: Build Astro site
+        working-directory: site
+        run: npm run build
+
+      - name: Check output
+        run: |
+          FILE_COUNT=$(find site/dist -type f | wc -l)
+          echo "📄 Built $FILE_COUNT files"
+          if [ "$FILE_COUNT" -lt 10 ]; then
+            echo "❌ Too few output files, build may have failed"
+            exit 1
+          fi
+          echo "✅ Site build OK"

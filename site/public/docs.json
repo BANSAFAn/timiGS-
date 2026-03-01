@@ -1,0 +1,37 @@
+[
+  {
+    "id": "intro",
+    "title": "Introduction",
+    "file": "1.md"
+  },
+  {
+    "id": "installation",
+    "title": "Installation",
+    "file": "install.md"
+  },
+  {
+    "id": "features",
+    "title": "Features",
+    "file": "features.md"
+  },
+  {
+    "id": "weather",
+    "title": "Weather Module",
+    "file": "weather.md"
+  },
+  {
+    "id": "settings",
+    "title": "Settings",
+    "file": "settings.md"
+  },
+  {
+    "id": "github-api",
+    "title": "GitHub Integration",
+    "file": "github-api.md"
+  },
+  {
+    "id": "docker",
+    "title": "Docker Deployment",
+    "file": "docker.md"
+  }
+]
