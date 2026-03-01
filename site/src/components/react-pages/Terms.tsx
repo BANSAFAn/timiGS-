@@ -128,15 +128,34 @@ const Terms: React.FC<TermsProps> = ({ t }) => {
                     <div className="mt-6 p-6 rounded-xl bg-black/20 border border-white/[0.06]">
                       <h4 className="text-white font-bold mb-3 flex items-center gap-2 text-sm">
                         <Shield className="w-4 h-4 text-apple-gray-400" />
-                        Mandatory Attribution
+                        TimiGS Public License (TPL) v1.0
                       </h4>
                       <p className="text-sm text-apple-gray-400 mb-4 leading-relaxed">
-                        The software is protected under the MIT License. Original Software developed by{" "}
-                        <a href="https://github.com/BANSAFAn" target="_blank" rel="noopener noreferrer" className="text-white underline decoration-white/30 hover:decoration-white transition-all">BANSAFAn</a>.
+                        Copyright © 2026 BANSAFAn. All rights reserved.
                       </p>
-                      <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/[0.04] border border-white/[0.05] w-fit">
-                        <span className="w-1.5 h-1.5 rounded-full bg-orange-500" />
-                        <span className="text-xs text-apple-gray-300 font-mono uppercase tracking-wide">Project: TimiGS</span>
+                      <div className="space-y-3 text-sm text-apple-gray-400">
+                        <div className="flex items-start gap-2">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-500/70 shrink-0 mt-0.5" />
+                          <p>Free to use, modify, and distribute</p>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-500/70 shrink-0 mt-0.5" />
+                          <p>Must include attribution to <strong>BANSAFAn</strong></p>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-500/70 shrink-0 mt-0.5" />
+                          <p>Must preserve the name "TimiGS" in forks and derivatives</p>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <span className="w-4 h-4 text-orange-500/70 shrink-0 mt-0.5 font-bold">!</span>
+                          <p>Cannot rename/rebrand for redistribution without permission</p>
+                        </div>
+                      </div>
+                      <div className="mt-4 pt-4 border-t border-white/[0.06]">
+                        <a href="https://github.com/BANSAFAn/timiGS-/blob/main/LICENSE" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-xs text-white/70 hover:text-white transition-all underline decoration-white/30 hover:decoration-white">
+                          <FileText className="w-3.5 h-3.5" />
+                          Read Full License
+                        </a>
                       </div>
                     </div>
                   )}
