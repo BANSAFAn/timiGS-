@@ -1,5 +1,42 @@
 # Changelog
 
+## [1.23.0](https://github.com/BANSAFAn/timiGS-/compare/v1.22.0...v1.23.0) (2026-03-01)
+
+
+### Features
+
+* Implement core Tauri application structure with activity tracking, settings, cloud sync, and P2P transfer capabilities. ([f965744](https://github.com/BANSAFAn/timiGS-/commit/f965744f2aecad738c711a15983bf918eaf6362d))
+* PROJECTS ([6086bfd](https://github.com/BANSAFAn/timiGS-/commit/6086bfd1651f66b9fdd61632174979ca40f152b1))
+
+
+### Bug Fixes
+
+* blocking combat tab, music for TIMEOUT ([44a2215](https://github.com/BANSAFAn/timiGS-/commit/44a22152da8173c42123070404f5b04ebb7148b2))
+* version file ([e1919fd](https://github.com/BANSAFAn/timiGS-/commit/e1919fd4eef5ca7cda9878a9eb9383cd2a462267))
+
+
+### Documentation
+
+* docker add ([b7ef80e](https://github.com/BANSAFAn/timiGS-/commit/b7ef80e0ce4a60c0506f450621cd0d89d04b9394))
+* update platform build statuses [skip ci] ([c0b72fb](https://github.com/BANSAFAn/timiGS-/commit/c0b72fb7790adca6d479a8d9c602292ea2ae5154))
+* update platform build statuses [skip ci] ([888b8d8](https://github.com/BANSAFAn/timiGS-/commit/888b8d8f1ccd439289aad8102af6bdd659d465cc))
+* update platform build statuses [skip ci] ([9022ffa](https://github.com/BANSAFAn/timiGS-/commit/9022ffa9cb13524fdc727e39b8e22bbe0a441d39))
+* update platform build statuses [skip ci] ([b013e09](https://github.com/BANSAFAn/timiGS-/commit/b013e096cb39ce80c917e6af5910a2c9fea3d8b1))
+* update platform build statuses [skip ci] ([8fdfd12](https://github.com/BANSAFAn/timiGS-/commit/8fdfd12022cef8601caa7b50061bdf723c31cb81))
+
+
+### CI/CD
+
+* docker ([99d43a4](https://github.com/BANSAFAn/timiGS-/commit/99d43a4f36d2cc8898fb625f906ffa22fc2a86c1))
+* docker fix ([9a58dce](https://github.com/BANSAFAn/timiGS-/commit/9a58dce267bb45bfcb7289e92669b990f19f653e))
+* fix sourceforge ([fd6ae43](https://github.com/BANSAFAn/timiGS-/commit/fd6ae4386c1aaa10cc29bedf051f44945543ab90))
+
+
+### Build System
+
+* **deps-dev:** bump minimatch ([15a0c07](https://github.com/BANSAFAn/timiGS-/commit/15a0c07eae6ca8d19cd5c989378868a13628e0f6))
+* **deps:** bump the npm_and_yarn group across 2 directories with 1 update ([5d9f884](https://github.com/BANSAFAn/timiGS-/commit/5d9f88434a5e2608ebbff3ff970fea53080b97f6))
+
 ## [1.22.0](https://github.com/BANSAFAn/timiGS-/compare/v1.21.0...v1.22.0) (2026-02-25)
 
 
