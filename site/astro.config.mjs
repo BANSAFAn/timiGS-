@@ -7,7 +7,7 @@ import auth from 'auth-astro';
 // https://astro.build/config
 export default defineConfig({
   site: 'https://timigs.bansafan.com',
-  output: 'hybrid',
+  output: 'static',
   adapter: vercel(),
   integrations: [react(), tailwind(), auth()],
   i18n: {
