@@ -7,17 +7,38 @@
         <div class="time-inputs">
           <div class="input-group">
             <label>Hours</label>
-            <input type="number" v-model.number="workHours" min="0" max="24" placeholder="0" class="time-input" />
+            <input
+              type="number"
+              v-model.number="workHours"
+              min="0"
+              max="24"
+              placeholder="0"
+              class="time-input"
+            />
           </div>
           <span class="separator">:</span>
           <div class="input-group">
             <label>Minutes</label>
-            <input type="number" v-model.number="workMinutes" min="0" max="59" placeholder="45" class="time-input" />
+            <input
+              type="number"
+              v-model.number="workMinutes"
+              min="0"
+              max="59"
+              placeholder="45"
+              class="time-input"
+            />
           </div>
           <span class="separator">:</span>
           <div class="input-group">
             <label>Seconds</label>
-            <input type="number" v-model.number="workSeconds" min="0" max="59" placeholder="0" class="time-input" />
+            <input
+              type="number"
+              v-model.number="workSeconds"
+              min="0"
+              max="59"
+              placeholder="0"
+              class="time-input"
+            />
           </div>
         </div>
         <p class="hint">How long to work before a break</p>
@@ -28,17 +49,38 @@
         <div class="time-inputs">
           <div class="input-group">
             <label>Hours</label>
-            <input type="number" v-model.number="breakHours" min="0" max="24" placeholder="0" class="time-input" />
+            <input
+              type="number"
+              v-model.number="breakHours"
+              min="0"
+              max="24"
+              placeholder="0"
+              class="time-input"
+            />
           </div>
           <span class="separator">:</span>
           <div class="input-group">
             <label>Minutes</label>
-            <input type="number" v-model.number="breakMinutes" min="0" max="59" placeholder="10" class="time-input" />
+            <input
+              type="number"
+              v-model.number="breakMinutes"
+              min="0"
+              max="59"
+              placeholder="10"
+              class="time-input"
+            />
           </div>
           <span class="separator">:</span>
           <div class="input-group">
             <label>Seconds</label>
-            <input type="number" v-model.number="breakSeconds" min="0" max="59" placeholder="0" class="time-input" />
+            <input
+              type="number"
+              v-model.number="breakSeconds"
+              min="0"
+              max="59"
+              placeholder="0"
+              class="time-input"
+            />
           </div>
         </div>
         <p class="hint">How long each break lasts (all apps blocked)</p>
@@ -48,18 +90,25 @@
         <label class="section-label">🎵 Background Music</label>
         <div class="folder-selection">
           <div class="folder-display">
-            <span class="folder-path">Using built-in music folder (public/music)</span>
+            <span class="folder-path"
+              >Using built-in music folder (public/music)</span
+            >
           </div>
         </div>
-        <p class="hint">Place MP3/WAV files in the 'public/music' folder to play them.</p>
+        <p class="hint">
+          Place MP3/WAV files in the 'public/music' folder to play them.
+        </p>
       </div>
 
       <div class="setup-section">
         <label class="section-label">🔒 Lock Password</label>
-        <input type="password" v-model="password" class="password-input" placeholder="Password to cancel..." />
+        <input
+          type="password"
+          v-model="password"
+          class="password-input"
+          placeholder="Password to cancel..."
+        />
       </div>
-
-
 
       <button @click="startTimeout" class="btn-start" :disabled="!canStart">
         ☕ Activate Time OUT
@@ -77,7 +126,14 @@
         <div class="circular-progress break-progress">
           <svg viewBox="0 0 100 100">
             <circle class="bg" cx="50" cy="50" r="45"></circle>
-            <circle class="fg break-fg" cx="50" cy="50" r="45" :stroke-dasharray="283" :stroke-dashoffset="breakProgressOffset"></circle>
+            <circle
+              class="fg break-fg"
+              cx="50"
+              cy="50"
+              r="45"
+              :stroke-dasharray="283"
+              :stroke-dashoffset="breakProgressOffset"
+            ></circle>
           </svg>
           <div class="time-display">{{ breakFormattedTime }}</div>
         </div>
@@ -111,7 +167,12 @@
 
       <!-- Cancel -->
       <div class="cancel-section">
-        <input type="password" v-model="cancelPassword" class="password-input small" placeholder="Password to cancel..." />
+        <input
+          type="password"
+          v-model="cancelPassword"
+          class="password-input small"
+          placeholder="Password to cancel..."
+        />
         <button @click="stopTimeout" class="btn-cancel">
           ✋ Cancel Time OUT
         </button>
@@ -122,33 +183,47 @@
 
   <!-- Full-screen break overlay -->
   <Teleport to="body">
-    <div v-if="status?.break_active" class="fullscreen-break-overlay" @click.prevent>
+    <div
+      v-if="status?.break_active"
+      class="fullscreen-break-overlay"
+      @click.prevent
+    >
       <div class="overlay-content">
         <div class="overlay-emoji">☕</div>
         <h2>Time to Rest!</h2>
         <p>Take a break, drink some tea, and relax.</p>
         <div class="overlay-timer">{{ breakFormattedTime }}</div>
-        
+
         <!-- Music Controls -->
         <div class="music-controls" v-if="isPlaying || audio">
           <button class="music-btn" @click="toggleMusic">
-            {{ isPlaying ? '⏸️' : '▶️' }}
+            {{ isPlaying ? "⏸️" : "▶️" }}
           </button>
-          <input 
-            type="range" 
-            min="0" 
-            max="1" 
-            step="0.05" 
-            v-model.number="volume" 
-            @input="updateVolume" 
+          <input
+            type="range"
+            min="0"
+            max="1"
+            step="0.05"
+            v-model.number="volume"
+            @input="updateVolume"
             class="volume-slider"
-          >
+          />
         </div>
 
         <div class="overlay-cancel">
-          <input type="password" v-model="overlayCancelPassword" class="overlay-input" placeholder="Enter password to cancel..." @keydown.enter="stopTimeoutOverlay" />
-          <button @click="stopTimeoutOverlay" class="overlay-btn">Cancel</button>
-          <p v-if="overlayCancelError" class="error-text">{{ overlayCancelError }}</p>
+          <input
+            type="password"
+            v-model="overlayCancelPassword"
+            class="overlay-input"
+            placeholder="Enter password to cancel..."
+            @keydown.enter="stopTimeoutOverlay"
+          />
+          <button @click="stopTimeoutOverlay" class="overlay-btn">
+            Cancel
+          </button>
+          <p v-if="overlayCancelError" class="error-text">
+            {{ overlayCancelError }}
+          </p>
         </div>
       </div>
     </div>
@@ -156,11 +231,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue';
-import { useI18n } from 'vue-i18n';
-import { invoke } from '@tauri-apps/api/core';
-import { listen } from '@tauri-apps/api/event';
-
+import { ref, computed, onMounted, onUnmounted } from "vue";
+import { useI18n } from "vue-i18n";
+import { invoke } from "@tauri-apps/api/core";
+import { listen } from "@tauri-apps/api/event";
 
 useI18n();
 
@@ -179,11 +253,11 @@ const workSeconds = ref<number>(0);
 const breakHours = ref<number>(0);
 const breakMinutes = ref<number>(10);
 const breakSeconds = ref<number>(0);
-const password = ref('');
-const cancelPassword = ref('');
-const overlayCancelPassword = ref('');
-const cancelError = ref('');
-const overlayCancelError = ref('');
+const password = ref("");
+const cancelPassword = ref("");
+const overlayCancelPassword = ref("");
+const cancelError = ref("");
+const overlayCancelError = ref("");
 const status = ref<TimeoutStatus | null>(null);
 let pollInterval: number | null = null;
 
@@ -208,57 +282,87 @@ function updateVolume() {
   }
 }
 
+const workTotalSecs = computed(
+  () =>
+    (workHours.value || 0) * 3600 +
+    (workMinutes.value || 0) * 60 +
+    (workSeconds.value || 0),
+);
+const breakTotalSecs = computed(
+  () =>
+    (breakHours.value || 0) * 3600 +
+    (breakMinutes.value || 0) * 60 +
+    (breakSeconds.value || 0),
+);
 
-
-const workTotalSecs = computed(() => (workHours.value || 0) * 3600 + (workMinutes.value || 0) * 60 + (workSeconds.value || 0));
-const breakTotalSecs = computed(() => (breakHours.value || 0) * 3600 + (breakMinutes.value || 0) * 60 + (breakSeconds.value || 0));
-
-const canStart = computed(() => workTotalSecs.value > 0 && breakTotalSecs.value > 0 && password.value.length >= 1);
+const canStart = computed(
+  () =>
+    workTotalSecs.value > 0 &&
+    breakTotalSecs.value > 0 &&
+    password.value.length >= 1,
+);
 
 const workFormattedTime = computed(() => {
-  if (!status.value) return '';
+  if (!status.value) return "";
   const r = status.value.next_break_in;
   const m = Math.floor(r / 60);
   const s = r % 60;
-  return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+  return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
 });
 
 const breakFormattedTime = computed(() => {
-  if (!status.value) return '';
+  if (!status.value) return "";
   const r = status.value.break_remaining;
   const m = Math.floor(r / 60);
   const s = r % 60;
-  return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+  return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
 });
 
 const breakProgressOffset = computed(() => {
   if (!status.value || status.value.break_duration_secs === 0) return 283;
-  return 283 - (283 * status.value.break_remaining) / status.value.break_duration_secs;
+  return (
+    283 -
+    (283 * status.value.break_remaining) / status.value.break_duration_secs
+  );
 });
 
 async function loadStatus() {
   try {
-    const s = await invoke<TimeoutStatus | null>('get_timeout_status_cmd');
+    const s = await invoke<TimeoutStatus | null>("get_timeout_status_cmd");
     if (s && s.active) {
       status.value = s;
+      manageAudio(s.break_active);
       startPolling();
     } else {
       status.value = null;
+      manageAudio(false);
     }
   } catch (e) {
-    console.error('Failed to get timeout status:', e);
+    console.error("Failed to get timeout status:", e);
+  }
+}
+
+function manageAudio(breakActive: boolean) {
+  if (breakActive && !audio.value) {
+    audio.value = new Audio("/music/123.mp3");
+    audio.value.loop = true;
+    audio.value.volume = volume.value;
+  } else if (!breakActive && audio.value) {
+    audio.value.pause();
+    audio.value = null;
+    isPlaying.value = false;
   }
 }
 
 async function startTimeout() {
   if (!canStart.value) return;
   try {
-    await invoke('start_timeout_cmd', {
+    await invoke("start_timeout_cmd", {
       intervalSecs: workTotalSecs.value,
       breakDurationSecs: breakTotalSecs.value,
       password: password.value,
     });
-    password.value = '';
+    password.value = "";
     await loadStatus();
   } catch (e: any) {
     alert(e);
@@ -266,10 +370,10 @@ async function startTimeout() {
 }
 
 async function stopTimeout() {
-  cancelError.value = '';
+  cancelError.value = "";
   try {
-    await invoke('stop_timeout_cmd', { password: cancelPassword.value });
-    cancelPassword.value = '';
+    await invoke("stop_timeout_cmd", { password: cancelPassword.value });
+    cancelPassword.value = "";
     status.value = null;
     if (pollInterval) {
       clearInterval(pollInterval);
@@ -281,10 +385,10 @@ async function stopTimeout() {
 }
 
 async function stopTimeoutOverlay() {
-  overlayCancelError.value = '';
+  overlayCancelError.value = "";
   try {
-    await invoke('stop_timeout_cmd', { password: overlayCancelPassword.value });
-    overlayCancelPassword.value = '';
+    await invoke("stop_timeout_cmd", { password: overlayCancelPassword.value });
+    overlayCancelPassword.value = "";
     status.value = null;
     if (pollInterval) {
       clearInterval(pollInterval);
@@ -298,24 +402,24 @@ async function stopTimeoutOverlay() {
 function startPolling() {
   if (pollInterval) clearInterval(pollInterval);
   pollInterval = window.setInterval(async () => {
-    const s = await invoke<TimeoutStatus | null>('get_timeout_status_cmd');
+    const s = await invoke<TimeoutStatus | null>("get_timeout_status_cmd");
     if (!s || !s.active) {
       status.value = null;
+      manageAudio(false);
       if (pollInterval) clearInterval(pollInterval);
     } else {
       status.value = s;
+      manageAudio(s.break_active);
     }
   }, 1000);
 }
 
-
-
 onMounted(async () => {
   loadStatus();
-  await listen('timeout-break-start', () => {
+  await listen("timeout-break-start", () => {
     loadStatus();
   });
-  await listen('timeout-break-end', () => {
+  await listen("timeout-break-end", () => {
     loadStatus();
   });
 });
@@ -326,7 +430,8 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-.timeout-setup, .timeout-active {
+.timeout-setup,
+.timeout-active {
   display: flex;
   flex-direction: column;
   gap: 18px;
@@ -512,8 +617,13 @@ onUnmounted(() => {
   animation: pulse 2s ease-in-out infinite;
 }
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.3; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
 }
 
 .next-break-info {
@@ -561,8 +671,13 @@ onUnmounted(() => {
   animation: bounce 1.5s ease-in-out infinite;
 }
 @keyframes bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
 }
 .break-title {
   margin: 0;
@@ -591,9 +706,16 @@ circle {
   stroke-width: 8;
   stroke-linecap: round;
 }
-.bg { stroke: rgba(255, 255, 255, 0.05); }
-.fg { stroke: #14b8a6; transition: stroke-dashoffset 1s linear; }
-.break-fg { stroke: #fbbf24; }
+.bg {
+  stroke: rgba(255, 255, 255, 0.05);
+}
+.fg {
+  stroke: #14b8a6;
+  transition: stroke-dashoffset 1s linear;
+}
+.break-fg {
+  stroke: #fbbf24;
+}
 .time-display {
   position: absolute;
   top: 50%;
@@ -643,8 +765,8 @@ circle {
   position: fixed;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
+  width: 100vw;
+  height: 100vh;
   background: rgba(0, 0, 0, 0.95);
   backdrop-filter: blur(30px);
   display: flex;

@@ -10,6 +10,74 @@ use std::thread;
 use std::time::Duration;
 use tauri::{Emitter, Manager};
 
+#[cfg(target_os = "windows")]
+use windows::Win32::Foundation::{LPARAM, LRESULT, WPARAM};
+#[cfg(target_os = "windows")]
+use windows::Win32::UI::WindowsAndMessaging::{
+    CallNextHookEx, GetMessageW, SetWindowsHookExW, UnhookWindowsHookEx, HHOOK, KBDLLHOOKSTRUCT,
+    MSG, WH_KEYBOARD_LL,
+};
+
+#[cfg(target_os = "windows")]
+static mut KBD_HOOK: HHOOK = HHOOK(std::ptr::null_mut());
+
+#[cfg(target_os = "windows")]
+unsafe extern "system" fn keyboard_hook_proc(code: i32, wparam: WPARAM, lparam: LPARAM) -> LRESULT {
+    if code >= 0 && BREAK_ACTIVE.load(Ordering::SeqCst) {
+        let kb = &*(lparam.0 as *const KBDLLHOOKSTRUCT);
+        let vk_code = kb.vkCode;
+        let flags = kb.flags.0;
+        let alt_down = (flags & 32) != 0;
+
+        let mut block = false;
+        // Alt+Tab or Alt+Esc
+        if alt_down && (vk_code == 0x09 || vk_code == 0x1B) {
+            block = true;
+        }
+        // LWIN / RWIN
+        if vk_code == 0x5B || vk_code == 0x5C {
+            block = true;
+        }
+
+        if block {
+            return LRESULT(1);
+        }
+    }
+    CallNextHookEx(KBD_HOOK, code, wparam, lparam)
+}
+
+#[cfg(target_os = "windows")]
+fn manage_keyboard_hook() {
+    unsafe {
+        if KBD_HOOK.0.is_null() {
+            std::thread::spawn(|| {
+                let hook = SetWindowsHookExW(
+                    WH_KEYBOARD_LL,
+                    Some(keyboard_hook_proc),
+                    windows::Win32::Foundation::HINSTANCE(std::ptr::null_mut()),
+                    0,
+                )
+                .unwrap_or(HHOOK(std::ptr::null_mut()));
+
+                KBD_HOOK = hook;
+
+                let mut msg = MSG::default();
+                while GetMessageW(
+                    &mut msg,
+                    windows::Win32::Foundation::HWND(std::ptr::null_mut()),
+                    0,
+                    0,
+                )
+                .into()
+                {
+                    let _ = windows::Win32::UI::WindowsAndMessaging::TranslateMessage(&msg);
+                    let _ = windows::Win32::UI::WindowsAndMessaging::DispatchMessageW(&msg);
+                }
+            });
+        }
+    }
+}
+
 static TIMEOUT_STATE: Lazy<Mutex<Option<TimeoutSession>>> = Lazy::new(|| Mutex::new(None));
 static TIMEOUT_RUNNING: AtomicBool = AtomicBool::new(false);
 static BREAK_ACTIVE: AtomicBool = AtomicBool::new(false);
@@ -49,6 +117,9 @@ pub fn start_timeout(
     if TIMEOUT_RUNNING.load(Ordering::SeqCst) {
         return Err("Time OUT is already active".to_string());
     }
+
+    #[cfg(target_os = "windows")]
+    manage_keyboard_hook();
 
     let password_hash = simple_hash(password);
 
@@ -158,6 +229,7 @@ pub fn get_timeout_status() -> Option<TimeoutStatus> {
 fn set_break_window_state(app_handle: &tauri::AppHandle, entering_break: bool) {
     if let Some(window) = app_handle.get_webview_window("main") {
         if entering_break {
+            let _ = window.set_decorations(false);
             let _ = window.set_always_on_top(true);
             let _ = window.set_fullscreen(true);
             let _ = window.set_focus();
@@ -169,6 +241,7 @@ fn set_break_window_state(app_handle: &tauri::AppHandle, entering_break: bool) {
             let _ = window.set_always_on_top(false);
             let _ = window.set_closable(true);
             let _ = window.set_minimizable(true);
+            let _ = window.set_decorations(true);
         }
     }
 }
