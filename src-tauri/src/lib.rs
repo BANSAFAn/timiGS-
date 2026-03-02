@@ -113,13 +113,13 @@ pub fn run() {
         #[cfg(desktop)]
         {
             use tauri::menu::{Menu, MenuItem, PredefinedMenuItem};
-            
+
             // Navigation items
             let dashboard_mi = MenuItem::with_id(app, "nav_dashboard", "🏠 Dashboard", true, None::<&str>).unwrap();
             let timeline_mi = MenuItem::with_id(app, "nav_timeline", "📊 Timeline", true, None::<&str>).unwrap();
             let tools_mi = MenuItem::with_id(app, "nav_tools", "🛠️ Tools", true, None::<&str>).unwrap();
             let analytics_mi = MenuItem::with_id(app, "nav_analytics", "📈 Analytics", true, None::<&str>).unwrap();
-            
+
             // Tracking toggle
             #[cfg(target_os = "windows")]
             let is_tracking = crate::tracker::is_tracking();
@@ -127,7 +127,7 @@ pub fn run() {
             let is_tracking = false;
             let tracking_label = if is_tracking { "⏹️ Stop Tracking" } else { "▶️ Start Tracking" };
             let tracking_mi = MenuItem::with_id(app, "toggle_tracking", tracking_label, true, None::<&str>).unwrap();
-            
+
             // System items
             let show_mi = MenuItem::with_id(app, "show", "🖥️ Show Window", true, None::<&str>).unwrap();
             let separator_mi = PredefinedMenuItem::separator(app).unwrap();
@@ -145,7 +145,7 @@ pub fn run() {
                 &quit_mi,
             ]).unwrap();
 
-            let _tray = TrayIconBuilder::new()
+            let tray = TrayIconBuilder::new()
                 .icon(
                     tauri::image::Image::from_bytes(include_bytes!("../icons/icon.png"))
                         .expect("failed to load tray icon"),
@@ -205,20 +205,10 @@ pub fn run() {
                         _ => {}
                     }
                 })
-                .on_tray_icon_event(|tray, event| {
-                    if let tauri::tray::TrayIconEvent::Click {
-                        button: tauri::tray::MouseButton::Left,
-                        ..
-                    } = event
-                    {
-                        let app = tray.app_handle();
-                        if let Some(window) = app.get_webview_window("main") {
-                            let _ = window.show();
-                            let _ = window.set_focus();
-                        }
-                    }
-                })
-                .build(app);
+                .build(app)?;
+
+            // Store tray in app state to prevent it from being dropped
+            app.manage(tray);
         }
 
         let _ = music::init_music_dir(app.handle());
