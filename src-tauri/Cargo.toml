@@ -10,17 +10,17 @@ name = "timigs_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]
-tauri-build = { version = "2", features = [] }
+tauri-build = { version = "2.1", features = [] }
 dotenv = "0.15"
 
 [dependencies]
-tauri = { version = "2", features = [] }
-tauri-plugin-opener = "2"
-tauri-plugin-shell = "2"
-tauri-plugin-process = "2"
-tauri-plugin-deep-link = "2"
-tauri-plugin-fs = "2"
-tauri-plugin-dialog = "2"
+tauri = { version = "2.1", features = [] }
+tauri-plugin-opener = "2.1"
+tauri-plugin-shell = "2.1"
+tauri-plugin-process = "2.1"
+tauri-plugin-deep-link = "2.1"
+tauri-plugin-fs = "2.1"
+tauri-plugin-dialog = "2.1"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 rusqlite = { version = "0.32", features = ["bundled"] }
@@ -41,10 +41,10 @@ mime_guess = "2.0.5"
 rodio = "0.20"
 
 [target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
-tauri = { version = "2", features = ["tray-icon", "image-png"] }
-tauri-plugin-autostart = "2"
-tauri-plugin-cli = "2"
-tauri-plugin-updater = "2"
+tauri = { version = "2.1", features = ["tray-icon", "image-png"] }
+tauri-plugin-autostart = "2.1"
+tauri-plugin-cli = "2.1"
+tauri-plugin-updater = "2.1"
 discord-rich-presence = "0.2"
 
 [target.'cfg(target_os = "linux")'.dependencies]
