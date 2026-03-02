@@ -122,9 +122,6 @@ pub fn get_focus_status() -> Option<FocusStatus> {
 #[cfg(target_os = "windows")]
 fn enforce_focus(target_exe_lower: &str) {
     use windows::Win32::Foundation::{BOOL, HWND, LPARAM};
-    use windows::Win32::System::Threading::{
-        OpenProcess, PROCESS_QUERY_INFORMATION, PROCESS_VM_READ,
-    };
     use windows::Win32::UI::WindowsAndMessaging::{
         EnumWindows, GetForegroundWindow, GetWindowThreadProcessId, IsWindowVisible,
         SetForegroundWindow, ShowWindow, SW_MINIMIZE, SW_RESTORE,
@@ -157,7 +154,6 @@ fn enforce_focus(target_exe_lower: &str) {
 
             // Find the target app's window and bring it to foreground
             let target_owned = target_exe_lower.to_string();
-            let mut found_hwnd: Option<HWND> = None;
 
             // Use a closure to enumerate windows and find the target
             struct EnumData {

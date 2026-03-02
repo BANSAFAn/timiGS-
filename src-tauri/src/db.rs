@@ -42,6 +42,10 @@ pub struct Settings {
     pub autostart: bool,
     pub minimize_to_tray: bool,
     pub discord_rpc: bool,
+    pub auto_export_enabled: bool,
+    pub auto_export_interval_hours: i64,
+    pub auto_export_folder: String,
+    pub last_export_time: Option<String>,
 }
 
 impl Default for Settings {
@@ -52,6 +56,10 @@ impl Default for Settings {
             autostart: true,
             minimize_to_tray: true,
             discord_rpc: true,
+            auto_export_enabled: false,
+            auto_export_interval_hours: 24,
+            auto_export_folder: String::new(),
+            last_export_time: None,
         }
     }
 }
@@ -419,6 +427,38 @@ pub fn get_settings() -> Settings {
             settings.discord_rpc = discord == "true";
         }
 
+        if let Ok(auto_export_enabled) = conn.query_row(
+            "SELECT value FROM settings WHERE key = 'auto_export_enabled'",
+            [],
+            |row| row.get::<_, String>(0),
+        ) {
+            settings.auto_export_enabled = auto_export_enabled == "true";
+        }
+
+        if let Ok(interval) = conn.query_row(
+            "SELECT value FROM settings WHERE key = 'auto_export_interval_hours'",
+            [],
+            |row| row.get::<_, i64>(0),
+        ) {
+            settings.auto_export_interval_hours = interval;
+        }
+
+        if let Ok(folder) = conn.query_row(
+            "SELECT value FROM settings WHERE key = 'auto_export_folder'",
+            [],
+            |row| row.get::<_, String>(0),
+        ) {
+            settings.auto_export_folder = folder;
+        }
+
+        if let Ok(last_export) = conn.query_row(
+            "SELECT value FROM settings WHERE key = 'last_export_time'",
+            [],
+            |row| row.get::<_, String>(0),
+        ) {
+            settings.last_export_time = Some(last_export);
+        }
+
         settings
     } else {
         Settings::default()
@@ -457,6 +497,28 @@ pub fn save_settings(settings: &Settings) -> Result<()> {
             "false"
         }],
     )?;
+    conn.execute(
+        "INSERT OR REPLACE INTO settings (key, value) VALUES ('auto_export_enabled', ?1)",
+        [if settings.auto_export_enabled {
+            "true"
+        } else {
+            "false"
+        }],
+    )?;
+    conn.execute(
+        "INSERT OR REPLACE INTO settings (key, value) VALUES ('auto_export_interval_hours', ?1)",
+        [&settings.auto_export_interval_hours.to_string()],
+    )?;
+    conn.execute(
+        "INSERT OR REPLACE INTO settings (key, value) VALUES ('auto_export_folder', ?1)",
+        [&settings.auto_export_folder],
+    )?;
+    if let Some(ref last_export) = settings.last_export_time {
+        conn.execute(
+            "INSERT OR REPLACE INTO settings (key, value) VALUES ('last_export_time', ?1)",
+            [last_export],
+        )?;
+    }
 
     Ok(())
 }
@@ -1024,5 +1086,146 @@ pub fn export_sessions_csv(path: &str) -> Result<()> {
     std::fs::write(path, csv_content)
         .map_err(|e| rusqlite::Error::ToSqlConversionFailure(Box::new(e)))?;
 
+    Ok(())
+}
+
+pub fn export_sessions_html(path: &str) -> Result<()> {
+    let guard = DB.lock();
+    let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
+
+    let mut stmt = conn.prepare(
+        "SELECT app_name, window_title, start_time, end_time, duration_seconds
+         FROM activity_sessions ORDER BY start_time DESC",
+    )?;
+
+    let mut html_content = String::from(r#"<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>TimiGS Activity Report</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #0f172a; color: #e2e8f0; padding: 20px; }
+        h2 { color: #8b5cf6; margin-bottom: 20px; }
+        table { border-collapse: collapse; width: 100%; background: #1e293b; border-radius: 8px; overflow: hidden; }
+        th { background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: white; padding: 14px 12px; text-align: left; font-weight: 600; }
+        td { padding: 12px; border-bottom: 1px solid #334155; }
+        tr:hover td { background: #334155; }
+        .duration { color: #60a5fa; font-weight: 600; }
+        .timestamp { color: #94a3b8; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+    <h2>📊 TimiGS Activity Report</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Application</th>
+                <th>Window Title</th>
+                <th>Start Time</th>
+                <th>End Time</th>
+                <th>Duration</th>
+            </tr>
+        </thead>
+        <tbody>
+"#);
+
+    let rows = stmt.query_map([], |row| {
+        let app_name: String = row.get(0)?;
+        let window_title: String = row.get(1)?;
+        let start_time: String = row.get(2)?;
+        let end_time: Option<String> = row.get(3)?;
+        let duration: i64 = row.get(4)?;
+        Ok((app_name, window_title, start_time, end_time, duration))
+    })?;
+
+    for row in rows {
+        if let Ok((app, title, start, end, dur)) = row {
+            let hrs = dur / 3600;
+            let mins = (dur % 3600) / 60;
+            let secs = dur % 60;
+            let duration_str = if hrs > 0 {
+                format!("{}h {}m {}s", hrs, mins, secs)
+            } else if mins > 0 {
+                format!("{}m {}s", mins, secs)
+            } else {
+                format!("{}s", secs)
+            };
+
+            let escape = |s: &str| -> String {
+                s.replace('&', "&amp;").replace('<', "&lt;").replace('>', "&gt;").replace('"', "&quot;")
+            };
+
+            html_content.push_str(&format!(
+                r#"<tr>
+                    <td><strong>{}</strong></td>
+                    <td>{}</td>
+                    <td class="timestamp">{}</td>
+                    <td class="timestamp">{}</td>
+                    <td class="duration">{}</td>
+                </tr>"#,
+                escape(&app),
+                escape(&title),
+                escape(&start),
+                escape(&end.unwrap_or_else(|| "Now".to_string())),
+                duration_str
+            ));
+        }
+    }
+
+    html_content.push_str(r#"
+        </tbody>
+    </table>
+</body>
+</html>"#);
+
+    std::fs::write(path, html_content)
+        .map_err(|e| rusqlite::Error::ToSqlConversionFailure(Box::new(e)))?;
+
+    Ok(())
+}
+
+pub fn auto_export_if_needed() -> Result<()> {
+    let settings = get_settings();
+    
+    if !settings.auto_export_enabled || settings.auto_export_folder.is_empty() {
+        return Ok(());
+    }
+
+    let now = Local::now();
+    let last_export = settings.last_export_time
+        .and_then(|s| DateTime::parse_from_rfc3339(&s).ok())
+        .map(|dt| dt.with_timezone(&Local));
+
+    let should_export = match last_export {
+        None => true,
+        Some(last) => {
+            let elapsed = now.signed_duration_since(last).num_hours();
+            elapsed >= settings.auto_export_interval_hours
+        }
+    };
+
+    if should_export {
+        let timestamp = now.format("%Y-%m-%d_%H-%M-%S").to_string();
+        let filename = format!("TimiGS_Activity_{}.html", timestamp);
+        let export_path = PathBuf::from(&settings.auto_export_folder).join(filename);
+        
+        std::fs::create_dir_all(&settings.auto_export_folder)
+            .map_err(|e| rusqlite::Error::ToSqlConversionFailure(Box::new(e)))?;
+        
+        export_sessions_html(export_path.to_str().unwrap())?;
+        
+        save_last_export_time(&now.to_rfc3339())?;
+    }
+
+    Ok(())
+}
+
+fn save_last_export_time(time: &str) -> Result<()> {
+    let guard = DB.lock();
+    let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
+    conn.execute(
+        "INSERT OR REPLACE INTO settings (key, value) VALUES ('last_export_time', ?1)",
+        [time],
+    )?;
     Ok(())
 }

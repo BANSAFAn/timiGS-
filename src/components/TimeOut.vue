@@ -3,7 +3,10 @@
     <!-- Setup State -->
     <div v-if="!status" class="timeout-setup">
       <div class="setup-section">
-        <label class="section-label">💼 Work Interval</label>
+        <label class="section-label">
+          <span class="icon" v-html="Icons.timeoutWork"></span> 
+          Work Interval
+        </label>
         <div class="time-inputs">
           <div class="input-group">
             <label>Hours</label>
@@ -45,7 +48,10 @@
       </div>
 
       <div class="setup-section">
-        <label class="section-label">☕ Break Duration</label>
+        <label class="section-label">
+          <span class="icon" v-html="Icons.timeoutBreak"></span> 
+          Break Duration
+        </label>
         <div class="time-inputs">
           <div class="input-group">
             <label>Hours</label>
@@ -87,21 +93,55 @@
       </div>
 
       <div class="setup-section">
-        <label class="section-label">🎵 Background Music</label>
-        <div class="folder-selection">
-          <div class="folder-display">
-            <span class="folder-path"
-              >Using built-in music folder (public/music)</span
+        <label class="section-label">
+          <span class="icon" v-html="Icons.timeoutMusic"></span> 
+          Background Music
+        </label>
+        
+        <div class="music-manager">
+          <div class="music-header">
+            <button class="btn-icon" @click="openMusicFolder" title="Open Music Folder">
+              <span v-html="Icons.timeoutFolder"></span>
+            </button>
+            <button class="btn-secondary" @click="addMusicFile">
+              + Add Track
+            </button>
+          </div>
+          
+          <div class="music-list">
+            <div v-if="musicFiles.length === 0" class="empty-music">
+              No custom music files found.
+            </div>
+            <div 
+              v-else 
+              v-for="file in musicFiles" 
+              :key="file.filename"
+              class="music-item"
+              :class="{ 'active-track': selectedMusic === file.filename }"
+              @click="selectedMusic = file.filename"
             >
+              <div class="radio-circle"></div>
+              <span class="track-name">{{ file.filename }}</span>
+              <button class="btn-icon-danger" @click.stop="deleteMusicFile(file.filename)" title="Delete Track">
+                <span v-html="Icons.timeoutTrash"></span>
+              </button>
+            </div>
+          </div>
+          
+          <div class="music-options">
+            <label class="checkbox-label">
+              <input type="checkbox" v-model="playMusicDuringBreak" />
+              Play music during break
+            </label>
           </div>
         </div>
-        <p class="hint">
-          Place MP3/WAV files in the 'public/music' folder to play them.
-        </p>
       </div>
 
       <div class="setup-section">
-        <label class="section-label">🔒 Lock Password</label>
+        <label class="section-label">
+          <span class="icon" v-html="Icons.timeoutLock"></span> 
+          Lock Password
+        </label>
         <input
           type="password"
           v-model="password"
@@ -111,7 +151,7 @@
       </div>
 
       <button @click="startTimeout" class="btn-start" :disabled="!canStart">
-        ☕ Activate Time OUT
+        <span class="btn-icon" v-html="Icons.timeoutBreak"></span> Activate Time OUT
       </button>
     </div>
 
@@ -119,7 +159,7 @@
     <div v-else class="timeout-active">
       <!-- During Break -->
       <div v-if="status.break_active" class="break-overlay">
-        <div class="break-emoji">☕</div>
+        <div class="break-emoji" v-html="Icons.timeoutBreak"></div>
         <h3 class="break-title">Time to relax!</h3>
         <p class="break-subtitle">Take a break, drink some tea, stretch!</p>
 
@@ -155,11 +195,11 @@
 
         <div class="schedule-info">
           <div class="schedule-item">
-            <span class="schedule-icon">💼</span>
+            <span class="schedule-icon" v-html="Icons.timeoutWork"></span>
             <span>Work: {{ status.interval_secs / 60 }}min</span>
           </div>
           <div class="schedule-item">
-            <span class="schedule-icon">☕</span>
+            <span class="schedule-icon" v-html="Icons.timeoutBreak"></span>
             <span>Break: {{ status.break_duration_secs / 60 }}min</span>
           </div>
         </div>
@@ -174,7 +214,7 @@
           placeholder="Password to cancel..."
         />
         <button @click="stopTimeout" class="btn-cancel">
-          ✋ Cancel Time OUT
+          <span class="btn-icon" v-html="Icons.timeoutStop"></span> Cancel Time OUT
         </button>
         <p v-if="cancelError" class="error-text">{{ cancelError }}</p>
       </div>
@@ -189,15 +229,16 @@
       @click.prevent
     >
       <div class="overlay-content">
-        <div class="overlay-emoji">☕</div>
+        <div class="overlay-emoji" v-html="Icons.timeoutBreak"></div>
         <h2>Time to Rest!</h2>
         <p>Take a break, drink some tea, and relax.</p>
         <div class="overlay-timer">{{ breakFormattedTime }}</div>
 
         <!-- Music Controls -->
         <div class="music-controls" v-if="isPlaying || audio">
-          <button class="music-btn" @click="toggleMusic">
-            {{ isPlaying ? "⏸️" : "▶️" }}
+          <button class="music-btn" @click="toggleMusic" title="Play/Pause">
+            <span v-if="isPlaying" v-html="Icons.timeoutPause"></span>
+            <span v-else v-html="Icons.timeoutPlay"></span>
           </button>
           <input
             type="range"
@@ -235,6 +276,9 @@ import { ref, computed, onMounted, onUnmounted } from "vue";
 import { useI18n } from "vue-i18n";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
+import { convertFileSrc } from "@tauri-apps/api/core";
+import { open as openDialog } from "@tauri-apps/plugin-dialog";
+import { Icons } from "./icons/IconMap";
 
 useI18n();
 
@@ -265,6 +309,59 @@ let pollInterval: number | null = null;
 const isPlaying = ref(false);
 const audio = ref<HTMLAudioElement | null>(null);
 const volume = ref(0.5);
+const musicFiles = ref<any[]>([]);
+const selectedMusic = ref<string>("");
+const playMusicDuringBreak = ref<boolean>(true);
+
+async function loadMusicFiles() {
+  try {
+    musicFiles.value = await invoke("get_music_files_cmd");
+    // Auto-select first if none selected
+    if (!selectedMusic.value && musicFiles.value.length > 0) {
+      selectedMusic.value = musicFiles.value[0].filename;
+    }
+  } catch (e) {
+    console.error("Failed to load music files", e);
+  }
+}
+
+async function addMusicFile() {
+  try {
+    const selected = await openDialog({
+      multiple: false,
+      filters: [{
+        name: 'Audio',
+        extensions: ['mp3', 'wav', 'ogg', 'flac']
+      }]
+    });
+    if (selected) {
+      await invoke("add_music_file_cmd", { sourcePath: selected });
+      await loadMusicFiles();
+    }
+  } catch (e) {
+    alert("Error adding music file: " + e);
+  }
+}
+
+async function deleteMusicFile(filename: string) {
+  try {
+    await invoke("delete_music_file_cmd", { filename });
+    if (selectedMusic.value === filename) {
+      selectedMusic.value = "";
+    }
+    await loadMusicFiles();
+  } catch (e) {
+    console.error("Error deleting music:", e);
+  }
+}
+
+async function openMusicFolder() {
+  try {
+    await invoke("open_music_folder_cmd");
+  } catch (e) {
+    console.error("Failed to open music folder:", e);
+  }
+}
 
 function toggleMusic() {
   if (!audio.value) return;
@@ -343,10 +440,25 @@ async function loadStatus() {
 }
 
 function manageAudio(breakActive: boolean) {
-  if (breakActive && !audio.value) {
-    audio.value = new Audio("/music/123.mp3");
+  if (breakActive && !audio.value && playMusicDuringBreak.value) {
+    // If a custom track is selected, play it, else play builtin
+    let src = "/music/123.mp3";
+    const selected = musicFiles.value.find(f => f.filename === selectedMusic.value);
+
+    if (selected) {
+      // Use the full path for custom tracks
+      src = convertFileSrc(selected.path);
+    }
+
+    audio.value = new Audio(src);
     audio.value.loop = true;
     audio.value.volume = volume.value;
+    audio.value.play().then(() => {
+      isPlaying.value = true;
+    }).catch(e => {
+      console.error("Failed to auto-play audio", e);
+      isPlaying.value = false;
+    });
   } else if (!breakActive && audio.value) {
     audio.value.pause();
     audio.value = null;
@@ -418,6 +530,14 @@ function startPolling() {
 
 onMounted(async () => {
   loadStatus();
+  loadMusicFiles();
+  
+  // Try to load persisted user preferences
+  const savedMusic = localStorage.getItem("timigs-timeout-music");
+  if (savedMusic) selectedMusic.value = savedMusic;
+  const savedPlayState = localStorage.getItem("timigs-timeout-play");
+  if (savedPlayState !== null) playMusicDuringBreak.value = savedPlayState === "true";
+
   await listen("timeout-break-start", () => {
     loadStatus();
   });
@@ -427,6 +547,10 @@ onMounted(async () => {
 });
 
 onUnmounted(() => {
+  // Save preferences
+  localStorage.setItem("timigs-timeout-music", selectedMusic.value);
+  localStorage.setItem("timigs-timeout-play", String(playMusicDuringBreak.value));
+  
   if (pollInterval) clearInterval(pollInterval);
 });
 </script>
@@ -502,51 +626,170 @@ onUnmounted(() => {
   margin: 0;
 }
 
-/* Music Folder Styles */
-.folder-selection {
+/* Music Manager UI */
+.music-manager {
   display: flex;
-  gap: 10px;
+  flex-direction: column;
+  gap: 12px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.music-header {
+  display: flex;
+  justify-content: space-between;
   align-items: center;
 }
 
-.folder-display {
-  flex: 1;
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 10px 12px;
-  border-radius: 10px;
-  overflow: hidden;
-  display: flex;
+.btn-icon {
+  display: inline-flex;
   align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  padding: 0;
+}
+.btn-icon:hover {
+  background: rgba(255, 255, 255, 0.2);
 }
 
-.folder-path {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  font-size: 0.9rem;
-  color: #10b981;
+.btn-icon-danger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: #ef4444;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-icon-danger:hover {
+  background: rgba(239, 68, 68, 0.15);
 }
 
-.folder-placeholder {
-  color: rgba(255, 255, 255, 0.3);
-  font-size: 0.9rem;
+.btn-secondary {
+  background: rgba(20, 184, 166, 0.15);
+  color: #14b8a6;
+  border: 1px solid rgba(20, 184, 166, 0.3);
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-secondary:hover {
+  background: rgba(20, 184, 166, 0.25);
+}
+
+.music-list {
+  max-height: 150px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.music-list::-webkit-scrollbar {
+  width: 6px;
+}
+.music-list::-webkit-scrollbar-track {
+  background: rgba(0,0,0,0.1);
+  border-radius: 3px;
+}
+.music-list::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.2);
+  border-radius: 3px;
+}
+
+.empty-music {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  padding: 16px 0;
   font-style: italic;
 }
 
-.btn-browse {
-  background: rgba(255, 255, 255, 0.1);
-  border: none;
-  padding: 10px 16px;
-  border-radius: 10px;
-  color: #fff;
+.music-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid transparent;
+}
+.music-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+.music-item.active-track {
+  background: rgba(20, 184, 166, 0.1);
+  border-color: rgba(20, 184, 166, 0.3);
 }
 
-.btn-browse:hover {
-  background: rgba(255, 255, 255, 0.2);
+.radio-circle {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  position: relative;
+  flex-shrink: 0;
+}
+.active-track .radio-circle {
+  border-color: #14b8a6;
+}
+.active-track .radio-circle::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 6px;
+  height: 6px;
+  background: #14b8a6;
+  border-radius: 50%;
+}
+
+.track-name {
+  flex: 1;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: white;
+}
+.active-track .track-name {
+  color: #14b8a6;
+  font-weight: 500;
+}
+
+.music-options {
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.checkbox-label input {
+  accent-color: #14b8a6;
 }
 
 .password-input {
@@ -569,6 +812,10 @@ onUnmounted(() => {
 }
 
 .btn-start {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
   background: linear-gradient(135deg, #14b8a6, #0d9488);
   color: white;
   border: none;
@@ -669,8 +916,17 @@ onUnmounted(() => {
   gap: 8px;
 }
 .break-emoji {
-  font-size: 3rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 64px;
+  height: 64px;
+  color: #fbbf24;
   animation: bounce 1.5s ease-in-out infinite;
+}
+.break-emoji :deep(svg) {
+  width: 100%;
+  height: 100%;
 }
 @keyframes bounce {
   0%,

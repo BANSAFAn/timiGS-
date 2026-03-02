@@ -6,15 +6,50 @@
           <h2>{{ $t('analytics.title') }}</h2>
           <p class="subtitle">Insights into your productivity patterns</p>
         </div>
-        <div class="week-nav">
-          <button class="nav-btn" @click="prevWeek">
+        <div class="header-controls">
+          <!-- View Style Selector -->
+          <div class="view-selector">
+            <button 
+              class="view-btn" 
+              :class="{ active: viewStyle === 'default' }" 
+              @click="viewStyle = 'default'"
+              title="Default View"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+            </button>
+            <button 
+              class="view-btn" 
+              :class="{ active: viewStyle === 'roadmap' }" 
+              @click="viewStyle = 'roadmap'"
+              title="Roadmap View"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
+            </button>
+            <button 
+              class="view-btn" 
+              :class="{ active: viewStyle === 'compact' }" 
+              @click="viewStyle = 'compact'"
+              title="Compact View"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+            </button>
+          </div>
+          
+          <!-- Time Range Selector -->
+          <div class="time-range-selector">
+            <button class="range-btn" :class="{ active: selectedRange === 'day' }" @click="selectedRange = 'day'">Day</button>
+            <button class="range-btn" :class="{ active: selectedRange === 'week' }" @click="selectedRange = 'week'">Week</button>
+            <button class="range-btn" :class="{ active: selectedRange === 'month' }" @click="selectedRange = 'month'">Month</button>
+          </div>
+          
+          <button class="nav-btn" @click="prevPeriod">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
           </button>
           <div class="date-range-badge">
             <span class="range-icon" v-html="Icons.timeline"></span>
-            <span>{{ weekRangeLabel }}</span>
+            <span>{{ periodLabel }}</span>
           </div>
-          <button class="nav-btn" @click="nextWeek" :disabled="weekOffset >= 0">
+          <button class="nav-btn" @click="nextPeriod" :disabled="isCurrentPeriod">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
           </button>
         </div>
@@ -213,6 +248,12 @@ const { t } = useI18n();
 const store = useActivityStore();
 const showDetailModal = ref(false);
 
+// View style and time range
+const viewStyle = ref<'default' | 'roadmap' | 'compact'>('default');
+const selectedRange = ref<'day' | 'week' | 'month'>('week');
+const dayOffset = ref(0);
+const monthOffset = ref(0);
+
 // --- Week Navigation ---
 const weekOffset = ref(0); // 0 = current week, -1 = last week, etc.
 interface DailyStatLocal { date: string; total_seconds: number; app_count: number; }
@@ -241,6 +282,46 @@ const weekRangeLabel = computed(() => {
   const fmt = (d: string) => new Date(d).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
   return `${fmt(from)} – ${fmt(to)}`;
 });
+
+const periodLabel = computed(() => {
+  if (selectedRange.value === 'day') {
+    const date = new Date();
+    date.setDate(date.getDate() + dayOffset.value);
+    return date.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+  } else if (selectedRange.value === 'week') {
+    return weekRangeLabel.value;
+  } else {
+    const now = new Date();
+    const month = new Date(now.getFullYear(), now.getMonth() + monthOffset.value, 1);
+    return month.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
+  }
+});
+
+const isCurrentPeriod = computed(() => {
+  if (selectedRange.value === 'day') return dayOffset.value === 0;
+  if (selectedRange.value === 'week') return weekOffset.value === 0;
+  return monthOffset.value === 0;
+});
+
+function prevPeriod() {
+  if (selectedRange.value === 'day') {
+    dayOffset.value--;
+  } else if (selectedRange.value === 'week') {
+    prevWeek();
+  } else {
+    monthOffset.value--;
+  }
+}
+
+function nextPeriod() {
+  if (selectedRange.value === 'day') {
+    if (dayOffset.value < 0) dayOffset.value++;
+  } else if (selectedRange.value === 'week') {
+    nextWeek();
+  } else {
+    if (monthOffset.value < 0) monthOffset.value++;
+  }
+}
 
 async function fetchWeekData() {
   if (weekOffset.value === 0) {
@@ -437,12 +518,75 @@ onMounted(async () => { await fetchWeekData(); });
 
 .subtitle { color: var(--text-muted); font-size: 0.95rem; margin-top: 4px; }
 
-.week-nav {
+.header-controls {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
 }
-.week-nav .nav-btn {
+
+.view-selector {
+  display: flex;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 4px;
+  border-radius: 10px;
+}
+
+.view-btn {
+  background: transparent;
+  border: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.view-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+}
+
+.view-btn.active {
+  background: var(--color-primary);
+  color: white;
+}
+
+.time-range-selector {
+  display: flex;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 4px;
+  border-radius: 10px;
+}
+
+.range-btn {
+  background: transparent;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 500;
+}
+
+.range-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+}
+
+.range-btn.active {
+  background: var(--color-primary);
+  color: white;
+}
+
+.nav-btn {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.08);
   width: 36px;
@@ -455,15 +599,18 @@ onMounted(async () => { await fetchWeekData(); });
   cursor: pointer;
   transition: all 0.3s;
 }
-.week-nav .nav-btn:hover:not(:disabled) {
+
+.nav-btn:hover:not(:disabled) {
   background: rgba(255, 255, 255, 0.1);
   color: #fff;
   transform: scale(1.05);
 }
-.week-nav .nav-btn:disabled {
+
+.nav-btn:disabled {
   opacity: 0.3;
   cursor: not-allowed;
 }
+
 .date-range-badge {
   display: flex;
   align-items: center;

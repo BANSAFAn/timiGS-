@@ -1,16 +1,24 @@
 {
   "identifier": "music-access",
-  "description": "Allow playback of bundled music",
+  "description": "Allow playback of bundled and custom music",
   "local": true,
-  "windows": ["main"],
+  "windows": ["main", "tray"],
   "permissions": [
     {
       "identifier": "fs:allow-read-dir",
-      "allow": [{ "path": "$RESOURCE/music" }, { "path": "$RESOURCE/music/*" }]
+      "allow": [
+        { "path": "$RESOURCE/music" },
+        { "path": "$RESOURCE/music/*" },
+        { "path": "$APPDATA/timigs/music" },
+        { "path": "$APPDATA/timigs/music/*" }
+      ]
     },
     {
       "identifier": "fs:allow-read-file",
-      "allow": [{ "path": "$RESOURCE/music/*" }]
+      "allow": [
+        { "path": "$RESOURCE/music/*" },
+        { "path": "$APPDATA/timigs/music/*" }
+      ]
     }
   ]
 }

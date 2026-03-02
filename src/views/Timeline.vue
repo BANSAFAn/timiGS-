@@ -40,23 +40,44 @@
     </div>
 
     <div class="timeline-container">
-      <div v-if="filteredSessions.length > 0" class="timeline">
-        <div v-for="session in filteredSessions" :key="session.id" class="timeline-item" @click="handleSessionClick(session)">
-          <div class="timeline-time">
-            {{ formatTime(session.start_time) }} - {{ session.end_time ? formatTime(session.end_time) : 'Now' }}
+      <div v-if="groupedSessions.length > 0" class="timeline">
+        <div v-for="group in groupedSessions" :key="group.appName" class="timeline-group">
+          <div class="timeline-group-header" @click="toggleGroup(group.appName)">
+            <div class="group-toggle">
+              <svg :class="{ 'rotated': expandedGroups.has(group.appName) }" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </div>
+            <img v-if="appIcons[group.exePath]" :src="appIcons[group.exePath]" class="app-icon-img" :alt="group.appName" />
+            <div v-else class="app-icon-small" :style="{ background: getAppColor(group.appName) }">
+              {{ group.appName.charAt(0).toUpperCase() }}
+            </div>
+            <div class="group-info">
+              <div class="group-app-name">{{ group.appName }}</div>
+              <div class="group-meta">
+                <span class="group-sessions-count">{{ group.sessions.length }} {{ group.sessions.length === 1 ? 'session' : 'sessions' }}</span>
+                <span class="group-separator">•</span>
+                <span class="group-total-time">{{ formatDuration(group.totalTime) }} total</span>
+              </div>
+            </div>
+            <div class="group-duration">
+              {{ formatDuration(group.totalTime) }}
+            </div>
           </div>
-          <div class="timeline-content">
-            <div class="timeline-app" :class="{ 'is-clickable': isBrowser(session.app_name) }">
-              <img v-if="appIcons[session.exe_path]" :src="appIcons[session.exe_path]" class="app-icon-img" :alt="session.app_name" />
-              <div v-else class="app-icon-small" :style="{ background: getAppColor(session.app_name) }">
-                {{ session.app_name.charAt(0).toUpperCase() }}
+          
+          <div v-show="expandedGroups.has(group.appName)" class="timeline-group-sessions">
+            <div v-for="session in group.sessions" :key="session.id" class="timeline-item" @click="handleSessionClick(session)">
+              <div class="timeline-time">
+                {{ formatTime(session.start_time) }} - {{ session.end_time ? formatTime(session.end_time) : 'Now' }}
               </div>
-              <div class="timeline-app-info">
-                <div class="app-name">{{ session.app_name }}</div>
-                <div class="window-title">{{ session.window_title }}</div>
-              </div>
-              <div class="session-duration">
-                {{ formatDuration(session.duration_seconds) }}
+              <div class="timeline-content">
+                <div class="timeline-app" :class="{ 'is-clickable': isBrowser(session.app_name) }">
+                  <div class="timeline-app-info">
+                    <div class="app-name">{{ session.app_name }}</div>
+                    <div class="window-title">{{ session.window_title }}</div>
+                  </div>
+                  <div class="session-duration">
+                    {{ formatDuration(session.duration_seconds) }}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -109,6 +130,53 @@ const dateInputRef = ref<HTMLInputElement | null>(null);
 const sessions = ref<ActivitySession[]>([]);
 const searchQuery = ref('');
 const appIcons = ref<Record<string, string>>({});
+const expandedGroups = ref<Set<string>>(new Set());
+
+// Group sessions by app
+interface SessionGroup {
+  appName: string;
+  exePath: string;
+  sessions: ActivitySession[];
+  totalTime: number;
+}
+
+const groupedSessions = computed(() => {
+  const sessionList = searchQuery.value ? filteredSessions.value : sessions.value;
+  
+  // Group by app name and exe path
+  const groups: Map<string, SessionGroup> = new Map();
+  
+  sessionList.forEach(session => {
+    const key = `${session.app_name}|${session.exe_path}`;
+    
+    if (!groups.has(key)) {
+      groups.set(key, {
+        appName: session.app_name,
+        exePath: session.exe_path,
+        sessions: [],
+        totalTime: 0
+      });
+    }
+    
+    const group = groups.get(key)!;
+    group.sessions.push(session);
+    group.totalTime += session.duration_seconds;
+  });
+  
+  // Convert to array and sort by total time
+  return Array.from(groups.values())
+    .sort((a, b) => b.totalTime - a.totalTime);
+});
+
+function toggleGroup(appName: string) {
+  const newSet = new Set(expandedGroups.value);
+  if (newSet.has(appName)) {
+    newSet.delete(appName);
+  } else {
+    newSet.add(appName);
+  }
+  expandedGroups.value = newSet;
+}
 
 // Browser Modal Logic
 const showBrowserModal = ref(false);
@@ -389,6 +457,29 @@ onMounted(async () => {
   cursor: pointer;
 }
 
+/* Custom Calendar Styling */
+.date-input-hidden::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0;
+}
+
+/* Override default calendar popup styles where possible */
+input[type="date"] {
+  font-family: inherit;
+}
+
+/* Calendar button styling */
+.calendar-btn {
+  background: rgba(139, 92, 246, 0.15);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  color: #a78bfa;
+}
+
+.calendar-btn:hover {
+  background: rgba(139, 92, 246, 0.25);
+  color: #c4b5fd;
+}
+
 /* Timeline */
 .timeline-container { padding-left: 12px; }
 .timeline {
@@ -408,6 +499,109 @@ onMounted(async () => {
   z-index: 0;
 }
 
+/* Timeline Group */
+.timeline-group {
+  position: relative;
+  z-index: 1;
+}
+
+.timeline-group-header {
+  display: grid;
+  grid-template-columns: 40px 40px 1fr auto;
+  gap: 12px;
+  align-items: center;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.timeline-group-header:hover {
+  border-color: var(--border-color-hover);
+  background: var(--bg-card-hover);
+  box-shadow: var(--shadow-sm);
+}
+
+.group-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+}
+
+.group-toggle svg {
+  transition: transform 0.3s ease;
+}
+
+.group-toggle svg.rotated {
+  transform: rotate(180deg);
+}
+
+.group-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.group-app-name {
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+
+.group-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.group-sessions-count {
+  font-weight: 500;
+}
+
+.group-separator {
+  opacity: 0.5;
+}
+
+.group-total-time {
+  color: var(--color-primary);
+  font-weight: 500;
+}
+
+.group-duration {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--color-primary);
+  background: var(--bg-tertiary);
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+.timeline-group-sessions {
+  margin-top: 8px;
+  padding-left: 52px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .timeline-item {
   display: grid;
   grid-template-columns: 100px 1fr;
@@ -425,13 +619,14 @@ onMounted(async () => {
 }
 
 .timeline-content {
-  background: var(--bg-card);
+  background: var(--bg-secondary);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
-  padding: 16px;
+  padding: 12px 16px;
   transition: all 0.2s;
   cursor: default;
 }
+
 .timeline-item:hover .timeline-content {
   border-color: var(--border-color-hover);
   transform: translateX(4px);

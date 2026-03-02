@@ -3,7 +3,10 @@
     <!-- Setup State -->
     <div v-if="!status" class="focus-setup">
       <div class="setup-section">
-        <label class="section-label">🎯 Select Application</label>
+        <label class="section-label">
+          <span class="icon" v-html="Icons.focusTarget"></span>
+          Select Application
+        </label>
         <select v-model="selectedApp" class="app-select">
           <option value="" disabled>Choose an app to focus on...</option>
           <option v-for="app in recentApps" :key="app.app_name" :value="app">
@@ -13,7 +16,10 @@
       </div>
 
       <div class="setup-section">
-        <label class="section-label">⏱️ Duration</label>
+        <label class="section-label">
+          <span class="icon" v-html="Icons.timeoutPause"></span>
+          Duration
+        </label>
         <div class="time-inputs">
           <div class="input-group">
             <label>{{ t('common.hours', 'Hours') }}</label>
@@ -33,20 +39,51 @@
       </div>
 
       <div class="setup-section">
-        <label class="section-label">🔒 Lock Password</label>
+        <label class="section-label">
+          <span class="icon" v-html="Icons.focusMusic"></span>
+          Background Music (Optional)
+        </label>
+        <div class="music-selection">
+          <select v-model="selectedMusic" class="music-select">
+            <option value="">No music</option>
+            <option v-for="track in musicFiles" :key="track.filename" :value="track.filename">
+              {{ track.filename }}
+            </option>
+          </select>
+          <div class="music-buttons">
+            <button @click="addMusicFile" class="btn-music-folder" title="Add music file">
+              <span v-html="Icons.musicFolder"></span>
+            </button>
+            <button @click="removeMusicFile" class="btn-music-folder btn-delete" :disabled="!selectedMusic" title="Remove selected file">
+              <span v-html="Icons.tasksDelete"></span>
+            </button>
+          </div>
+        </div>
+        <div v-if="selectedMusic" class="music-preview">
+          <button @click="previewMusic" class="btn-preview" :disabled="isPreviewing">
+            {{ isPreviewing ? 'Stop Preview' : 'Preview' }}
+          </button>
+        </div>
+      </div>
+
+      <div class="setup-section">
+        <label class="section-label">
+          <span class="icon" v-html="Icons.focusLock"></span>
+          Lock Password
+        </label>
         <input type="password" v-model="password" class="password-input" placeholder="Enter a password to lock..." />
         <p class="hint">You'll need this password to cancel focus mode early</p>
       </div>
 
       <button @click="startFocus" class="btn-start" :disabled="!canStart">
-        🚀 Start Focus Mode
+        Start Focus Mode
       </button>
     </div>
 
     <!-- Active State -->
     <div v-else class="focus-active">
       <div class="focus-target">
-        <div class="target-badge">🎯</div>
+        <div class="target-badge" v-html="Icons.focusTarget"></div>
         <div class="target-info">
           <span class="target-name">{{ status.app_name }}</span>
           <span class="target-label">Focused Application</span>
@@ -61,12 +98,46 @@
         <div class="time-display">{{ formattedTime }}</div>
       </div>
 
+      <!-- Music Player -->
+      <div v-if="musicFiles.length > 0" class="music-player">
+        <div class="now-playing">
+          <span class="music-icon" v-html="Icons.focusMusic"></span>
+          <span class="track-name">{{ musicStatus.current_track || 'No track selected' }}</span>
+        </div>
+        <div class="player-controls">
+          <button @click="prevTrack" class="control-btn" title="Previous track">
+            <span v-html="Icons.musicPrev"></span>
+          </button>
+          <button @click="togglePlayPause" class="control-btn play-btn" :title="musicStatus.is_playing ? 'Pause' : 'Play'">
+            <span v-html="musicStatus.is_playing ? Icons.musicPause : Icons.musicPlay"></span>
+          </button>
+          <button @click="nextTrack" class="control-btn" title="Next track">
+            <span v-html="Icons.musicNext"></span>
+          </button>
+          <button @click="toggleLoop" class="control-btn" :class="{ active: isLooping }" title="Toggle loop">
+            <span v-html="Icons.musicLoop"></span>
+          </button>
+        </div>
+        <div class="volume-control">
+          <span class="volume-icon" v-html="Icons.musicVolume"></span>
+          <input type="range" v-model.number="volume" min="0" max="100" @input="changeVolume" class="volume-slider" />
+          <span class="volume-value">{{ volume }}%</span>
+        </div>
+        <select v-model="selectedTrack" @change="changeTrack" class="track-select">
+          <option value="" disabled>Select a track...</option>
+          <option v-for="track in musicFiles" :key="track.filename" :value="track.filename">
+            {{ track.filename }}
+          </option>
+        </select>
+      </div>
+
       <p class="focus-message">Other apps will be blocked</p>
 
       <div class="cancel-section">
         <input type="password" v-model="cancelPassword" class="password-input small" placeholder="Enter password to cancel..." />
         <button @click="stopFocus" class="btn-cancel">
-          ✋ Cancel Focus
+          <span v-html="Icons.cancelFocus"></span>
+          Cancel Focus
         </button>
         <p v-if="cancelError" class="error-text">{{ cancelError }}</p>
       </div>
@@ -75,9 +146,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { invoke } from '@tauri-apps/api/core';
+import { Icons } from './icons/IconMap';
+import { open } from '@tauri-apps/plugin-dialog';
 
 const { t } = useI18n();
 
@@ -95,6 +168,17 @@ interface FocusStatus {
   total_secs: number;
 }
 
+interface MusicFile {
+  filename: string;
+  path: string;
+}
+
+interface MusicPlaybackStatus {
+  is_playing: boolean;
+  current_track: string | null;
+  volume: number;
+}
+
 const recentApps = ref<AppSummary[]>([]);
 const selectedApp = ref<AppSummary | null>(null);
 const hours = ref<number>(0);
@@ -105,6 +189,19 @@ const cancelPassword = ref('');
 const cancelError = ref('');
 const status = ref<FocusStatus | null>(null);
 let pollInterval: number | null = null;
+
+// Music state
+const musicFiles = ref<MusicFile[]>([]);
+const selectedMusic = ref<string>('');
+const selectedTrack = ref<string>('');
+const musicStatus = ref<MusicPlaybackStatus>({
+  is_playing: false,
+  current_track: null,
+  volume: 0.5,
+});
+const volume = ref<number>(50);
+const isLooping = ref<boolean>(false);
+const isPreviewing = ref<boolean>(false);
 
 const canStart = computed(() => selectedApp.value && (hours.value > 0 || minutes.value > 0 || seconds.value > 0) && password.value.length >= 1);
 
@@ -197,13 +294,212 @@ function startPolling() {
   }, 1000);
 }
 
+// Music functions
+async function loadMusicFiles() {
+  try {
+    musicFiles.value = await invoke<MusicFile[]>('get_music_files_cmd');
+  } catch (e) {
+    console.error('Failed to load music files:', e);
+  }
+}
+
+async function addMusicFile() {
+  try {
+    const selected = await open({
+      multiple: false,
+      filters: [{
+        name: 'Audio',
+        extensions: ['mp3', 'wav', 'ogg', 'flac']
+      }]
+    });
+    
+    if (selected) {
+      await invoke('add_music_file_cmd', { sourcePath: selected });
+      await loadMusicFiles();
+    }
+  } catch (e) {
+    console.error('Failed to add music file:', e);
+  }
+}
+
+async function removeMusicFile() {
+  if (!selectedMusic.value) return;
+  
+  try {
+    const track = musicFiles.value.find(f => f.filename === selectedMusic.value);
+    if (track) {
+      await invoke('delete_music_file_cmd', { path: track.path });
+      selectedMusic.value = '';
+      await loadMusicFiles();
+    }
+  } catch (e) {
+    console.error('Failed to remove music file:', e);
+  }
+}
+
+async function previewMusic() {
+  if (!selectedMusic.value) return;
+
+  if (isPreviewing.value) {
+    await stopMusic();
+    isPreviewing.value = false;
+  } else {
+    try {
+      const track = musicFiles.value.find(f => f.filename === selectedMusic.value);
+      if (track) {
+        await invoke('play_music_cmd', { filename: track.path });
+        isPreviewing.value = true;
+        await updateMusicStatus();
+      }
+    } catch (e) {
+      console.error('Failed to preview music:', e);
+    }
+  }
+}
+
+async function startMusicPlayback() {
+  if (!selectedMusic.value) return;
+  try {
+    const track = musicFiles.value.find(f => f.filename === selectedMusic.value);
+    if (track) {
+      await invoke('play_music_cmd', { filename: track.path });
+      await updateMusicStatus();
+    }
+  } catch (e) {
+    console.error('Failed to play music:', e);
+  }
+}
+
+async function stopMusic() {
+  try {
+    await invoke('stop_music_cmd');
+    isPreviewing.value = false;
+    await updateMusicStatus();
+  } catch (e) {
+    console.error('Failed to stop music:', e);
+  }
+}
+
+async function togglePlayPause() {
+  try {
+    if (musicStatus.value.is_playing) {
+      await invoke('pause_music_cmd');
+    } else {
+      await invoke('resume_music_cmd');
+    }
+    await updateMusicStatus();
+  } catch (e) {
+    console.error('Failed to toggle play/pause:', e);
+  }
+}
+
+async function changeTrack() {
+  if (!selectedTrack.value) return;
+  try {
+    const track = musicFiles.value.find(f => f.filename === selectedTrack.value);
+    if (track) {
+      await invoke('play_music_cmd', { filename: track.path });
+      await updateMusicStatus();
+    }
+  } catch (e) {
+    console.error('Failed to change track:', e);
+  }
+}
+
+async function changeVolume() {
+  try {
+    await invoke('set_music_volume_cmd', { volume: volume.value / 100 });
+  } catch (e) {
+    console.error('Failed to change volume:', e);
+  }
+}
+
+async function toggleLoop() {
+  try {
+    isLooping.value = await invoke('toggle_music_loop_cmd');
+  } catch (e) {
+    console.error('Failed to toggle loop:', e);
+  }
+}
+
+async function prevTrack() {
+  if (musicFiles.value.length === 0) return;
+  const currentIndex = musicFiles.value.findIndex(f => f.filename === musicStatus.value.current_track);
+  const prevIndex = currentIndex <= 0 ? musicFiles.value.length - 1 : currentIndex - 1;
+  const track = musicFiles.value[prevIndex];
+  selectedTrack.value = track.filename;
+  try {
+    await invoke('play_music_cmd', { filename: track.path });
+    await updateMusicStatus();
+  } catch (e) {
+    console.error('Failed to change track:', e);
+  }
+}
+
+async function nextTrack() {
+  if (musicFiles.value.length === 0) return;
+  const currentIndex = musicFiles.value.findIndex(f => f.filename === musicStatus.value.current_track);
+  const nextIndex = currentIndex >= musicFiles.value.length - 1 ? 0 : currentIndex + 1;
+  const track = musicFiles.value[nextIndex];
+  selectedTrack.value = track.filename;
+  try {
+    await invoke('play_music_cmd', { filename: track.path });
+    await updateMusicStatus();
+  } catch (e) {
+    console.error('Failed to change track:', e);
+  }
+}
+
+async function updateMusicStatus() {
+  try {
+    musicStatus.value = await invoke<MusicPlaybackStatus>('get_music_status_cmd');
+    volume.value = Math.round(musicStatus.value.volume * 100);
+  } catch (e) {
+    console.error('Failed to get music status:', e);
+  }
+}
+
+let musicStatusInterval: number | null = null;
+
+function startMusicStatusPolling() {
+  if (musicStatusInterval) clearInterval(musicStatusInterval);
+  musicStatusInterval = window.setInterval(() => {
+    updateMusicStatus();
+  }, 500);
+}
+
+function stopMusicStatusPolling() {
+  if (musicStatusInterval) {
+    clearInterval(musicStatusInterval);
+    musicStatusInterval = null;
+  }
+}
+
+// Watch for focus mode state changes
+watch(status, (newStatus) => {
+  if (newStatus && newStatus.active) {
+    // Focus mode started
+    if (selectedMusic.value) {
+      startMusicPlayback();
+    }
+    startMusicStatusPolling();
+  } else {
+    // Focus mode ended
+    stopMusic();
+    stopMusicStatusPolling();
+  }
+}, { immediate: true });
+
 onMounted(() => {
   loadApps();
   loadStatus();
+  loadMusicFiles();
 });
 
 onUnmounted(() => {
   if (pollInterval) clearInterval(pollInterval);
+  if (musicStatusInterval) clearInterval(musicStatusInterval);
+  stopMusic();
 });
 </script>
 
@@ -221,9 +517,24 @@ onUnmounted(() => {
 }
 
 .section-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-weight: 600;
   font-size: 0.9rem;
   color: var(--text-primary);
+}
+
+.section-label .icon {
+  display: inline-flex;
+  width: 20px;
+  height: 20px;
+  color: #a78bfa;
+}
+
+.section-label .icon svg {
+  width: 100%;
+  height: 100%;
 }
 
 .app-select {
@@ -348,7 +659,17 @@ onUnmounted(() => {
   width: 100%;
 }
 .target-badge {
-  font-size: 1.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  color: #a78bfa;
+}
+
+.target-badge svg {
+  width: 32px;
+  height: 32px;
 }
 .target-info {
   display: flex;
@@ -412,15 +733,25 @@ circle {
 }
 
 .btn-cancel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   background: rgba(239, 68, 68, 0.15);
   color: #ef4444;
   border: 1px solid rgba(239, 68, 68, 0.3);
-  padding: 10px;
+  padding: 10px 16px;
   border-radius: 10px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
 }
+
+.btn-cancel svg {
+  width: 20px;
+  height: 20px;
+}
+
 .btn-cancel:hover {
   background: rgba(239, 68, 68, 0.25);
 }
@@ -429,5 +760,283 @@ circle {
   color: #ef4444;
   font-size: 0.85rem;
   margin: 0;
+}
+
+/* Music Selection */
+.music-selection {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.music-select {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  appearance: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.music-select:focus {
+  outline: none;
+  border-color: #8b5cf6;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+}
+
+.music-select option {
+  background: #1a1a2e;
+  color: white;
+}
+
+.music-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-music-folder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  background: rgba(139, 92, 246, 0.2);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  color: white;
+  padding: 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-music-folder svg {
+  width: 24px;
+  height: 24px;
+}
+
+.btn-music-folder:hover:not(:disabled) {
+  background: rgba(139, 92, 246, 0.3);
+}
+
+.btn-music-folder:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn-music-folder.btn-delete {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.btn-music-folder.btn-delete:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.3);
+}
+
+.music-preview {
+  margin-top: 8px;
+}
+
+.btn-preview {
+  background: rgba(139, 92, 246, 0.2);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  color: #a78bfa;
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-preview:hover:not(:disabled) {
+  background: rgba(139, 92, 246, 0.3);
+}
+.btn-preview:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Music Player */
+.music-player {
+  width: 100%;
+  background: rgba(139, 92, 246, 0.1);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  border-radius: 16px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.now-playing {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+}
+
+.music-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  color: #a78bfa;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.music-icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.track-name {
+  font-size: 0.95rem;
+  color: #a78bfa;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.player-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+}
+
+.control-btn {
+  background: rgba(139, 92, 246, 0.2);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  color: white;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.control-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+.control-btn:hover {
+  background: rgba(139, 92, 246, 0.3);
+  transform: scale(1.05);
+}
+
+.control-btn.play-btn {
+  width: 52px;
+  height: 52px;
+  background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+  border: none;
+}
+
+.control-btn.play-btn svg {
+  width: 24px;
+  height: 24px;
+}
+
+.control-btn.play-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+}
+
+.control-btn.active {
+  background: rgba(139, 92, 246, 0.5);
+  border-color: #a78bfa;
+}
+
+.volume-control {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+}
+
+.volume-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  color: var(--text-muted);
+}
+
+.volume-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.volume-slider {
+  flex: 1;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.1);
+  appearance: none;
+  cursor: pointer;
+}
+.volume-slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #8b5cf6;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.volume-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+.volume-slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #8b5cf6;
+  cursor: pointer;
+  border: none;
+}
+
+.volume-value {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  min-width: 40px;
+  text-align: right;
+}
+
+.track-select {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  appearance: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.track-select:focus {
+  outline: none;
+  border-color: #8b5cf6;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+}
+.track-select option {
+  background: #1a1a2e;
+  color: white;
 }
 </style>

@@ -228,9 +228,43 @@
                   <p class="setting-description">{{ $t("settings.exportDataDesc") }}</p>
                 </div>
               </div>
-              <button class="btn btn-primary" @click="exportData" :disabled="isExporting">
-                {{ isExporting ? $t("settings.exporting") : $t("settings.exportData") }}
-              </button>
+              <div class="export-buttons">
+                <button class="btn btn-secondary" @click="exportData('csv')" :disabled="isExporting">
+                  CSV
+                </button>
+                <button class="btn btn-secondary" @click="exportData('html')" :disabled="isExporting">
+                  HTML (Beautiful)
+                </button>
+              </div>
+            </div>
+
+            <div class="setting-item auto-export-item">
+              <div class="setting-left">
+                <div class="setting-icon" v-html="Icons.update"></div>
+                <div class="setting-content">
+                  <label class="setting-label">Auto-Export</label>
+                  <p class="setting-description">Automatically export data at regular intervals</p>
+                </div>
+              </div>
+              <div class="auto-export-settings">
+                <label class="toggle-switch">
+                  <input type="checkbox" v-model="autoExportEnabled" @change="saveAutoExportSettings" />
+                  <span class="toggle-slider"></span>
+                </label>
+                <div v-if="autoExportEnabled" class="auto-export-options">
+                  <select v-model="autoExportInterval" @change="saveAutoExportSettings" class="interval-select">
+                    <option :value="1">Every hour</option>
+                    <option :value="6">Every 6 hours</option>
+                    <option :value="12">Every 12 hours</option>
+                    <option :value="24">Daily</option>
+                    <option :value="48">Every 2 days</option>
+                  </select>
+                  <span v-if="autoExportFolder" class="folder-path" :title="autoExportFolder">{{ autoExportFolder }}</span>
+                  <button @click="selectExportFolder" class="btn btn-secondary btn-small">
+                    📁 Select
+                  </button>
+                </div>
+              </div>
             </div>
 
             <div class="setting-item danger-zone">
@@ -386,7 +420,7 @@ import { relaunch } from '@tauri-apps/plugin-process';
 import { getVersion } from '@tauri-apps/api/app';
 import { useNotificationStore } from "../stores/notifications";
 import { Icons } from "../components/icons/IconMap";
-import { save } from '@tauri-apps/plugin-dialog';
+import { save, open } from '@tauri-apps/plugin-dialog';
 
 const { locale, t } = useI18n();
 const store = useActivityStore();
@@ -644,15 +678,61 @@ const resetConfirmText = ref('');
 const isResetting = ref(false);
 const isExporting = ref(false);
 
-async function exportData() {
+// Auto-export settings
+const autoExportEnabled = ref(false);
+const autoExportInterval = ref(24);
+const autoExportFolder = ref('');
+
+async function loadAutoExportSettings() {
+  try {
+    const settings: any = await invoke('get_auto_export_settings_cmd');
+    autoExportEnabled.value = settings.enabled;
+    autoExportInterval.value = settings.interval_hours;
+    autoExportFolder.value = settings.folder || '';
+  } catch (e) {
+    console.error('Failed to load auto-export settings:', e);
+  }
+}
+
+async function saveAutoExportSettings() {
+  try {
+    await invoke('save_auto_export_settings_cmd', {
+      enabled: autoExportEnabled.value,
+      intervalHours: autoExportInterval.value,
+      folder: autoExportFolder.value
+    });
+    notifications.success('Auto-export settings saved');
+  } catch (e) {
+    console.error('Failed to save auto-export settings:', e);
+    notifications.error('Failed to save settings');
+  }
+}
+
+async function selectExportFolder() {
+  try {
+    const folder = await open({
+      directory: true,
+      multiple: false,
+      defaultPath: autoExportFolder.value || undefined
+    });
+    if (folder) {
+      autoExportFolder.value = Array.isArray(folder) ? folder[0] : folder;
+      saveAutoExportSettings();
+    }
+  } catch (e) {
+    console.error('Failed to select folder:', e);
+  }
+}
+
+async function exportData(format: 'csv' | 'html' = 'csv') {
   isExporting.value = true;
   try {
     const filePath = await save({
-      defaultPath: `TimiGS_Activity_${new Date().toISOString().slice(0, 10)}.csv`,
-      filters: [{ name: 'CSV', extensions: ['csv'] }],
+      defaultPath: `TimiGS_Activity_${new Date().toISOString().slice(0, 10)}.${format}`,
+      filters: [{ name: format.toUpperCase(), extensions: [format] }],
     });
     if (filePath) {
-      await invoke('export_data_csv_cmd', { path: filePath });
+      await invoke(format === 'csv' ? 'export_data_csv_cmd' : 'export_data_html_cmd', { path: filePath });
       notifications.success(t('settings.exportSuccess'));
     }
   } catch (e: any) {
@@ -684,6 +764,7 @@ async function confirmResetData() {
 onMounted(() => {
   // Delay slightly to allow transition
   setTimeout(initSettings, 100);
+  loadAutoExportSettings();
 });
 </script>
 
@@ -1143,6 +1224,138 @@ onMounted(() => {
 .modern-select.open {
   border-color: var(--color-primary);
   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+/* Export Buttons */
+.export-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.export-buttons .btn {
+  min-width: 80px;
+}
+
+/* Auto-Export Settings */
+.auto-export-item {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.auto-export-settings {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.auto-export-options {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  flex: 1;
+  min-width: 0;
+}
+
+.interval-select {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.folder-path {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 200px;
+  display: block;
+}
+
+.btn-small {
+  padding: 8px 12px;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+/* Toggle Switch */
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 26px;
+  cursor: pointer;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.1);
+  transition: 0.3s;
+  border-radius: 26px;
+}
+
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 2px;
+  bottom: 2px;
+  background-color: var(--text-muted);
+  transition: 0.3s;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.toggle-switch input:checked + .toggle-slider {
+  background-color: var(--color-primary);
+}
+
+.toggle-switch input:checked + .toggle-slider:before {
+  transform: translateX(24px);
+  background-color: white;
+}
+
+/* Legacy toggle-switch (div-based) */
+.toggle-switch.checked .toggle-thumb {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  transform: translateX(24px);
+}
+
+.toggle-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  background-color: var(--text-muted);
+  transition: 0.3s;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 /* Responsive */

@@ -3,20 +3,20 @@
     <div class="widget-header">
       <h3>{{ $t('tasks.title', 'Tasks & Goals') }}</h3>
       <div class="header-actions">
-        <button 
-          @click="viewMode = viewMode === 'active' ? 'history' : 'active'" 
-          class="btn-icon header-btn" 
+        <button
+          @click="viewMode = viewMode === 'active' ? 'history' : 'active'"
+          class="btn-icon header-btn"
           :title="viewMode === 'active' ? 'View History' : 'View Active'"
         >
-          {{ viewMode === 'active' ? '🕒' : '📝' }}
+          <span v-html="viewMode === 'active' ? Icons.tasksHistory : Icons.tasksActive"></span>
         </button>
-        <button 
+        <button
             v-if="viewMode === 'history'"
-            @click="exportCsv" 
-            class="btn-icon header-btn" 
+            @click="exportCsv"
+            class="btn-icon header-btn"
             title="Export CSV"
         >
-          💾
+          <span v-html="Icons.tasksExport"></span>
         </button>
       </div>
     </div>
@@ -45,7 +45,9 @@
              <span class="status-badge" :class="task.status">
                {{ task.status }}
              </span>
-             <button @click="deleteTask(task.id)" class="btn-icon delete-btn" title="Delete">✕</button>
+             <button @click="deleteTask(task.id)" class="btn-icon delete-btn" title="Delete">
+               <span v-html="Icons.tasksDelete"></span>
+             </button>
           </div>
         </div>
         
@@ -67,12 +69,12 @@
 
     <!-- Add Button / Form (Only in Active View) -->
     <div v-if="viewMode === 'active'" class="widget-footer">
-      <button 
+      <button
         v-if="!showAddForm"
         @click="openAddForm"
         class="btn-primary full-width"
       >
-        <span>+</span> {{ $t('tasks.addTask', 'Add New Task') }}
+        <span v-html="Icons.tasksAdd"></span> {{ $t('tasks.addTask', 'Add New Task') }}
       </button>
 
       <!-- Add Form -->
@@ -152,8 +154,12 @@
         </div>
         
         <div class="form-actions">
-          <button @click="addTask" class="btn-primary flex-1">{{ $t('tasks.create', 'Create') }}</button>
-          <button @click="showAddForm = false" class="btn-secondary flex-1">{{ $t('tasks.cancel', 'Cancel') }}</button>
+          <button @click="addTask" class="btn-primary flex-1">
+            <span v-html="Icons.tasksCheck"></span> {{ $t('tasks.create', 'Create') }}
+          </button>
+          <button @click="showAddForm = false" class="btn-secondary flex-1">
+            <span v-html="Icons.tasksCancel"></span> {{ $t('tasks.cancel', 'Cancel') }}
+          </button>
         </div>
       </div>
     </div>
@@ -163,6 +169,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { invoke } from '@tauri-apps/api/core';
+import { Icons } from './icons/IconMap';
 
 interface Task {
   id: number;
@@ -439,7 +446,16 @@ onUnmounted(() => {
     border: 1px solid var(--border);
     border-radius: 6px;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
+
+.header-btn svg {
+    width: 18px;
+    height: 18px;
+}
+
 .header-btn:hover { background: var(--bg-tertiary); }
 
 .tasks-list {
@@ -580,6 +596,14 @@ onUnmounted(() => {
 .delete-btn {
   color: var(--text-muted);
   font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.delete-btn svg {
+  width: 18px;
+  height: 18px;
 }
 
 .delete-btn:hover {
@@ -643,6 +667,11 @@ onUnmounted(() => {
   gap: 8px;
 }
 
+.btn-primary svg {
+  width: 18px;
+  height: 18px;
+}
+
 .btn-primary:hover {
   background: var(--primary-dark);
 }
@@ -655,6 +684,15 @@ onUnmounted(() => {
     border-radius: var(--radius-md);
     cursor: pointer;
     transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-secondary svg {
+    width: 18px;
+    height: 18px;
 }
 
 .btn-secondary:hover {

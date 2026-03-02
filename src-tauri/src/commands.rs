@@ -383,6 +383,68 @@ pub fn delete_project_task_cmd(id: i64) -> Result<(), String> {
     crate::db::delete_project_task(id).map_err(|e| e.to_string())
 }
 
+#[tauri::command]
+pub fn get_music_files_cmd(
+    app_handle: tauri::AppHandle,
+) -> Result<Vec<crate::music::MusicFile>, String> {
+    crate::music::get_music_files(&app_handle)
+}
+
+#[tauri::command]
+pub fn add_music_file_cmd(
+    app_handle: tauri::AppHandle,
+    source_path: String,
+) -> Result<crate::music::MusicFile, String> {
+    crate::music::add_music_path(&app_handle, source_path)
+}
+
+#[tauri::command]
+pub fn delete_music_file_cmd(app_handle: tauri::AppHandle, path: String) -> Result<(), String> {
+    crate::music::remove_music_path(&app_handle, path)
+}
+
+#[tauri::command]
+pub fn open_music_folder_cmd(app_handle: tauri::AppHandle) -> Result<(), String> {
+    crate::music::open_music_folder(&app_handle)
+}
+
+// ── Music Playback ──
+
+#[tauri::command]
+pub fn play_music_cmd(app_handle: tauri::AppHandle, filename: String) -> Result<(), String> {
+    crate::music::play_music(&app_handle, &filename)
+}
+
+#[tauri::command]
+pub fn pause_music_cmd() -> Result<(), String> {
+    crate::music::pause_music()
+}
+
+#[tauri::command]
+pub fn resume_music_cmd() -> Result<(), String> {
+    crate::music::resume_music()
+}
+
+#[tauri::command]
+pub fn stop_music_cmd() -> Result<(), String> {
+    crate::music::stop_music()
+}
+
+#[tauri::command]
+pub fn get_music_status_cmd() -> Result<crate::music::MusicPlaybackStatus, String> {
+    crate::music::get_music_status()
+}
+
+#[tauri::command]
+pub fn set_music_volume_cmd(volume: f32) -> Result<(), String> {
+    crate::music::set_music_volume(volume)
+}
+
+#[tauri::command]
+pub fn toggle_music_loop_cmd() -> Result<bool, String> {
+    crate::music::toggle_music_loop()
+}
+
 // ── Data Management ──
 
 #[command]
@@ -393,4 +455,33 @@ pub fn reset_all_data_cmd() -> Result<(), String> {
 #[command]
 pub fn export_data_csv_cmd(path: String) -> Result<(), String> {
     crate::db::export_sessions_csv(&path).map_err(|e| e.to_string())
+}
+
+#[command]
+pub fn export_data_html_cmd(path: String) -> Result<(), String> {
+    crate::db::export_sessions_html(&path).map_err(|e| e.to_string())
+}
+
+#[command]
+pub fn save_auto_export_settings_cmd(
+    enabled: bool,
+    interval_hours: i64,
+    folder: String,
+) -> Result<(), String> {
+    let mut settings = crate::db::get_settings();
+    settings.auto_export_enabled = enabled;
+    settings.auto_export_interval_hours = interval_hours;
+    settings.auto_export_folder = folder;
+    crate::db::save_settings(&settings).map_err(|e| e.to_string())
+}
+
+#[command]
+pub fn get_auto_export_settings_cmd() -> Result<serde_json::Value, String> {
+    let settings = crate::db::get_settings();
+    Ok(serde_json::json!({
+        "enabled": settings.auto_export_enabled,
+        "interval_hours": settings.auto_export_interval_hours,
+        "folder": settings.auto_export_folder,
+        "last_export_time": settings.last_export_time
+    }))
 }
