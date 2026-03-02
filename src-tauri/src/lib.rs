@@ -121,7 +121,10 @@ pub fn run() {
             let analytics_mi = MenuItem::with_id(app, "nav_analytics", "📈 Analytics", true, None::<&str>).unwrap();
             
             // Tracking toggle
+            #[cfg(target_os = "windows")]
             let is_tracking = crate::tracker::is_tracking();
+            #[cfg(not(target_os = "windows"))]
+            let is_tracking = false;
             let tracking_label = if is_tracking { "⏹️ Stop Tracking" } else { "▶️ Start Tracking" };
             let tracking_mi = MenuItem::with_id(app, "toggle_tracking", tracking_label, true, None::<&str>).unwrap();
             
@@ -181,10 +184,13 @@ pub fn run() {
                             }
                         }
                         "toggle_tracking" => {
-                            if crate::tracker::is_tracking() {
-                                crate::tracker::stop_tracking();
-                            } else {
-                                crate::tracker::start_tracking();
+                            #[cfg(target_os = "windows")]
+                            {
+                                if crate::tracker::is_tracking() {
+                                    crate::tracker::stop_tracking();
+                                } else {
+                                    crate::tracker::start_tracking();
+                                }
                             }
                         }
                         "show" => {
