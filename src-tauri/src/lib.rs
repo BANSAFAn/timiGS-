@@ -157,7 +157,10 @@ pub fn run() {
                     let window = app.get_webview_window("main");
                     let id = event.id.as_ref();
                     
+                    eprintln!("Tray menu event: {}", id);
+                    
                     if id == "nav_dashboard" {
+                        eprintln!("Navigating to dashboard");
                         if let Some(w) = &window {
                             let _ = w.show();
                             let _ = w.set_focus();
