@@ -154,61 +154,49 @@ pub fn run() {
                 .menu(&tray_menu)
                 .show_menu_on_left_click(true)
                 .on_menu_event(|app, event| {
-                    // Get the main window (first window that's not "tray")
-                    let windows = app.webview_windows();
-                    let main_window = windows.iter()
-                        .find(|(label, _)| *label != "tray")
-                        .and_then(|(_, window)| Some(window.clone()));
-
-                    match event.id.as_ref() {
-                        "nav_dashboard" => {
-                            if let Some(window) = main_window.as_ref() {
-                                let _ = window.show();
-                                let _ = window.set_focus();
-                                let _ = app.emit("navigate", "/");
+                    let window = app.get_webview_window("main");
+                    let id = event.id.as_ref();
+                    
+                    if id == "nav_dashboard" {
+                        if let Some(w) = &window {
+                            let _ = w.show();
+                            let _ = w.set_focus();
+                        }
+                        let _ = app.emit("navigate", "/");
+                    } else if id == "nav_timeline" {
+                        if let Some(w) = &window {
+                            let _ = w.show();
+                            let _ = w.set_focus();
+                        }
+                        let _ = app.emit("navigate", "/timeline");
+                    } else if id == "nav_tools" {
+                        if let Some(w) = &window {
+                            let _ = w.show();
+                            let _ = w.set_focus();
+                        }
+                        let _ = app.emit("navigate", "/tools");
+                    } else if id == "nav_analytics" {
+                        if let Some(w) = &window {
+                            let _ = w.show();
+                            let _ = w.set_focus();
+                        }
+                        let _ = app.emit("navigate", "/analytics");
+                    } else if id == "toggle_tracking" {
+                        #[cfg(target_os = "windows")]
+                        {
+                            if crate::tracker::is_tracking() {
+                                crate::tracker::stop_tracking();
+                            } else {
+                                crate::tracker::start_tracking();
                             }
                         }
-                        "nav_timeline" => {
-                            if let Some(window) = main_window.as_ref() {
-                                let _ = window.show();
-                                let _ = window.set_focus();
-                                let _ = app.emit("navigate", "/timeline");
-                            }
+                    } else if id == "show" {
+                        if let Some(w) = &window {
+                            let _ = w.show();
+                            let _ = w.set_focus();
                         }
-                        "nav_tools" => {
-                            if let Some(window) = main_window.as_ref() {
-                                let _ = window.show();
-                                let _ = window.set_focus();
-                                let _ = app.emit("navigate", "/tools");
-                            }
-                        }
-                        "nav_analytics" => {
-                            if let Some(window) = main_window.as_ref() {
-                                let _ = window.show();
-                                let _ = window.set_focus();
-                                let _ = app.emit("navigate", "/analytics");
-                            }
-                        }
-                        "toggle_tracking" => {
-                            #[cfg(target_os = "windows")]
-                            {
-                                if crate::tracker::is_tracking() {
-                                    crate::tracker::stop_tracking();
-                                } else {
-                                    crate::tracker::start_tracking();
-                                }
-                            }
-                        }
-                        "show" => {
-                            if let Some(window) = main_window.as_ref() {
-                                let _ = window.show();
-                                let _ = window.set_focus();
-                            }
-                        }
-                        "quit" => {
-                            let _ = app.exit(0);
-                        }
-                        _ => {}
+                    } else if id == "quit" {
+                        let _ = app.exit(0);
                     }
                 })
                 .build(app)?;
