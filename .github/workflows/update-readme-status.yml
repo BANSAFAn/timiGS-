@@ -124,6 +124,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "docs: update platform build statuses [skip ci]"
+            git commit -m "docs: update platform build statuses"
             git push
           fi

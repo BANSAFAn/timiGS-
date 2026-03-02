@@ -154,30 +154,36 @@ pub fn run() {
                 .menu(&tray_menu)
                 .show_menu_on_left_click(true)
                 .on_menu_event(|app, event| {
+                    // Get the main window (first window that's not "tray")
+                    let windows = app.webview_windows();
+                    let main_window = windows.iter()
+                        .find(|(label, _)| *label != "tray")
+                        .and_then(|(_, window)| Some(window.clone()));
+
                     match event.id.as_ref() {
                         "nav_dashboard" => {
-                            if let Some(window) = app.get_webview_window("main") {
+                            if let Some(window) = main_window.as_ref() {
                                 let _ = window.show();
                                 let _ = window.set_focus();
                                 let _ = app.emit("navigate", "/");
                             }
                         }
                         "nav_timeline" => {
-                            if let Some(window) = app.get_webview_window("main") {
+                            if let Some(window) = main_window.as_ref() {
                                 let _ = window.show();
                                 let _ = window.set_focus();
                                 let _ = app.emit("navigate", "/timeline");
                             }
                         }
                         "nav_tools" => {
-                            if let Some(window) = app.get_webview_window("main") {
+                            if let Some(window) = main_window.as_ref() {
                                 let _ = window.show();
                                 let _ = window.set_focus();
                                 let _ = app.emit("navigate", "/tools");
                             }
                         }
                         "nav_analytics" => {
-                            if let Some(window) = app.get_webview_window("main") {
+                            if let Some(window) = main_window.as_ref() {
                                 let _ = window.show();
                                 let _ = window.set_focus();
                                 let _ = app.emit("navigate", "/analytics");
@@ -194,7 +200,7 @@ pub fn run() {
                             }
                         }
                         "show" => {
-                            if let Some(window) = app.get_webview_window("main") {
+                            if let Some(window) = main_window.as_ref() {
                                 let _ = window.show();
                                 let _ = window.set_focus();
                             }
