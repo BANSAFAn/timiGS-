@@ -530,14 +530,14 @@ async function toggleTracking() {
     try {
       // Check if permission is granted
       const hasPermission = await safeInvoke("check_usage_permission");
-      
+
       if (!hasPermission) {
         // Request permission
         const confirmed = confirm(
           "TimiGS needs 'Usage Access' permission to track app activity on Android. " +
           "You will be redirected to Settings to grant this permission."
         );
-        
+
         if (confirmed) {
           await safeInvoke("request_usage_permission");
           alert("Please grant 'Usage Access' permission in Settings, then try again.");
@@ -548,6 +548,33 @@ async function toggleTracking() {
       console.error("Permission check failed:", e);
       alert("Failed to check permissions: " + e);
       return;
+    }
+  }
+
+  // Check if on Linux and warn about dependencies
+  if (!store.isMobile && navigator.userAgent.includes("Linux")) {
+    // Check if xdotool or wmctrl is available
+    const { command } = await import('@tauri-apps/plugin-shell');
+    try {
+      const xdotoolCheck = await command('which', ['xdotool']).execute();
+      const wmctrlCheck = await command('which', ['wmctrl']).execute();
+      
+      if (!xdotoolCheck.stdout.trim() && !wmctrlCheck.stdout.trim()) {
+        const confirmed = confirm(
+          "On Linux, TimiGS requires either 'xdotool' or 'wmctrl' to track active windows.\n\n" +
+          "Please install one of them:\n" +
+          "  - Debian/Ubuntu: sudo apt install xdotool wmctrl\n" +
+          "  - Fedora: sudo dnf install xdotool wmctrl\n" +
+          "  - Arch: sudo pacman -S xdotool wmctrl\n\n" +
+          "Click OK to continue anyway, or Cancel to install first."
+        );
+        
+        if (!confirmed) {
+          return;
+        }
+      }
+    } catch (e) {
+      console.warn("Could not check for xdotool/wmctrl:", e);
     }
   }
 

@@ -1,4 +1,4 @@
-//! Windows activity tracker module
+//! Cross-platform activity tracker module
 
 use crate::db;
 #[cfg(desktop)]
@@ -117,9 +117,91 @@ fn get_foreground_window_info() -> Option<ActiveWindow> {
     }
 }
 
-#[cfg(not(windows))]
+#[cfg(target_os = "linux")]
 fn get_foreground_window_info() -> Option<ActiveWindow> {
-    // Stub for non-Windows platforms
+    use std::process::Command;
+    
+    // Try to get active window using xdotool (most reliable)
+    if let Ok(output) = Command::new("xdotool")
+        .args(["getactivewindow", "getwindowname"])
+        .output()
+    {
+        if output.status.success() {
+            if let Ok(title) = String::from_utf8(output.stdout) {
+                let title = title.trim().to_string();
+                if !title.is_empty() {
+                    // Try to get the window class/application name
+                    let app_name = Command::new("xdotool")
+                        .args(["getactivewindow", "getwindowclassname"])
+                        .output()
+                        .ok()
+                        .and_then(|o| String::from_utf8(o.stdout).ok())
+                        .map(|s| s.trim().to_string())
+                        .unwrap_or_else(|| "Unknown".to_string());
+                    
+                    // Get executable path from /proc if possible
+                    let exe_path = Command::new("xdotool")
+                        .args(["getactivewindow", "getwindowpid"])
+                        .output()
+                        .ok()
+                        .and_then(|o| String::from_utf8(o.stdout).ok())
+                        .and_then(|pid_str| {
+                            let pid = pid_str.trim();
+                            let proc_path = format!("/proc/{}/exe", pid);
+                            std::fs::read_link(&proc_path).ok()
+                        })
+                        .and_then(|p| p.into_os_string().into_string().ok())
+                        .unwrap_or_else(|| "unknown".to_string());
+                    
+                    // Filter ignored apps
+                    if app_name.eq_ignore_ascii_case("explorer")
+                        || app_name.eq_ignore_ascii_case("LockApp")
+                        || app_name.is_empty()
+                    {
+                        return None;
+                    }
+                    
+                    return Some(ActiveWindow {
+                        app_name,
+                        window_title: title,
+                        exe_path,
+                    });
+                }
+            }
+        }
+    }
+    
+    // Fallback: try wmctrl
+    if let Ok(output) = Command::new("wmctrl")
+        .arg("-lp")
+        .output()
+    {
+        if output.status.success() {
+            if let Ok(output_str) = String::from_utf8(output.stdout) {
+                // Get the last line (active window)
+                if let Some(line) = output_str.lines().last() {
+                    let parts: Vec<&str> = line.split_whitespace().collect();
+                    if parts.len() >= 3 {
+                        let app_name = parts[2].to_string();
+                        let title = parts[3..].join(" ");
+                        
+                        return Some(ActiveWindow {
+                            app_name,
+                            window_title: title,
+                            exe_path: "unknown".to_string(),
+                        });
+                    }
+                }
+            }
+        }
+    }
+    
+    None
+}
+
+#[cfg(not(any(windows, target_os = "linux")))]
+fn get_foreground_window_info() -> Option<ActiveWindow> {
+    // Stub for unsupported platforms (macOS, etc.)
     None
 }
 
@@ -144,37 +226,44 @@ pub fn start_tracking() {
         let mut ticker = 0;
 
         while RUNNING.load(Ordering::SeqCst) {
-            if let Some(active) = get_foreground_window_info() {
-                // Create new session if app OR window title changed
-                if active.exe_path != last_app || active.window_title != last_title {
-                    // End previous session
-                    if let Some(session) = CURRENT_SESSION.lock().take() {
-                        let _ = db::end_session(session.id);
-                    }
-
-                    // Start new session
-                    if let Ok(id) =
-                        db::start_session(&active.app_name, &active.window_title, &active.exe_path)
-                    {
-                        *CURRENT_SESSION.lock() = Some(CurrentSession {
-                            id,
-                            app_name: active.app_name.clone(),
-                            window_title: active.window_title.clone(),
-                            exe_path: active.exe_path.clone(),
-                        });
-
-                        // Update Discord Presence
-                        #[cfg(desktop)]
-                        if db::get_settings().discord_rpc {
-                            discord::update_presence(&active.app_name, &active.window_title);
-                        } else {
-                            discord::clear_presence();
+            // Use catch_unwind to prevent panics from crashing the thread
+            let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+                if let Some(active) = get_foreground_window_info() {
+                    // Create new session if app OR window title changed
+                    if active.exe_path != last_app || active.window_title != last_title {
+                        // End previous session
+                        if let Some(session) = CURRENT_SESSION.lock().take() {
+                            let _ = db::end_session(session.id);
                         }
-                    }
 
-                    last_app = active.exe_path;
-                    last_title = active.window_title;
+                        // Start new session
+                        if let Ok(id) =
+                            db::start_session(&active.app_name, &active.window_title, &active.exe_path)
+                        {
+                            *CURRENT_SESSION.lock() = Some(CurrentSession {
+                                id,
+                                app_name: active.app_name.clone(),
+                                window_title: active.window_title.clone(),
+                                exe_path: active.exe_path.clone(),
+                            });
+
+                            // Update Discord Presence
+                            #[cfg(desktop)]
+                            if db::get_settings().discord_rpc {
+                                discord::update_presence(&active.app_name, &active.window_title);
+                            } else {
+                                discord::clear_presence();
+                            }
+                        }
+
+                        last_app = active.exe_path;
+                        last_title = active.window_title;
+                    }
                 }
+            }));
+
+            if let Err(e) = result {
+                eprintln!("Tracking thread panicked: {:?}", e);
             }
 
             thread::sleep(Duration::from_secs(1));

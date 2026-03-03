@@ -99,9 +99,12 @@ pub fn run() {
         #[cfg(any(target_os = "android", target_os = "ios"))]
         let _ = app;
 
-        // Start tracking on app launch (only on desktop)
-        #[cfg(target_os = "windows")]
-        tracker::start_tracking();
+        // Start tracking on app launch (only on supported platforms)
+        #[cfg(any(target_os = "windows", target_os = "linux"))]
+        {
+            println!("Starting activity tracking for supported platform...");
+            tracker::start_tracking();
+        }
 
         #[cfg(target_os = "windows")]
         timeout::init_keyboard_hook();
