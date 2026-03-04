@@ -554,11 +554,11 @@ async function toggleTracking() {
   // Check if on Linux and warn about dependencies
   if (!store.isMobile && navigator.userAgent.includes("Linux")) {
     // Check if xdotool or wmctrl is available
-    const { command } = await import('@tauri-apps/plugin-shell');
+    const { Command } = await import('@tauri-apps/plugin-shell');
     try {
-      const xdotoolCheck = await command('which', ['xdotool']).execute();
-      const wmctrlCheck = await command('which', ['wmctrl']).execute();
-      
+      const xdotoolCheck = await Command.create('which', ['xdotool']).execute();
+      const wmctrlCheck = await Command.create('which', ['wmctrl']).execute();
+
       if (!xdotoolCheck.stdout.trim() && !wmctrlCheck.stdout.trim()) {
         const confirmed = confirm(
           "On Linux, TimiGS requires either 'xdotool' or 'wmctrl' to track active windows.\n\n" +
@@ -568,7 +568,7 @@ async function toggleTracking() {
           "  - Arch: sudo pacman -S xdotool wmctrl\n\n" +
           "Click OK to continue anyway, or Cancel to install first."
         );
-        
+
         if (!confirmed) {
           return;
         }
