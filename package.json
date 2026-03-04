@@ -1,5 +1,9 @@
 {
-  "name": "timiGS",
+  "name": "timigs",
+  "productName": "TimiGS",
+  "description": "TimiGS",
+  "author": "Baneronetwo",
+  "license": "nya",
   "private": true,
   "version": "1.0.1",
   "type": "module",

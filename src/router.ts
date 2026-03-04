@@ -50,6 +50,11 @@ const routes = [
     name: "Tray",
     component: () => import("./views/Tray.vue"),
   },
+  {
+    path: "/sync",
+    name: "Sync",
+    component: () => import("./views/Sync.vue"),
+  },
 
 ];
 

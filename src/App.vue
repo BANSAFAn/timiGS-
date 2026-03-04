@@ -51,6 +51,11 @@
           <span>{{ $t("projects.title") || "Projects" }}</span>
         </router-link>
 
+        <router-link to="/sync" class="nav-link" active-class="active">
+          <div class="nav-icon" v-html="Icons.sync"></div>
+          <span>{{ $t("nav.sync") || "Sync" }}</span>
+        </router-link>
+
         <router-link to="/settings" class="nav-link" active-class="active">
           <div class="nav-icon" v-html="Icons.settings"></div>
           <span>{{ $t("nav.settings") }}</span>
@@ -103,6 +108,11 @@
         <span>Projects</span>
       </router-link>
 
+      <router-link to="/sync" class="bottom-nav-item" active-class="active">
+        <div class="nav-icon-mobile" v-html="Icons.sync"></div>
+        <span>Sync</span>
+      </router-link>
+
       <router-link to="/settings" class="bottom-nav-item" active-class="active">
         <div class="nav-icon-mobile" v-html="Icons.settings"></div>
         <span>Setgs</span>
@@ -143,14 +153,16 @@ onMounted(async () => {
   await store.fetchSettings();
   document.documentElement.setAttribute("data-theme", store.settings.theme);
   checkGitHubConnection();
-  
+
   const { listen } = await import('@tauri-apps/api/event');
 
   await listen('navigate', (event: any) => {
-      console.log("Navigating to:", event.payload);
-      router.push(event.payload);
+      console.log("🧭 Navigation event received:", event.payload);
+      router.push(event.payload).catch(err => {
+        console.error("Navigation failed:", err);
+      });
   });
-  
+
   // Initialize Activity Tracking
   await store.fetchTrackingStatus();
   if (!store.isTracking) {
@@ -165,6 +177,8 @@ onMounted(async () => {
       e.stopPropagation();
     }
   });
+  
+  console.log("✅ App mounted, navigation listener ready");
 });
 </script>
 

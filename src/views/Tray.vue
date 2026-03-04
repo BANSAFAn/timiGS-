@@ -2,10 +2,12 @@
   <div class="tray-container">
     <div class="tray-header">
       <div class="logo">
-        <span class="logo-icon">⏱️</span>
+        <span class="logo-icon" v-html="Icons.clock"></span>
         <span class="logo-text">TimiGS</span>
       </div>
-      <button class="close-btn" @click="hideTray">×</button>
+      <button class="close-btn" @click="hideTray">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
     </div>
     
     <div class="tray-menu">
@@ -60,20 +62,36 @@ import { invoke } from "@tauri-apps/api/core";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { Icons } from "../components/icons/IconMap";
 
-// No dynamic resizing needed - using fixed size from config
-
 async function hideTray() {
-  await getCurrentWindow().hide();
+  try {
+    await getCurrentWindow().hide();
+  } catch (e) {
+    console.error("Failed to hide tray:", e);
+  }
 }
 
 async function navigateTo(path: string) {
-    await invoke("show_main_window_cmd"); 
+  try {
+    console.log("Navigating to:", path);
+    // First show main window
+    await invoke("show_main_window_cmd");
+    // Wait a bit for window to show
+    await new Promise(resolve => setTimeout(resolve, 100));
+    // Then navigate
     await invoke("emit_navigate_cmd", { path });
+    // Hide tray
     await hideTray();
+  } catch (e) {
+    console.error("Navigation failed:", e);
+  }
 }
 
 async function quitApp() {
-  await invoke("quit_app_cmd");
+  try {
+    await invoke("quit_app_cmd");
+  } catch (e) {
+    console.error("Quit failed:", e);
+  }
 }
 </script>
 
@@ -99,11 +117,21 @@ async function quitApp() {
 .logo {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
 
 .logo-icon {
-  font-size: 1.5rem;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #8b5cf6;
+}
+
+.logo-icon :deep(svg) {
+  width: 24px;
+  height: 24px;
 }
 
 .logo-text {

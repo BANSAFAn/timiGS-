@@ -89,20 +89,20 @@
                 </div>
               </div>
               <div class="theme-switcher-modern">
-                 <button 
-                   class="theme-btn-modern" 
+                 <button
+                   class="theme-btn-modern"
                    :class="{ active: localSettings.theme === 'dark' }"
                    @click="setTheme('dark')"
                  >
-                   <span class="theme-icon">🌙</span>
+                   <span class="theme-icon" v-html="Icons.theme"></span>
                    <span class="theme-label">Dark</span>
                  </button>
-                 <button 
-                   class="theme-btn-modern" 
+                 <button
+                   class="theme-btn-modern"
                    :class="{ active: localSettings.theme === 'light' }"
                    @click="setTheme('light')"
                  >
-                   <span class="theme-icon">☀️</span>
+                   <span class="theme-icon" v-html="Icons.themeLight"></span>
                    <span class="theme-label">Light</span>
                  </button>
               </div>
@@ -261,7 +261,7 @@
                   </select>
                   <span v-if="autoExportFolder" class="folder-path" :title="autoExportFolder">{{ autoExportFolder }}</span>
                   <button @click="selectExportFolder" class="btn btn-secondary btn-small">
-                    📁 Select
+                    <span style="margin-right: 4px;" v-html="Icons.folder"></span> Select
                   </button>
                 </div>
               </div>
@@ -376,7 +376,7 @@
           </div>
           <div class="update-modal-body">
             <p class="update-desc" style="color: #fbbf24; font-weight: 500">
-              ⚠️ {{ $t('settings.resetConfirmMsg') }}
+              <span style="margin-right: 6px;" v-html="Icons.warning"></span>{{ $t('settings.resetConfirmMsg') }}
             </p>
             <div style="margin-top: 16px">
               <label style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px; display: block">
@@ -441,7 +441,7 @@ const availableLanguages = [
 const currentLangFlag = computed(
   () =>
     availableLanguages.find((l) => l.code === localSettings.language)?.flag ||
-    "🌐"
+    `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>`
 );
 const currentLangName = computed(
   () =>

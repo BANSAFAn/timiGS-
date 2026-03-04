@@ -190,4 +190,85 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get timeoutWorking => 'Trabajando';
+
+  @override
+  String get sync => 'Sincronización';
+
+  @override
+  String get syncDevice => 'Sincronización de dispositivos';
+
+  @override
+  String get syncDescription => 'Sincronizar con PC y otros dispositivos';
+
+  @override
+  String get syncPairing => 'Vincular dispositivos';
+
+  @override
+  String get syncGenerateCode => 'Generar código';
+
+  @override
+  String get syncEnterCode => 'Introducir código';
+
+  @override
+  String get syncPairedDevices => 'Dispositivos vinculados';
+
+  @override
+  String get syncMethods => 'Métodos de sincronización';
+
+  @override
+  String get syncP2P => 'Modo P2P';
+
+  @override
+  String get syncAPI => 'API (Store-and-Forward)';
+
+  @override
+  String get syncEndpoint => 'Punto final de API';
+
+  @override
+  String get syncToken => 'Token de API';
+
+  @override
+  String get syncSave => 'Guardar configuración';
+
+  @override
+  String get syncQueue => 'Sincronizaciones pendientes';
+
+  @override
+  String get syncNow => 'Sincronizar ahora';
+
+  @override
+  String get syncBackup => 'Copia de seguridad';
+
+  @override
+  String get syncExport => 'Exportar';
+
+  @override
+  String get syncImport => 'Importar';
+
+  @override
+  String get syncSettings => 'Configuración de sync';
+
+  @override
+  String get syncEnable => 'Activar sincronización';
+
+  @override
+  String get syncAuto => 'Sincronización automática';
+
+  @override
+  String get syncClear => 'Borrar datos de sync';
+
+  @override
+  String get syncConnected => 'Conectado';
+
+  @override
+  String get syncDisconnected => 'Desconectado';
+
+  @override
+  String get syncConnecting => 'Conectando';
+
+  @override
+  String get syncError => 'Error';
+
+  @override
+  String get syncNeverSynced => 'Nunca sincronizado';
 }

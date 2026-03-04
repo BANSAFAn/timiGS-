@@ -1,4 +1,4 @@
-name: Update README Status
+-name: Update README Status
 
 on:
   workflow_run:

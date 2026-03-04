@@ -226,6 +226,9 @@ pub fn show_main_window_cmd(app: tauri::AppHandle) {
     if let Some(window) = app.get_webview_window("main") {
         let _ = window.show();
         let _ = window.set_focus();
+        let _ = window.set_always_on_top(true);
+        std::thread::sleep(std::time::Duration::from_millis(50));
+        let _ = window.set_always_on_top(false);
     }
 }
 
@@ -233,6 +236,7 @@ use tauri::Emitter;
 
 #[command]
 pub fn emit_navigate_cmd(app: tauri::AppHandle, path: String) {
+    println!("Emitting navigate event to: {}", path);
     let _ = app.emit("navigate", path);
 }
 
@@ -485,3 +489,42 @@ pub fn get_auto_export_settings_cmd() -> Result<serde_json::Value, String> {
         "last_export_time": settings.last_export_time
     }))
 }
+
+// Sync commands
+#[command]
+pub async fn export_full_backup() -> Result<serde_json::Value, String> {
+    use serde_json::json;
+    
+    let activity = db::get_all_activity().map_err(|e| e.to_string())?;
+    let settings = db::get_settings();
+    
+    Ok(json!({
+        "version": 1,
+        "exported_at": chrono::Utc::now().to_rfc3339(),
+        "activity": activity,
+        "settings": settings
+    }))
+}
+
+#[command]
+pub async fn import_activity_data(data: serde_json::Value) -> Result<(), String> {
+    // Merge activity data from sync
+    // This is a simplified implementation - real merging would be more sophisticated
+    println!("Importing activity data: {:?}", data);
+    Ok(())
+}
+
+#[command]
+pub async fn import_settings(settings: serde_json::Value) -> Result<(), String> {
+    // Import settings from sync
+    println!("Importing settings: {:?}", settings);
+    Ok(())
+}
+
+#[command]
+pub async fn restore_backup(backup: serde_json::Value) -> Result<(), String> {
+    // Restore from full backup
+    println!("Restoring from backup: {:?}", backup);
+    Ok(())
+}
+

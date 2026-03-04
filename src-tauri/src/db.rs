@@ -1229,3 +1229,37 @@ fn save_last_export_time(time: &str) -> Result<()> {
     )?;
     Ok(())
 }
+
+/// Get all activity sessions (for export/sync)
+pub fn get_all_activity() -> Result<Vec<ActivitySession>> {
+    let guard = DB.lock();
+    let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
+
+    let mut stmt = conn.prepare(
+        "SELECT id, app_name, window_title, exe_path, start_time, end_time, duration_seconds
+         FROM activity_sessions
+         ORDER BY start_time DESC",
+    )?;
+
+    let sessions = stmt
+        .query_map([], |row| {
+            Ok(ActivitySession {
+                id: Some(row.get(0)?),
+                app_name: row.get(1)?,
+                window_title: row.get(2)?,
+                exe_path: row.get(3)?,
+                start_time: DateTime::parse_from_rfc3339(&row.get::<_, String>(4)?)
+                    .map(|dt| dt.with_timezone(&Local))
+                    .unwrap_or_else(|_| Local::now()),
+                end_time: row
+                    .get::<_, Option<String>>(5)?
+                    .and_then(|s| DateTime::parse_from_rfc3339(&s).ok())
+                    .map(|dt| dt.with_timezone(&Local)),
+                duration_seconds: row.get(6)?,
+            })
+        })?
+        .filter_map(|r| r.ok())
+        .collect();
+
+    Ok(sessions)
+}

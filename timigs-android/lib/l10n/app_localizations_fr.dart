@@ -190,4 +190,85 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get timeoutWorking => 'En cours de travail';
+
+  @override
+  String get sync => 'Synchronisation';
+
+  @override
+  String get syncDevice => 'Synchronisation des appareils';
+
+  @override
+  String get syncDescription => 'Synchroniser avec PC et autres appareils';
+
+  @override
+  String get syncPairing => 'Jumeler des appareils';
+
+  @override
+  String get syncGenerateCode => 'Générer un code';
+
+  @override
+  String get syncEnterCode => 'Entrer le code';
+
+  @override
+  String get syncPairedDevices => 'Appareils jumelés';
+
+  @override
+  String get syncMethods => 'Méthodes de synchronisation';
+
+  @override
+  String get syncP2P => 'Mode P2P';
+
+  @override
+  String get syncAPI => 'API (Store-and-Forward)';
+
+  @override
+  String get syncEndpoint => 'Point de terminaison API';
+
+  @override
+  String get syncToken => 'Jeton API';
+
+  @override
+  String get syncSave => 'Enregistrer la configuration';
+
+  @override
+  String get syncQueue => 'Synchronisations en attente';
+
+  @override
+  String get syncNow => 'Synchroniser maintenant';
+
+  @override
+  String get syncBackup => 'Sauvegarde et restauration';
+
+  @override
+  String get syncExport => 'Exporter';
+
+  @override
+  String get syncImport => 'Importer';
+
+  @override
+  String get syncSettings => 'Paramètres de sync';
+
+  @override
+  String get syncEnable => 'Activer la synchronisation';
+
+  @override
+  String get syncAuto => 'Synchronisation automatique';
+
+  @override
+  String get syncClear => 'Effacer les données de sync';
+
+  @override
+  String get syncConnected => 'Connecté';
+
+  @override
+  String get syncDisconnected => 'Déconnecté';
+
+  @override
+  String get syncConnecting => 'Connexion';
+
+  @override
+  String get syncError => 'Erreur';
+
+  @override
+  String get syncNeverSynced => 'Jamais synchronisé';
 }

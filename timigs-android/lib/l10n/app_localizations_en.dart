@@ -191,4 +191,85 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get timeoutWorking => 'Working';
+
+  @override
+  String get sync => 'Sync';
+
+  @override
+  String get syncDevice => 'Device Sync';
+
+  @override
+  String get syncDescription => 'Sync with desktop and other devices';
+
+  @override
+  String get syncPairing => 'Pair Devices';
+
+  @override
+  String get syncGenerateCode => 'Generate Code';
+
+  @override
+  String get syncEnterCode => 'Enter Code';
+
+  @override
+  String get syncPairedDevices => 'Paired Devices';
+
+  @override
+  String get syncMethods => 'Sync Methods';
+
+  @override
+  String get syncP2P => 'P2P Mode';
+
+  @override
+  String get syncAPI => 'API (Store-and-Forward)';
+
+  @override
+  String get syncEndpoint => 'API Endpoint';
+
+  @override
+  String get syncToken => 'API Token';
+
+  @override
+  String get syncSave => 'Save Configuration';
+
+  @override
+  String get syncQueue => 'Pending Syncs';
+
+  @override
+  String get syncNow => 'Sync Now';
+
+  @override
+  String get syncBackup => 'Backup & Restore';
+
+  @override
+  String get syncExport => 'Export';
+
+  @override
+  String get syncImport => 'Import';
+
+  @override
+  String get syncSettings => 'Sync Settings';
+
+  @override
+  String get syncEnable => 'Enable Sync';
+
+  @override
+  String get syncAuto => 'Auto Sync';
+
+  @override
+  String get syncClear => 'Clear Sync Data';
+
+  @override
+  String get syncConnected => 'Connected';
+
+  @override
+  String get syncDisconnected => 'Disconnected';
+
+  @override
+  String get syncConnecting => 'Connecting';
+
+  @override
+  String get syncError => 'Error';
+
+  @override
+  String get syncNeverSynced => 'Never synced';
 }

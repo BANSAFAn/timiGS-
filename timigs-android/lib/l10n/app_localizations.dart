@@ -105,6 +105,33 @@ abstract class AppLocalizations {
   String get timeoutBreakMessage;
   String get timeoutNextBreak;
   String get timeoutWorking;
+  String get sync;
+  String get syncDevice;
+  String get syncDescription;
+  String get syncPairing;
+  String get syncGenerateCode;
+  String get syncEnterCode;
+  String get syncPairedDevices;
+  String get syncMethods;
+  String get syncP2P;
+  String get syncAPI;
+  String get syncEndpoint;
+  String get syncToken;
+  String get syncSave;
+  String get syncQueue;
+  String get syncNow;
+  String get syncBackup;
+  String get syncExport;
+  String get syncImport;
+  String get syncSettings;
+  String get syncEnable;
+  String get syncAuto;
+  String get syncClear;
+  String get syncConnected;
+  String get syncDisconnected;
+  String get syncConnecting;
+  String get syncError;
+  String get syncNeverSynced;
 }
 
 class _AppLocalizationsDelegate

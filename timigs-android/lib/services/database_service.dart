@@ -303,4 +303,96 @@ class DatabaseService {
     _db = null;
     _initialized = false;
   }
+
+  // ============ Sync Support ============
+
+  /// Export all activity data for sync
+  Future<List<Map<String, dynamic>>> exportAllActivity() async {
+    _ensureInitialized();
+
+    final rows = await _db!.query(
+      'sessions',
+      orderBy: 'start_time DESC',
+    );
+
+    return rows.map((row) => Map<String, dynamic>.from(row)).toList();
+  }
+
+  /// Import activity data from sync
+  Future<void> importActivityData(Map<String, dynamic> data) async {
+    _ensureInitialized();
+
+    final sessions = data['sessions'] as List?;
+    if (sessions == null) return;
+
+    for (final sessionData in sessions) {
+      final session = Map<String, dynamic>.from(sessionData);
+      
+      // Check if session already exists (by start_time and app_name as composite key)
+      final existing = await _db!.query(
+        'sessions',
+        where: 'start_time = ? AND app_name = ?',
+        whereArgs: [session['start_time'], session['app_name']],
+        limit: 1,
+      );
+
+      if (existing.isEmpty) {
+        // Insert new session
+        await _db!.insert('sessions', session);
+      }
+    }
+
+    print('Imported ${sessions.length} activity sessions');
+  }
+
+  /// Import settings from sync
+  Future<void> importSettings(Map<String, dynamic> data) async {
+    _ensureInitialized();
+
+    final prefs = await SharedPreferences.getInstance();
+    
+    if (data['language'] != null) {
+      await prefs.setString('language', data['language']);
+    }
+    if (data['theme'] != null) {
+      await prefs.setString('theme', data['theme']);
+    }
+    if (data['autostart'] != null) {
+      await prefs.setBool('autostart', data['autostart']);
+    }
+    if (data['minimize_to_tray'] != null) {
+      await prefs.setBool('minimize_to_tray', data['minimize_to_tray']);
+    }
+  }
+
+  /// Import tasks from sync
+  Future<void> importTasks(Map<String, dynamic> data) async {
+    _ensureInitialized();
+    // Task import logic - for future implementation
+    print('Importing tasks...');
+  }
+
+  /// Restore from full backup
+  Future<void> restoreFromBackup(Map<String, dynamic> data) async {
+    _ensureInitialized();
+
+    // Clear existing data
+    await _db!.delete('sessions');
+
+    // Restore activity
+    final activity = data['activity'] as List?;
+    if (activity != null) {
+      for (final sessionData in activity) {
+        await _db!.insert('sessions', Map<String, dynamic>.from(sessionData));
+      }
+    }
+
+    // Restore settings
+    final settings = data['settings'] as Map<String, dynamic>?;
+    if (settings != null) {
+      await importSettings(settings);
+    }
+
+    print('Restored from backup');
+  }
 }

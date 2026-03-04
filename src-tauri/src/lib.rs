@@ -159,56 +159,60 @@ pub fn run() {
                     tauri::image::Image::from_bytes(include_bytes!("../icons/icon.png"))
                         .expect("failed to load tray icon"),
                 )
-                .tooltip("TimiGS")
+                .tooltip("TimiGS - Right-click for menu")
                 .menu(&tray_menu)
-                .show_menu_on_left_click(true)
+                .show_menu_on_left_click(false)
                 .on_menu_event(|app, event| {
                     let window = app.get_webview_window("main");
                     let id = event.id.as_ref();
-                    
-                    eprintln!("Tray menu event: {}", id);
-                    
-                    if id == "nav_dashboard" {
-                        eprintln!("Navigating to dashboard");
-                        if let Some(w) = &window {
-                            let _ = w.show();
-                            let _ = w.set_focus();
+
+                    println!("Tray menu event: {}", id);
+
+                    // First show and focus main window for all actions
+                    if let Some(w) = &window {
+                        let _ = w.show();
+                        let _ = w.set_focus();
+                        let _ = w.set_always_on_top(true);
+                        std::thread::sleep(std::time::Duration::from_millis(50));
+                        let _ = w.set_always_on_top(false);
+                    }
+
+                    // Then navigate
+                    match id {
+                        "nav_dashboard" => {
+                            println!("Navigating to dashboard");
+                            let _ = app.emit("navigate", "/");
                         }
-                        let _ = app.emit("navigate", "/");
-                    } else if id == "nav_timeline" {
-                        if let Some(w) = &window {
-                            let _ = w.show();
-                            let _ = w.set_focus();
+                        "nav_timeline" => {
+                            println!("Navigating to timeline");
+                            let _ = app.emit("navigate", "/timeline");
                         }
-                        let _ = app.emit("navigate", "/timeline");
-                    } else if id == "nav_tools" {
-                        if let Some(w) = &window {
-                            let _ = w.show();
-                            let _ = w.set_focus();
+                        "nav_tools" => {
+                            println!("Navigating to tools");
+                            let _ = app.emit("navigate", "/tools");
                         }
-                        let _ = app.emit("navigate", "/tools");
-                    } else if id == "nav_analytics" {
-                        if let Some(w) = &window {
-                            let _ = w.show();
-                            let _ = w.set_focus();
+                        "nav_analytics" => {
+                            println!("Navigating to analytics");
+                            let _ = app.emit("navigate", "/analytics");
                         }
-                        let _ = app.emit("navigate", "/analytics");
-                    } else if id == "toggle_tracking" {
-                        #[cfg(target_os = "windows")]
-                        {
-                            if crate::tracker::is_tracking() {
-                                crate::tracker::stop_tracking();
-                            } else {
-                                crate::tracker::start_tracking();
+                        "toggle_tracking" => {
+                            #[cfg(target_os = "windows")]
+                            {
+                                if crate::tracker::is_tracking() {
+                                    crate::tracker::stop_tracking();
+                                } else {
+                                    crate::tracker::start_tracking();
+                                }
                             }
                         }
-                    } else if id == "show" {
-                        if let Some(w) = &window {
-                            let _ = w.show();
-                            let _ = w.set_focus();
+                        "show" => {
+                            println!("Showing main window");
                         }
-                    } else if id == "quit" {
-                        let _ = app.exit(0);
+                        "quit" => {
+                            println!("Quitting application");
+                            let _ = app.exit(0);
+                        }
+                        _ => {}
                     }
                 })
                 .build(app)?;
@@ -334,6 +338,11 @@ pub fn run() {
             commands::export_data_html_cmd,
             commands::save_auto_export_settings_cmd,
             commands::get_auto_export_settings_cmd,
+            // Sync
+            commands::export_full_backup,
+            commands::import_activity_data,
+            commands::import_settings,
+            commands::restore_backup,
             // Music
             commands::get_music_files_cmd,
             commands::add_music_file_cmd,

@@ -6,6 +6,7 @@ import '../services/tracker_service.dart';
 import '../main.dart';
 import '../models/settings.dart';
 import 'google_drive_screen.dart';
+import 'sync_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -242,6 +243,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
+                  ListTile(
+                    leading: SvgPicture.asset('assets/icons/sync.svg',
+                        width: 24,
+                        height: 24,
+                        colorFilter: ColorFilter.mode(
+                            Theme.of(context).iconTheme.color!,
+                            BlendMode.srcIn)),
+                    title: const Text('Device Sync'),
+                    subtitle: const Text('Sync with desktop and other devices'),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const SyncScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                  const Divider(),
                   ListTile(
                     leading: SvgPicture.asset('assets/icons/drive.svg',
                         width: 24,

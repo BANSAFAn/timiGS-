@@ -191,4 +191,85 @@ class AppLocalizationsUk extends AppLocalizations {
 
   @override
   String get timeoutWorking => 'Працюємо';
+
+  @override
+  String get sync => 'Синхронізація';
+
+  @override
+  String get syncDevice => 'Синхронізація пристроїв';
+
+  @override
+  String get syncDescription => 'Синхронізація з ПК та іншими пристроями';
+
+  @override
+  String get syncPairing => 'Поєднання пристроїв';
+
+  @override
+  String get syncGenerateCode => 'Згенерувати код';
+
+  @override
+  String get syncEnterCode => 'Ввести код';
+
+  @override
+  String get syncPairedDevices => 'Поєднані пристрої';
+
+  @override
+  String get syncMethods => 'Методи синхронізації';
+
+  @override
+  String get syncP2P => 'Режим P2P';
+
+  @override
+  String get syncAPI => 'API (Store-and-Forward)';
+
+  @override
+  String get syncEndpoint => 'Кінцева точка API';
+
+  @override
+  String get syncToken => 'Токен API';
+
+  @override
+  String get syncSave => 'Зберегти налаштування';
+
+  @override
+  String get syncQueue => 'Очікуючі синхронізації';
+
+  @override
+  String get syncNow => 'Синхронізувати зараз';
+
+  @override
+  String get syncBackup => 'Резервне копіювання';
+
+  @override
+  String get syncExport => 'Експорт';
+
+  @override
+  String get syncImport => 'Імпорт';
+
+  @override
+  String get syncSettings => 'Налаштування синхронізації';
+
+  @override
+  String get syncEnable => 'Увімкнути синхронізацію';
+
+  @override
+  String get syncAuto => 'Автоматична синхронізація';
+
+  @override
+  String get syncClear => 'Очистити дані синхронізації';
+
+  @override
+  String get syncConnected => 'Підключено';
+
+  @override
+  String get syncDisconnected => 'Відключено';
+
+  @override
+  String get syncConnecting => 'Підключення';
+
+  @override
+  String get syncError => 'Помилка';
+
+  @override
+  String get syncNeverSynced => 'Ніколи не синхронізувався';
 }

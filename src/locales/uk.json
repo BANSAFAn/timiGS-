@@ -10,7 +10,8 @@
     "tools": "Інструменти",
     "github": "GitHub",
     "settings": "Налаштування",
-    "compare": "Команди"
+    "compare": "Команди",
+    "sync": "Синхронізація"
   },
   "github": {
     "connection": "Підключення GitHub",
@@ -214,6 +215,79 @@
     "close": "Закрити",
     "hours": "Годин",
     "minutes": "Хвилин",
-    "seconds": "Секунд"
+    "seconds": "Секунд",
+    "generating": "Генерування...",
+    "connecting": "Підключення..."
+  },
+  "sync": {
+    "title": "Синхронізація з телефоном",
+    "description": "Синхронізуйте дані активності між комп'ютером та мобільними пристроями",
+    "status": {
+      "disconnected": "Не підключено",
+      "connecting": "Підключення...",
+      "connected": "Підключено",
+      "error": "Помилка"
+    },
+    "pairing": {
+      "title": "Підключення пристрою",
+      "generateCode": "Згенерувати код",
+      "generateCodeDesc": "Згенеруйте код для введення на іншому пристрої",
+      "expiresIn": "Дійсний",
+      "generateCodeBtn": "Згенерувати код",
+      "enterCode": "Ввести код",
+      "enterCodeDesc": "Введіть код з іншого пристрою",
+      "codePlaceholder": "XXXXXX",
+      "connectBtn": "Підключити",
+      "pairedDevices": "Підключені пристрої",
+      "neverSynced": "Ніколи не синхронізувався",
+      "remove": "Видалити",
+      "removeConfirm": "Ви впевнені, що хочете видалити цей пристрій?"
+    },
+    "methods": {
+      "title": "Методи синхронізації",
+      "p2p": {
+        "title": "Peer-to-Peer (P2P)",
+        "description": "Пряма синхронізація між пристроями через WebRTC"
+      },
+      "api": {
+        "title": "API (Store-and-Forward)",
+        "description": "Синхронізація через ваш особистий API сервер",
+        "endpointPlaceholder": "API Endpoint (наприклад, https://api.yourserver.com)",
+        "tokenPlaceholder": "API Token (опціонально)"
+      }
+    },
+    "queue": {
+      "title": "Очікуючі синхронізації",
+      "retries": "Спроби",
+      "status": {
+        "pending": "Очікує",
+        "sent": "Відправлено",
+        "confirmed": "Підтверджено"
+      }
+    },
+    "backup": {
+      "title": "Експорт та Імпорт",
+      "export": "Експортувати резервну копію",
+      "import": "Імпортувати резервну копію",
+      "exportFailed": "Не вдалося експортувати резервну копію",
+      "importSuccess": "Резервну копію успішно імпортовано",
+      "importFailed": "Не вдалося імпортувати резервну копію"
+    },
+    "settings": {
+      "title": "Налаштування синхронізації",
+      "enableSync": "Увімкнути синхронізацію",
+      "autoSync": "Автосинхронізація кожні 5 хвилин",
+      "syncOnMetered": "Синхронізація через мобільний інтернет",
+      "clearData": "Очистити дані синхронізації",
+      "clearDataConfirm": "Це видалить всі підключені пристрої та очікуючі синхронізації. Продовжити?"
+    },
+    "syncing": "Синхронізація...",
+    "syncNow": "Синхронізувати зараз",
+    "syncFailed": "Помилка синхронізації. Перевірте підключення.",
+    "time": {
+      "minutesAgo": "{count}хв тому",
+      "hoursAgo": "{count}год тому",
+      "daysAgo": "{count}дн тому"
+    }
   }
 }

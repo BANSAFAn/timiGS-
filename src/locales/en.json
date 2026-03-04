@@ -10,7 +10,8 @@
     "tools": "Tools",
     "github": "GitHub",
     "settings": "Settings",
-    "compare": "Teams"
+    "compare": "Teams",
+    "sync": "Sync"
   },
   "github": {
     "connection": "GitHub Connection",
@@ -224,6 +225,79 @@
     "close": "Close",
     "hours": "Hours",
     "minutes": "Minutes",
-    "seconds": "Seconds"
+    "seconds": "Seconds",
+    "generating": "Generating...",
+    "connecting": "Connecting..."
+  },
+  "sync": {
+    "title": "Phone Synchronization",
+    "description": "Sync your activity data between desktop and mobile devices seamlessly",
+    "status": {
+      "disconnected": "Disconnected",
+      "connecting": "Connecting...",
+      "connected": "Connected",
+      "error": "Error"
+    },
+    "pairing": {
+      "title": "Device Pairing",
+      "generateCode": "Generate Pairing Code",
+      "generateCodeDesc": "Generate a code to enter on your other device",
+      "expiresIn": "Expires in",
+      "generateCodeBtn": "Generate Code",
+      "enterCode": "Enter Pairing Code",
+      "enterCodeDesc": "Enter the code shown on your other device",
+      "codePlaceholder": "XXXXXX",
+      "connectBtn": "Connect",
+      "pairedDevices": "Paired Devices",
+      "neverSynced": "Never synced",
+      "remove": "Remove",
+      "removeConfirm": "Are you sure you want to remove this device?"
+    },
+    "methods": {
+      "title": "Sync Methods",
+      "p2p": {
+        "title": "Peer-to-Peer (P2P)",
+        "description": "Direct device-to-device sync via WebRTC"
+      },
+      "api": {
+        "title": "API (Store-and-Forward)",
+        "description": "Sync via your personal API server",
+        "endpointPlaceholder": "API Endpoint (e.g., https://api.yourserver.com)",
+        "tokenPlaceholder": "API Token (optional)"
+      }
+    },
+    "queue": {
+      "title": "Pending Syncs",
+      "retries": "Retries",
+      "status": {
+        "pending": "Pending",
+        "sent": "Sent",
+        "confirmed": "Confirmed"
+      }
+    },
+    "backup": {
+      "title": "Export & Import",
+      "export": "Export Backup",
+      "import": "Import Backup",
+      "exportFailed": "Failed to export backup",
+      "importSuccess": "Backup imported successfully",
+      "importFailed": "Failed to import backup"
+    },
+    "settings": {
+      "title": "Sync Settings",
+      "enableSync": "Enable synchronization",
+      "autoSync": "Auto-sync every 5 minutes",
+      "syncOnMetered": "Sync on metered connections",
+      "clearData": "Clear Sync Data",
+      "clearDataConfirm": "This will remove all paired devices and pending syncs. Continue?"
+    },
+    "syncing": "Syncing...",
+    "syncNow": "Sync Now",
+    "syncFailed": "Sync failed. Please check your connection.",
+    "time": {
+      "minutesAgo": "{count}m ago",
+      "hoursAgo": "{count}h ago",
+      "daysAgo": "{count}d ago"
+    }
   }
 }

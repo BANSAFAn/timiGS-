@@ -11,6 +11,7 @@ import 'screens/weather_screen.dart';
 import 'screens/transfer_screen.dart';
 import 'screens/tools_screen.dart';
 import 'screens/settings_screen.dart';
+import 'screens/sync_screen.dart';
 import 'services/database_service.dart';
 import 'services/tracker_service.dart';
 import 'services/notification_service.dart';
@@ -177,6 +178,7 @@ class _MainScreenState extends State<MainScreen> {
     const WeatherScreen(),
     const TransferScreen(),
     const ToolsScreen(),
+    const SyncScreen(),
     const SettingsScreen(),
   ];
 
@@ -228,9 +230,9 @@ class _MainScreenState extends State<MainScreen> {
                           AppLocalizations.of(context)!.analytics),
                       _buildNavItem(3, 'weather.svg', "Weather"),
                       _buildNavItem(4, 'transfer.svg', "Transfer"),
-                      _buildNavItem(
-                          5, 'tools.svg', AppLocalizations.of(context)!.tools),
-                      _buildNavItem(6, 'settings.svg',
+                      _buildNavItem(5, 'tools.svg', AppLocalizations.of(context)!.tools),
+                      _buildNavItem(6, 'sync.svg', "Sync"),
+                      _buildNavItem(7, 'settings.svg',
                           AppLocalizations.of(context)!.settings),
                     ],
                   ),
