@@ -100,9 +100,15 @@ pub fn run() {
         let _ = app;
 
         // Start tracking on app launch (only on supported platforms)
-        #[cfg(any(target_os = "windows", target_os = "linux"))]
+        #[cfg(target_os = "windows")]
         {
-            println!("Starting activity tracking for supported platform...");
+            println!("Starting activity tracking for Windows...");
+            tracker::start_tracking();
+        }
+
+        #[cfg(target_os = "linux")]
+        {
+            println!("Starting activity tracking for Linux...");
             tracker::start_tracking();
         }
 
