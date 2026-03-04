@@ -1,5 +1,37 @@
 # Changelog
 
+## [1.1.0](https://github.com/BANSAFAn/timiGS-/compare/v1.0.1...v1.1.0) (2026-03-04)
+
+
+### Features
+
+* new designer tray, music +- ([0889d39](https://github.com/BANSAFAn/timiGS-/commit/0889d397586dc0935d1ae1dc70f3313f3c78623e))
+
+
+### Bug Fixes
+
+* package-lock music ([d6ad98c](https://github.com/BANSAFAn/timiGS-/commit/d6ad98c848e40ffef899ad18bad3038c6ffe9753))
+* root linux ([868f844](https://github.com/BANSAFAn/timiGS-/commit/868f844d14e3420a2e9c82c836255a5c6c353ba9))
+* simplify tray menu event handling ([2ad356f](https://github.com/BANSAFAn/timiGS-/commit/2ad356f6200ead6270d8d4e8d5dd600d771365d0))
+* tray menu events and remove [skip ci] from workflow ([d1e0d7b](https://github.com/BANSAFAn/timiGS-/commit/d1e0d7bce54b89fbe4458444de00450f5ed46c15))
+* tray menu not working - store tray in app state ([b6673e6](https://github.com/BANSAFAn/timiGS-/commit/b6673e6afb60abc06d56dc66d8751d843e2b71b2))
+* views not compiler ! ([b3673c4](https://github.com/BANSAFAn/timiGS-/commit/b3673c46962646d300cc016a3310aac50ebe6971))
+
+
+### Documentation
+
+* update platform build statuses ([3b0198f](https://github.com/BANSAFAn/timiGS-/commit/3b0198f849bb7a2d6b6bf495fa4b37c997df2adb))
+* update platform build statuses [skip ci] ([3ebdb6e](https://github.com/BANSAFAn/timiGS-/commit/3ebdb6eb8749dd21ccf3dcddd5ec15be345522a4))
+* update platform build statuses [skip ci] ([3ec4f49](https://github.com/BANSAFAn/timiGS-/commit/3ec4f491c6a43295181acb91ab791a5f5b285e03))
+* update platform build statuses [skip ci] ([2ea6b3f](https://github.com/BANSAFAn/timiGS-/commit/2ea6b3f920ae639e6efe16fc9c9a55593de391d6))
+* update platform build statuses [skip ci] ([2e4f197](https://github.com/BANSAFAn/timiGS-/commit/2e4f1971912b1d65427682cd920e37ab8384b338))
+
+
+### CI/CD
+
+* ci update ([7ba1da1](https://github.com/BANSAFAn/timiGS-/commit/7ba1da1575f809edd0f893c12dac21f5e47e6ae5))
+* fix build ([90072e7](https://github.com/BANSAFAn/timiGS-/commit/90072e78689d9b61739bd96c3a5897e6a7fbce91))
+
 ## [1.0.1](https://github.com/BANSAFAn/timiGS-/compare/v1.0.0...v1.0.1) (2026-03-01)
 
 
