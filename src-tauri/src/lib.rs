@@ -20,7 +20,7 @@ mod tasks;
 mod timeout;
 mod timer;
 
-#[cfg(target_os = "windows")]
+#[cfg(any(target_os = "windows", target_os = "linux"))]
 mod tracker;
 
 #[cfg(target_os = "android")]
