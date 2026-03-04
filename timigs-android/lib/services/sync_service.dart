@@ -501,8 +501,8 @@ class SyncService {
 
   Future<void> _initializePeer() async {
     try {
-      _peer = Peer(_deviceId);
-      
+      _peer = Peer(id: _deviceId);
+
       _peer!.on('open').listen((id) {
         _log('PeerJS initialized: $id');
       });
@@ -727,7 +727,7 @@ class SyncService {
 
   /// Dispose
   Future<void> dispose() async {
-    await _peer?.dispose();
+    _peer?.dispose();
     await _logController.close();
     await _statusController.close();
   }

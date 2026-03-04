@@ -54,4 +54,15 @@ class AppSettings {
       googleClientSecret: googleClientSecret ?? this.googleClientSecret,
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'language': language,
+      'theme': theme,
+      'autostart': autostart,
+      'minimizeToTray': minimizeToTray,
+      'googleClientId': googleClientId,
+      'googleClientSecret': googleClientSecret,
+    };
+  }
 }

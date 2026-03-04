@@ -109,7 +109,7 @@ pub fn run() {
         #[cfg(target_os = "linux")]
         {
             println!("Starting activity tracking for Linux...");
-            tracker::start_tracking();
+            crate::tracker::start_tracking();
         }
 
         #[cfg(target_os = "windows")]
