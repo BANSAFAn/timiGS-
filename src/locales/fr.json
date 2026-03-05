@@ -10,7 +10,8 @@
     "tools": "Outils",
     "github": "GitHub",
     "settings": "Paramètres",
-    "compare": "Équipes"
+    "compare": "Équipes",
+    "sync": "Synchronisation"
   },
   "github": {
     "connection": "Connexion GitHub",
@@ -87,7 +88,18 @@
     "trackingInactive": "Le suivi est en pause",
     "dataManagement": "Gestion des données",
     "exportData": "Exporter les données",
+    "exportDataDesc": "Sauvegarder tout l'historique d'activité en fichier",
+    "exportSuccess": "Données exportées avec succès !",
+    "exportError": "Échec de l'exportation des données",
+    "exporting": "Exportation...",
     "clearData": "Effacer toutes les données",
+    "resetData": "Réinitialiser toutes les données",
+    "resetDataDesc": "Supprimer définitivement toutes les données et paramètres",
+    "resetConfirmTitle": "Réinitialiser toutes les données ?",
+    "resetConfirmMsg": "Cela supprimera définitivement TOUT l'historique d'activité, les tâches, les projets et les paramètres. Cette action est irréversible.",
+    "resetTypeConfirm": "Tapez RESET pour confirmer",
+    "resetSuccess": "Toutes les données ont été réinitialisées avec succès",
+    "resetting": "Réinitialisation...",
     "about": "À propos",
     "version": "Version",
     "saved": "Paramètres enregistrés !",
@@ -108,7 +120,8 @@
     "checkForUpdates": "Vérifier les mises à jour",
     "checkUpdates": "Vérifier les mises à jour",
     "checkNow": "Vérifier maintenant",
-    "checking": "Vérification..."
+    "checking": "Vérification...",
+    "noUpdates": "Vous utilisez la dernière version."
   },
   "tools": {
     "timer": "Minuterie d'arrêt",
@@ -136,6 +149,48 @@
   },
   "weather": {
     "title": "Météo et activité"
+  },
+  "projects": {
+    "title": "Projets",
+    "subtitle": "Projets GitHub et statistiques de travail",
+    "connectTitle": "Connecter GitHub",
+    "connectDesc": "Connectez-vous avec GitHub pour gérer vos projets et suivre les statistiques",
+    "signInWithGitHub": "Se connecter avec GitHub",
+    "credentialsNote": "Vous serez redirigé vers GitHub pour l'autorisation",
+    "createOAuthApp": "Créer une OAuth App",
+    "createProject": "Créer un projet",
+    "templateDesc": "Choisissez un modèle pour commencer rapidement",
+    "projectTemplates": "Modèles de projets",
+    "startFromScratch": "Partir de zéro",
+    "searchTemplates": "Rechercher des modèles",
+    "myProjects": "Mes projets",
+    "noProjects": "Aucun projet trouvé",
+    "noProjectsDesc": "Créez un nouveau projet sur GitHub pour le voir ici",
+    "workStats": "Statistiques de travail",
+    "timeSpent": "temps passé aujourd'hui",
+    "noStats": "Pas encore de statistiques",
+    "noStatsDesc": "Commencez à travailler pour voir le suivi du temps par dépôt",
+    "localBoards": "Mes tableaux",
+    "newBoard": "Nouveau tableau",
+    "boardNamePlaceholder": "Nom du tableau...",
+    "createBoard": "Créer",
+    "noBoardsYet": "Pas encore de tableaux",
+    "noBoardsDesc": "Créez un tableau pour suivre votre activité",
+    "recordActivity": "Enregistrer l'activité",
+    "syncToGitHub": "Synchroniser avec GitHub",
+    "appName": "Application",
+    "windowTitle": "Fenêtre",
+    "timeTracked": "Temps",
+    "date": "Date",
+    "status": "Statut",
+    "noItems": "Aucun enregistrement",
+    "noItemsDesc": "Cliquez sur 'Enregistrer l'activité' pour capturer l'utilisation",
+    "addTaskPlaceholder": "Ajouter une nouvelle tâche...",
+    "addMilestonePlaceholder": "Ajouter un jalon...",
+    "taskTitle": "Tâche",
+    "priority": "Priorité",
+    "noTasks": "Pas encore de tâches",
+    "noMilestones": "Pas encore de jalons"
   },
   "focus": {
     "title": "Mode concentration",
@@ -172,6 +227,79 @@
     "close": "Fermer",
     "hours": "Heures",
     "minutes": "Minutes",
-    "seconds": "Secondes"
+    "seconds": "Secondes",
+    "generating": "Génération...",
+    "connecting": "Connexion..."
+  },
+  "sync": {
+    "title": "Synchronisation téléphone",
+    "description": "Synchronisez vos données d'activité entre ordinateur et appareils mobiles",
+    "status": {
+      "disconnected": "Déconnecté",
+      "connecting": "Connexion...",
+      "connected": "Connecté",
+      "error": "Erreur"
+    },
+    "pairing": {
+      "title": "Appairage d'appareil",
+      "generateCode": "Générer un code d'appairage",
+      "generateCodeDesc": "Générez un code à entrer sur votre autre appareil",
+      "expiresIn": "Expire dans",
+      "generateCodeBtn": "Générer le code",
+      "enterCode": "Entrer le code d'appairage",
+      "enterCodeDesc": "Entrez le code affiché sur votre autre appareil",
+      "codePlaceholder": "XXXXXX",
+      "connectBtn": "Connecter",
+      "pairedDevices": "Appareils appairés",
+      "neverSynced": "Jamais synchronisé",
+      "remove": "Supprimer",
+      "removeConfirm": "Êtes-vous sûr de vouloir supprimer cet appareil ?"
+    },
+    "methods": {
+      "title": "Méthodes de synchronisation",
+      "p2p": {
+        "title": "Peer-to-Peer (P2P)",
+        "description": "Synchronisation directe appareil à appareil via WebRTC"
+      },
+      "api": {
+        "title": "API (Store-and-Forward)",
+        "description": "Synchronisation via votre serveur API personnel",
+        "endpointPlaceholder": "Point de terminaison API (ex : https://api.votreserveur.com)",
+        "tokenPlaceholder": "Token API (optionnel)"
+      }
+    },
+    "queue": {
+      "title": "Synchronisations en attente",
+      "retries": "Tentatives",
+      "status": {
+        "pending": "En attente",
+        "sent": "Envoyé",
+        "confirmed": "Confirmé"
+      }
+    },
+    "backup": {
+      "title": "Export et Import",
+      "export": "Exporter la sauvegarde",
+      "import": "Importer la sauvegarde",
+      "exportFailed": "Échec de l'exportation",
+      "importSuccess": "Sauvegarde importée avec succès",
+      "importFailed": "Échec de l'importation"
+    },
+    "settings": {
+      "title": "Paramètres de synchronisation",
+      "enableSync": "Activer la synchronisation",
+      "autoSync": "Synchronisation automatique toutes les 5 minutes",
+      "syncOnMetered": "Synchroniser via les connexions mobiles",
+      "clearData": "Effacer les données de synchronisation",
+      "clearDataConfirm": "Cela supprimera tous les appareils appairés et les synchronisations en attente. Continuer ?"
+    },
+    "syncing": "Synchronisation...",
+    "syncNow": "Synchroniser maintenant",
+    "syncFailed": "Échec de la synchronisation. Vérifiez votre connexion.",
+    "time": {
+      "minutesAgo": "il y a {count}min",
+      "hoursAgo": "il y a {count}h",
+      "daysAgo": "il y a {count}j"
+    }
   }
 }

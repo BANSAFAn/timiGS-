@@ -1,6 +1,6 @@
 <template>
   <div class="page page-shell">
-    <div class="page-container settings-page" style="max-width: 1200px;">
+    <div class="page-container settings-page" style="max-width: 1200px">
       <div class="page-header modern-header">
         <div class="header-content">
           <div class="header-icon" v-html="Icons.settings"></div>
@@ -52,8 +52,12 @@
               <div class="setting-left">
                 <div class="setting-icon" v-html="Icons.language"></div>
                 <div class="setting-content">
-                  <label class="setting-label">{{ $t("settings.language") }}</label>
-                  <p class="setting-description">Choose your preferred language</p>
+                  <label class="setting-label">{{
+                    $t("settings.language")
+                  }}</label>
+                  <p class="setting-description">
+                    Choose your preferred language
+                  </p>
                 </div>
               </div>
               <div
@@ -84,27 +88,31 @@
               <div class="setting-left">
                 <div class="setting-icon" v-html="Icons.theme"></div>
                 <div class="setting-content">
-                  <label class="setting-label">{{ $t("settings.theme") }}</label>
-                  <p class="setting-description">Switch between dark and light mode</p>
+                  <label class="setting-label">{{
+                    $t("settings.theme")
+                  }}</label>
+                  <p class="setting-description">
+                    Switch between dark and light mode
+                  </p>
                 </div>
               </div>
               <div class="theme-switcher-modern">
-                 <button
-                   class="theme-btn-modern"
-                   :class="{ active: localSettings.theme === 'dark' }"
-                   @click="setTheme('dark')"
-                 >
-                   <span class="theme-icon" v-html="Icons.theme"></span>
-                   <span class="theme-label">Dark</span>
-                 </button>
-                 <button
-                   class="theme-btn-modern"
-                   :class="{ active: localSettings.theme === 'light' }"
-                   @click="setTheme('light')"
-                 >
-                   <span class="theme-icon" v-html="Icons.themeLight"></span>
-                   <span class="theme-label">Light</span>
-                 </button>
+                <button
+                  class="theme-btn-modern"
+                  :class="{ active: localSettings.theme === 'dark' }"
+                  @click="setTheme('dark')"
+                >
+                  <span class="theme-icon" v-html="Icons.theme"></span>
+                  <span class="theme-label">Dark</span>
+                </button>
+                <button
+                  class="theme-btn-modern"
+                  :class="{ active: localSettings.theme === 'light' }"
+                  @click="setTheme('light')"
+                >
+                  <span class="theme-icon" v-html="Icons.themeLight"></span>
+                  <span class="theme-label">Light</span>
+                </button>
               </div>
             </div>
           </div>
@@ -121,21 +129,28 @@
           </div>
 
           <div class="settings-group">
-
             <div class="setting-item">
               <div class="setting-left">
                 <div class="setting-icon" v-html="Icons.tracking"></div>
                 <div class="setting-content">
-                  <label class="setting-label">{{ $t("settings.tracking") }}</label>
-                  <p class="setting-description">{{ store.isTracking ? "Active" : "Paused" }}</p>
+                  <label class="setting-label">{{
+                    $t("settings.tracking")
+                  }}</label>
+                  <p class="setting-description">
+                    {{ store.isTracking ? "Active" : "Paused" }}
+                  </p>
                 </div>
               </div>
-              <button 
-                class="btn" 
+              <button
+                class="btn"
                 :class="store.isTracking ? 'btn-danger' : 'btn-success'"
                 @click="toggleTracking"
               >
-                {{ store.isTracking ? $t("settings.stopTracking") : $t("settings.startTracking") }}
+                {{
+                  store.isTracking
+                    ? $t("settings.stopTracking")
+                    : $t("settings.startTracking")
+                }}
               </button>
             </div>
 
@@ -143,8 +158,12 @@
               <div class="setting-left">
                 <div class="setting-icon" v-html="Icons.autostart"></div>
                 <div class="setting-content">
-                  <label class="setting-label">{{ $t("settings.autostart") }}</label>
-                  <p class="setting-description">Launch TimiGS on system startup</p>
+                  <label class="setting-label">{{
+                    $t("settings.autostart")
+                  }}</label>
+                  <p class="setting-description">
+                    Launch TimiGS on system startup
+                  </p>
                 </div>
               </div>
               <div
@@ -160,7 +179,9 @@
               <div class="setting-left">
                 <div class="setting-icon" v-html="Icons.tray"></div>
                 <div class="setting-content">
-                  <label class="setting-label">{{ $t("settings.minimizeToTray") }}</label>
+                  <label class="setting-label">{{
+                    $t("settings.minimizeToTray")
+                  }}</label>
                   <p class="setting-description">Keep running in background</p>
                 </div>
               </div>
@@ -177,8 +198,15 @@
               <div class="setting-left">
                 <div class="setting-icon" v-html="Icons.discord"></div>
                 <div class="setting-content">
-                  <label class="setting-label">{{ $t("settings.discordRpc") || "Discord Rich Presence" }}</label>
-                  <p class="setting-description">{{ $t("settings.discordRpcDesc") || "Show activity on Discord profile" }}</p>
+                  <label class="setting-label">{{
+                    $t("settings.discordRpc") || "Discord Rich Presence"
+                  }}</label>
+                  <p class="setting-description">
+                    {{
+                      $t("settings.discordRpcDesc") ||
+                      "Show activity on Discord profile"
+                    }}
+                  </p>
                 </div>
               </div>
               <div
@@ -214,7 +242,9 @@
           <div class="card-header-modern">
             <div class="card-icon" v-html="Icons.dataManage"></div>
             <div>
-              <h3 class="card-title-modern">{{ $t("settings.dataManagement") }}</h3>
+              <h3 class="card-title-modern">
+                {{ $t("settings.dataManagement") }}
+              </h3>
               <p class="card-subtitle">Export or reset your data</p>
             </div>
           </div>
@@ -224,15 +254,27 @@
               <div class="setting-left">
                 <div class="setting-icon" v-html="Icons.dataExport"></div>
                 <div class="setting-content">
-                  <label class="setting-label">{{ $t("settings.exportData") }}</label>
-                  <p class="setting-description">{{ $t("settings.exportDataDesc") }}</p>
+                  <label class="setting-label">{{
+                    $t("settings.exportData")
+                  }}</label>
+                  <p class="setting-description">
+                    {{ $t("settings.exportDataDesc") }}
+                  </p>
                 </div>
               </div>
               <div class="export-buttons">
-                <button class="btn btn-secondary" @click="exportData('csv')" :disabled="isExporting">
+                <button
+                  class="btn btn-secondary"
+                  @click="exportData('csv')"
+                  :disabled="isExporting"
+                >
                   CSV
                 </button>
-                <button class="btn btn-secondary" @click="exportData('html')" :disabled="isExporting">
+                <button
+                  class="btn btn-secondary"
+                  @click="exportData('html')"
+                  :disabled="isExporting"
+                >
                   HTML (Beautiful)
                 </button>
               </div>
@@ -243,25 +285,47 @@
                 <div class="setting-icon" v-html="Icons.update"></div>
                 <div class="setting-content">
                   <label class="setting-label">Auto-Export</label>
-                  <p class="setting-description">Automatically export data at regular intervals</p>
+                  <p class="setting-description">
+                    Automatically export data at regular intervals
+                  </p>
                 </div>
               </div>
               <div class="auto-export-settings">
                 <label class="toggle-switch">
-                  <input type="checkbox" v-model="autoExportEnabled" @change="saveAutoExportSettings" />
+                  <input
+                    type="checkbox"
+                    v-model="autoExportEnabled"
+                    @change="saveAutoExportSettings"
+                  />
                   <span class="toggle-slider"></span>
                 </label>
                 <div v-if="autoExportEnabled" class="auto-export-options">
-                  <select v-model="autoExportInterval" @change="saveAutoExportSettings" class="interval-select">
+                  <select
+                    v-model="autoExportInterval"
+                    @change="saveAutoExportSettings"
+                    class="interval-select"
+                  >
                     <option :value="1">Every hour</option>
                     <option :value="6">Every 6 hours</option>
                     <option :value="12">Every 12 hours</option>
                     <option :value="24">Daily</option>
                     <option :value="48">Every 2 days</option>
                   </select>
-                  <span v-if="autoExportFolder" class="folder-path" :title="autoExportFolder">{{ autoExportFolder }}</span>
-                  <button @click="selectExportFolder" class="btn btn-secondary btn-small">
-                    <span style="margin-right: 4px;" v-html="Icons.folder"></span> Select
+                  <span
+                    v-if="autoExportFolder"
+                    class="folder-path"
+                    :title="autoExportFolder"
+                    >{{ autoExportFolder }}</span
+                  >
+                  <button
+                    @click="selectExportFolder"
+                    class="btn btn-secondary btn-small"
+                  >
+                    <span
+                      style="margin-right: 4px"
+                      v-html="Icons.folder"
+                    ></span>
+                    Select
                   </button>
                 </div>
               </div>
@@ -269,10 +333,17 @@
 
             <div class="setting-item danger-zone">
               <div class="setting-left">
-                <div class="setting-icon danger-icon" v-html="Icons.dataReset"></div>
+                <div
+                  class="setting-icon danger-icon"
+                  v-html="Icons.dataReset"
+                ></div>
                 <div class="setting-content">
-                  <label class="setting-label" style="color: #ef4444">{{ $t("settings.resetData") }}</label>
-                  <p class="setting-description">{{ $t("settings.resetDataDesc") }}</p>
+                  <label class="setting-label" style="color: #ef4444">{{
+                    $t("settings.resetData")
+                  }}</label>
+                  <p class="setting-description">
+                    {{ $t("settings.resetDataDesc") }}
+                  </p>
                 </div>
               </div>
               <button class="btn btn-danger" @click="showResetModal = true">
@@ -345,15 +416,26 @@
                 <span v-if="updateProgress > 0">{{ updateProgress }}%</span>
               </div>
               <div class="update-progress-track">
-                <div class="update-progress-fill" :style="{ width: updateProgress + '%' }"></div>
+                <div
+                  class="update-progress-fill"
+                  :style="{ width: updateProgress + '%' }"
+                ></div>
               </div>
             </div>
           </div>
           <div class="update-modal-actions">
-            <button class="btn btn-secondary" @click="showUpdateModal = false" :disabled="isUpdating">
+            <button
+              class="btn btn-secondary"
+              @click="showUpdateModal = false"
+              :disabled="isUpdating"
+            >
               Later
             </button>
-            <button class="btn btn-primary" @click="installUpdate" :disabled="isUpdating">
+            <button
+              class="btn btn-primary"
+              @click="installUpdate"
+              :disabled="isUpdating"
+            >
               <span v-if="isUpdating" class="updating-spinner"></span>
               {{ updateButtonText }}
             </button>
@@ -371,29 +453,50 @@
       >
         <div class="update-modal">
           <div class="update-modal-header">
-            <div class="update-icon danger-icon-large" v-html="Icons.dataReset"></div>
-            <h2 style="color: #ef4444">{{ $t('settings.resetConfirmTitle') }}</h2>
+            <div
+              class="update-icon danger-icon-large"
+              v-html="Icons.dataReset"
+            ></div>
+            <h2 style="color: #ef4444">
+              {{ $t("settings.resetConfirmTitle") }}
+            </h2>
           </div>
           <div class="update-modal-body">
             <p class="update-desc" style="color: #fbbf24; font-weight: 500">
-              <span style="margin-right: 6px;" v-html="Icons.warning"></span>{{ $t('settings.resetConfirmMsg') }}
+              <span style="margin-right: 6px" v-html="Icons.warning"></span
+              >{{ $t("settings.resetConfirmMsg") }}
             </p>
             <div style="margin-top: 16px">
-              <label style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px; display: block">
-                {{ $t('settings.resetTypeConfirm') }}
+              <label
+                style="
+                  font-size: 0.85rem;
+                  color: var(--text-muted);
+                  margin-bottom: 8px;
+                  display: block;
+                "
+              >
+                {{ $t("settings.resetTypeConfirm") }}
               </label>
               <input
                 v-model="resetConfirmText"
                 type="text"
                 placeholder="RESET"
                 class="reset-input"
-                @keyup.enter="resetConfirmText === 'RESET' && confirmResetData()"
+                @keyup.enter="
+                  resetConfirmText === 'RESET' && confirmResetData()
+                "
               />
             </div>
           </div>
           <div class="update-modal-actions">
-            <button class="btn btn-secondary" @click="showResetModal = false; resetConfirmText = ''">
-              {{ $t('common.cancel') }}
+            <button
+              class="btn btn-secondary"
+              @click="
+                showResetModal = false;
+                resetConfirmText = '';
+              "
+            >
+              {{ $t("common.cancel") }}
             </button>
             <button
               class="btn btn-danger"
@@ -401,7 +504,11 @@
               @click="confirmResetData"
             >
               <span v-if="isResetting" class="updating-spinner"></span>
-              {{ isResetting ? $t('settings.resetting') : $t('settings.resetData') }}
+              {{
+                isResetting
+                  ? $t("settings.resetting")
+                  : $t("settings.resetData")
+              }}
             </button>
           </div>
         </div>
@@ -415,12 +522,12 @@ import { ref, onMounted, reactive, computed } from "vue";
 import { useI18n } from "vue-i18n";
 import { invoke } from "@tauri-apps/api/core";
 import { useActivityStore } from "../stores/activity";
-import { check } from '@tauri-apps/plugin-updater';
-import { relaunch } from '@tauri-apps/plugin-process';
-import { getVersion } from '@tauri-apps/api/app';
+import { check } from "@tauri-apps/plugin-updater";
+import { relaunch } from "@tauri-apps/plugin-process";
+import { getVersion } from "@tauri-apps/api/app";
 import { useNotificationStore } from "../stores/notifications";
 import { Icons } from "../components/icons/IconMap";
-import { save, open } from '@tauri-apps/plugin-dialog';
+import { save, open } from "@tauri-apps/plugin-dialog";
 
 const { locale, t } = useI18n();
 const store = useActivityStore();
@@ -429,24 +536,24 @@ const notifications = useNotificationStore();
 // Language State
 const langOpen = ref(false);
 const availableLanguages = [
-  { code: "en", name: "English", flag: "" },
-  { code: "uk", name: "Українська", flag: "" },
-  { code: "de", name: "Deutsch", flag: "" },
-  { code: "fr", name: "Français", flag: "" },
-  { code: "es", name: "Español", flag: "" },
-  { code: "zh-CN", name: "中文 (简体)", flag: "" },
-  { code: "ar", name: "العربية", flag: "" },
+  { code: "en", name: "English", flag: "🇬🇧" },
+  { code: "uk", name: "Українська", flag: "🇺🇦" },
+  { code: "de", name: "Deutsch", flag: "🇩🇪" },
+  { code: "fr", name: "Français", flag: "🇫🇷" },
+  { code: "es", name: "Español", flag: "🇪🇸" },
+  { code: "zh-CN", name: "中文 (简体)", flag: "🇨🇳" },
+  { code: "ar", name: "العربية", flag: "🇸🇦" },
 ];
 
 const currentLangFlag = computed(
   () =>
     availableLanguages.find((l) => l.code === localSettings.language)?.flag ||
-    `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>`
+    "🌐",
 );
 const currentLangName = computed(
   () =>
     availableLanguages.find((l) => l.code === localSettings.language)?.name ||
-    "Language"
+    "Language",
 );
 
 function changeLanguage(code: string) {
@@ -464,7 +571,6 @@ const isReady = ref(false);
 const globalError = ref("");
 
 const appVersion = ref("...");
-
 
 const localSettings = reactive({
   language: "en",
@@ -496,7 +602,7 @@ async function initSettings() {
       locale.value = settings.language || "en";
       document.documentElement.setAttribute(
         "data-theme",
-        settings.theme || "dark"
+        settings.theme || "dark",
       );
     }
 
@@ -535,12 +641,14 @@ async function toggleTracking() {
         // Request permission
         const confirmed = confirm(
           "TimiGS needs 'Usage Access' permission to track app activity on Android. " +
-          "You will be redirected to Settings to grant this permission."
+            "You will be redirected to Settings to grant this permission.",
         );
 
         if (confirmed) {
           await safeInvoke("request_usage_permission");
-          alert("Please grant 'Usage Access' permission in Settings, then try again.");
+          alert(
+            "Please grant 'Usage Access' permission in Settings, then try again.",
+          );
         }
         return;
       }
@@ -554,19 +662,19 @@ async function toggleTracking() {
   // Check if on Linux and warn about dependencies
   if (!store.isMobile && navigator.userAgent.includes("Linux")) {
     // Check if xdotool or wmctrl is available
-    const { Command } = await import('@tauri-apps/plugin-shell');
+    const { Command } = await import("@tauri-apps/plugin-shell");
     try {
-      const xdotoolCheck = await Command.create('which', ['xdotool']).execute();
-      const wmctrlCheck = await Command.create('which', ['wmctrl']).execute();
+      const xdotoolCheck = await Command.create("which", ["xdotool"]).execute();
+      const wmctrlCheck = await Command.create("which", ["wmctrl"]).execute();
 
       if (!xdotoolCheck.stdout.trim() && !wmctrlCheck.stdout.trim()) {
         const confirmed = confirm(
           "On Linux, TimiGS requires either 'xdotool' or 'wmctrl' to track active windows.\n\n" +
-          "Please install one of them:\n" +
-          "  - Debian/Ubuntu: sudo apt install xdotool wmctrl\n" +
-          "  - Fedora: sudo dnf install xdotool wmctrl\n" +
-          "  - Arch: sudo pacman -S xdotool wmctrl\n\n" +
-          "Click OK to continue anyway, or Cancel to install first."
+            "Please install one of them:\n" +
+            "  - Debian/Ubuntu: sudo apt install xdotool wmctrl\n" +
+            "  - Fedora: sudo dnf install xdotool wmctrl\n" +
+            "  - Arch: sudo pacman -S xdotool wmctrl\n\n" +
+            "Click OK to continue anyway, or Cancel to install first.",
         );
 
         if (!confirmed) {
@@ -605,20 +713,23 @@ const isUpdating = ref(false);
 const showUpdateModal = ref(false);
 const updateVersion = ref("");
 const updateProgress = ref(0);
-const updateStatusText = ref('Preparing...');
+const updateStatusText = ref("Preparing...");
 let cachedUpdate: any = null;
 
 const updateButtonText = computed(() => {
-  if (!isUpdating.value) return 'Update Now';
-  if (updateProgress.value > 0 && updateProgress.value < 100) return `Downloading... ${updateProgress.value}%`;
-  if (updateProgress.value >= 100) return 'Installing...';
-  return 'Preparing...';
+  if (!isUpdating.value) return "Update Now";
+  if (updateProgress.value > 0 && updateProgress.value < 100)
+    return `Downloading... ${updateProgress.value}%`;
+  if (updateProgress.value >= 100) return "Installing...";
+  return "Preparing...";
 });
 
 async function checkForUpdates() {
   try {
     // Primary: GitHub API (reliable, always has releases)
-    const response = await window.fetch("https://api.github.com/repos/BANSAFAn/timiGS-/releases/latest");
+    const response = await window.fetch(
+      "https://api.github.com/repos/BANSAFAn/timiGS-/releases/latest",
+    );
     if (!response.ok) throw new Error("GitHub API unavailable");
     const data = await response.json();
     const latestVersion = data.tag_name.replace("v", "");
@@ -628,10 +739,14 @@ async function checkForUpdates() {
       try {
         const update = await check();
         if (update) cachedUpdate = update;
-      } catch { /* Tauri updater not available, will use browser fallback */ }
+      } catch {
+        /* Tauri updater not available, will use browser fallback */
+      }
       showUpdateModal.value = true;
     } else {
-      notifications.info(t('settings.noUpdates', 'You are using the latest version.'));
+      notifications.info(
+        t("settings.noUpdates", "You are using the latest version."),
+      );
     }
   } catch (error) {
     console.error("GitHub API check failed:", error);
@@ -643,10 +758,14 @@ async function checkForUpdates() {
         cachedUpdate = update;
         showUpdateModal.value = true;
       } else {
-        notifications.info(t('settings.noUpdates', 'You are using the latest version.'));
+        notifications.info(
+          t("settings.noUpdates", "You are using the latest version."),
+        );
       }
     } catch (e2) {
-      notifications.error('Failed to check for updates. Please check your internet connection.');
+      notifications.error(
+        "Failed to check for updates. Please check your internet connection.",
+      );
     }
   }
 }
@@ -654,7 +773,7 @@ async function checkForUpdates() {
 async function installUpdate() {
   isUpdating.value = true;
   updateProgress.value = 0;
-  updateStatusText.value = 'Downloading update...';
+  updateStatusText.value = "Downloading update...";
 
   try {
     // Re-check if we don't have cached update
@@ -668,32 +787,34 @@ async function installUpdate() {
 
       await cachedUpdate.downloadAndInstall((event: any) => {
         switch (event.event) {
-          case 'Started':
+          case "Started":
             contentLength = event.data.contentLength || 0;
-            updateStatusText.value = 'Downloading...';
+            updateStatusText.value = "Downloading...";
             break;
-          case 'Progress':
+          case "Progress":
             downloaded += event.data.chunkLength || 0;
             if (contentLength > 0) {
-              updateProgress.value = Math.round((downloaded / contentLength) * 100);
+              updateProgress.value = Math.round(
+                (downloaded / contentLength) * 100,
+              );
             }
             break;
-          case 'Finished':
+          case "Finished":
             updateProgress.value = 100;
-            updateStatusText.value = 'Installing...';
+            updateStatusText.value = "Installing...";
             break;
         }
       });
 
-      updateStatusText.value = 'Restarting...';
+      updateStatusText.value = "Restarting...";
       await relaunch();
     } else {
-      notifications.error('No update available to install.');
+      notifications.error("No update available to install.");
       isUpdating.value = false;
     }
   } catch (error) {
-    console.error('Update installation failed:', error);
-    notifications.error('Update failed: ' + error);
+    console.error("Update installation failed:", error);
+    notifications.error("Update failed: " + error);
     isUpdating.value = false;
     updateProgress.value = 0;
   }
@@ -701,37 +822,37 @@ async function installUpdate() {
 
 // Data Management
 const showResetModal = ref(false);
-const resetConfirmText = ref('');
+const resetConfirmText = ref("");
 const isResetting = ref(false);
 const isExporting = ref(false);
 
 // Auto-export settings
 const autoExportEnabled = ref(false);
 const autoExportInterval = ref(24);
-const autoExportFolder = ref('');
+const autoExportFolder = ref("");
 
 async function loadAutoExportSettings() {
   try {
-    const settings: any = await invoke('get_auto_export_settings_cmd');
+    const settings: any = await invoke("get_auto_export_settings_cmd");
     autoExportEnabled.value = settings.enabled;
     autoExportInterval.value = settings.interval_hours;
-    autoExportFolder.value = settings.folder || '';
+    autoExportFolder.value = settings.folder || "";
   } catch (e) {
-    console.error('Failed to load auto-export settings:', e);
+    console.error("Failed to load auto-export settings:", e);
   }
 }
 
 async function saveAutoExportSettings() {
   try {
-    await invoke('save_auto_export_settings_cmd', {
+    await invoke("save_auto_export_settings_cmd", {
       enabled: autoExportEnabled.value,
       intervalHours: autoExportInterval.value,
-      folder: autoExportFolder.value
+      folder: autoExportFolder.value,
     });
-    notifications.success('Auto-export settings saved');
+    notifications.success("Auto-export settings saved");
   } catch (e) {
-    console.error('Failed to save auto-export settings:', e);
-    notifications.error('Failed to save settings');
+    console.error("Failed to save auto-export settings:", e);
+    notifications.error("Failed to save settings");
   }
 }
 
@@ -740,18 +861,18 @@ async function selectExportFolder() {
     const folder = await open({
       directory: true,
       multiple: false,
-      defaultPath: autoExportFolder.value || undefined
+      defaultPath: autoExportFolder.value || undefined,
     });
     if (folder) {
       autoExportFolder.value = Array.isArray(folder) ? folder[0] : folder;
       saveAutoExportSettings();
     }
   } catch (e) {
-    console.error('Failed to select folder:', e);
+    console.error("Failed to select folder:", e);
   }
 }
 
-async function exportData(format: 'csv' | 'html' = 'csv') {
+async function exportData(format: "csv" | "html" = "csv") {
   isExporting.value = true;
   try {
     const filePath = await save({
@@ -759,30 +880,33 @@ async function exportData(format: 'csv' | 'html' = 'csv') {
       filters: [{ name: format.toUpperCase(), extensions: [format] }],
     });
     if (filePath) {
-      await invoke(format === 'csv' ? 'export_data_csv_cmd' : 'export_data_html_cmd', { path: filePath });
-      notifications.success(t('settings.exportSuccess'));
+      await invoke(
+        format === "csv" ? "export_data_csv_cmd" : "export_data_html_cmd",
+        { path: filePath },
+      );
+      notifications.success(t("settings.exportSuccess"));
     }
   } catch (e: any) {
-    console.error('Export failed:', e);
-    notifications.error(t('settings.exportError') + ': ' + e);
+    console.error("Export failed:", e);
+    notifications.error(t("settings.exportError") + ": " + e);
   } finally {
     isExporting.value = false;
   }
 }
 
 async function confirmResetData() {
-  if (resetConfirmText.value !== 'RESET') return;
+  if (resetConfirmText.value !== "RESET") return;
   isResetting.value = true;
   try {
-    await invoke('reset_all_data_cmd');
-    notifications.success(t('settings.resetSuccess'));
+    await invoke("reset_all_data_cmd");
+    notifications.success(t("settings.resetSuccess"));
     showResetModal.value = false;
-    resetConfirmText.value = '';
+    resetConfirmText.value = "";
     // Re-init settings to reflect defaults
     await initSettings();
   } catch (e: any) {
-    console.error('Reset failed:', e);
-    notifications.error('Reset failed: ' + e);
+    console.error("Reset failed:", e);
+    notifications.error("Reset failed: " + e);
   } finally {
     isResetting.value = false;
   }
@@ -1052,7 +1176,11 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+  background: linear-gradient(
+    135deg,
+    rgba(99, 102, 241, 0.1),
+    rgba(139, 92, 246, 0.1)
+  );
   border-radius: 20px;
   border: 1px solid rgba(99, 102, 241, 0.2);
 }
@@ -1097,7 +1225,11 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(139, 92, 246, 0.15));
+  background: linear-gradient(
+    135deg,
+    rgba(99, 102, 241, 0.15),
+    rgba(139, 92, 246, 0.15)
+  );
   border-radius: 14px;
   border: 1px solid rgba(99, 102, 241, 0.25);
 }
@@ -1391,20 +1523,20 @@ onMounted(() => {
     padding: 16px;
     gap: 12px;
   }
-  
+
   .theme-switcher-modern {
     width: 100%;
   }
-  
+
   .theme-btn-modern {
     flex: 1;
     justify-content: center;
   }
-  
+
   .modern-select {
     width: 100%;
   }
-  
+
   .header-icon {
     width: 60px;
     height: 60px;
@@ -1489,6 +1621,4 @@ onMounted(() => {
   opacity: 0.5;
   cursor: not-allowed;
 }
-
 </style>
-

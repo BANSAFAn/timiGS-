@@ -1,260 +1,243 @@
 <template>
-  <div class="tray-container">
+  <div class="tray-popup">
     <div class="tray-header">
-      <div class="logo">
-        <span class="logo-icon" v-html="Icons.clock"></span>
-        <span class="logo-text">TimiGS</span>
+      <div class="brand-row">
+        <img src="/icons/128x128.png" alt="TimiGS" class="brand-icon" />
+        <span class="brand">TimiGS</span>
       </div>
-      <button class="close-btn" @click="hideTray">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-      </button>
+      <span class="status-badge" :class="{ active: isTracking }">
+        {{ isTracking ? "● Tracking" : "○ Idle" }}
+      </span>
     </div>
-    
-    <div class="tray-menu">
-      <div class="menu-section">
-        <span class="section-label">Navigation</span>
-        <button class="menu-item" @click="navigateTo('/')">
-          <span class="icon" v-html="Icons.dashboard"></span>
-          <span>Dashboard</span>
-          <span class="shortcut">1</span>
-        </button>
 
-        <button class="menu-item" @click="navigateTo('/timeline')">
-          <span class="icon" v-html="Icons.timeline"></span>
-          <span>Timeline</span>
-          <span class="shortcut">2</span>
-        </button>
+    <div class="tray-sep"></div>
 
-        <button class="menu-item" @click="navigateTo('/tools')">
-          <span class="icon" v-html="Icons.tools"></span>
-          <span>Tools</span>
-          <span class="shortcut">3</span>
-        </button>
+    <button class="tray-btn open-btn" @click="showMainWindow">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+        <line x1="8" y1="21" x2="16" y2="21" />
+        <line x1="12" y1="17" x2="12" y2="21" />
+      </svg>
+      <span>Open App</span>
+    </button>
 
-        <button class="menu-item" @click="navigateTo('/analytics')">
-          <span class="icon" v-html="Icons.analytics"></span>
-          <span>Analytics</span>
-          <span class="shortcut">4</span>
-        </button>
-      </div>
-
-      <div class="menu-section">
-        <span class="section-label">Settings</span>
-        <button class="menu-item" @click="navigateTo('/settings')">
-          <span class="icon" v-html="Icons.settings"></span>
-          <span>Settings</span>
-        </button>
-      </div>
-
-      <div class="divider"></div>
-
-      <button class="menu-item danger" @click="quitApp">
-        <span class="icon" v-html="Icons.cancelFocus"></span>
-        <span>Quit TimiGS</span>
-        <span class="shortcut">Q</span>
-      </button>
-    </div>
+    <button class="tray-btn quit-btn" @click="quitApp">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+        <polyline points="16 17 21 12 16 7" />
+        <line x1="21" y1="12" x2="9" y2="12" />
+      </svg>
+      <span>Quit</span>
+    </button>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted } from "vue";
+import { getCurrentWindow, Window } from "@tauri-apps/api/window";
+import { exit } from "@tauri-apps/plugin-process";
 import { invoke } from "@tauri-apps/api/core";
-import { getCurrentWindow } from "@tauri-apps/api/window";
-import { Icons } from "../components/icons/IconMap";
 
-async function hideTray() {
+const trayWindow = getCurrentWindow();
+const isTracking = ref(false);
+
+async function refreshStatus() {
   try {
-    await getCurrentWindow().hide();
-  } catch (e) {
-    console.error("Failed to hide tray:", e);
+    isTracking.value = await invoke<boolean>("is_tracking");
+  } catch {
+    isTracking.value = false;
   }
 }
 
-async function navigateTo(path: string) {
+onMounted(() => {
+  refreshStatus();
+  // Refresh each time the popup is shown
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) refreshStatus();
+  });
+});
+
+async function hideTray() {
   try {
-    console.log("Navigating to:", path);
-    // First show main window
-    await invoke("show_main_window_cmd");
-    // Wait a bit for window to show
-    await new Promise(resolve => setTimeout(resolve, 100));
-    // Then navigate
-    await invoke("emit_navigate_cmd", { path });
-    // Hide tray
+    await trayWindow.hide();
+  } catch (e) {
+    console.error("[Tray] Failed to hide:", e);
+  }
+}
+
+async function showMainWindow() {
+  try {
+    const mainWin = await Window.getByLabel("main");
+    if (mainWin) {
+      await mainWin.show();
+      await mainWin.unminimize();
+      await mainWin.setFocus();
+    }
     await hideTray();
   } catch (e) {
-    console.error("Navigation failed:", e);
+    console.error("[Tray] Failed to show main window:", e);
   }
 }
 
 async function quitApp() {
   try {
-    await invoke("quit_app_cmd");
+    await exit(0);
   } catch (e) {
-    console.error("Quit failed:", e);
+    console.error("[Tray] Quit failed:", e);
   }
 }
+
+// ESC key to hide
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") hideTray();
+});
 </script>
 
 <style scoped>
-.tray-container {
-  width: 280px;
-  background: #1e293b;
-  border: 1px solid #334155;
+.tray-popup {
+  width: 220px;
+  background: #1a1d2e;
+  border: 1px solid rgba(139, 92, 246, 0.25);
   border-radius: 12px;
-  padding: 8px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  padding: 12px;
+  font-family:
+    "Segoe UI",
+    system-ui,
+    -apple-system,
+    sans-serif;
+  color: #e2e8f0;
+  box-shadow:
+    0 16px 48px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(255, 255, 255, 0.04),
+    0 0 20px rgba(139, 92, 246, 0.08);
+  overflow: hidden;
+  user-select: none;
 }
 
 .tray-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 8px 12px 12px;
-  border-bottom: 1px solid #334155;
-  margin-bottom: 8px;
+  padding: 4px 4px 8px;
 }
 
-.logo {
+.brand-row {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
-.logo-icon {
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #8b5cf6;
+.brand-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
 }
 
-.logo-icon :deep(svg) {
-  width: 24px;
-  height: 24px;
-}
-
-.logo-text {
+.brand {
   font-weight: 700;
-  font-size: 1.1rem;
-  background: linear-gradient(135deg, #8b5cf6, #6366f1);
+  font-size: 0.95rem;
+  background: linear-gradient(135deg, #a78bfa, #818cf8);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-.close-btn {
-  background: rgba(255, 255, 255, 0.05);
-  border: none;
-  color: #94a3b8;
-  width: 28px;
-  height: 28px;
-  border-radius: 6px;
-  font-size: 1.2rem;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.close-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: #f1f5f9;
-}
-
-.tray-menu {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.menu-section {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.section-label {
+.status-badge {
   font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: #64748b;
-  font-weight: 600;
-  padding: 6px 12px 4px;
+  padding: 3px 8px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #94a3b8;
+  font-weight: 500;
+  letter-spacing: 0.02em;
 }
 
-.menu-item {
+.status-badge.active {
+  background: rgba(34, 197, 94, 0.12);
+  color: #4ade80;
+}
+
+.tray-sep {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.06);
+  margin: 4px 0 6px;
+}
+
+.tray-btn {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px 12px;
-  background: transparent;
-  border: none;
-  border-radius: 8px;
-  color: #f1f5f9;
-  cursor: pointer;
-  font-size: 0.9rem;
-  font-family: inherit;
-  text-align: left;
-  transition: all 0.15s ease;
   width: 100%;
+  padding: 10px 12px;
+  border: none;
+  background: transparent;
+  color: #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.12s ease;
 }
 
-.menu-item:hover {
-  background: #334155;
-  transform: translateX(2px);
+.tray-btn svg {
+  flex-shrink: 0;
+  opacity: 0.8;
 }
 
-.menu-item .icon {
-  width: 20px;
-  height: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #8b5cf6;
+.open-btn:hover {
+  background: rgba(139, 92, 246, 0.15);
+  color: #c4b5fd;
 }
 
-.menu-item .icon :deep(svg) {
-  width: 18px;
-  height: 18px;
+.open-btn:hover svg {
+  opacity: 1;
+  color: #a78bfa;
 }
 
-.menu-item .shortcut {
-  margin-left: auto;
-  font-size: 0.75rem;
-  color: #64748b;
-  background: rgba(255, 255, 255, 0.05);
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-weight: 600;
+.open-btn:active {
+  background: rgba(139, 92, 246, 0.25);
+  transform: scale(0.98);
 }
 
-.menu-item:hover .shortcut {
+.quit-btn {
   color: #94a3b8;
-  background: rgba(255, 255, 255, 0.1);
+  margin-top: 2px;
 }
 
-.divider {
-  height: 1px;
-  background: #334155;
-  margin: 8px 0;
-}
-
-.menu-item.danger {
-  color: #ef4444;
-}
-
-.menu-item.danger .icon {
-  color: #ef4444;
-}
-
-.menu-item.danger:hover {
+.quit-btn:hover {
   background: rgba(239, 68, 68, 0.1);
+  color: #f87171;
 }
 
-.menu-item.danger:hover .shortcut {
-  background: rgba(239, 68, 68, 0.15);
-  color: #ef4444;
+.quit-btn:hover svg {
+  opacity: 1;
+  color: #f87171;
+}
+
+.quit-btn:active {
+  background: rgba(239, 68, 68, 0.18);
+  transform: scale(0.98);
 }
 </style>

@@ -1,0 +1,9 @@
+{
+  "identifier": "tray-window",
+  "description": "Capabilities for the tray popup window",
+  "windows": ["tray"],
+  "permissions": [
+    "core:default",
+    "process:default"
+  ]
+}

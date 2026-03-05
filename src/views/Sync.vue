@@ -251,15 +251,21 @@ onMounted(async () => {
   await syncStore.initialize();
   syncStore.loadAPIConfig();
   syncStore.loadP2PPreference();
-  
+
   useP2P.value = syncStore.useP2P;
   apiEndpoint.value = syncStore.apiEndpoint;
   apiToken.value = syncStore.apiToken;
   syncEnabled.value = syncStore.syncEnabled;
-  
+
   // Listen for sync events
   window.addEventListener('timigs-sync-received', handleSyncReceived);
   
+  // Listen for pairing completed event
+  window.addEventListener('timigs-sync-paired', () => {
+    // Force UI refresh when pairing completes
+    console.log('[Sync] Pairing completed, refreshing UI');
+  });
+
   // Start auto-sync if enabled
   if (autoSync.value) {
     startAutoSync();
@@ -302,20 +308,27 @@ async function generateCode() {
 // Accept pairing code
 async function acceptCode() {
   if (!enteredCode.value) return;
-  
+
   acceptingCode.value = true;
   try {
-    // In a real implementation, this would connect to the remote device
-    // For now, we'll simulate successful pairing
+    // Get our device info to send to the remote device
+    const deviceInfo = {
+      deviceId: syncStore.deviceId,
+      deviceName: syncStore.deviceName,
+      deviceType: syncStore.deviceType
+    };
+
     const success = await syncStore.acceptPairing(
       enteredCode.value,
-      'remote-device-id',
-      'Remote Device',
-      syncStore.deviceType === 'desktop' ? 'mobile' : 'desktop'
+      deviceInfo.deviceId,
+      deviceInfo.deviceName,
+      deviceInfo.deviceType
     );
-    
+
     if (success) {
       enteredCode.value = '';
+      // Refresh the UI by re-initializing
+      await syncStore.initialize();
     }
   } catch (error) {
     console.error('Failed to accept code:', error);

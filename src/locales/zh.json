@@ -10,7 +10,8 @@
     "tools": "工具",
     "github": "GitHub",
     "settings": "设置",
-    "compare": "团队"
+    "compare": "团队",
+    "sync": "同步"
   },
   "github": {
     "connection": "GitHub 连接",
@@ -61,7 +62,7 @@
     "totalWeek": "本周总计",
     "trend": "与上周相比",
     "productiveTime": "生产时间",
-    "breakdownByApp": "按应用细分及用量",
+    "breakdownByApp": "按应用细分",
     "viewDetails": "查看详情",
     "detailedUsage": "详细应用使用情况",
     "application": "应用",
@@ -87,7 +88,18 @@
     "trackingInactive": "追踪已暂停",
     "dataManagement": "数据管理",
     "exportData": "导出数据",
+    "exportDataDesc": "将所有活动历史保存为文件",
+    "exportSuccess": "数据导出成功！",
+    "exportError": "数据导出失败",
+    "exporting": "导出中...",
     "clearData": "清除所有数据",
+    "resetData": "重置所有数据",
+    "resetDataDesc": "永久删除所有追踪数据和设置",
+    "resetConfirmTitle": "重置所有数据？",
+    "resetConfirmMsg": "这将永久删除所有活动历史、任务、项目和设置。此操作无法撤销。",
+    "resetTypeConfirm": "输入 RESET 以确认",
+    "resetSuccess": "所有数据已成功重置",
+    "resetting": "重置中...",
     "about": "关于",
     "version": "版本",
     "saved": "设置已保存！",
@@ -108,7 +120,8 @@
     "checkForUpdates": "检查更新",
     "checkUpdates": "检查更新",
     "checkNow": "立即检查",
-    "checking": "检查中..."
+    "checking": "检查中...",
+    "noUpdates": "您正在使用最新版本。"
   },
   "tools": {
     "timer": "关机定时器",
@@ -136,6 +149,48 @@
   },
   "weather": {
     "title": "天气与活动"
+  },
+  "projects": {
+    "title": "项目",
+    "subtitle": "GitHub 项目与工作统计",
+    "connectTitle": "连接 GitHub",
+    "connectDesc": "使用 GitHub 登录以管理项目和追踪统计数据",
+    "signInWithGitHub": "使用 GitHub 登录",
+    "credentialsNote": "您将被重定向到 GitHub 进行授权",
+    "createOAuthApp": "创建 OAuth 应用",
+    "createProject": "创建项目",
+    "templateDesc": "选择模板快速开始",
+    "projectTemplates": "项目模板",
+    "startFromScratch": "从头开始",
+    "searchTemplates": "搜索模板",
+    "myProjects": "我的项目",
+    "noProjects": "未找到项目",
+    "noProjectsDesc": "在 GitHub 上创建新项目即可在此查看",
+    "workStats": "工作统计",
+    "timeSpent": "今日花费时间",
+    "noStats": "暂无统计",
+    "noStatsDesc": "开始工作以查看按仓库的时间追踪",
+    "localBoards": "我的看板",
+    "newBoard": "新建看板",
+    "boardNamePlaceholder": "看板名称...",
+    "createBoard": "创建",
+    "noBoardsYet": "暂无看板",
+    "noBoardsDesc": "创建看板以开始追踪您的活动",
+    "recordActivity": "记录活动",
+    "syncToGitHub": "同步到 GitHub",
+    "appName": "应用",
+    "windowTitle": "窗口",
+    "timeTracked": "时间",
+    "date": "日期",
+    "status": "状态",
+    "noItems": "无记录",
+    "noItemsDesc": "点击「记录活动」以捕获应用使用情况",
+    "addTaskPlaceholder": "添加新任务...",
+    "addMilestonePlaceholder": "添加里程碑...",
+    "taskTitle": "任务",
+    "priority": "优先级",
+    "noTasks": "暂无任务",
+    "noMilestones": "暂无里程碑"
   },
   "focus": {
     "title": "专注模式",
@@ -172,6 +227,79 @@
     "close": "关闭",
     "hours": "小时",
     "minutes": "分钟",
-    "seconds": "秒"
+    "seconds": "秒",
+    "generating": "生成中...",
+    "connecting": "连接中..."
+  },
+  "sync": {
+    "title": "手机同步",
+    "description": "在桌面和移动设备之间无缝同步您的活动数据",
+    "status": {
+      "disconnected": "未连接",
+      "connecting": "连接中...",
+      "connected": "已连接",
+      "error": "错误"
+    },
+    "pairing": {
+      "title": "设备配对",
+      "generateCode": "生成配对码",
+      "generateCodeDesc": "生成一个代码以在其他设备上输入",
+      "expiresIn": "有效期至",
+      "generateCodeBtn": "生成代码",
+      "enterCode": "输入配对码",
+      "enterCodeDesc": "输入另一台设备上显示的代码",
+      "codePlaceholder": "XXXXXX",
+      "connectBtn": "连接",
+      "pairedDevices": "已配对设备",
+      "neverSynced": "从未同步",
+      "remove": "移除",
+      "removeConfirm": "确定要移除此设备吗？"
+    },
+    "methods": {
+      "title": "同步方式",
+      "p2p": {
+        "title": "点对点 (P2P)",
+        "description": "通过 WebRTC 进行设备间直接同步"
+      },
+      "api": {
+        "title": "API（存储转发）",
+        "description": "通过您的个人 API 服务器进行同步",
+        "endpointPlaceholder": "API 端点（例如 https://api.yourserver.com）",
+        "tokenPlaceholder": "API 令牌（可选）"
+      }
+    },
+    "queue": {
+      "title": "待处理同步",
+      "retries": "重试次数",
+      "status": {
+        "pending": "待处理",
+        "sent": "已发送",
+        "confirmed": "已确认"
+      }
+    },
+    "backup": {
+      "title": "导出与导入",
+      "export": "导出备份",
+      "import": "导入备份",
+      "exportFailed": "备份导出失败",
+      "importSuccess": "备份导入成功",
+      "importFailed": "备份导入失败"
+    },
+    "settings": {
+      "title": "同步设置",
+      "enableSync": "启用同步",
+      "autoSync": "每5分钟自动同步",
+      "syncOnMetered": "通过移动数据连接同步",
+      "clearData": "清除同步数据",
+      "clearDataConfirm": "这将删除所有配对设备和待处理同步。是否继续？"
+    },
+    "syncing": "同步中...",
+    "syncNow": "立即同步",
+    "syncFailed": "同步失败，请检查您的连接。",
+    "time": {
+      "minutesAgo": "{count}分钟前",
+      "hoursAgo": "{count}小时前",
+      "daysAgo": "{count}天前"
+    }
   }
 }

@@ -232,6 +232,14 @@ pub fn show_main_window_cmd(app: tauri::AppHandle) {
     }
 }
 
+#[command]
+pub fn show_tray_window_cmd(app: tauri::AppHandle) {
+    if let Some(tray_window) = app.get_webview_window("tray") {
+        let _ = tray_window.show();
+        let _ = tray_window.set_focus();
+    }
+}
+
 use tauri::Emitter;
 
 #[command]

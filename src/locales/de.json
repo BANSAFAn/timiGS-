@@ -10,7 +10,8 @@
     "tools": "Werkzeuge",
     "github": "GitHub",
     "settings": "Einstellungen",
-    "compare": "Teams"
+    "compare": "Teams",
+    "sync": "Synchronisierung"
   },
   "github": {
     "connection": "GitHub-Verbindung",
@@ -87,7 +88,18 @@
     "trackingInactive": "Verfolgung ist pausiert",
     "dataManagement": "Datenverwaltung",
     "exportData": "Daten exportieren",
+    "exportDataDesc": "Alle Aktivitätsdaten als Datei speichern",
+    "exportSuccess": "Daten erfolgreich exportiert!",
+    "exportError": "Daten konnten nicht exportiert werden",
+    "exporting": "Exportieren...",
     "clearData": "Alle Daten löschen",
+    "resetData": "Alle Daten zurücksetzen",
+    "resetDataDesc": "Alle verfolgten Daten und Einstellungen dauerhaft löschen",
+    "resetConfirmTitle": "Alle Daten zurücksetzen?",
+    "resetConfirmMsg": "Dies löscht dauerhaft ALLE Aktivitätsverläufe, Aufgaben, Projekte und Einstellungen. Diese Aktion kann nicht rückgängig gemacht werden.",
+    "resetTypeConfirm": "Geben Sie RESET zur Bestätigung ein",
+    "resetSuccess": "Alle Daten wurden erfolgreich zurückgesetzt",
+    "resetting": "Zurücksetzen...",
     "about": "Über",
     "version": "Version",
     "saved": "Einstellungen gespeichert!",
@@ -108,7 +120,8 @@
     "checkForUpdates": "Nach Updates suchen",
     "checkUpdates": "Nach Updates suchen",
     "checkNow": "Jetzt prüfen",
-    "checking": "Prüfe..."
+    "checking": "Prüfe...",
+    "noUpdates": "Sie verwenden die neueste Version."
   },
   "tools": {
     "timer": "Ausschalt-Timer",
@@ -136,6 +149,48 @@
   },
   "weather": {
     "title": "Wetter & Aktivität"
+  },
+  "projects": {
+    "title": "Projekte",
+    "subtitle": "GitHub-Projekte & Arbeitsstatistiken",
+    "connectTitle": "GitHub verbinden",
+    "connectDesc": "Melden Sie sich mit GitHub an, um Projekte zu verwalten und Statistiken zu verfolgen",
+    "signInWithGitHub": "Mit GitHub anmelden",
+    "credentialsNote": "Sie werden zur Autorisierung zu GitHub weitergeleitet",
+    "createOAuthApp": "OAuth-App erstellen",
+    "createProject": "Projekt erstellen",
+    "templateDesc": "Wählen Sie eine Vorlage für einen schnellen Start",
+    "projectTemplates": "Projektvorlagen",
+    "startFromScratch": "Von Grund auf beginnen",
+    "searchTemplates": "Vorlagen suchen",
+    "myProjects": "Meine Projekte",
+    "noProjects": "Keine Projekte gefunden",
+    "noProjectsDesc": "Erstellen Sie ein neues Projekt auf GitHub, um es hier zu sehen",
+    "workStats": "Arbeitsstatistiken",
+    "timeSpent": "heute aufgewendet",
+    "noStats": "Noch keine Statistiken",
+    "noStatsDesc": "Beginnen Sie zu arbeiten, um die Zeiterfassung pro Repository zu sehen",
+    "localBoards": "Meine Boards",
+    "newBoard": "Neues Board",
+    "boardNamePlaceholder": "Board-Name...",
+    "createBoard": "Erstellen",
+    "noBoardsYet": "Noch keine Boards",
+    "noBoardsDesc": "Erstellen Sie ein Board, um Ihre Aktivitäten zu verfolgen",
+    "recordActivity": "Aktivität aufzeichnen",
+    "syncToGitHub": "Mit GitHub synchronisieren",
+    "appName": "Anwendung",
+    "windowTitle": "Fenster",
+    "timeTracked": "Zeit",
+    "date": "Datum",
+    "status": "Status",
+    "noItems": "Keine Einträge",
+    "noItemsDesc": "Klicken Sie auf 'Aktivität aufzeichnen', um die App-Nutzung zu erfassen",
+    "addTaskPlaceholder": "Neue Aufgabe hinzufügen...",
+    "addMilestonePlaceholder": "Meilenstein hinzufügen...",
+    "taskTitle": "Aufgabe",
+    "priority": "Priorität",
+    "noTasks": "Noch keine Aufgaben",
+    "noMilestones": "Noch keine Meilensteine"
   },
   "focus": {
     "title": "Fokus-Modus",
@@ -172,6 +227,79 @@
     "close": "Schließen",
     "hours": "Stunden",
     "minutes": "Minuten",
-    "seconds": "Sekunden"
+    "seconds": "Sekunden",
+    "generating": "Wird generiert...",
+    "connecting": "Verbinden..."
+  },
+  "sync": {
+    "title": "Telefon-Synchronisierung",
+    "description": "Synchronisieren Sie Ihre Aktivitätsdaten nahtlos zwischen Desktop und mobilen Geräten",
+    "status": {
+      "disconnected": "Getrennt",
+      "connecting": "Verbinden...",
+      "connected": "Verbunden",
+      "error": "Fehler"
+    },
+    "pairing": {
+      "title": "Gerätekopplung",
+      "generateCode": "Kopplungscode generieren",
+      "generateCodeDesc": "Generieren Sie einen Code zur Eingabe auf dem anderen Gerät",
+      "expiresIn": "Läuft ab in",
+      "generateCodeBtn": "Code generieren",
+      "enterCode": "Kopplungscode eingeben",
+      "enterCodeDesc": "Geben Sie den auf Ihrem anderen Gerät angezeigten Code ein",
+      "codePlaceholder": "XXXXXX",
+      "connectBtn": "Verbinden",
+      "pairedDevices": "Gekoppelte Geräte",
+      "neverSynced": "Nie synchronisiert",
+      "remove": "Entfernen",
+      "removeConfirm": "Möchten Sie dieses Gerät wirklich entfernen?"
+    },
+    "methods": {
+      "title": "Sync-Methoden",
+      "p2p": {
+        "title": "Peer-to-Peer (P2P)",
+        "description": "Direkte Gerät-zu-Gerät-Synchronisierung über WebRTC"
+      },
+      "api": {
+        "title": "API (Store-and-Forward)",
+        "description": "Synchronisierung über Ihren persönlichen API-Server",
+        "endpointPlaceholder": "API-Endpunkt (z.B. https://api.ihrserver.com)",
+        "tokenPlaceholder": "API-Token (optional)"
+      }
+    },
+    "queue": {
+      "title": "Ausstehende Synchronisierungen",
+      "retries": "Versuche",
+      "status": {
+        "pending": "Ausstehend",
+        "sent": "Gesendet",
+        "confirmed": "Bestätigt"
+      }
+    },
+    "backup": {
+      "title": "Export & Import",
+      "export": "Backup exportieren",
+      "import": "Backup importieren",
+      "exportFailed": "Backup-Export fehlgeschlagen",
+      "importSuccess": "Backup erfolgreich importiert",
+      "importFailed": "Backup-Import fehlgeschlagen"
+    },
+    "settings": {
+      "title": "Sync-Einstellungen",
+      "enableSync": "Synchronisierung aktivieren",
+      "autoSync": "Automatisch alle 5 Minuten synchronisieren",
+      "syncOnMetered": "Über mobile Datenverbindungen synchronisieren",
+      "clearData": "Sync-Daten löschen",
+      "clearDataConfirm": "Dadurch werden alle gekoppelten Geräte und ausstehenden Synchronisierungen entfernt. Fortfahren?"
+    },
+    "syncing": "Synchronisieren...",
+    "syncNow": "Jetzt synchronisieren",
+    "syncFailed": "Synchronisierung fehlgeschlagen. Bitte überprüfen Sie Ihre Verbindung.",
+    "time": {
+      "minutesAgo": "vor {count}Min",
+      "hoursAgo": "vor {count}Std",
+      "daysAgo": "vor {count}T"
+    }
   }
 }

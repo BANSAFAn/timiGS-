@@ -10,7 +10,8 @@
     "tools": "الأدوات",
     "github": "GitHub",
     "settings": "الإعدادات",
-    "compare": "الفِرَق"
+    "compare": "الفِرَق",
+    "sync": "المزامنة"
   },
   "github": {
     "connection": "اتصال GitHub",
@@ -57,7 +58,7 @@
     "weeklyOverview": "نظرة عامة أسبوعية",
     "dailyAverage": "المعدل اليومي",
     "last7Days": "آخر 7 أيام",
-    "mostUsed": "التطبيقات الأكثر استخداما",
+    "mostUsed": "التطبيقات الأكثر استخداماً",
     "totalWeek": "المجموع هذا الأسبوع",
     "trend": "مقارنة بالأسبوع الماضي",
     "productiveTime": "الوقت الإنتاجي",
@@ -73,7 +74,7 @@
     "title": "الإعدادات",
     "appearance": "المظهر",
     "language": "اللغة",
-    "theme": "المظهر",
+    "theme": "السمة",
     "themeDark": "داكن",
     "themeLight": "فاتح",
     "autostart": "ابدأ مع Windows",
@@ -84,16 +85,27 @@
     "startTracking": "بدء التتبع",
     "stopTracking": "إيقاف التتبع",
     "trackingActive": "التتبع نشط",
-    "trackingInactive": "التتبع متوقف مؤقتا",
+    "trackingInactive": "التتبع متوقف مؤقتاً",
     "dataManagement": "إدارة البيانات",
     "exportData": "تصدير البيانات",
+    "exportDataDesc": "حفظ كل سجل النشاط كملف",
+    "exportSuccess": "تم تصدير البيانات بنجاح!",
+    "exportError": "فشل تصدير البيانات",
+    "exporting": "جاري التصدير...",
     "clearData": "مسح جميع البيانات",
+    "resetData": "إعادة تعيين جميع البيانات",
+    "resetDataDesc": "حذف جميع البيانات والإعدادات نهائياً",
+    "resetConfirmTitle": "إعادة تعيين جميع البيانات؟",
+    "resetConfirmMsg": "سيؤدي هذا إلى حذف جميع سجلات النشاط والمهام والمشاريع والإعدادات نهائياً. لا يمكن التراجع عن هذا الإجراء.",
+    "resetTypeConfirm": "اكتب RESET للتأكيد",
+    "resetSuccess": "تمت إعادة تعيين جميع البيانات بنجاح",
+    "resetting": "جاري إعادة التعيين...",
     "about": "حول",
     "version": "الإصدار",
     "saved": "تم حفظ الإعدادات!",
     "dataSync": "مزامنة البيانات",
     "localStorage": "التخزين المحلي",
-    "localStorageDesc": "تصدير أو استيراد بياناتك محليا",
+    "localStorageDesc": "تصدير أو استيراد بياناتك محلياً",
     "import": "استيراد",
     "emailReports": "تقارير البريد الإلكتروني",
     "emailReportsDesc": "إرسال تقرير النشاط الأسبوعي إلى بريدك الإلكتروني",
@@ -108,7 +120,8 @@
     "checkForUpdates": "البحث عن تحديثات",
     "checkUpdates": "البحث عن تحديثات",
     "checkNow": "تحقق الآن",
-    "checking": "جاري التحقق..."
+    "checking": "جاري التحقق...",
+    "noUpdates": "أنت تستخدم أحدث إصدار."
   },
   "tools": {
     "timer": "مؤقت الإغلاق",
@@ -137,6 +150,48 @@
   "weather": {
     "title": "الطقس والنشاط"
   },
+  "projects": {
+    "title": "المشاريع",
+    "subtitle": "مشاريع GitHub وإحصائيات العمل",
+    "connectTitle": "ربط GitHub",
+    "connectDesc": "سجل الدخول بـ GitHub لإدارة مشاريعك وتتبع الإحصائيات",
+    "signInWithGitHub": "تسجيل الدخول بـ GitHub",
+    "credentialsNote": "ستتم إعادة توجيهك إلى GitHub للتفويض",
+    "createOAuthApp": "إنشاء تطبيق OAuth",
+    "createProject": "إنشاء مشروع",
+    "templateDesc": "اختر قالباً للبدء بسرعة",
+    "projectTemplates": "قوالب المشاريع",
+    "startFromScratch": "البدء من الصفر",
+    "searchTemplates": "البحث عن القوالب",
+    "myProjects": "مشاريعي",
+    "noProjects": "لم يتم العثور على مشاريع",
+    "noProjectsDesc": "أنشئ مشروعاً جديداً على GitHub لرؤيته هنا",
+    "workStats": "إحصائيات العمل",
+    "timeSpent": "الوقت المستغرق اليوم",
+    "noStats": "لا توجد إحصائيات بعد",
+    "noStatsDesc": "ابدأ العمل لرؤية تتبع الوقت لكل مستودع",
+    "localBoards": "لوحاتي",
+    "newBoard": "لوحة جديدة",
+    "boardNamePlaceholder": "اسم اللوحة...",
+    "createBoard": "إنشاء",
+    "noBoardsYet": "لا توجد لوحات بعد",
+    "noBoardsDesc": "أنشئ لوحة لبدء تتبع نشاطك",
+    "recordActivity": "تسجيل النشاط",
+    "syncToGitHub": "مزامنة مع GitHub",
+    "appName": "التطبيق",
+    "windowTitle": "النافذة",
+    "timeTracked": "الوقت",
+    "date": "التاريخ",
+    "status": "الحالة",
+    "noItems": "لا توجد سجلات",
+    "noItemsDesc": "انقر على 'تسجيل النشاط' لالتقاط استخدام التطبيقات",
+    "addTaskPlaceholder": "إضافة مهمة جديدة...",
+    "addMilestonePlaceholder": "إضافة مرحلة...",
+    "taskTitle": "المهمة",
+    "priority": "الأولوية",
+    "noTasks": "لا توجد مهام بعد",
+    "noMilestones": "لا توجد مراحل بعد"
+  },
   "focus": {
     "title": "وضع التركيز",
     "selectApp": "اختر التطبيق",
@@ -156,7 +211,7 @@
     "start": "تفعيل وقت الراحة",
     "cancel": "إلغاء وقت الراحة",
     "breakTitle": "حان وقت الاسترخاء!",
-    "breakMessage": "خذ استراحة، اشرب شايا، تمدد!",
+    "breakMessage": "خذ استراحة، اشرب شاياً، تمدد!",
     "nextBreak": "الاستراحة التالية بعد",
     "working": "قيد العمل"
   },
@@ -172,6 +227,79 @@
     "close": "إغلاق",
     "hours": "ساعات",
     "minutes": "دقائق",
-    "seconds": "ثواني"
+    "seconds": "ثواني",
+    "generating": "جاري الإنشاء...",
+    "connecting": "جاري الاتصال..."
+  },
+  "sync": {
+    "title": "مزامنة الهاتف",
+    "description": "مزامنة بيانات نشاطك بين سطح المكتب والأجهزة المحمولة بسلاسة",
+    "status": {
+      "disconnected": "غير متصل",
+      "connecting": "جاري الاتصال...",
+      "connected": "متصل",
+      "error": "خطأ"
+    },
+    "pairing": {
+      "title": "إقران الجهاز",
+      "generateCode": "إنشاء رمز الإقران",
+      "generateCodeDesc": "أنشئ رمزاً لإدخاله على جهازك الآخر",
+      "expiresIn": "ينتهي في",
+      "generateCodeBtn": "إنشاء الرمز",
+      "enterCode": "إدخال رمز الإقران",
+      "enterCodeDesc": "أدخل الرمز المعروض على جهازك الآخر",
+      "codePlaceholder": "XXXXXX",
+      "connectBtn": "اتصال",
+      "pairedDevices": "الأجهزة المقترنة",
+      "neverSynced": "لم تتم المزامنة أبداً",
+      "remove": "إزالة",
+      "removeConfirm": "هل أنت متأكد من أنك تريد إزالة هذا الجهاز؟"
+    },
+    "methods": {
+      "title": "طرق المزامنة",
+      "p2p": {
+        "title": "نظير لنظير (P2P)",
+        "description": "مزامنة مباشرة بين الأجهزة عبر WebRTC"
+      },
+      "api": {
+        "title": "API (التخزين وإعادة التوجيه)",
+        "description": "المزامنة عبر خادم API الشخصي الخاص بك",
+        "endpointPlaceholder": "نقطة نهاية API (مثال: https://api.yourserver.com)",
+        "tokenPlaceholder": "رمز API (اختياري)"
+      }
+    },
+    "queue": {
+      "title": "المزامنات المعلقة",
+      "retries": "المحاولات",
+      "status": {
+        "pending": "معلق",
+        "sent": "مرسل",
+        "confirmed": "مؤكد"
+      }
+    },
+    "backup": {
+      "title": "التصدير والاستيراد",
+      "export": "تصدير النسخة الاحتياطية",
+      "import": "استيراد النسخة الاحتياطية",
+      "exportFailed": "فشل تصدير النسخة الاحتياطية",
+      "importSuccess": "تم استيراد النسخة الاحتياطية بنجاح",
+      "importFailed": "فشل استيراد النسخة الاحتياطية"
+    },
+    "settings": {
+      "title": "إعدادات المزامنة",
+      "enableSync": "تفعيل المزامنة",
+      "autoSync": "مزامنة تلقائية كل 5 دقائق",
+      "syncOnMetered": "المزامنة عبر اتصالات البيانات المحمولة",
+      "clearData": "مسح بيانات المزامنة",
+      "clearDataConfirm": "سيؤدي هذا إلى إزالة جميع الأجهزة المقترنة والمزامنات المعلقة. متابعة؟"
+    },
+    "syncing": "جاري المزامنة...",
+    "syncNow": "مزامنة الآن",
+    "syncFailed": "فشلت المزامنة. يرجى التحقق من اتصالك.",
+    "time": {
+      "minutesAgo": "منذ {count} دقيقة",
+      "hoursAgo": "منذ {count} ساعة",
+      "daysAgo": "منذ {count} يوم"
+    }
   }
 }

@@ -13,6 +13,9 @@ mod discord;
 mod drive;
 mod icons;
 
+#[cfg(desktop)]
+mod tray;
+
 mod focus;
 mod p2p;
 mod picker;
@@ -27,10 +30,7 @@ mod tracker;
 mod android_tracker;
 
 #[cfg(desktop)]
-use tauri::{tray::TrayIconBuilder, Manager, Emitter, WindowEvent};
-
-#[cfg(desktop)]
-static TRAY_LAST_SHOWN: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+use tauri::WindowEvent;
 
 #[cfg(desktop)]
 use tauri_plugin_autostart::MacosLauncher;
@@ -63,18 +63,6 @@ pub fn run() {
                 MB_OK | MB_ICONERROR,
             );
         }
-    }
-
-    // Initialize music directory
-    if let Err(e) = music::init_music_dir(&tauri::AppHandle::from(
-        tauri::Builder::default()
-            .build(tauri::generate_context!())
-            .expect("failed")
-            .handle()
-            .clone(),
-    )) {
-        println!("Failed to init music dir: {}", e);
-        // We'll ignore the error here since it will be properly handled inside the builder setup later.
     }
 
     let builder = tauri::Builder::default()
@@ -121,104 +109,9 @@ pub fn run() {
         // Setup Tray Icon (desktop only)
         #[cfg(desktop)]
         {
-            use tauri::menu::{Menu, MenuItem, PredefinedMenuItem};
-
-            // Navigation items
-            let dashboard_mi = MenuItem::with_id(app, "nav_dashboard", "🏠 Dashboard", true, None::<&str>).unwrap();
-            let timeline_mi = MenuItem::with_id(app, "nav_timeline", "📊 Timeline", true, None::<&str>).unwrap();
-            let tools_mi = MenuItem::with_id(app, "nav_tools", "🛠️ Tools", true, None::<&str>).unwrap();
-            let analytics_mi = MenuItem::with_id(app, "nav_analytics", "📈 Analytics", true, None::<&str>).unwrap();
-
-            // Tracking toggle
-            #[cfg(target_os = "windows")]
-            let is_tracking = crate::tracker::is_tracking();
-            #[cfg(not(target_os = "windows"))]
-            let is_tracking = false;
-            let tracking_label = if is_tracking { "⏹️ Stop Tracking" } else { "▶️ Start Tracking" };
-            let tracking_mi = MenuItem::with_id(app, "toggle_tracking", tracking_label, true, None::<&str>).unwrap();
-
-            // System items
-            let show_mi = MenuItem::with_id(app, "show", "🖥️ Show Window", true, None::<&str>).unwrap();
-            let separator_mi = PredefinedMenuItem::separator(app).unwrap();
-            let quit_mi = MenuItem::with_id(app, "quit", "❌ Quit TimiGS", true, None::<&str>).unwrap();
-
-            let tray_menu = Menu::with_items(app, &[
-                &dashboard_mi,
-                &timeline_mi,
-                &tools_mi,
-                &analytics_mi,
-                &separator_mi,
-                &tracking_mi,
-                &separator_mi,
-                &show_mi,
-                &quit_mi,
-            ]).unwrap();
-
-            let tray = TrayIconBuilder::new()
-                .icon(
-                    tauri::image::Image::from_bytes(include_bytes!("../icons/icon.png"))
-                        .expect("failed to load tray icon"),
-                )
-                .tooltip("TimiGS - Right-click for menu")
-                .menu(&tray_menu)
-                .show_menu_on_left_click(false)
-                .on_menu_event(|app, event| {
-                    let window = app.get_webview_window("main");
-                    let id = event.id.as_ref();
-
-                    println!("Tray menu event: {}", id);
-
-                    // First show and focus main window for all actions
-                    if let Some(w) = &window {
-                        let _ = w.show();
-                        let _ = w.set_focus();
-                        let _ = w.set_always_on_top(true);
-                        std::thread::sleep(std::time::Duration::from_millis(50));
-                        let _ = w.set_always_on_top(false);
-                    }
-
-                    // Then navigate
-                    match id {
-                        "nav_dashboard" => {
-                            println!("Navigating to dashboard");
-                            let _ = app.emit("navigate", "/");
-                        }
-                        "nav_timeline" => {
-                            println!("Navigating to timeline");
-                            let _ = app.emit("navigate", "/timeline");
-                        }
-                        "nav_tools" => {
-                            println!("Navigating to tools");
-                            let _ = app.emit("navigate", "/tools");
-                        }
-                        "nav_analytics" => {
-                            println!("Navigating to analytics");
-                            let _ = app.emit("navigate", "/analytics");
-                        }
-                        "toggle_tracking" => {
-                            #[cfg(target_os = "windows")]
-                            {
-                                if crate::tracker::is_tracking() {
-                                    crate::tracker::stop_tracking();
-                                } else {
-                                    crate::tracker::start_tracking();
-                                }
-                            }
-                        }
-                        "show" => {
-                            println!("Showing main window");
-                        }
-                        "quit" => {
-                            println!("Quitting application");
-                            let _ = app.exit(0);
-                        }
-                        _ => {}
-                    }
-                })
-                .build(app)?;
-
-            // Store tray in app state to prevent it from being dropped
-            app.manage(tray);
+            if let Err(e) = crate::tray::setup(app) {
+                eprintln!("Failed to setup tray: {}", e);
+            }
         }
 
         let _ = music::init_music_dir(app.handle());
@@ -241,30 +134,14 @@ pub fn run() {
         if let WindowEvent::CloseRequested { api, .. } = event {
             // Check if we should minimize to tray
             let should_minimize = db::get_settings().minimize_to_tray;
-            // Check if main window
             if window.label() == "main" && should_minimize {
                 api.prevent_close();
                 let _ = window.hide();
             }
         } else if let WindowEvent::Focused(focused) = event {
-            // Hide tray when it loses focus (user clicks elsewhere)
+            // Auto-hide tray popup when it loses focus
             if window.label() == "tray" && !*focused {
-                let window_clone = window.clone();
-                std::thread::spawn(move || {
-                    // Wait a bit before hiding
-                    std::thread::sleep(std::time::Duration::from_millis(200));
-
-                    // Don't hide if the tray was just shown (prevents race condition)
-                    let shown_at = TRAY_LAST_SHOWN.load(std::sync::atomic::Ordering::SeqCst);
-                    let now = std::time::SystemTime::now()
-                        .duration_since(std::time::UNIX_EPOCH)
-                        .unwrap_or_default()
-                        .as_millis() as u64;
-
-                    if now.saturating_sub(shown_at) > 300 {
-                        let _ = window_clone.hide();
-                    }
-                });
+                crate::tray::handle_tray_focus_lost(window);
             }
         }
     });
@@ -295,6 +172,7 @@ pub fn run() {
             tasks::get_recent_apps_cmd,
             tasks::get_task_progress_cmd,
             commands::show_main_window_cmd,
+            commands::show_tray_window_cmd,
             commands::emit_navigate_cmd,
             commands::quit_app_cmd,
             #[cfg(target_os = "android")]

@@ -60,6 +60,14 @@ export default {
         "glow-pulse": "glowPulse 3s ease-in-out infinite",
         "border-glow": "borderGlow 4s linear infinite",
         "text-shimmer": "textShimmer 3s ease-in-out infinite",
+        "pulse-slow": "pulse-slow 3s ease-in-out infinite",
+        "bounce-slow": "bounce-slow 2s ease-in-out infinite",
+        "float-particle": "float-particle 4s ease-in-out infinite",
+        "shimmer-sweep": "shimmer-sweep 1.5s ease-in-out infinite",
+        "spin-slow": "spin-slow 20s linear infinite",
+        "spin-slow-reverse": "spin-slow-reverse 15s linear infinite",
+        "grid-move": "grid-move 20s linear infinite",
+        "gradient-shift": "gradient-shift 5s ease-in-out infinite",
       },
       keyframes: {
         blob: {
@@ -124,6 +132,40 @@ export default {
         "pulse-glow": {
           "0%, 100%": { boxShadow: "0 0 20px 5px rgba(56, 189, 248, 0.3)" },
           "50%": { boxShadow: "0 0 40px 10px rgba(56, 189, 248, 0.5)" },
+        },
+        "pulse-slow": {
+          "0%, 100%": { opacity: "0.4", transform: "scale(1)" },
+          "50%": { opacity: "0.6", transform: "scale(1.05)" },
+        },
+        "bounce-slow": {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-5px)" },
+        },
+        "float-particle": {
+          "0%, 100%": { transform: "translateY(0) translateX(0)", opacity: "0.3" },
+          "25%": { transform: "translateY(-20px) translateX(10px)", opacity: "0.6" },
+          "50%": { transform: "translateY(-10px) translateX(-10px)", opacity: "0.5" },
+          "75%": { transform: "translateY(-30px) translateX(5px)", opacity: "0.4" },
+        },
+        "shimmer-sweep": {
+          "0%": { transform: "translateX(-100%)" },
+          "100%": { transform: "translateX(100%)" },
+        },
+        "spin-slow": {
+          from: { transform: "rotate(0deg)" },
+          to: { transform: "rotate(360deg)" },
+        },
+        "spin-slow-reverse": {
+          from: { transform: "rotate(360deg)" },
+          to: { transform: "rotate(0deg)" },
+        },
+        "grid-move": {
+          "0%": { backgroundPosition: "0 0" },
+          "100%": { backgroundPosition: "40px 40px" },
+        },
+        "gradient-shift": {
+          "0%, 100%": { backgroundPosition: "0% 50%" },
+          "50%": { backgroundPosition: "100% 50%" },
         },
       },
     },
