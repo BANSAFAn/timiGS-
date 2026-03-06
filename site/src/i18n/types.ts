@@ -44,28 +44,98 @@ export interface Translation {
     music: string;
   };
   hero: {
-    new_version: string;
-    tagline: string;
+    badge: string;
+    badge_new: string;
+    tagline1: string;
+    tagline2: string;
     subtext: string;
     cta_download: string;
     cta_github: string;
-    built_for: string;
-    powered_by: string;
+    stats_downloads: string;
+    stats_stars: string;
+    stats_platforms: string;
+    stats_privacy: string;
+  };
+  whyTimiGS: {
+    title: string;
+    subtitle: string;
+    features: {
+      privacy: { badge: string; title: string; description: string };
+      focus: { badge: string; title: string; description: string };
+      timeout: { badge: string; title: string; description: string };
+      analytics: { badge: string; title: string; description: string };
+      crossplatform: { badge: string; title: string; description: string };
+      opensource: { badge: string; title: string; description: string };
+    };
   };
   features: {
     title: string;
-    realtime_title: string;
-    realtime_desc: string;
-    privacy_title: string;
-    privacy_desc: string;
-    analytics_title: string;
-    analytics_desc: string;
-    timeline_title: string;
-    timeline_desc: string;
-    crossplatform_title: string;
-    crossplatform_desc: string;
-    i18n_title: string;
-    i18n_desc: string;
+    subtitle: string;
+    sections: {
+      tracking: { icon: string; title: string; description: string; highlights: string[] };
+      timeline: { icon: string; title: string; description: string; highlights: string[] };
+      focus: { icon: string; title: string; description: string; highlights: string[] };
+      weather: { icon: string; title: string; description: string; highlights: string[] };
+    };
+  };
+  animations: {
+    title: string;
+    subtitle: string;
+    cards: {
+      live: { title: string; description: string };
+      transitions: { title: string; description: string };
+      visual: { title: string; description: string };
+    };
+  };
+  comparison: {
+    title: string;
+    subtitle: string;
+    features: {
+      free: string;
+      opensource: string;
+      focus: string;
+      local: string;
+      telemetry: string;
+      desktop: string;
+      android: string;
+      breaks: string;
+      weather: string;
+      gdrive: string;
+    };
+    products: {
+      timigs: string;
+      rescuetime: string;
+      toggl: string;
+      wakatime: string;
+    };
+    labels: {
+      yes: string;
+      no: string;
+      partial: string;
+      alpha: string;
+    };
+  };
+  platforms: {
+    title: string;
+    subtitle: string;
+    tech: string;
+    platforms: {
+      windows: { name: string; description: string };
+      macos: { name: string; description: string };
+      linux: { name: string; description: string };
+      android: { name: string; description: string };
+    };
+  };
+  cta: {
+    title: string;
+    subtitle: string;
+    primary: string;
+    secondary: string;
+  };
+  footer: {
+    rights: string;
+    created_by: string;
+    built_with: string;
   };
   downloads: {
     title: string;
@@ -89,6 +159,7 @@ export interface Translation {
     loading: string;
     error: string;
     no_assets_platform: string;
+    cta_download: string;
   };
   releases: {
     title: string;
@@ -108,11 +179,6 @@ export interface Translation {
     license_title: string;
     license_content: string;
   };
-  footer: {
-    rights: string;
-    created_by: string;
-    built_with: string;
-  };
   testing: {
     title: string;
     subtitle: string;
@@ -123,42 +189,5 @@ export interface Translation {
     no_commits: string;
     download_debug: string;
     alpha_warning: string;
-  };
-  home: {
-    badge: string;
-    hero_line1: string;
-    hero_line2: string;
-    unique_title: string;
-    unique_subtitle: string;
-    feat_focus_title: string;
-    feat_focus_desc: string;
-    feat_timeout_title: string;
-    feat_timeout_desc: string;
-    feat_weather_title: string;
-    feat_weather_desc: string;
-    feat_gdrive_title: string;
-    feat_gdrive_desc: string;
-    feat_privacy_title: string;
-    feat_privacy_desc: string;
-    feat_analytics_title: string;
-    feat_analytics_desc: string;
-    compare_title: string;
-    compare_subtitle: string;
-    compare_free: string;
-    compare_opensource: string;
-    compare_focus: string;
-    compare_local: string;
-    compare_notelemetry: string;
-    compare_desktop: string;
-    compare_android: string;
-    compare_breaks: string;
-    compare_weather: string;
-    compare_gdrive: string;
-    platform_label: string;
-    platform_title: string;
-    platform_desc: string;
-    platform_tech: string;
-    cta_title: string;
-    cta_subtitle: string;
   };
 }
