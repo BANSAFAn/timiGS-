@@ -1,0 +1,224 @@
+{
+  "nav": {
+    "home": "首页",
+    "releases": "版本",
+    "download": "下载",
+    "features": "功能",
+    "terms": "条款",
+    "docs": "文档",
+    "notes": "笔记",
+    "testing": "测试",
+    "music": "音乐"
+  },
+  "hero": {
+    "badge": "v2.0 现已发布",
+    "badge_new": "新",
+    "tagline1": "追踪时间。",
+    "tagline2": "掌控专注。",
+    "subtext": "注重隐私的活动追踪。通过详细的分析和仅本地的数据存储，了解您如何花费时间。",
+    "cta_download": "立即下载",
+    "cta_github": "查看源码",
+    "stats_downloads": "下载量",
+    "stats_stars": "GitHub Stars",
+    "stats_platforms": "平台",
+    "stats_privacy": "收集的数据"
+  },
+  "whyTimiGS": {
+    "title": "为什么选择 TimiGS",
+    "subtitle": "发现使 TimiGS 成为时间追踪和生产力最佳选择的功能",
+    "features": {
+      "privacy": {
+        "badge": "🔒",
+        "title": "100% 隐私",
+        "description": "所有数据本地存储于 SQLite。零遥测、零云端上传。您拥有每一个字节的数据。"
+      },
+      "focus": {
+        "badge": "🎯",
+        "title": "专注模式",
+        "description": "将自己锁定在高效工作中。通过密码保护的专注模式阻止应用切换，保持专注。"
+      },
+      "timeout": {
+        "badge": "⏰",
+        "title": "智能休息",
+        "description": "Time OUT 功能提醒您休息。设置自定义间隔，在保持高效的同时保护健康。"
+      },
+      "analytics": {
+        "badge": "📊",
+        "title": "丰富分析",
+        "description": "精美的环形图、饼图和柱状图。逐日时间轴视图。准确了解您的时间去向。"
+      },
+      "crossplatform": {
+        "badge": "💻",
+        "title": "跨平台",
+        "description": "基于 Tauri v2 构建，在 Windows、Linux 和 macOS 上具有高性能。另提供 Android Alpha 支持。"
+      },
+      "opensource": {
+        "badge": "🌟",
+        "title": "开源",
+        "description": "永久免费且开源。以透明度和社区信任为核心构建。"
+      }
+    }
+  },
+  "features": {
+    "title": "强大功能",
+    "subtitle": "掌控时间、提升效率所需的一切",
+    "sections": {
+      "tracking": {
+        "icon": "⚡",
+        "title": "实时追踪",
+        "description": "自动检测活动窗口并追踪使用时长，无需任何手动输入。",
+        "highlights": ["自动检测", "后台监控", "智能分类", "空闲时间检测"]
+      },
+      "timeline": {
+        "icon": "📅",
+        "title": "时间轴视图",
+        "description": "逐日浏览详细的活动历史记录。搜索和过滤您的整个历史记录。",
+        "highlights": ["日间概览", "搜索历史", "分类明细", "导出数据"]
+      },
+      "focus": {
+        "icon": "🎯",
+        "title": "专注模式",
+        "description": "使用我们强大的专注模式消除干扰。阻止分散注意力的应用，保持专注。",
+        "highlights": ["应用阻止", "自定义会话", "密码保护", "休息提醒"]
+      },
+      "weather": {
+        "icon": "🌦️",
+        "title": "内置天气",
+        "description": "追踪器中直接集成天气小部件。自动检测位置或手动设置，无需离开应用即可规划一天。",
+        "highlights": ["自动定位", "5 天预报", "温度和天气状况", "自定义位置"]
+      }
+    }
+  },
+  "animations": {
+    "title": "流畅美观",
+    "subtitle": "注重每个细节的精心设计",
+    "cards": {
+      "live": {
+        "title": "实时活动",
+        "description": "通过流畅的动画实时观看您的活动更新"
+      },
+      "transitions": {
+        "title": "流畅过渡",
+        "description": "流畅的动画让每次交互都感觉自然"
+      },
+      "visual": {
+        "title": "视觉反馈",
+        "description": "为您采取的每个操作获取即时视觉反馈"
+      }
+    }
+  },
+  "comparison": {
+    "title": "TimiGS 对比",
+    "subtitle": "看看 TimiGS 与其他流行的时间追踪解决方案相比如何",
+    "features": {
+      "free": "永久免费",
+      "opensource": "开源",
+      "focus": "专注模式",
+      "local": "本地数据",
+      "telemetry": "无遥测",
+      "desktop": "桌面应用",
+      "android": "Android",
+      "breaks": "休息提醒",
+      "weather": "天气小部件"
+    },
+    "products": {
+      "timigs": "TimiGS",
+      "rescuetime": "RescueTime",
+      "toggl": "Toggl",
+      "wakatime": "WakaTime"
+    },
+    "labels": {
+      "yes": "是",
+      "no": "否",
+      "partial": "部分",
+      "alpha": "Alpha"
+    }
+  },
+  "platforms": {
+    "title": "为性能而生",
+    "subtitle": "由现代技术驱动，提供最佳体验",
+    "tech": "使用 Tauri v2、Rust 和 Vue 3 构建",
+    "platforms": {
+      "windows": {
+        "name": "Windows",
+        "description": "适用于 Windows 10 和 11 的原生 64 位安装程序"
+      },
+      "macos": {
+        "name": "macOS",
+        "description": "针对 macOS 优化。支持 Intel 和 Apple Silicon"
+      },
+      "linux": {
+        "name": "Linux",
+        "description": "提供 AppImage、RPM 和 DEB 包"
+      },
+      "android": {
+        "name": "Android",
+        "description": "适用于 Android 8.0+ 的 APK（Alpha 版本）"
+      }
+    }
+  },
+  "cta": {
+    "title": "准备好掌控了吗？",
+    "subtitle": "立即开始追踪您的时间，释放您的生产力潜力",
+    "primary": "立即下载",
+    "secondary": "在 GitHub 查看"
+  },
+  "footer": {
+    "rights": "版权所有。",
+    "created_by": "创作者",
+    "built_with": "使用 Tauri、Rust 和 Vue 3 构建"
+  },
+  "downloads": {
+    "title": "下载 TimiGS",
+    "subtitle": "选择适合您操作系统的版本。",
+    "latest_version": "最新版本：{version}",
+    "windows": "Windows",
+    "windows_desc": "适用于 Windows 10 和 11 的原生 64 位安装程序。标准安装请选择 .exe。",
+    "mac": "macOS",
+    "mac_desc": "针对 macOS 进行了优化。支持 Intel 和 Apple Silicon 芯片。",
+    "linux": "Linux",
+    "linux_desc": "适用于主要发行版的软件包。AppImage 通用，RPM 适用于 Fedora，DEB 适用于 Ubuntu。",
+    "android": "Android",
+    "android_desc": "适用于 Android 8.0+ 的 APK。这是早期 Alpha 版本，许多功能仍在开发中，可能无法正常工作。",
+    "android_alpha_badge": "ALPHA",
+    "android_alpha_warning": "⚠️ Alpha 版本 — 许多功能不完整或不稳定。使用风险自负。",
+    "source": "源代码",
+    "source_title": "源代码及其他",
+    "source_desc": "需要源代码包、校验和或旧版本？请访问 GitHub 发布页面。",
+    "installer_label": "安装包 ({ext})",
+    "no_assets": "未找到文件。",
+    "loading": "加载中...",
+    "error": "加载失败。",
+    "no_assets_platform": "该平台暂无可用文件",
+    "cta_download": "下载"
+  },
+  "releases": {
+    "title": "发布说明",
+    "subtitle": "探索 TimiGS 的演变历程。",
+    "published_on": "发布于",
+    "view_on_github": "在 GitHub 查看",
+    "assets": "资源",
+    "latest_badge": "最新版本",
+    "prerelease_badge": "预发布"
+  },
+  "terms": {
+    "title": "条款与隐私",
+    "privacy_title": "隐私政策",
+    "privacy_content": "TimiGS 以隐私为核心。所有活动数据均存储在您设备的本地 SQLite 数据库中。我们不会将您的个人数据传输到任何外部云服务器。",
+    "data_title": "数据所有权",
+    "data_content": "您拥有您的数据。您可以随时导出、删除或修改您的本地数据库。",
+    "license_title": "许可证",
+    "license_content": "TimiGS 受 TimiGS Public License (TPL) v1.0 保护。可免费使用、修改和分发，但需正确归属 BANSAFAn。"
+  },
+  "testing": {
+    "title": "测试版本",
+    "subtitle": "最新开发版本和提交历史。",
+    "latest_commit": "最新提交",
+    "recent_changes": "最近更改",
+    "test_builds": "测试版本",
+    "commit_by": "由",
+    "no_commits": "未找到提交。",
+    "download_debug": "下载 Debug APK",
+    "alpha_warning": "这些版本不稳定，可能包含错误。使用风险自负。"
+  }
+}

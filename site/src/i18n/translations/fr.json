@@ -1,0 +1,224 @@
+{
+  "nav": {
+    "home": "Accueil",
+    "releases": "Versions",
+    "download": "Télécharger",
+    "features": "Fonctionnalités",
+    "terms": "Conditions",
+    "docs": "Docs",
+    "notes": "Notes",
+    "testing": "Tests",
+    "music": "Musique"
+  },
+  "hero": {
+    "badge": "v2.0 Maintenant disponible",
+    "badge_new": "Nouveau",
+    "tagline1": "Suivez le temps.",
+    "tagline2": "Maîtrisez le focus.",
+    "subtext": "Suivi d'activité axé sur la confidentialité. Comprenez comment vous passez votre temps grâce à des analyses détaillées et un stockage de données uniquement local.",
+    "cta_download": "Télécharger",
+    "cta_github": "Code Source",
+    "stats_downloads": "Téléchargements",
+    "stats_stars": "Étoiles GitHub",
+    "stats_platforms": "Plateformes",
+    "stats_privacy": "Données collectées"
+  },
+  "whyTimiGS": {
+    "title": "Pourquoi choisir TimiGS",
+    "subtitle": "Découvrez les fonctionnalités qui font de TimiGS le meilleur choix pour le suivi du temps et la productivité",
+    "features": {
+      "privacy": {
+        "badge": "🔒",
+        "title": "100% Confidentialité",
+        "description": "Toutes les données stockées localement dans SQLite. Zéro télémétrie, zéro téléchargement cloud. Vous possédez chaque octet de vos données."
+      },
+      "focus": {
+        "badge": "🎯",
+        "title": "Mode Concentration",
+        "description": "Verrouillez-vous dans un travail productif. Bloquez le changement d'application avec un mode concentration protégé par mot de passe."
+      },
+      "timeout": {
+        "badge": "⏰",
+        "title": "Pauses Intelligentes",
+        "description": "La fonction Time OUT vous rappelle de faire des pauses. Définissez des intervalles personnalisés et protégez votre santé."
+      },
+      "analytics": {
+        "badge": "📊",
+        "title": "Analyses Complètes",
+        "description": "Beaux graphiques en beignet, camembert et barres. Vue chronologique jour par jour. Comprenez exactement où va votre temps."
+      },
+      "crossplatform": {
+        "badge": "💻",
+        "title": "Multiplateforme",
+        "description": "Construit avec Tauri v2 pour des performances élevées sur Windows, Linux et macOS. Plus support Android en alpha."
+      },
+      "opensource": {
+        "badge": "🌟",
+        "title": "Open Source",
+        "description": "Gratuit pour toujours et open source. Construit avec transparence et confiance communautaire."
+      }
+    }
+  },
+  "features": {
+    "title": "Fonctionnalités Puissantes",
+    "subtitle": "Tout ce dont vous avez besoin pour prendre le contrôle de votre temps et booster votre productivité",
+    "sections": {
+      "tracking": {
+        "icon": "⚡",
+        "title": "Suivi en Temps Réel",
+        "description": "Détecte automatiquement les fenêtres actives et suit la durée d'utilisation sans saisie manuelle.",
+        "highlights": ["Détection automatique", "Surveillance en arrière-plan", "Catégorisation intelligente", "Détection d'inactivité"]
+      },
+      "timeline": {
+        "icon": "📅",
+        "title": "Vue Chronologie",
+        "description": "Parcourez votre historique d'activité jour par jour avec des détails précis. Recherchez et filtrez tout votre historique.",
+        "highlights": ["Aperçu de la journée", "Historique de recherche", "Répartition par catégorie", "Exporter les données"]
+      },
+      "focus": {
+        "icon": "🎯",
+        "title": "Mode Concentration",
+        "description": "Éliminez les distractions avec notre puissant mode concentration. Bloquez les applications distrayantes.",
+        "highlights": ["Blocage d'applications", "Sessions personnalisées", "Protection par mot de passe", "Rappels de pause"]
+      },
+      "weather": {
+        "icon": "🌦️",
+        "title": "Météo Intégrée",
+        "description": "Widget météo directement dans votre tracker. Détection automatique ou réglage manuel de la localisation.",
+        "highlights": ["Localisation auto", "Prévisions 5 jours", "Température et conditions", "Localisations personnalisées"]
+      }
+    }
+  },
+  "animations": {
+    "title": "Fluide et Magnifique",
+    "subtitle": "Conçu avec attention à chaque détail",
+    "cards": {
+      "live": {
+        "title": "Activité en Direct",
+        "description": "Regardez votre activité se mettre à jour en temps réel avec des animations fluides"
+      },
+      "transitions": {
+        "title": "Transitions Fluides",
+        "description": "Chaque interaction semble naturelle avec des animations fluides"
+      },
+      "visual": {
+        "title": "Retour Visuel",
+        "description": "Obtenez un retour visuel instantané pour chaque action"
+      }
+    }
+  },
+  "comparison": {
+    "title": "Comparer TimiGS",
+    "subtitle": "Voyez comment TimiGS se compare aux autres solutions de suivi du temps populaires",
+    "features": {
+      "free": "Gratuit pour toujours",
+      "opensource": "Open Source",
+      "focus": "Mode Concentration",
+      "local": "Données Locales",
+      "telemetry": "Pas de Télémétrie",
+      "desktop": "App Desktop",
+      "android": "Android",
+      "breaks": "Rappels de Pause",
+      "weather": "Widget Météo"
+    },
+    "products": {
+      "timigs": "TimiGS",
+      "rescuetime": "RescueTime",
+      "toggl": "Toggl",
+      "wakatime": "WakaTime"
+    },
+    "labels": {
+      "yes": "Oui",
+      "no": "Non",
+      "partial": "Partiel",
+      "alpha": "Alpha"
+    }
+  },
+  "platforms": {
+    "title": "Conçu pour la Performance",
+    "subtitle": "Propulsé par des technologies modernes pour la meilleure expérience",
+    "tech": "Créé avec Tauri v2, Rust & Vue 3",
+    "platforms": {
+      "windows": {
+        "name": "Windows",
+        "description": "Installateurs natifs 64 bits pour Windows 10 et 11"
+      },
+      "macos": {
+        "name": "macOS",
+        "description": "Optimisé pour macOS. Prend en charge Intel et Apple Silicon"
+      },
+      "linux": {
+        "name": "Linux",
+        "description": "Paquets AppImage, RPM et DEB disponibles"
+      },
+      "android": {
+        "name": "Android",
+        "description": "APK pour Android 8.0+ (Version Alpha)"
+      }
+    }
+  },
+  "cta": {
+    "title": "Prêt à prendre le contrôle ?",
+    "subtitle": "Commencez à suivre votre temps aujourd'hui et libérez votre potentiel de productivité",
+    "primary": "Télécharger",
+    "secondary": "Voir sur GitHub"
+  },
+  "footer": {
+    "rights": "Tous droits réservés.",
+    "created_by": "Créé par",
+    "built_with": "Créé avec Tauri, Rust & Vue 3"
+  },
+  "downloads": {
+    "title": "Télécharger TimiGS",
+    "subtitle": "Choisissez la version pour votre système d'exploitation.",
+    "latest_version": "Dernière version: {version}",
+    "windows": "Windows",
+    "windows_desc": "Installateurs natifs 64 bits pour Windows 10 et 11. Choisissez .exe pour une installation standard.",
+    "mac": "macOS",
+    "mac_desc": "Optimisé pour macOS. Prend en charge les puces Intel et Apple Silicon.",
+    "linux": "Linux",
+    "linux_desc": "Paquets pour les principales distributions. AppImage pour la compatibilité, RPM pour Fedora, DEB pour Ubuntu.",
+    "android": "Android",
+    "android_desc": "APK pour Android 8.0+. Il s'agit d'une version Alpha précoce — de nombreuses fonctionnalités sont encore en développement.",
+    "android_alpha_badge": "ALPHA",
+    "android_alpha_warning": "⚠️ Version Alpha — de nombreuses fonctionnalités sont incomplètes ou instables. Utilisez à vos risques.",
+    "source": "Code Source",
+    "source_title": "Code Source et autres",
+    "source_desc": "Besoin du code source ou d'anciennes versions ? Visitez GitHub.",
+    "installer_label": "Installateur ({ext})",
+    "no_assets": "Aucun fichier trouvé.",
+    "loading": "Chargement...",
+    "error": "Erreur de chargement.",
+    "no_assets_platform": "Aucun fichier pour cette plateforme",
+    "cta_download": "Télécharger"
+  },
+  "releases": {
+    "title": "Notes de version",
+    "subtitle": "Explorez l'évolution de TimiGS.",
+    "published_on": "Publié le",
+    "view_on_github": "Voir sur GitHub",
+    "assets": "Fichiers",
+    "latest_badge": "DERNIÈRE VERSION",
+    "prerelease_badge": "Pré-version"
+  },
+  "terms": {
+    "title": "Conditions et Confidentialité",
+    "privacy_title": "Politique de Confidentialité",
+    "privacy_content": "TimiGS est conçu avec la confidentialité comme valeur fondamentale. Toutes les données sont stockées localement sur votre appareil dans une base de données SQLite. Nous ne transmettons aucune donnée personnelle à des serveurs externes.",
+    "data_title": "Propriété des données",
+    "data_content": "Vous êtes propriétaire de vos données. Vous avez le contrôle total pour exporter, supprimer ou modifier votre base de données locale à tout moment.",
+    "license_title": "Licence",
+    "license_content": "TimiGS est protégé par la TimiGS Public License (TPL) v1.0. Utilisation, modification et distribution gratuites avec attribution appropriée à BANSAFAn."
+  },
+  "testing": {
+    "title": "Builds de test",
+    "subtitle": "Derniers builds de développement et historique des commits.",
+    "latest_commit": "Dernier commit",
+    "recent_changes": "Dernières modifications",
+    "test_builds": "Builds de test",
+    "commit_by": "par",
+    "no_commits": "Aucun commit trouvé.",
+    "download_debug": "Télécharger Debug APK",
+    "alpha_warning": "Ces builds sont instables. Utilisez-les à vos risques."
+  }
+}

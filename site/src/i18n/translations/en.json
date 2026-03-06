@@ -1,0 +1,224 @@
+{
+  "nav": {
+    "home": "Home",
+    "releases": "Releases",
+    "download": "Download",
+    "features": "Features",
+    "terms": "Terms",
+    "docs": "Docs",
+    "notes": "Notes",
+    "testing": "Testing",
+    "music": "Music"
+  },
+  "hero": {
+    "badge": "v2.0 Now Available",
+    "badge_new": "New",
+    "tagline1": "Track Time.",
+    "tagline2": "Master Focus.",
+    "subtext": "Privacy-focused activity tracking. Understand how you spend your time with detailed analytics and local-only data storage.",
+    "cta_download": "Download Now",
+    "cta_github": "View Source",
+    "stats_downloads": "Downloads",
+    "stats_stars": "GitHub Stars",
+    "stats_platforms": "Platforms",
+    "stats_privacy": "Data Collected"
+  },
+  "whyTimiGS": {
+    "title": "Why Choose TimiGS",
+    "subtitle": "Discover the features that make TimiGS the best choice for time tracking and productivity",
+    "features": {
+      "privacy": {
+        "badge": "🔒",
+        "title": "100% Privacy",
+        "description": "All data stored locally in SQLite. Zero telemetry, zero cloud uploads. You own every byte of your data."
+      },
+      "focus": {
+        "badge": "🎯",
+        "title": "Focus Mode",
+        "description": "Lock yourself into productive work. Block app switching with a password-protected Focus Mode that keeps you on task."
+      },
+      "timeout": {
+        "badge": "⏰",
+        "title": "Smart Breaks",
+        "description": "Time OUT feature reminds you to take breaks. Set custom intervals and protect your health while staying productive."
+      },
+      "analytics": {
+        "badge": "📊",
+        "title": "Rich Analytics",
+        "description": "Beautiful Donut, Pie, and Bar charts. Day-by-day timeline view. Understand exactly where your time goes."
+      },
+      "crossplatform": {
+        "badge": "💻",
+        "title": "Cross-Platform",
+        "description": "Built with Tauri v2 for high performance on Windows, Linux, and macOS. Plus Android support in alpha."
+      },
+      "opensource": {
+        "badge": "🌟",
+        "title": "Open Source",
+        "description": "Free forever and open source. Built with transparency and community trust at its core."
+      }
+    }
+  },
+  "features": {
+    "title": "Powerful Features",
+    "subtitle": "Everything you need to take control of your time and boost productivity",
+    "sections": {
+      "tracking": {
+        "icon": "⚡",
+        "title": "Real-time Tracking",
+        "description": "Automatically detects active windows and tracks usage duration without any manual input.",
+        "highlights": ["Automatic detection", "Background monitoring", "Smart categorization", "Idle time detection"]
+      },
+      "timeline": {
+        "icon": "📅",
+        "title": "Timeline View",
+        "description": "Browse activity history day-by-day with granular details. Search and filter your entire history.",
+        "highlights": ["Day overview", "Search history", "Category breakdown", "Export data"]
+      },
+      "focus": {
+        "icon": "🎯",
+        "title": "Focus Mode",
+        "description": "Eliminate distractions with our powerful focus mode. Block distracting apps and stay on track.",
+        "highlights": ["App blocking", "Custom sessions", "Password protection", "Break reminders"]
+      },
+      "weather": {
+        "icon": "🌦️",
+        "title": "Built-in Weather",
+        "description": "Weather widget right in your tracker. Auto-detect location or set manually — plan your day without leaving the app.",
+        "highlights": ["Auto location", "5-day forecast", "Temperature & conditions", "Custom locations"]
+      }
+    }
+  },
+  "animations": {
+    "title": "Smooth & Beautiful",
+    "subtitle": "Crafted with attention to every detail",
+    "cards": {
+      "live": {
+        "title": "Live Activity",
+        "description": "Watch your activity update in real-time with smooth animations"
+      },
+      "transitions": {
+        "title": "Smooth Transitions",
+        "description": "Every interaction feels natural with fluid animations"
+      },
+      "visual": {
+        "title": "Visual Feedback",
+        "description": "Get instant visual feedback for every action you take"
+      }
+    }
+  },
+  "comparison": {
+    "title": "Compare TimiGS",
+    "subtitle": "See how TimiGS stacks up against other popular time tracking solutions",
+    "features": {
+      "free": "Free Forever",
+      "opensource": "Open Source",
+      "focus": "Focus Mode",
+      "local": "Local Data",
+      "telemetry": "No Telemetry",
+      "desktop": "Desktop App",
+      "android": "Android",
+      "breaks": "Break Reminders",
+      "weather": "Weather Widget"
+    },
+    "products": {
+      "timigs": "TimiGS",
+      "rescuetime": "RescueTime",
+      "toggl": "Toggl",
+      "wakatime": "WakaTime"
+    },
+    "labels": {
+      "yes": "Yes",
+      "no": "No",
+      "partial": "Partial",
+      "alpha": "Alpha"
+    }
+  },
+  "platforms": {
+    "title": "Built for Performance",
+    "subtitle": "Powered by modern technologies for the best experience",
+    "tech": "Built with Tauri v2, Rust & Vue 3",
+    "platforms": {
+      "windows": {
+        "name": "Windows",
+        "description": "Native 64-bit installers for Windows 10 and 11"
+      },
+      "macos": {
+        "name": "macOS",
+        "description": "Optimized for macOS. Supports Intel and Apple Silicon"
+      },
+      "linux": {
+        "name": "Linux",
+        "description": "AppImage, RPM, and DEB packages available"
+      },
+      "android": {
+        "name": "Android",
+        "description": "APK for Android 8.0+ (Alpha build)"
+      }
+    }
+  },
+  "cta": {
+    "title": "Ready to take control?",
+    "subtitle": "Start tracking your time today and unlock your productivity potential",
+    "primary": "Download Now",
+    "secondary": "View on GitHub"
+  },
+  "footer": {
+    "rights": "All rights reserved.",
+    "created_by": "Created by",
+    "built_with": "Built with Tauri, Rust & Vue 3"
+  },
+  "downloads": {
+    "title": "Download TimiGS",
+    "subtitle": "Choose the version for your operating system.",
+    "latest_version": "Latest Version: {version}",
+    "windows": "Windows",
+    "windows_desc": "Native 64-bit installers for Windows 10 and 11. Choose .exe for standard installation.",
+    "mac": "macOS",
+    "mac_desc": "Optimized for macOS. Supports Intel and Apple Silicon chips via universal binaries.",
+    "linux": "Linux",
+    "linux_desc": "Packages for major distributions. AppImage for universal compatibility, RPM for Fedora, and DEB for Ubuntu/Debian.",
+    "android": "Android",
+    "android_desc": "APK for Android 8.0+. This is an early Alpha build — many features are still in development and may not work correctly.",
+    "android_alpha_badge": "ALPHA",
+    "android_alpha_warning": "⚠️ Alpha version — many features are incomplete or unstable. Use at your own risk.",
+    "source": "Source Code",
+    "source_title": "Source Code & Other Assets",
+    "source_desc": "Need access to source code tarballs, checksums, or older releases? Visit the full release page on GitHub.",
+    "installer_label": "Installer ({ext})",
+    "no_assets": "No assets found.",
+    "loading": "Loading releases...",
+    "error": "Failed to load releases.",
+    "no_assets_platform": "No assets available for this platform",
+    "cta_download": "Download"
+  },
+  "releases": {
+    "title": "Release Notes",
+    "subtitle": "Explore the evolution of TimiGS.",
+    "published_on": "Published on",
+    "view_on_github": "View on GitHub",
+    "assets": "Assets",
+    "latest_badge": "LATEST RELEASE",
+    "prerelease_badge": "Pre-release"
+  },
+  "terms": {
+    "title": "Terms & Privacy",
+    "privacy_title": "Privacy Policy",
+    "privacy_content": "TimiGS is designed with privacy as a core value. All data collected by the application regarding your activity is stored strictly locally on your device using an encrypted SQLite database. We do not transmit your personal data to any external cloud servers.",
+    "data_title": "Data Ownership",
+    "data_content": "You own your data. You have full control to export, delete, or modify your local database at any time. TimiGS provides tools within the application to manage your data retention policies.",
+    "license_title": "License",
+    "license_content": "TimiGS is protected under the TimiGS Public License (TPL) v1.0. Free to use, modify, and distribute with proper attribution to BANSAFAn. The name \"TimiGS\" must be preserved in all derivative works."
+  },
+  "testing": {
+    "title": "Testing Builds",
+    "subtitle": "Latest development builds and commit history.",
+    "latest_commit": "Latest Commit",
+    "recent_changes": "Recent Changes",
+    "test_builds": "Test Builds",
+    "commit_by": "by",
+    "no_commits": "No commits found.",
+    "download_debug": "Download Debug APK",
+    "alpha_warning": "These builds are unstable and may contain bugs. Use at your own risk."
+  }
+}
