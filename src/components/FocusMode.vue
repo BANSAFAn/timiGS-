@@ -276,6 +276,9 @@ async function stopFocus() {
       clearInterval(pollInterval);
       pollInterval = null;
     }
+    // Stop music when focus mode is stopped
+    await stopMusic();
+    stopMusicStatusPolling();
   } catch (e: any) {
     cancelError.value = e;
   }
@@ -344,6 +347,9 @@ async function previewMusic() {
     await stopMusic();
     isPreviewing.value = false;
   } else {
+    // Stop any existing music first to avoid conflicts
+    await invoke('stop_music_cmd').catch(() => {});
+    
     try {
       const track = musicFiles.value.find(f => f.filename === selectedMusic.value);
       if (track) {
@@ -359,6 +365,17 @@ async function previewMusic() {
 
 async function startMusicPlayback() {
   if (!selectedMusic.value) return;
+  
+  // Check if music is already playing to avoid restart
+  try {
+    const currentStatus = await invoke<MusicPlaybackStatus>('get_music_status_cmd');
+    if (currentStatus.is_playing && currentStatus.current_track === selectedMusic.value) {
+      return; // Music is already playing, don't restart
+    }
+  } catch (e) {
+    console.error('Failed to check music status:', e);
+  }
+  
   try {
     const track = musicFiles.value.find(f => f.filename === selectedMusic.value);
     if (track) {
@@ -476,17 +493,17 @@ function stopMusicStatusPolling() {
 }
 
 // Watch for focus mode state changes
-watch(status, (newStatus) => {
+watch(status, async (newStatus) => {
   if (newStatus && newStatus.active) {
     // Focus mode started
     if (selectedMusic.value) {
-      startMusicPlayback();
+      await startMusicPlayback();
     }
     startMusicStatusPolling();
   } else {
-    // Focus mode ended
-    stopMusic();
+    // Focus mode ended - stop music and polling
     stopMusicStatusPolling();
+    await stopMusic();
   }
 }, { immediate: true });
 
@@ -498,8 +515,9 @@ onMounted(() => {
 
 onUnmounted(() => {
   if (pollInterval) clearInterval(pollInterval);
-  if (musicStatusInterval) clearInterval(musicStatusInterval);
-  stopMusic();
+  stopMusicStatusPolling();
+  // Ensure music is stopped when component unmounts
+  invoke('stop_music_cmd').catch(() => {});
 });
 </script>
 

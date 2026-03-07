@@ -278,6 +278,7 @@ import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { convertFileSrc } from "@tauri-apps/api/core";
 import { open as openDialog } from "@tauri-apps/plugin-dialog";
+import { readFile } from "@tauri-apps/plugin-fs";
 import { Icons } from "./icons/IconMap";
 
 useI18n();
@@ -439,15 +440,41 @@ async function loadStatus() {
   }
 }
 
-function manageAudio(breakActive: boolean) {
+async function manageAudio(breakActive: boolean) {
   if (breakActive && !audio.value && playMusicDuringBreak.value) {
     // If a custom track is selected, play it, else play builtin
     let src = "/music/123.mp3";
     const selected = musicFiles.value.find(f => f.filename === selectedMusic.value);
 
     if (selected) {
-      // Use the full path for custom tracks
-      src = convertFileSrc(selected.path);
+      try {
+        // Read file using Tauri FS API and create blob URL
+        const fileData = await readFile(selected.path);
+        const blob = new Blob([fileData], { type: 'audio/mpeg' });
+        const blobUrl = URL.createObjectURL(blob);
+        
+        audio.value = new Audio(blobUrl);
+        audio.value.loop = true;
+        audio.value.volume = volume.value;
+        await audio.value.play();
+        isPlaying.value = true;
+        return;
+      } catch (e) {
+        console.error("Failed to play audio via blob:", e);
+        // Fallback: try direct path
+        try {
+          audio.value = new Audio(selected.path);
+          audio.value.loop = true;
+          audio.value.volume = volume.value;
+          await audio.value.play();
+          isPlaying.value = true;
+          return;
+        } catch (e2) {
+          console.error("Fallback also failed:", e2);
+          isPlaying.value = false;
+          return;
+        }
+      }
     }
 
     audio.value = new Audio(src);
@@ -541,7 +568,13 @@ onMounted(async () => {
   await listen("timeout-break-start", () => {
     loadStatus();
   });
-  await listen("timeout-break-end", () => {
+  await listen("timeout-break-end", async () => {
+    // Stop music immediately when break ends
+    if (audio.value) {
+      audio.value.pause();
+      audio.value = null;
+      isPlaying.value = false;
+    }
     loadStatus();
   });
 });
@@ -550,7 +583,14 @@ onUnmounted(() => {
   // Save preferences
   localStorage.setItem("timigs-timeout-music", selectedMusic.value);
   localStorage.setItem("timigs-timeout-play", String(playMusicDuringBreak.value));
-  
+
+  // Stop music if component is unmounted
+  if (audio.value) {
+    audio.value.pause();
+    audio.value = null;
+    isPlaying.value = false;
+  }
+
   if (pollInterval) clearInterval(pollInterval);
 });
 </script>

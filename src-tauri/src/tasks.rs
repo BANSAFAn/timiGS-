@@ -1,5 +1,5 @@
 use crate::db;
-use tauri::command;
+use tauri::{command, Emitter};
 
 #[command]
 pub fn create_task_cmd(
@@ -40,7 +40,7 @@ pub fn get_task_progress_cmd(id: i64) -> Result<i64, String> {
         .map_err(|e| e.to_string())
 }
 
-pub fn check_goals(app_name: &str) {
+pub fn check_goals(app_handle: &tauri::AppHandle, app_name: &str) {
     if let Ok(tasks) = db::get_tasks() {
         for task in tasks {
             if task.status == "active" && task.app_name == app_name {
@@ -51,9 +51,8 @@ pub fn check_goals(app_name: &str) {
                         println!("Task Completed: {}", task.app_name);
                         let _ = db::update_task_status(task.id, "completed");
 
-                        // Simple system notification using msgbox or similar if on windows?
-                        // Ideally we use tauri notification, but we are deep in a thread here.
-                        // For now, status update is enough. Frontend will see it.
+                        // Emit event to notify frontend
+                        let _ = app_handle.emit("task-completed", task.id);
                     }
                 }
             }

@@ -91,13 +91,13 @@ pub fn run() {
         #[cfg(target_os = "windows")]
         {
             println!("Starting activity tracking for Windows...");
-            tracker::start_tracking();
+            tracker::start_tracking_with_app_handle(app.handle().clone());
         }
 
         #[cfg(target_os = "linux")]
         {
             println!("Starting activity tracking for Linux...");
-            crate::tracker::start_tracking();
+            crate::tracker::start_tracking_with_app_handle(app.handle().clone());
         }
 
         #[cfg(target_os = "windows")]
@@ -152,6 +152,10 @@ pub fn run() {
             commands::get_current_session,
             commands::get_today_activity,
             commands::get_today_summary,
+            commands::get_music_today_summary,
+            commands::get_total_music_time_today,
+            commands::get_current_music_session,
+            commands::get_music_activity_range,
             commands::get_weekly_stats,
             commands::get_activity_range,
             commands::get_settings,

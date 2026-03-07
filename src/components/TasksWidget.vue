@@ -169,6 +169,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { invoke } from '@tauri-apps/api/core';
+import { listen } from '@tauri-apps/api/event';
 import { Icons } from './icons/IconMap';
 
 interface Task {
@@ -399,10 +400,16 @@ function formatDuration(seconds: number) {
     return `${s}s`;
 }
 
-onMounted(() => {
+onMounted(async () => {
   loadTasks();
   // Poll for updates (though without backend command it wont update much yet)
   pollInterval = setInterval(loadTasks, 60000);
+  
+  // Listen for task completion events
+  await listen('task-completed', (event: any) => {
+    console.log('Task completed:', event.payload);
+    loadTasks(); // Reload tasks to show updated status
+  });
 });
 
 onUnmounted(() => {

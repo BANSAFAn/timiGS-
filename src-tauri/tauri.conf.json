@@ -37,7 +37,7 @@
       }
     ],
     "security": {
-      "csp": null
+      "csp": "default-src 'self'; img-src 'self' asset: https://asset.localhost blob: data: https://www.google.com https://t0.gstatic.com https://t1.gstatic.com https://t2.gstatic.com; media-src 'self' asset: https://asset.localhost blob: data: file:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src 'self' http://localhost:* https://asset.localhost blob: data: file:; fs:allow-read-recursive: true; fs:allow-write: false"
     }
   },
   "bundle": {

@@ -30,6 +30,8 @@
     "idle": "No activity detected",
     "todaySummary": "Today's Summary",
     "totalTime": "Total Time",
+    "musicTime": "Music Time",
+    "musicApps": "Music Apps",
     "appsUsed": "Apps Used",
     "sessions": "Sessions",
     "topApps": "Top Applications",

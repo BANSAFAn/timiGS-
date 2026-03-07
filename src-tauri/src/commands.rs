@@ -44,6 +44,35 @@ pub fn get_today_summary() -> Vec<db::AppUsageSummary> {
 }
 
 #[command]
+pub fn get_music_today_summary() -> Vec<db::MusicAppUsage> {
+    db::get_today_music_summary().unwrap_or_default()
+}
+
+#[command]
+pub fn get_total_music_time_today() -> i64 {
+    db::get_total_music_time_today().unwrap_or(0)
+}
+
+#[command]
+pub fn get_current_music_session() -> Option<db::MusicSession> {
+    db::get_today_music_sessions().ok().and_then(|sessions| sessions.into_iter().next())
+}
+
+#[command]
+pub fn get_music_activity_range(from: String, to: String) -> Vec<db::MusicSession> {
+    use chrono::NaiveDate;
+
+    let from_date = NaiveDate::parse_from_str(&from, "%Y-%m-%d").ok();
+    let to_date = NaiveDate::parse_from_str(&to, "%Y-%m-%d").ok();
+
+    if let (Some(f), Some(t)) = (from_date, to_date) {
+        db::get_music_sessions_range(f, t).unwrap_or_default()
+    } else {
+        vec![]
+    }
+}
+
+#[command]
 pub fn get_weekly_stats() -> Vec<db::DailyStats> {
     db::get_weekly_stats().unwrap_or_default()
 }

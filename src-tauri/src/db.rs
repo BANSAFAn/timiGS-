@@ -36,6 +36,25 @@ pub struct DailyStats {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MusicSession {
+    pub id: Option<i64>,
+    pub app_name: String,
+    pub window_title: Option<String>,
+    pub exe_path: String,
+    pub start_time: DateTime<Local>,
+    pub end_time: Option<DateTime<Local>>,
+    pub duration_seconds: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MusicAppUsage {
+    pub app_name: String,
+    pub exe_path: String,
+    pub total_seconds: i64,
+    session_count: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Settings {
     pub language: String,
     pub theme: String,
@@ -182,6 +201,24 @@ pub fn init_database() -> Result<()> {
         )",
         [],
     )?;
+//music kurwa (Це ідея Славіка....ОСЬ СУКА Я ХОТІЛ КИНУТИ ПУЛ, НО НІ ТРЕБА ЙОМУ ЗАХУЯРИТИ ТАКУ ІДЕЮ)
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS music_sessions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            app_name TEXT NOT NULL,
+            window_title TEXT,
+            exe_path TEXT NOT NULL,
+            start_time TEXT NOT NULL,
+            end_time TEXT,
+            duration_seconds INTEGER DEFAULT 0
+        )",
+        [],
+    )?;
+// НІ ну реально їбашити базу для музики)
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_music_start_time ON music_sessions(start_time)",
+        [],
+    )?;
 
     *DB.lock() = Some(conn);
     Ok(())
@@ -236,8 +273,8 @@ pub fn get_today_sessions() -> Result<Vec<ActivitySession>> {
     let start_of_day = today.and_hms_opt(0, 0, 0).unwrap();
 
     let mut stmt = conn.prepare(
-        "SELECT id, app_name, window_title, exe_path, start_time, end_time, duration_seconds 
-         FROM activity_sessions 
+        "SELECT id, app_name, window_title, exe_path, start_time, end_time, duration_seconds
+         FROM activity_sessions
          WHERE date(start_time) = date(?1)
          ORDER BY start_time DESC",
     )?;
@@ -269,8 +306,8 @@ pub fn get_sessions_range(from: NaiveDate, to: NaiveDate) -> Result<Vec<Activity
     let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
 
     let mut stmt = conn.prepare(
-        "SELECT id, app_name, window_title, exe_path, start_time, end_time, duration_seconds 
-         FROM activity_sessions 
+        "SELECT id, app_name, window_title, exe_path, start_time, end_time, duration_seconds
+         FROM activity_sessions
          WHERE date(start_time) >= date(?1) AND date(start_time) <= date(?2)
          ORDER BY start_time DESC",
     )?;
@@ -302,8 +339,8 @@ pub fn get_all_sessions() -> Result<Vec<ActivitySession>> {
     let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
 
     let mut stmt = conn.prepare(
-        "SELECT id, app_name, window_title, exe_path, start_time, end_time, duration_seconds 
-         FROM activity_sessions 
+        "SELECT id, app_name, window_title, exe_path, start_time, end_time, duration_seconds
+         FROM activity_sessions
          ORDER BY start_time DESC",
     )?;
 
@@ -337,7 +374,7 @@ pub fn get_today_summary() -> Result<Vec<AppUsageSummary>> {
 
     let mut stmt = conn.prepare(
         "SELECT app_name, exe_path, SUM(duration_seconds) as total, COUNT(*) as count
-         FROM activity_sessions 
+         FROM activity_sessions
          WHERE date(start_time) = date(?1)
          GROUP BY app_name
          ORDER BY total DESC",
@@ -363,7 +400,7 @@ pub fn get_weekly_stats() -> Result<Vec<DailyStats>> {
 
     let mut stmt = conn.prepare(
         "SELECT date(start_time) as day, SUM(duration_seconds) as total, COUNT(DISTINCT app_name) as apps
-         FROM activity_sessions 
+         FROM activity_sessions
          WHERE start_time >= datetime('now', '-7 days')
          GROUP BY day
          ORDER BY day DESC"
@@ -1021,6 +1058,7 @@ pub fn reset_all_data() -> Result<()> {
     let guard = DB.lock();
     let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
 
+    conn.execute("DELETE FROM music_sessions", [])?;
     conn.execute("DELETE FROM activity_sessions", [])?;
     conn.execute("DELETE FROM tasks", [])?;
     conn.execute("DELETE FROM board_items", [])?;
@@ -1186,7 +1224,7 @@ pub fn export_sessions_html(path: &str) -> Result<()> {
 
 pub fn auto_export_if_needed() -> Result<()> {
     let settings = get_settings();
-    
+
     if !settings.auto_export_enabled || settings.auto_export_folder.is_empty() {
         return Ok(());
     }
@@ -1208,12 +1246,12 @@ pub fn auto_export_if_needed() -> Result<()> {
         let timestamp = now.format("%Y-%m-%d_%H-%M-%S").to_string();
         let filename = format!("TimiGS_Activity_{}.html", timestamp);
         let export_path = PathBuf::from(&settings.auto_export_folder).join(filename);
-        
+
         std::fs::create_dir_all(&settings.auto_export_folder)
             .map_err(|e| rusqlite::Error::ToSqlConversionFailure(Box::new(e)))?;
-        
+
         export_sessions_html(export_path.to_str().unwrap())?;
-        
+
         save_last_export_time(&now.to_rfc3339())?;
     }
 
@@ -1262,4 +1300,162 @@ pub fn get_all_activity() -> Result<Vec<ActivitySession>> {
         .collect();
 
     Ok(sessions)
+}
+
+// Music Sessions Functions
+
+pub fn start_music_session(app_name: &str, window_title: Option<&str>, exe_path: &str) -> Result<i64> {
+    let guard = DB.lock();
+    let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
+
+    let now = Local::now();
+    conn.execute(
+        "INSERT INTO music_sessions (app_name, window_title, exe_path, start_time) VALUES (?1, ?2, ?3, ?4)",
+        params![app_name, window_title, exe_path, now.to_rfc3339()],
+    )?;
+
+    Ok(conn.last_insert_rowid())
+}
+
+pub fn end_music_session(id: i64) -> Result<()> {
+    let guard = DB.lock();
+    let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
+
+    let now = Local::now();
+
+    // Get start time to calculate duration
+    let start_time: String = conn.query_row(
+        "SELECT start_time FROM music_sessions WHERE id = ?1",
+        [id],
+        |row| row.get(0),
+    )?;
+
+    if let Ok(start) = DateTime::parse_from_rfc3339(&start_time) {
+        let duration = (now - start.with_timezone(&Local)).num_seconds();
+        conn.execute(
+            "UPDATE music_sessions SET end_time = ?1, duration_seconds = ?2 WHERE id = ?3",
+            params![now.to_rfc3339(), duration, id],
+        )?;
+    }
+
+    Ok(())
+}
+
+pub fn get_today_music_summary() -> Result<Vec<MusicAppUsage>> {
+    let guard = DB.lock();
+    let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
+
+    let today = Local::now().date_naive();
+
+    let mut stmt = conn.prepare(
+        "SELECT app_name, exe_path, SUM(duration_seconds) as total, COUNT(*) as count
+         FROM music_sessions
+         WHERE date(start_time) = date(?1)
+         GROUP BY app_name
+         ORDER BY total DESC",
+    )?;
+
+    let summaries = stmt
+        .query_map([today.to_string()], |row| {
+            Ok(MusicAppUsage {
+                app_name: row.get(0)?,
+                exe_path: row.get(1)?,
+                total_seconds: row.get(2)?,
+                session_count: row.get(3)?,
+            })
+        })?
+        .collect::<Result<Vec<_>>>()?;
+
+    Ok(summaries)
+}
+
+pub fn get_today_music_sessions() -> Result<Vec<MusicSession>> {
+    let guard = DB.lock();
+    let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
+
+    let today = Local::now().date_naive();
+    let start_of_day = today.and_hms_opt(0, 0, 0).unwrap();
+
+    let mut stmt = conn.prepare(
+        "SELECT id, app_name, window_title, exe_path, start_time, end_time, duration_seconds
+         FROM music_sessions
+         WHERE date(start_time) = date(?1)
+         ORDER BY start_time DESC",
+    )?;
+
+    let sessions = stmt
+        .query_map([start_of_day.to_string()], |row| {
+            Ok(MusicSession {
+                id: Some(row.get(0)?),
+                app_name: row.get(1)?,
+                window_title: row.get(2)?,
+                exe_path: row.get(3)?,
+                start_time: DateTime::parse_from_rfc3339(&row.get::<_, String>(4)?)
+                    .map(|dt| dt.with_timezone(&Local))
+                    .unwrap_or_else(|_| Local::now()),
+                end_time: row
+                    .get::<_, Option<String>>(5)?
+                    .and_then(|s| DateTime::parse_from_rfc3339(&s).ok())
+                    .map(|dt| dt.with_timezone(&Local)),
+                duration_seconds: row.get(6)?,
+            })
+        })?
+        .collect::<Result<Vec<_>>>()?;
+
+    Ok(sessions)
+}
+
+pub fn get_music_sessions_range(from: NaiveDate, to: NaiveDate) -> Result<Vec<MusicSession>> {
+    let guard = DB.lock();
+    let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
+
+    // Use date() function for proper date comparison
+    let from_date_str = from.format("%Y-%m-%d").to_string();
+    let to_date_str = to.format("%Y-%m-%d").to_string();
+
+    let mut stmt = conn.prepare(
+        "SELECT id, app_name, window_title, exe_path, start_time, end_time, duration_seconds
+         FROM music_sessions
+         WHERE date(start_time) >= date(?1) AND date(start_time) <= date(?2)
+         ORDER BY start_time DESC",
+    )?;
+
+    let sessions = stmt
+        .query_map(
+            [from_date_str, to_date_str],
+            |row| {
+                Ok(MusicSession {
+                    id: Some(row.get(0)?),
+                    app_name: row.get(1)?,
+                    window_title: row.get(2)?,
+                    exe_path: row.get(3)?,
+                    start_time: DateTime::parse_from_rfc3339(&row.get::<_, String>(4)?)
+                        .map(|dt| dt.with_timezone(&Local))
+                        .unwrap_or_else(|_| Local::now()),
+                    end_time: row
+                        .get::<_, Option<String>>(5)?
+                        .and_then(|s| DateTime::parse_from_rfc3339(&s).ok())
+                        .map(|dt| dt.with_timezone(&Local)),
+                    duration_seconds: row.get(6)?,
+                })
+            },
+        )?
+        .collect::<Result<Vec<_>>>()?;
+
+    Ok(sessions)
+}
+
+pub fn get_total_music_time_today() -> Result<i64> {
+    let guard = DB.lock();
+    let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
+
+    let today = Local::now().date_naive();
+
+    let total: Option<i64> = conn.query_row(
+        "SELECT SUM(duration_seconds) FROM music_sessions WHERE date(start_time) = date(?1)",
+        [today.to_string()],
+        |row| row.get(0),
+    ).ok();
+
+    Ok(total.unwrap_or(0))
 }

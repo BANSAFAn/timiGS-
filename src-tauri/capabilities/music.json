@@ -10,15 +10,18 @@
         { "path": "$RESOURCE/music" },
         { "path": "$RESOURCE/music/*" },
         { "path": "$APPDATA/timigs/music" },
-        { "path": "$APPDATA/timigs/music/*" }
+        { "path": "$APPDATA/timigs/music/*" },
+        { "path": "**" }
       ]
     },
     {
       "identifier": "fs:allow-read-file",
       "allow": [
         { "path": "$RESOURCE/music/*" },
-        { "path": "$APPDATA/timigs/music/*" }
+        { "path": "$APPDATA/timigs/music/*" },
+        { "path": "**" }
       ]
-    }
+    },
+    "fs:default"
   ]
 }

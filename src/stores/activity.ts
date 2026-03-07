@@ -37,6 +37,23 @@ export interface DailyStats {
   app_count: number;
 }
 
+export interface MusicAppUsage {
+  app_name: string;
+  exe_path: string;
+  total_seconds: number;
+  session_count: number;
+}
+
+export interface MusicSession {
+  id: number;
+  app_name: string;
+  window_title: string | null;
+  exe_path: string;
+  start_time: string;
+  end_time: string | null;
+  duration_seconds: number;
+}
+
 export interface Settings {
   language: string;
   theme: string;
@@ -52,6 +69,9 @@ export const useActivityStore = defineStore('activity', {
     todaySummary: [] as AppUsageSummary[],
     todaySessions: [] as ActivitySession[],
     weeklyStats: [] as DailyStats[],
+    musicSummary: [] as MusicAppUsage[],
+    totalMusicTime: 0,
+    currentMusicSession: null as MusicSession | null,
     settings: {
       language: 'en',
       theme: 'dark',
@@ -68,7 +88,15 @@ export const useActivityStore = defineStore('activity', {
     totalTimeToday: (state) => {
       return state.todaySummary.reduce((acc, app) => acc + app.total_seconds, 0);
     },
-    
+
+    totalTimeMusicToday: (state) => {
+      return state.musicSummary.reduce((acc, app) => acc + app.total_seconds, 0);
+    },
+
+    musicApps: (state) => {
+      return [...state.musicSummary].sort((a, b) => b.total_seconds - a.total_seconds);
+    },
+
     topApps: (state) => {
       // Sort by time descending
       return [...state.todaySummary].sort((a, b) => b.total_seconds - a.total_seconds).slice(0, 5);
@@ -82,12 +110,15 @@ export const useActivityStore = defineStore('activity', {
         const appNameLower = session.app_name.toLowerCase();
         // Check if app is a browser
         if (BROWSERS.some(b => appNameLower.includes(b))) {
+          // Skip YouTube Music - it's tracked as music
+          if (session.window_title.toLowerCase().includes('youtube music')) return;
+          
           let site = 'Unknown';
           const title = session.window_title;
-          
+
           // Pattern 1: "Page Title - Site Name - Browser" or "Page Title - Site Name"
           // We assume the Site Name is the last meaningful part before the browser suffix
-          
+
           // Remove browser suffix if present
           let cleanTitle = title
             .replace(/ - Google Chrome$/i, '')
@@ -107,10 +138,10 @@ export const useActivityStore = defineStore('activity', {
             // If no separator, use the whole title, or try to detect domains
             site = cleanTitle.trim();
           }
-          
+
           // Grouping common sites cleanup
           if (site === 'New Tab') return; // Skip new tabs
-          if (site.endsWith('.com') || site.endsWith('.org')) site = site; 
+          if (site.endsWith('.com') || site.endsWith('.org')) site = site;
 
           if (!SITE_USAGE[site]) SITE_USAGE[site] = 0;
           SITE_USAGE[site] += session.duration_seconds;
@@ -148,6 +179,9 @@ export const useActivityStore = defineStore('activity', {
       try {
         this.todaySummary = await invoke<AppUsageSummary[]>('get_today_summary');
         this.todaySessions = await invoke<ActivitySession[]>('get_today_activity');
+        this.musicSummary = await invoke<MusicAppUsage[]>('get_music_today_summary');
+        this.totalMusicTime = await invoke<number>('get_total_music_time_today');
+        this.currentMusicSession = await invoke<MusicSession | null>('get_current_music_session');
       } catch (error) {
         console.error('Failed to fetch today data:', error);
       } finally {
@@ -223,6 +257,15 @@ export const useActivityStore = defineStore('activity', {
         return await invoke<ActivitySession[]>('get_activity_range', { from, to });
       } catch (error) {
         console.error('Failed to fetch activity range:', error);
+        return [];
+      }
+    },
+
+    async getMusicActivityRange(from: string, to: string) {
+      try {
+        return await invoke<MusicSession[]>('get_music_activity_range', { from, to });
+      } catch (error) {
+        console.error('Failed to fetch music activity range:', error);
         return [];
       }
     },
