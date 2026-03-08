@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/BANSAFAn/timiGS-/compare/v1.1.0...v1.1.1) (2026-03-08)
+
+
+### Documentation
+
+* fix README merge conflict markers in status table ([528c73c](https://github.com/BANSAFAn/timiGS-/commit/528c73c61ba46982c846dfa1cf53cb307dcd9580))
+
 ## [1.1.0](https://github.com/BANSAFAn/timiGS-/compare/v1.0.1...v1.1.0) (2026-03-07)
 
 
