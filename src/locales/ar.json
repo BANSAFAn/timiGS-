@@ -11,7 +11,9 @@
     "github": "GitHub",
     "settings": "الإعدادات",
     "compare": "الفِرَق",
-    "sync": "المزامنة"
+    "sync": "المزامنة",
+    "weather": "الطقس",
+    "transfer": "النقل"
   },
   "github": {
     "connection": "اتصال GitHub",

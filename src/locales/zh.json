@@ -11,7 +11,9 @@
     "github": "GitHub",
     "settings": "设置",
     "compare": "团队",
-    "sync": "同步"
+    "sync": "同步",
+    "weather": "天气",
+    "transfer": "传输"
   },
   "github": {
     "connection": "GitHub 连接",

@@ -8,42 +8,32 @@
       <nav class="sidebar-nav">
         <router-link to="/" class="nav-link" active-class="active">
           <div class="nav-icon" v-html="Icons.dashboard"></div>
-          <span>{{ $t("nav.dashboard") }}</span>
+          <span>{{ $t("nav.dashboard") || "Dashboard" }}</span>
         </router-link>
 
         <router-link to="/timeline" class="nav-link" active-class="active">
           <div class="nav-icon" v-html="Icons.timeline"></div>
-          <span>{{ $t("nav.timeline") }}</span>
+          <span>{{ $t("nav.timeline") || "Timeline" }}</span>
         </router-link>
 
         <router-link to="/analytics" class="nav-link" active-class="active">
           <div class="nav-icon" v-html="Icons.analytics"></div>
-          <span>{{ $t("nav.analytics") }}</span>
+          <span>{{ $t("nav.analytics") || "Analytics" }}</span>
         </router-link>
 
         <router-link to="/weather" class="nav-link" active-class="active">
           <div class="nav-icon" v-html="Icons.weather"></div>
-          <span>Weather</span>
+          <span>{{ $t("nav.weather") || "Weather" }}</span>
         </router-link>
-        
+
         <router-link to="/transfer" class="nav-link" active-class="active">
           <div class="nav-icon" v-html="Icons.transfer"></div>
-          <span>Transfer</span>
+          <span>{{ $t("nav.transfer") || "Transfer" }}</span>
         </router-link>
 
         <router-link to="/tools" class="nav-link" active-class="active">
           <div class="nav-icon" v-html="Icons.tools"></div>
-          <span>{{ $t("nav.tools") }}</span>
-        </router-link>
-
-        <router-link
-          v-if="isGitHubConnected"
-          to="/github"
-          class="nav-link"
-          active-class="active"
-        >
-          <div class="nav-icon" v-html="Icons.github"></div>
-          <span>{{ $t("nav.github") }}</span>
+          <span>{{ $t("nav.tools") || "Tools" }}</span>
         </router-link>
 
         <router-link to="/projects" class="nav-link" active-class="active">
@@ -58,7 +48,7 @@
 
         <router-link to="/settings" class="nav-link" active-class="active">
           <div class="nav-icon" v-html="Icons.settings"></div>
-          <span>{{ $t("nav.settings") }}</span>
+          <span>{{ $t("nav.settings") || "Settings" }}</span>
         </router-link>
       </nav>
     </aside>
@@ -76,12 +66,12 @@
     <nav class="bottom-nav" v-if="shouldShowNav">
       <router-link to="/" class="bottom-nav-item" active-class="active">
         <div class="nav-icon-mobile" v-html="Icons.dashboard"></div>
-        <span>DB</span>
+        <span>{{ $t("nav.dashboard") || "DB" }}</span>
       </router-link>
 
       <router-link to="/timeline" class="bottom-nav-item" active-class="active">
         <div class="nav-icon-mobile" v-html="Icons.timeline"></div>
-        <span>Time</span>
+        <span>{{ $t("nav.timeline") || "Time" }}</span>
       </router-link>
 
       <router-link
@@ -90,32 +80,32 @@
         active-class="active"
       >
         <div class="nav-icon-mobile" v-html="Icons.analytics"></div>
-        <span>Stats</span>
+        <span>{{ $t("nav.analytics") || "Stats" }}</span>
       </router-link>
-      
+
       <router-link to="/weather" class="bottom-nav-item" active-class="active">
          <div class="nav-icon-mobile" v-html="Icons.weather"></div>
-        <span>Weather</span>
+        <span>{{ $t("nav.weather") || "Weather" }}</span>
       </router-link>
 
       <router-link to="/transfer" class="bottom-nav-item" active-class="active">
         <div class="nav-icon-mobile" v-html="Icons.transfer"></div>
-        <span>Send</span>
+        <span>{{ $t("nav.transfer") || "Send" }}</span>
       </router-link>
 
       <router-link to="/projects" class="bottom-nav-item" active-class="active">
         <div class="nav-icon-mobile" v-html="Icons.projects"></div>
-        <span>Projects</span>
+        <span>{{ $t("projects.title") || "Projects" }}</span>
       </router-link>
 
       <router-link to="/sync" class="bottom-nav-item" active-class="active">
         <div class="nav-icon-mobile" v-html="Icons.sync"></div>
-        <span>Sync</span>
+        <span>{{ $t("nav.sync") || "Sync" }}</span>
       </router-link>
 
       <router-link to="/settings" class="bottom-nav-item" active-class="active">
         <div class="nav-icon-mobile" v-html="Icons.settings"></div>
-        <span>Setgs</span>
+        <span>{{ $t("nav.settings") || "Setgs" }}</span>
       </router-link>
     </nav>
   </div>
@@ -123,25 +113,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch, computed } from "vue";
+import { onMounted, watch, computed } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useActivityStore } from "./stores/activity";
 import NotificationToast from "./components/NotificationToast.vue";
 import { Icons } from "./components/icons/IconMap";
 
 const store = useActivityStore();
-const isGitHubConnected = ref(false);
 const router = useRouter();
 const route = useRoute();
 
 const shouldShowNav = computed(() => route.path !== '/tray');
-
-function checkGitHubConnection() {
-  isGitHubConnected.value = !!localStorage.getItem("github_token");
-}
-
-// Listen for storage changes (when user connects in Settings)
-window.addEventListener("storage", checkGitHubConnection);
 
 // Reactive Theme Switching
 watch(() => store.settings.theme, (newTheme) => {
@@ -152,7 +134,6 @@ onMounted(async () => {
   await store.checkPlatform();
   await store.fetchSettings();
   document.documentElement.setAttribute("data-theme", store.settings.theme);
-  checkGitHubConnection();
 
   const { listen } = await import('@tauri-apps/api/event');
 

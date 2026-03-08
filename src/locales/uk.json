@@ -11,7 +11,9 @@
     "github": "GitHub",
     "settings": "Налаштування",
     "compare": "Команди",
-    "sync": "Синхронізація"
+    "sync": "Синхронізація",
+    "weather": "Погода",
+    "transfer": "Передача"
   },
   "github": {
     "connection": "Підключення GitHub",

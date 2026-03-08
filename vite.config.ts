@@ -29,4 +29,7 @@ export default defineConfig(async () => ({
       ignored: ["**/src-tauri/**"],
     },
   },
+  
+  // Use relative paths for assets to work with file:// protocol in production
+  base: './',
 }));

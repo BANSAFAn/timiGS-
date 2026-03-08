@@ -11,7 +11,9 @@
     "github": "GitHub",
     "settings": "Ajustes",
     "compare": "Equipos",
-    "sync": "Sincronización"
+    "sync": "Sincronización",
+    "weather": "Clima",
+    "transfer": "Transferir"
   },
   "github": {
     "connection": "Conexión de GitHub",
