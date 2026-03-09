@@ -179,14 +179,49 @@
                     :placeholder="$t('tools.untitled', 'Untitled Note')"
                     @input="handleInput"
                   />
-                  <span class="save-indicator" :class="{ saved: isSaved }">
-                    <span v-if="!isSaved" class="saving-spinner"></span>
-                    {{
-                      isSaved
-                        ? $t("common.saved", "Saved")
-                        : $t("common.saving", "Saving...")
-                    }}
-                  </span>
+                  <div class="editor-actions">
+                    <button 
+                      class="btn-insert-apps" 
+                      @click="showAppsPanel = !showAppsPanel"
+                      title="Insert tracked apps"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="14" width="7" height="7"></rect>
+                        <rect x="3" y="14" width="7" height="7"></rect>
+                      </svg>
+                      Apps
+                    </button>
+                    <span class="save-indicator" :class="{ saved: isSaved }">
+                      <span v-if="!isSaved" class="saving-spinner"></span>
+                      {{
+                        isSaved
+                          ? $t("common.saved", "Saved")
+                          : $t("common.saving", "Saving...")
+                      }}
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Apps Panel -->
+                <div v-if="showAppsPanel && recentApps.length > 0" class="apps-panel">
+                  <div class="apps-header">
+                    <span>📊 Recent Tracked Apps</span>
+                    <button class="btn-close-panel" @click="showAppsPanel = false">✕</button>
+                  </div>
+                  <div class="apps-grid">
+                    <button
+                      v-for="app in recentApps"
+                      :key="app.app_name"
+                      class="app-chip"
+                      @click="insertAppToNote(app.app_name)"
+                      :style="{ background: getAppColor(app.app_name) }"
+                    >
+                      {{ app.app_name }}
+                      <span class="app-time">{{ formatAppTime(app.total_seconds) }}</span>
+                    </button>
+                  </div>
                 </div>
 
                 <textarea
@@ -215,6 +250,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
+import { invoke } from "@tauri-apps/api/core";
 import ShutdownTimer from "../components/ShutdownTimer.vue";
 import TasksWidget from "../components/TasksWidget.vue";
 import FocusMode from "../components/FocusMode.vue";
@@ -237,9 +273,16 @@ interface Note {
   createdAt: number;
 }
 
+interface AppSummary {
+  app_name: string;
+  total_seconds: number;
+}
+
 const notes = ref<Note[]>([]);
 const selectedNote = ref<Note | null>(null);
 const isSaved = ref(true);
+const showAppsPanel = ref(false);
+const recentApps = ref<AppSummary[]>([]);
 
 const STORAGE_KEY = "timigs_notes";
 
@@ -310,8 +353,45 @@ function deleteNote(id: string) {
   }
 }
 
-onMounted(() => {
+function insertAppToNote(appName: string) {
+  if (!selectedNote.value) return;
+  const timestamp = new Date().toLocaleTimeString();
+  const appendText = `\n[${timestamp}] ${appName}\n`;
+  selectedNote.value.content += appendText;
+  handleInput();
+}
+
+function getAppColor(appName: string): string {
+  let hash = 0;
+  for (let i = 0; i < appName.length; i++) {
+    hash = appName.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const h = Math.abs(hash) % 360;
+  return `linear-gradient(135deg, hsl(${h}, 60%, 45%), hsl(${h}, 60%, 35%))`;
+}
+
+function formatAppTime(seconds: number): string {
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  if (h > 0) return `${h}h ${m}m`;
+  if (m > 0) return `${m}m`;
+  return `${seconds}s`;
+}
+
+async function loadRecentApps() {
+  try {
+    const summary = await invoke<AppSummary[]>("get_summary_by_date_cmd", {
+      date: new Date().toISOString().split("T")[0],
+    });
+    recentApps.value = summary.sort((a, b) => b.total_seconds - a.total_seconds).slice(0, 20);
+  } catch (e) {
+    console.error("Failed to load recent apps", e);
+  }
+}
+
+onMounted(async () => {
   loadNotes();
+  loadRecentApps();
 });
 </script>
 
@@ -502,19 +582,21 @@ onMounted(() => {
 
 /* Notepad Specifics */
 .notepad-card {
-  min-height: 500px;
+  min-height: 550px;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+  border-color: rgba(245, 158, 11, 0.1);
 }
 
 .notepad-layout {
   display: flex;
-  gap: 24px;
+  gap: 20px;
   flex: 1;
-  min-height: 400px;
+  min-height: 450px;
 }
 
 .notes-sidebar {
-  width: 260px;
-  background: rgba(0, 0, 0, 0.2);
+  width: 280px;
+  background: rgba(0, 0, 0, 0.3);
   border-radius: 16px;
   padding: 12px;
   display: flex;
@@ -522,10 +604,11 @@ onMounted(() => {
   gap: 8px;
   overflow-y: auto;
   max-height: 500px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .note-item {
-  padding: 12px 14px;
+  padding: 14px 16px;
   border-radius: 12px;
   cursor: pointer;
   display: flex;
@@ -538,10 +621,11 @@ onMounted(() => {
 
 .note-item:hover {
   background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.08);
 }
 
 .note-item.active {
-  background: rgba(245, 158, 11, 0.15);
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(245, 158, 11, 0.1) 100%);
   border-color: rgba(245, 158, 11, 0.3);
 }
 
@@ -552,12 +636,12 @@ onMounted(() => {
 
 .note-title {
   display: block;
-  font-weight: 500;
-  font-size: 0.9rem;
+  font-weight: 600;
+  font-size: 0.95rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  margin-bottom: 2px;
+  margin-bottom: 4px;
   color: #fff;
 }
 
@@ -573,9 +657,9 @@ onMounted(() => {
 .btn-delete {
   background: rgba(255, 255, 255, 0.05);
   border: none;
-  width: 28px;
-  height: 28px;
-  border-radius: 6px;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
   color: var(--text-muted);
   cursor: pointer;
   display: flex;
@@ -592,6 +676,7 @@ onMounted(() => {
 .btn-delete:hover {
   background: rgba(239, 68, 68, 0.2);
   color: #ef4444;
+  transform: scale(1.05);
 }
 
 .empty-notes {
@@ -601,7 +686,7 @@ onMounted(() => {
 }
 
 .empty-icon {
-  font-size: 2rem;
+  font-size: 2.5rem;
   opacity: 0.3;
   margin-bottom: 10px;
 }
@@ -611,7 +696,7 @@ onMounted(() => {
   flex: 1;
   display: flex;
   flex-direction: column;
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(0, 0, 0, 0.3);
   border-radius: 16px;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.05);
@@ -629,16 +714,51 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
+}
+
+.editor-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.btn-insert-apps {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(59, 130, 246, 0.1) 100%);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  padding: 8px 14px;
+  border-radius: 10px;
+  color: #60a5fa;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-insert-apps:hover {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.3) 0%, rgba(59, 130, 246, 0.15) 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+}
+
+.btn-insert-apps svg {
+  width: 18px;
+  height: 18px;
 }
 
 .note-title-input {
   background: transparent;
   border: none;
   font-size: 1.2rem;
-  font-weight: 600;
+  font-weight: 700;
   color: #fff;
   width: 100%;
   padding: 4px 0;
+  flex: 1;
 }
 
 .note-title-input:focus {
@@ -652,11 +772,117 @@ onMounted(() => {
   align-items: center;
   gap: 6px;
   white-space: nowrap;
-  margin-left: 16px;
 }
 
 .save-indicator.saved {
   color: #10b981;
+}
+
+/* Apps Panel */
+.apps-panel {
+  padding: 16px 20px;
+  background: rgba(0, 0, 0, 0.2);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  animation: slideDown 0.2s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.apps-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.btn-close-panel {
+  background: rgba(255, 255, 255, 0.05);
+  border: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  transition: all 0.2s;
+}
+
+.btn-close-panel:hover {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+}
+
+.apps-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 8px;
+  max-height: 200px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.app-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  position: relative;
+  overflow: hidden;
+}
+
+.app-chip::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 100%);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.app-chip:hover::before {
+  opacity: 1;
+}
+
+.app-chip:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.app-chip span {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.app-time {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.8) !important;
+  font-weight: 500;
+  margin-top: 4px;
 }
 
 .notepad-area {
@@ -666,7 +892,7 @@ onMounted(() => {
   padding: 20px;
   color: var(--text-primary);
   font-size: 1rem;
-  line-height: 1.6;
+  line-height: 1.8;
   resize: none;
   font-family: inherit;
 }
@@ -688,9 +914,9 @@ onMounted(() => {
 }
 
 .select-icon {
-  font-size: 2rem;
+  font-size: 2.5rem;
   display: block;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 /* Button */
@@ -702,15 +928,17 @@ onMounted(() => {
   color: white;
   border: none;
   padding: 10px 20px;
-  border-radius: 10px;
+  border-radius: 12px;
   font-weight: 600;
+  font-size: 0.9rem;
   cursor: pointer;
   transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
 }
 
 .btn-new-note:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+  box-shadow: 0 6px 20px rgba(245, 158, 11, 0.3);
 }
 
 /* Scrollbar */
@@ -731,16 +959,197 @@ onMounted(() => {
   background: rgba(255, 255, 255, 0.2);
 }
 
-@media (max-width: 900px) {
+/* Mobile Responsive */
+@media (max-width: 1024px) {
+  .tools-page {
+    padding-bottom: 20px;
+  }
+  
+  .tool-content-card {
+    padding: 20px;
+  }
+  
   .notepad-layout {
     flex-direction: column;
   }
+  
   .notes-sidebar {
     width: 100%;
-    max-height: 200px;
+    max-height: 180px;
+    flex-direction: row;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 10px;
   }
+  
+  .note-item {
+    min-width: 180px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .btn-delete {
+    opacity: 1;
+    position: absolute;
+    top: 8px;
+    right: 8px;
+  }
+  
+  .note-item-content {
+    width: 100%;
+    padding-right: 36px;
+  }
+  
+  .apps-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .page-header h2 {
+    font-size: 1.3rem;
+  }
+  
+  .subtitle {
+    font-size: 0.85rem;
+  }
+  
+  .tools-tabs {
+    padding: 6px;
+    gap: 6px;
+  }
+  
+  .tab-btn {
+    padding: 10px 16px;
+    font-size: 0.85rem;
+  }
+  
+  .tab-icon {
+    font-size: 1rem;
+  }
+  
+  .tool-content-card {
+    padding: 16px;
+    border-radius: 16px;
+  }
+  
+  .card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .header-icon-box {
+    width: 42px;
+    height: 42px;
+    font-size: 1.2rem;
+  }
+  
+  .tool-content-card h3 {
+    font-size: 1.1rem;
+  }
+  
+  .notepad-card {
+    min-height: auto;
+  }
+  
+  .notepad-layout {
+    min-height: auto;
+  }
+  
+  .notes-sidebar {
+    max-height: 140px;
+  }
+  
+  .note-item {
+    min-width: 150px;
+  }
+  
+  .editor-header {
+    flex-wrap: wrap;
+  }
+  
+  .editor-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .note-title-input {
+    font-size: 1rem;
+  }
+  
+  .btn-insert-apps {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+  }
+  
+  .apps-grid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    max-height: 150px;
+  }
+  
+  .app-chip {
+    padding: 8px 10px;
+  }
+  
+  .app-chip span {
+    font-size: 0.75rem;
+  }
+  
+  .app-time {
+    font-size: 0.65rem;
+  }
+  
   .notepad-area {
-    min-height: 300px;
+    padding: 14px;
+    font-size: 0.95rem;
+    min-height: 250px;
+  }
+  
+  .btn-new-note {
+    padding: 8px 16px;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .tools-tabs {
+    overflow-x: scroll;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .tools-tabs::-webkit-scrollbar {
+    height: 4px;
+  }
+  
+  .tab-btn {
+    white-space: nowrap;
+  }
+  
+  .tool-content-card {
+    padding: 12px;
+  }
+  
+  .notes-sidebar {
+    max-height: 120px;
+  }
+  
+  .note-item {
+    min-width: 130px;
+  }
+  
+  .apps-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .app-chip {
+    min-height: 60px;
+    justify-content: center;
+  }
+  
+  .notepad-area {
+    min-height: 200px;
   }
 }
 </style>

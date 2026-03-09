@@ -5,7 +5,6 @@ import Analytics from "./views/Analytics.vue";
 import Settings from "./views/Settings.vue";
 import Weather from "./views/Weather.vue";
 import Tools from "./views/Tools.vue";
-import Projects from "./views/Projects.vue";
 import Transfer from "./views/Transfer.vue";
 import Tray from "./views/Tray.vue";
 import Sync from "./views/Sync.vue";
@@ -40,11 +39,6 @@ const routes = [
     path: "/tools",
     name: "Tools",
     component: Tools,
-  },
-  {
-    path: "/projects",
-    name: "Projects",
-    component: Projects,
   },
   {
     path: "/transfer",

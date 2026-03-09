@@ -11,7 +11,7 @@
 **A modern, privacy-first activity tracker for Desktop & Android.**
 Track your app usage, visualize productivity, manage tasks, and stay focused — all with your data stored locally.
 
-[📥 Download](https://github.com/BANSAFAn/timiGS-/releases) · [🌐 Website](https://bansafan.github.io/timiGS-/) · [🐛 Report Bug](https://github.com/BANSAFAn/timiGS-/issues)
+[📥 Download](https://github.com/BANSAFAn/timiGS-/releases)  · [🐛 Report Bug](https://github.com/BANSAFAn/timiGS-/issues) · [💬 Discord](https://discord.gg/78V2c4bdpj)
 
 </div>
 

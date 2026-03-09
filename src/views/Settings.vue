@@ -268,14 +268,28 @@
                   @click="exportData('csv')"
                   :disabled="isExporting"
                 >
-                  CSV
+                  📄 CSV
                 </button>
                 <button
                   class="btn btn-secondary"
                   @click="exportData('html')"
                   :disabled="isExporting"
                 >
-                  HTML (Beautiful)
+                  🎨 HTML
+                </button>
+                <button
+                  class="btn btn-secondary"
+                  @click="exportData('json')"
+                  :disabled="isExporting"
+                >
+                  📦 JSON
+                </button>
+                <button
+                  class="btn btn-secondary"
+                  @click="exportData('markdown')"
+                  :disabled="isExporting"
+                >
+                  📝 Markdown
                 </button>
               </div>
             </div>
@@ -300,17 +314,29 @@
                   <span class="toggle-slider"></span>
                 </label>
                 <div v-if="autoExportEnabled" class="auto-export-options">
-                  <select
-                    v-model="autoExportInterval"
-                    @change="saveAutoExportSettings"
-                    class="interval-select"
-                  >
-                    <option :value="1">Every hour</option>
-                    <option :value="6">Every 6 hours</option>
-                    <option :value="12">Every 12 hours</option>
-                    <option :value="24">Daily</option>
-                    <option :value="48">Every 2 days</option>
-                  </select>
+                  <div class="auto-export-row">
+                    <select
+                      v-model="autoExportFormat"
+                      @change="saveAutoExportSettings"
+                      class="format-select"
+                    >
+                      <option value="csv">CSV</option>
+                      <option value="html">HTML</option>
+                      <option value="json">JSON</option>
+                      <option value="markdown">Markdown</option>
+                    </select>
+                    <select
+                      v-model="autoExportInterval"
+                      @change="saveAutoExportSettings"
+                      class="interval-select"
+                    >
+                      <option :value="1">Every hour</option>
+                      <option :value="6">Every 6 hours</option>
+                      <option :value="12">Every 12 hours</option>
+                      <option :value="24">Daily</option>
+                      <option :value="48">Every 2 days</option>
+                    </select>
+                  </div>
                   <span
                     v-if="autoExportFolder"
                     class="folder-path"
@@ -325,7 +351,7 @@
                       style="margin-right: 4px"
                       v-html="Icons.folder"
                     ></span>
-                    Select
+                    Select Folder
                   </button>
                 </div>
               </div>
@@ -830,6 +856,7 @@ const isExporting = ref(false);
 const autoExportEnabled = ref(false);
 const autoExportInterval = ref(24);
 const autoExportFolder = ref("");
+const autoExportFormat = ref("csv");
 
 async function loadAutoExportSettings() {
   try {
@@ -837,6 +864,7 @@ async function loadAutoExportSettings() {
     autoExportEnabled.value = settings.enabled;
     autoExportInterval.value = settings.interval_hours;
     autoExportFolder.value = settings.folder || "";
+    autoExportFormat.value = settings.format || "csv";
   } catch (e) {
     console.error("Failed to load auto-export settings:", e);
   }
@@ -848,6 +876,7 @@ async function saveAutoExportSettings() {
       enabled: autoExportEnabled.value,
       intervalHours: autoExportInterval.value,
       folder: autoExportFolder.value,
+      format: autoExportFormat.value,
     });
     notifications.success("Auto-export settings saved");
   } catch (e) {
@@ -872,18 +901,22 @@ async function selectExportFolder() {
   }
 }
 
-async function exportData(format: "csv" | "html" = "csv") {
+async function exportData(format: "csv" | "html" | "json" | "markdown" = "csv") {
   isExporting.value = true;
   try {
+    const extension = format === "json" ? "json" : format === "markdown" ? "md" : format;
     const filePath = await save({
-      defaultPath: `TimiGS_Activity_${new Date().toISOString().slice(0, 10)}.${format}`,
-      filters: [{ name: format.toUpperCase(), extensions: [format] }],
+      defaultPath: `TimiGS_Activity_${new Date().toISOString().slice(0, 10)}.${extension}`,
+      filters: [{ name: format.toUpperCase(), extensions: [extension] }],
     });
     if (filePath) {
-      await invoke(
-        format === "csv" ? "export_data_csv_cmd" : "export_data_html_cmd",
-        { path: filePath },
-      );
+      const commandMap: Record<string, string> = {
+        csv: "export_data_csv_cmd",
+        html: "export_data_html_cmd",
+        json: "export_data_json_cmd",
+        markdown: "export_data_markdown_cmd",
+      };
+      await invoke(commandMap[format], { path: filePath });
       notifications.success(t("settings.exportSuccess"));
     }
   } catch (e: any) {
@@ -1419,6 +1452,15 @@ onMounted(() => {
   min-width: 0;
 }
 
+.auto-export-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.format-select,
 .interval-select {
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -1428,6 +1470,14 @@ onMounted(() => {
   font-size: 0.9rem;
   cursor: pointer;
   flex-shrink: 0;
+}
+
+.format-select {
+  min-width: 120px;
+}
+
+.interval-select {
+  min-width: 140px;
 }
 
 .folder-path {

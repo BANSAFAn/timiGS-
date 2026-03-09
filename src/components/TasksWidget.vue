@@ -31,7 +31,7 @@
         <p>{{ viewMode === 'active' ? $t('tasks.noTasks', 'No active tasks. Start by adding one!') : 'No completed tasks found.' }}</p>
       </div>
       
-      <div v-for="task in filteredTasks" :key="task.id" class="task-card">
+      <div v-for="task in filteredTasks" :key="task.id" class="task-card" :class="{ completed: task.status === 'completed' }">
         <div class="task-header">
           <div class="task-info">
             <h4 class="task-title">
@@ -425,20 +425,24 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   height: 100%;
-  gap: 16px;
+  gap: 20px;
 }
 
 .widget-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 8px;
 }
 
 .widget-header h3 {
     margin: 0;
-    font-size: 1.1rem;
+    font-size: 1.25rem;
+    font-weight: 700;
     color: var(--text-primary);
+    background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .header-actions {
@@ -448,14 +452,16 @@ onUnmounted(() => {
 
 .header-btn {
     font-size: 1.1rem;
-    padding: 6px;
-    background: var(--bg-secondary);
-    border: 1px solid var(--border);
-    border-radius: 6px;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: all 0.2s ease;
+    color: var(--text-muted);
 }
 
 .header-btn svg {
@@ -463,7 +469,11 @@ onUnmounted(() => {
     height: 18px;
 }
 
-.header-btn:hover { background: var(--bg-tertiary); }
+.header-btn:hover { 
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+    transform: translateY(-2px);
+}
 
 .tasks-list {
   flex: 1;
@@ -471,18 +481,20 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  padding-right: 4px; /* Space for scrollbar */
+  padding-right: 4px;
+  padding-bottom: 8px;
 }
 
-/* Scrollbar styling */
 .tasks-list::-webkit-scrollbar {
   width: 6px;
 }
+
 .tasks-list::-webkit-scrollbar-track {
   background: transparent;
 }
+
 .tasks-list::-webkit-scrollbar-thumb {
-  background: var(--border);
+  background: rgba(255, 255, 255, 0.1);
   border-radius: 3px;
 }
 
@@ -490,7 +502,7 @@ onUnmounted(() => {
   text-align: center;
   color: var(--text-muted);
   font-size: 0.9rem;
-  padding: 24px 0;
+  padding: 40px 0;
 }
 
 .empty-state {
@@ -498,27 +510,51 @@ onUnmounted(() => {
     align-items: center;
     justify-content: center;
     height: 100%;
+    min-height: 200px;
 }
 
 .task-card {
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  padding: 12px;
-  transition: all 0.2s;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 16px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.task-card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: linear-gradient(180deg, #60a5fa 0%, #3b82f6 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.task-card.completed::before {
+  background: linear-gradient(180deg, #4ade80 0%, #22c55e 100%);
 }
 
 .task-card:hover {
-    border-color: var(--primary);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border-color: rgba(96, 165, 250, 0.3);
+    transform: translateX(4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%);
+}
+
+.task-card:hover::before {
+  opacity: 1;
 }
 
 .task-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
 .task-info {
@@ -527,8 +563,8 @@ onUnmounted(() => {
 }
 
 .task-title {
-  font-size: 0.95rem;
-  font-weight: 600;
+  font-size: 1rem;
+  font-weight: 700;
   color: var(--text-primary);
   margin: 0;
   white-space: nowrap;
@@ -540,17 +576,19 @@ onUnmounted(() => {
 }
 
 .filter-tag {
-    font-size: 0.7rem;
-    background: #3b82f633;
+    font-size: 0.65rem;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(59, 130, 246, 0.1) 100%);
     color: #60a5fa;
-    padding: 1px 6px;
-    border-radius: 4px;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-weight: 600;
+    border: 1px solid rgba(59, 130, 246, 0.2);
 }
 
 .task-desc {
   font-size: 0.8rem;
   color: var(--text-muted);
-  margin: 2px 0 0 0;
+  margin: 4px 0 0 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -559,8 +597,8 @@ onUnmounted(() => {
 .task-date {
     font-size: 0.7rem;
     color: var(--text-muted);
-    opacity: 0.7;
-    margin-top: 4px;
+    opacity: 0.6;
+    margin-top: 6px;
 }
 
 .task-actions {
@@ -571,33 +609,36 @@ onUnmounted(() => {
 }
 
 .status-badge {
-  font-size: 0.7rem;
-  padding: 2px 8px;
-  border-radius: 12px;
+  font-size: 0.65rem;
+  padding: 3px 10px;
+  border-radius: 20px;
   text-transform: capitalize;
-  font-weight: 500;
+  font-weight: 700;
+  letter-spacing: 0.3px;
 }
 
 .status-badge.active {
-  background: rgba(59, 130, 246, 0.15);
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(59, 130, 246, 0.1) 100%);
   color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.3);
 }
 
 .status-badge.completed {
-  background: rgba(34, 197, 94, 0.15);
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.2) 0%, rgba(34, 197, 94, 0.1) 100%);
   color: #4ade80;
+  border: 1px solid rgba(34, 197, 94, 0.3);
 }
 
 .btn-icon {
   background: none;
   border: none;
   cursor: pointer;
-  padding: 4px;
-  border-radius: 4px;
+  padding: 6px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.2s;
+  transition: all 0.2s ease;
 }
 
 .delete-btn {
@@ -616,62 +657,108 @@ onUnmounted(() => {
 .delete-btn:hover {
   background: rgba(239, 68, 68, 0.15);
   color: #f87171;
+  transform: scale(1.1);
 }
 
 /* Progress Bar */
 .progress-container {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
+  margin-top: 8px;
 }
 
 .progress-bar {
-  height: 6px;
-  background: rgba(255,255,255,0.1);
-  border-radius: 3px;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
   overflow: hidden;
+  position: relative;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .progress-fill {
   height: 100%;
-  background: var(--primary);
-  border-radius: 3px;
-  transition: width 0.3s ease;
+  background: linear-gradient(90deg, #60a5fa 0%, #3b82f6 50%, #2563eb 100%);
+  border-radius: 4px;
+  transition: width 0.5s ease;
+  position: relative;
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+}
+
+.progress-fill::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.4) 50%,
+    transparent 100%
+  );
+  animation: shimmer 2s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
 }
 
 .progress-labels {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   font-size: 0.75rem;
   color: var(--text-muted);
+  font-weight: 500;
+}
+
+.progress-labels span:last-child {
+  color: #60a5fa;
+  font-weight: 700;
 }
 
 .completion-info {
     font-size: 0.8rem;
     color: var(--text-muted);
     text-align: right;
+    padding-top: 8px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    margin-top: 8px;
+}
+
+.completion-info span {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(34, 197, 94, 0.05) 100%);
+  padding: 4px 10px;
+  border-radius: 8px;
+  color: #4ade80;
+  font-weight: 600;
 }
 
 /* Footer / Form */
 .widget-footer {
-  border-top: 1px solid var(--border);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
   padding-top: 16px;
 }
 
 .btn-primary {
-  background: var(--primary);
+  background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
   color: white;
   border: none;
-  padding: 8px 16px;
-  border-radius: var(--radius-md);
-  font-size: 0.9rem;
-  font-weight: 500;
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: all 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
 .btn-primary svg {
@@ -680,21 +767,24 @@ onUnmounted(() => {
 }
 
 .btn-primary:hover {
-  background: var(--primary-dark);
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
 }
 
 .btn-secondary {
-    background: var(--bg-secondary);
+    background: rgba(255, 255, 255, 0.05);
     color: var(--text-muted);
-    border: 1px solid var(--border);
-    padding: 8px 16px;
-    border-radius: var(--radius-md);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 12px 20px;
+    border-radius: 12px;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.2s ease;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
+    font-weight: 600;
 }
 
 .btn-secondary svg {
@@ -703,8 +793,9 @@ onUnmounted(() => {
 }
 
 .btn-secondary:hover {
-    background: var(--bg-tertiary);
+    background: rgba(255, 255, 255, 0.1);
     color: var(--text-primary);
+    border-color: rgba(255, 255, 255, 0.2);
 }
 
 .full-width {
@@ -712,40 +803,43 @@ onUnmounted(() => {
 }
 
 .add-form {
-  background: var(--bg-tertiary);
-  padding: 12px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+  padding: 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .form-group {
-    margin-bottom: 8px;
+    margin-bottom: 12px;
 }
 
-.mb-2 { margin-bottom: 8px; }
-.mb-3 { margin-bottom: 12px; }
+.mb-2 { margin-bottom: 12px; }
+.mb-3 { margin-bottom: 16px; }
 
 .input-label {
     display: block;
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     color: var(--text-muted);
-    margin-bottom: 4px;
+    margin-bottom: 6px;
+    font-weight: 500;
 }
 
 .input-field {
   width: 100%;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 10px 14px;
   color: var(--text-primary);
   font-size: 0.9rem;
-  transition: border-color 0.2s;
+  transition: all 0.2s ease;
 }
 
 .input-field:focus {
   outline: none;
-  border-color: var(--primary);
+  border-color: #60a5fa;
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .relative { position: relative; }
@@ -755,24 +849,27 @@ onUnmounted(() => {
     top: 100%;
     left: 0;
     right: 0;
-    background: var(--bg-secondary);
-    border: 1px solid var(--border);
-    border-radius: 0 0 6px 6px;
+    background: rgba(15, 23, 42, 0.98);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0 0 10px 10px;
     max-height: 150px;
     overflow-y: auto;
     z-index: 10;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    margin-top: 4px;
 }
 
 .suggestion-item {
-    padding: 8px 12px;
+    padding: 10px 14px;
     font-size: 0.9rem;
     cursor: pointer;
-    transition: background 0.1s;
+    transition: all 0.15s ease;
+    color: var(--text-muted);
 }
 
 .suggestion-item:hover {
-    background: var(--bg-primary);
+    background: rgba(59, 130, 246, 0.15);
+    color: #60a5fa;
 }
 
 .form-row {
@@ -786,21 +883,115 @@ onUnmounted(() => {
     flex-direction: column;
 }
 
-.input-suffix {
-    position: absolute;
-    right: 12px;
-    top: 32px;
-    color: var(--text-muted);
-    font-size: 0.85rem;
-    pointer-events: none;
+.flex-1 {
+    flex: 1;
 }
 
 .form-actions {
   display: flex;
-  gap: 8px;
+  gap: 10px;
 }
 
-.flex-1 {
-    flex: 1;
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .widget-header h3 {
+    font-size: 1.1rem;
+  }
+  
+  .task-card {
+    padding: 12px;
+  }
+  
+  .task-header {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .task-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .task-title {
+    font-size: 0.9rem;
+  }
+  
+  .filter-tag {
+    font-size: 0.6rem;
+    padding: 1px 5px;
+  }
+  
+  .form-row {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .input-wrapper {
+    width: 100%;
+  }
+  
+  .input-field {
+    padding: 9px 12px;
+    font-size: 0.85rem;
+  }
+  
+  .btn-primary,
+  .btn-secondary {
+    padding: 10px 16px;
+    font-size: 0.9rem;
+  }
+  
+  .progress-bar {
+    height: 6px;
+  }
+  
+  .progress-labels {
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .tasks-widget {
+    gap: 12px;
+  }
+  
+  .widget-header {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  
+  .header-actions {
+    margin-left: auto;
+  }
+  
+  .task-card {
+    padding: 10px;
+    border-radius: 12px;
+  }
+  
+  .task-title {
+    font-size: 0.85rem;
+  }
+  
+  .task-desc {
+    font-size: 0.75rem;
+  }
+  
+  .status-badge {
+    font-size: 0.6rem;
+    padding: 2px 6px;
+  }
+  
+  .add-form {
+    padding: 12px;
+  }
+  
+  .apps-panel {
+    padding: 12px;
+  }
+  
+  .apps-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 </style>
