@@ -7,9 +7,7 @@
 
     <!-- Device Info -->
     <div class="card device-info">
-      <div class="device-icon">
-        <IconDevice :type="syncStore.deviceType" />
-      </div>
+      <div class="device-icon" v-html="getDeviceIcon(syncStore.deviceType)"></div>
       <div class="device-details">
         <h3>{{ syncStore.deviceName }}</h3>
         <p class="device-id">{{ syncStore.deviceId }}</p>
@@ -70,10 +68,10 @@
       <!-- Paired Devices -->
       <div v-else class="paired-devices">
         <h3>{{ t('sync.pairing.pairedDevices') }}</h3>
-        
+
         <div v-for="device in syncStore.pairedDevices" :key="device.id" class="paired-device">
           <div class="paired-device-info">
-            <IconDevice :type="device.type" />
+            <span v-html="getDeviceIcon(device.type)"></span>
             <div>
               <h4>{{ device.name }}</h4>
               <p class="device-id-small">{{ device.id }}</p>
@@ -82,8 +80,8 @@
               </p>
             </div>
           </div>
-          
-          <button 
+
+          <button
             class="btn btn-danger btn-small"
             @click="removeDevice(device.id)"
           >
@@ -462,8 +460,8 @@ function formatTime(timestamp: number): string {
   return new Date(timestamp).toLocaleString();
 }
 
-// Icon component with SVG
-function IconDevice({ type }: { type: 'desktop' | 'mobile' }) {
+// Get device icon SVG
+function getDeviceIcon(type: 'desktop' | 'mobile'): string {
   if (type === 'desktop') {
     return `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
       <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
