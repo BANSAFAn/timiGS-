@@ -262,35 +262,68 @@
                   </p>
                 </div>
               </div>
-              <div class="export-buttons">
+              <div class="export-dropdown" :class="{ open: exportDropdownOpen }">
                 <button
-                  class="btn btn-secondary"
-                  @click="exportData('csv')"
+                  class="export-dropdown-trigger btn btn-primary"
+                  @click="exportDropdownOpen = !exportDropdownOpen"
                   :disabled="isExporting"
                 >
-                  📄 CSV
+                  <span v-html="getExportIcon(selectedExportFormat)"></span>
+                  <span>{{ selectedExportFormat.toUpperCase() }}</span>
+                  <svg class="dropdown-chevron" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
                 </button>
-                <button
-                  class="btn btn-secondary"
-                  @click="exportData('html')"
-                  :disabled="isExporting"
-                >
-                  🎨 HTML
-                </button>
-                <button
-                  class="btn btn-secondary"
-                  @click="exportData('json')"
-                  :disabled="isExporting"
-                >
-                  📦 JSON
-                </button>
-                <button
-                  class="btn btn-secondary"
-                  @click="exportData('markdown')"
-                  :disabled="isExporting"
-                >
-                  📝 Markdown
-                </button>
+                <div class="export-dropdown-menu">
+                  <button
+                    class="export-dropdown-item"
+                    @click="selectExportFormat('csv')"
+                  >
+                    <span class="export-icon-wrapper" v-html="Icons.exportCSV"></span>
+                    <div class="export-item-content">
+                      <span class="item-text">CSV</span>
+                      <span class="format-desc">Spreadsheet compatible</span>
+                    </div>
+                  </button>
+                  <button
+                    class="export-dropdown-item"
+                    @click="selectExportFormat('html')"
+                  >
+                    <span class="export-icon-wrapper" v-html="Icons.exportHTML"></span>
+                    <div class="export-item-content">
+                      <span class="item-text">HTML</span>
+                      <span class="format-desc">Web page format</span>
+                    </div>
+                  </button>
+                  <button
+                    class="export-dropdown-item"
+                    @click="selectExportFormat('json')"
+                  >
+                    <span class="export-icon-wrapper" v-html="Icons.exportJSON"></span>
+                    <div class="export-item-content">
+                      <span class="item-text">JSON</span>
+                      <span class="format-desc">Machine readable</span>
+                    </div>
+                  </button>
+                  <button
+                    class="export-dropdown-item"
+                    @click="selectExportFormat('markdown')"
+                  >
+                    <span class="export-icon-wrapper" v-html="Icons.exportMarkdown"></span>
+                    <div class="export-item-content">
+                      <span class="item-text">Markdown</span>
+                      <span class="format-desc">Documentation format</span>
+                    </div>
+                  </button>
+                  <div class="export-divider"></div>
+                  <button
+                    class="export-dropdown-item export-action"
+                    @click="exportWithSelectedFormat"
+                  >
+                    <span class="export-icon-wrapper" v-html="Icons.dataExport"></span>
+                    <span class="item-text">Export Now</span>
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -544,7 +577,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, reactive, computed } from "vue";
+import { ref, onMounted, onUnmounted, reactive, computed } from "vue";
 import { useI18n } from "vue-i18n";
 import { invoke } from "@tauri-apps/api/core";
 import { useActivityStore } from "../stores/activity";
@@ -851,6 +884,8 @@ const showResetModal = ref(false);
 const resetConfirmText = ref("");
 const isResetting = ref(false);
 const isExporting = ref(false);
+const exportDropdownOpen = ref(false);
+const selectedExportFormat = ref<"csv" | "html" | "json" | "markdown">("csv");
 
 // Auto-export settings
 const autoExportEnabled = ref(false);
@@ -927,6 +962,51 @@ async function exportData(format: "csv" | "html" | "json" | "markdown" = "csv") 
   }
 }
 
+// Export dropdown functions
+function getExportIcon(format: string): string {
+  switch (format) {
+    case "csv":
+      return Icons.exportCSV;
+    case "html":
+      return Icons.exportHTML;
+    case "json":
+      return Icons.exportJSON;
+    case "markdown":
+      return Icons.exportMarkdown;
+    default:
+      return Icons.exportCSV;
+  }
+}
+
+function selectExportFormat(format: "csv" | "html" | "json" | "markdown") {
+  selectedExportFormat.value = format;
+  exportDropdownOpen.value = false;
+}
+
+function exportWithSelectedFormat() {
+  exportData(selectedExportFormat.value);
+  exportDropdownOpen.value = false;
+}
+
+// Close dropdown when clicking outside
+function handleClickOutside(e: MouseEvent) {
+  const dropdown = document.querySelector(".export-dropdown");
+  if (dropdown && !dropdown.contains(e.target as Node)) {
+    exportDropdownOpen.value = false;
+  }
+}
+
+onMounted(() => {
+  // Delay slightly to allow transition
+  setTimeout(initSettings, 100);
+  loadAutoExportSettings();
+  document.addEventListener("click", handleClickOutside);
+});
+
+onUnmounted(() => {
+  document.removeEventListener("click", handleClickOutside);
+});
+
 async function confirmResetData() {
   if (resetConfirmText.value !== "RESET") return;
   isResetting.value = true;
@@ -944,12 +1024,6 @@ async function confirmResetData() {
     isResetting.value = false;
   }
 }
-
-onMounted(() => {
-  // Delay slightly to allow transition
-  setTimeout(initSettings, 100);
-  loadAutoExportSettings();
-});
 </script>
 
 <style scoped>
@@ -1418,14 +1492,168 @@ onMounted(() => {
   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
 
-/* Export Buttons */
-.export-buttons {
-  display: flex;
-  gap: 8px;
+/* Export Dropdown */
+.export-dropdown {
+  position: relative;
+  display: inline-block;
 }
 
-.export-buttons .btn {
-  min-width: 80px;
+.export-dropdown.open .export-dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.export-dropdown-trigger {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 18px;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.export-dropdown-trigger:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+}
+
+.export-dropdown-trigger:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.export-dropdown-trigger > span:first-child {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+}
+
+.export-dropdown-trigger > span:first-child svg {
+  width: 100%;
+  height: 100%;
+}
+
+.dropdown-chevron {
+  transition: transform 0.3s ease;
+}
+
+.export-dropdown.open .dropdown-chevron {
+  transform: rotate(180deg);
+}
+
+.export-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 260px;
+  background: rgba(30, 30, 40, 0.98);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 8px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(20px);
+}
+
+.export-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 16px;
+  background: transparent;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  position: relative;
+}
+
+.export-dropdown-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.export-dropdown-item:active {
+  transform: scale(0.98);
+}
+
+.export-icon-wrapper {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.export-icon-wrapper svg {
+  width: 100%;
+  height: 100%;
+}
+
+.export-item-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.export-dropdown-item .item-text {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.export-dropdown-item .format-desc {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.export-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 8px 0;
+}
+
+.export-action {
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 12px !important;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark)) !important;
+  color: white !important;
+  margin-top: 4px;
+}
+
+.export-action:hover {
+  background: linear-gradient(135deg, var(--color-primary-dark), var(--color-primary)) !important;
+}
+
+.export-action .export-icon-wrapper {
+  position: static;
+  transform: none;
+}
+
+.export-action > span {
+  margin-left: 0 !important;
+}
+
+.export-action .format-desc {
+  display: none;
 }
 
 /* Auto-Export Settings */
