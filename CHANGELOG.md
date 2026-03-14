@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.2.0](https://github.com/BANSAFAn/timiGS-/compare/v1.1.1...v1.2.0) (2026-03-14)
+
+
+### Features
+
+* improve Sync design with SVG icons and modern UI ([20570bd](https://github.com/BANSAFAn/timiGS-/commit/20570bd06481935acce10bdaa081bae5125565f5))
+* new table syns ([129bfe3](https://github.com/BANSAFAn/timiGS-/commit/129bfe3d7d048dbe89e14698d033db29e2694fc6))
+* update contacts, export formats and fix analytics toggle ([c577454](https://github.com/BANSAFAn/timiGS-/commit/c57745459f69b0d40d8ed7aeb9cff1058eedb2e4))
+
+
+### Bug Fixes
+
+* remove Android, improve Linux tracking ([39cf1ac](https://github.com/BANSAFAn/timiGS-/commit/39cf1ac089d6d9b44485bf88c1a7033ebe77d1b3))
+* tracing Linux ([cae4ae3](https://github.com/BANSAFAn/timiGS-/commit/cae4ae3825d1c3981772fda24dacc48f3278d402))
+
 ## [1.1.1](https://github.com/BANSAFAn/timiGS-/compare/v1.1.0...v1.1.1) (2026-03-08)
 
 
