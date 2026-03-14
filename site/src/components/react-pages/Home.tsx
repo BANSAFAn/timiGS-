@@ -127,7 +127,7 @@ const Home: React.FC<HomeProps> = ({ lang, t }) => {
     { feature: t.comparison.features.local, timigs: true, rescuetime: false, toggl: false, wakatime: false },
     { feature: t.comparison.features.telemetry, timigs: true, rescuetime: false, toggl: false, wakatime: false },
     { feature: t.comparison.features.desktop, timigs: true, rescuetime: true, toggl: true, wakatime: true },
-    { feature: t.comparison.features.android, timigs: "alpha", rescuetime: true, toggl: true, wakatime: false },
+    { feature: t.comparison.features.android, timigs: false, rescuetime: true, toggl: true, wakatime: false },
     { feature: t.comparison.features.breaks, timigs: true, rescuetime: false, toggl: false, wakatime: false },
     { feature: t.comparison.features.weather, timigs: true, rescuetime: false, toggl: false, wakatime: false },
   ];

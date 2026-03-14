@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { fetchReleases } from '../../services/githubService';
 import { Language } from '../../i18n/types';
 import type { GithubRelease, GithubAsset, Translation } from '../../i18n/types';
-import { Monitor, Apple, Terminal, Smartphone, Box, Download as DownloadIcon, AlertCircle, ExternalLink, Sparkles, ArrowRight, Shield, Zap } from 'lucide-react';
+import { Monitor, Apple, Terminal, Box, Download as DownloadIcon, AlertCircle, ExternalLink, Sparkles, ArrowRight, Shield, Zap } from 'lucide-react';
 
 interface DownloadProps {
     lang: Language;
@@ -50,7 +50,6 @@ const Download: React.FC<DownloadProps> = ({ lang, t }) => {
   const windowsAssets = getAssetsByExt(['.exe', '.msi']);
   const macAssets = getAssetsByExt(['.dmg', '.app']);
   const linuxAssets = getAssetsByExt(['.AppImage', '.rpm', '.deb']);
-  const androidAssets = getAssetsByExt(['.apk']);
 
   const formatSize = (bytes: number) => (bytes / (1024 * 1024)).toFixed(1) + ' MB';
 
@@ -87,19 +86,6 @@ const Download: React.FC<DownloadProps> = ({ lang, t }) => {
       iconBg: "from-orange-500/15 to-red-500/15",
       borderHover: "hover:border-orange-500/25",
       glow: "bg-orange-500/8",
-    },
-    {
-      id: "android",
-      title: t.downloads.android,
-      icon: <Smartphone className="w-7 h-7" />,
-      assets: androidAssets,
-      description: t.downloads.android_desc,
-      accent: "from-green-500 to-emerald-500",
-      iconBg: "from-green-500/15 to-emerald-500/15",
-      borderHover: "hover:border-green-500/25",
-      glow: "bg-green-500/8",
-      badge: t.downloads.android_alpha_badge,
-      warning: t.downloads.android_alpha_warning,
     },
   ];
 

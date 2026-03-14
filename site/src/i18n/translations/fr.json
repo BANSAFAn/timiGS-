@@ -50,7 +50,7 @@
       "crossplatform": {
         "badge": "💻",
         "title": "Multiplateforme",
-        "description": "Construit avec Tauri v2 pour des performances élevées sur Windows, Linux et macOS. Plus support Android en alpha."
+        "description": "Construit avec Tauri v2 pour des performances élevées sur Windows, Linux et macOS."
       },
       "opensource": {
         "badge": "🌟",
@@ -131,7 +131,7 @@
       "yes": "Oui",
       "no": "Non",
       "partial": "Partiel",
-      "alpha": "Alpha"
+      "unavailableunavailableunavailableunavailableunavailableunavailableunavailableunavailable": "Non disponibleNon disponibleNon disponibleNon disponibleNon disponibleNon disponibleNon disponibleNon disponible"
     }
   },
   "platforms": {
@@ -150,10 +150,6 @@
       "linux": {
         "name": "Linux",
         "description": "Paquets AppImage, RPM et DEB disponibles"
-      },
-      "android": {
-        "name": "Android",
-        "description": "APK pour Android 8.0+ (Version Alpha)"
       }
     }
   },
@@ -179,9 +175,9 @@
     "linux": "Linux",
     "linux_desc": "Paquets pour les principales distributions. AppImage pour la compatibilité, RPM pour Fedora, DEB pour Ubuntu.",
     "android": "Android",
-    "android_desc": "APK pour Android 8.0+. Il s'agit d'une version Alpha précoce — de nombreuses fonctionnalités sont encore en développement.",
-    "android_alpha_badge": "ALPHA",
-    "android_alpha_warning": "⚠️ Version Alpha — de nombreuses fonctionnalités sont incomplètes ou instables. Utilisez à vos risques.",
+    "android_desc": "Android version isis currentlycurrently unavailableunavailable.",
+    "android_alpha_badge": """",
+    "android_alpha_warning": """",
     "source": "Code Source",
     "source_title": "Code Source et autres",
     "source_desc": "Besoin du code source ou d'anciennes versions ? Visitez GitHub.",
@@ -218,7 +214,6 @@
     "test_builds": "Builds de test",
     "commit_by": "par",
     "no_commits": "Aucun commit trouvé.",
-    "download_debug": "Télécharger Debug APK",
     "alpha_warning": "Ces builds sont instables. Utilisez-les à vos risques."
   }
 }

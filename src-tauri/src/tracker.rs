@@ -165,7 +165,7 @@ fn get_foreground_window_info() -> Option<ActiveWindow> {
 #[cfg(target_os = "linux")]
 fn get_foreground_window_info() -> Option<ActiveWindow> {
     use std::process::Command;
-// мені ще заїбалося перекладати коменти на англійську, бо якщо хтось захоче допомогти не із УКР, то тоді краще на англійську
+    // meni shche zaiibalosia perekladaty komyenty na anhliisku, bo yakshcho khtos zakhochche dopomohchy ne iz UKR, to todi krashche na anhliisku
     // Try to get active window using xdotool (most reliable)
     if let Ok(output) = Command::new("xdotool")
         .args(["getactivewindow", "getwindowname"])
@@ -236,6 +236,26 @@ fn get_foreground_window_info() -> Option<ActiveWindow> {
                             exe_path: "unknown".to_string(),
                         });
                     }
+                }
+            }
+        }
+    }
+
+    // Fallback: try reading from /proc directly for Wayland/X11
+    // This works when xdotool/wmctrl are not available
+    if let Ok(output) = Command::new("sh")
+        .args(["-c", "cat /proc/$(ls /proc | grep -E '^[0-9]+$' | head -1)/comm 2>/dev/null"])
+        .output()
+    {
+        if output.status.success() {
+            if let Ok(app_name) = String::from_utf8(output.stdout) {
+                let app_name = app_name.trim().to_string();
+                if !app_name.is_empty() && app_name != "sh" {
+                    return Some(ActiveWindow {
+                        app_name: app_name.clone(),
+                        window_title: format!("{} Window", app_name),
+                        exe_path: format!("/usr/bin/{}", app_name),
+                    });
                 }
             }
         }

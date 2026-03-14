@@ -50,7 +50,7 @@
       "crossplatform": {
         "badge": "💻",
         "title": "Кросплатформеність",
-        "description": "Створено на Tauri v2 для високої продуктивності на Windows, Linux та macOS. Плюс підтримка Android в альфа-версії."
+        "description": "Створено на Tauri v2 для високої продуктивності на Windows, Linux та macOS."
       },
       "opensource": {
         "badge": "🌟",
@@ -131,7 +131,7 @@
       "yes": "Так",
       "no": "Ні",
       "partial": "Частково",
-      "alpha": "Альфа"
+      "unavailable": "Недоступно"
     }
   },
   "platforms": {
@@ -150,10 +150,6 @@
       "linux": {
         "name": "Linux",
         "description": "Доступні пакунки AppImage, RPM та DEB"
-      },
-      "android": {
-        "name": "Android",
-        "description": "APK для Android 8.0+ (Альфа-версія)"
       }
     }
   },
@@ -179,9 +175,9 @@
     "linux": "Linux",
     "linux_desc": "Пакети для основних дистрибутивів. AppImage для сумісності, RPM для Fedora та DEB для Ubuntu.",
     "android": "Android",
-    "android_desc": "APK для Android 8.0+. Це рання Альфа-версія — багато функцій ще в розробці та можуть працювати некоректно.",
-    "android_alpha_badge": "АЛЬФА",
-    "android_alpha_warning": "⚠️ Альфа-версія — багато функцій незавершені або нестабільні. Використовуйте на свій ризик.",
+    "android_desc": "Версія для Android наразі недоступна.",
+    "android_alpha_badge": "",
+    "android_alpha_warning": "",
     "source": "Вихідний код",
     "source_title": "Вихідний код та інше",
     "source_desc": "Потрібен вихідний код, контрольні суми або старі версії? Відвідайте GitHub.",
@@ -218,7 +214,6 @@
     "test_builds": "Тестові збірки",
     "commit_by": "від",
     "no_commits": "Коміти не знайдено.",
-    "download_debug": "Завантажити Debug APK",
     "alpha_warning": "Ці збірки нестабільні і можуть містити помилки. Використовуйте на свій ризик."
   }
 }

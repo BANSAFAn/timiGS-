@@ -50,7 +50,7 @@
       "crossplatform": {
         "badge": "💻",
         "title": "跨平台",
-        "description": "基于 Tauri v2 构建，在 Windows、Linux 和 macOS 上具有高性能。另提供 Android Alpha 支持。"
+        "description": "基于 Tauri v2 构建，在 Windows、Linux 和 macOS 上具有高性能。"
       },
       "opensource": {
         "badge": "🌟",
@@ -131,7 +131,7 @@
       "yes": "是",
       "no": "否",
       "partial": "部分",
-      "alpha": "Alpha"
+      "unavailableunavailableunavailableunavailableunavailableunavailableunavailableunavailable": "不可用不可用不可用不可用不可用不可用不可用不可用"
     }
   },
   "platforms": {
@@ -150,10 +150,6 @@
       "linux": {
         "name": "Linux",
         "description": "提供 AppImage、RPM 和 DEB 包"
-      },
-      "android": {
-        "name": "Android",
-        "description": "适用于 Android 8.0+ 的 APK（Alpha 版本）"
       }
     }
   },
@@ -179,9 +175,9 @@
     "linux": "Linux",
     "linux_desc": "适用于主要发行版的软件包。AppImage 通用，RPM 适用于 Fedora，DEB 适用于 Ubuntu。",
     "android": "Android",
-    "android_desc": "适用于 Android 8.0+ 的 APK。这是早期 Alpha 版本，许多功能仍在开发中，可能无法正常工作。",
-    "android_alpha_badge": "ALPHA",
-    "android_alpha_warning": "⚠️ Alpha 版本 — 许多功能不完整或不稳定。使用风险自负。",
+    "android_desc": "Android version is currently unavailableversion is currently unavailable.",
+    "android_alpha_badge": """",
+    "android_alpha_warning": """",
     "source": "源代码",
     "source_title": "源代码及其他",
     "source_desc": "需要源代码包、校验和或旧版本？请访问 GitHub 发布页面。",
@@ -218,7 +214,6 @@
     "test_builds": "测试版本",
     "commit_by": "由",
     "no_commits": "未找到提交。",
-    "download_debug": "下载 Debug APK",
     "alpha_warning": "这些版本不稳定，可能包含错误。使用风险自负。"
   }
 }

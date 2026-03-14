@@ -50,7 +50,7 @@
       "crossplatform": {
         "badge": "💻",
         "title": "Multiplataforma",
-        "description": "Construido con Tauri v2 para alto rendimiento en Windows, Linux y macOS. Más soporte Android en alpha."
+        "description": "Construido con Tauri v2 para alto rendimiento en Windows, Linux y macOS."
       },
       "opensource": {
         "badge": "🌟",
@@ -131,7 +131,7 @@
       "yes": "Sí",
       "no": "No",
       "partial": "Parcial",
-      "alpha": "Alpha"
+      "unavailableunavailableunavailableunavailableunavailableunavailableunavailableunavailable": "No disponibleNo disponibleNo disponibleNo disponibleNo disponibleNo disponibleNo disponibleNo disponible"
     }
   },
   "platforms": {
@@ -150,10 +150,6 @@
       "linux": {
         "name": "Linux",
         "description": "Paquetes AppImage, RPM y DEB disponibles"
-      },
-      "android": {
-        "name": "Android",
-        "description": "APK para Android 8.0+ (Versión Alpha)"
       }
     }
   },
@@ -179,9 +175,9 @@
     "linux": "Linux",
     "linux_desc": "Paquetes para las principales distribuciones. AppImage para compatibilidad, RPM para Fedora, DEB para Ubuntu.",
     "android": "Android",
-    "android_desc": "APK para Android 8.0+. Esta es una versión Alpha temprana — muchas funciones aún están en desarrollo.",
-    "android_alpha_badge": "ALPHA",
-    "android_alpha_warning": "⚠️ Versión Alpha — muchas funciones están incompletas o inestables. Úsalo bajo tu propio riesgo.",
+    "android_desc": "Android versionversion isis currentlycurrently unavailableunavailable.",
+    "android_alpha_badge": """",
+    "android_alpha_warning": """",
     "source": "Código Fuente",
     "source_title": "Código Fuente y Otros",
     "source_desc": "¿Necesitas código fuente o versiones anteriores? Visita GitHub.",
@@ -218,7 +214,6 @@
     "test_builds": "Builds de prueba",
     "commit_by": "por",
     "no_commits": "No se encontraron commits.",
-    "download_debug": "Descargar Debug APK",
     "alpha_warning": "Estas builds son inestables. Úsalas bajo tu propio riesgo."
   }
 }

@@ -6,9 +6,8 @@
 [![License](https://img.shields.io/badge/License-TPL_1.0-blue?style=for-the-badge)](LICENSE)
 [![Stars](https://img.shields.io/github/stars/BANSAFAn/timiGS-?style=for-the-badge&color=fbbf24)](https://github.com/BANSAFAn/timiGS-/stargazers)
 [![CI](https://img.shields.io/github/actions/workflow/status/BANSAFAn/timiGS-/release.yml?style=for-the-badge&label=Desktop%20CI)](https://github.com/BANSAFAn/timiGS-/actions/workflows/release.yml)
-[![Flutter CI](https://img.shields.io/github/actions/workflow/status/BANSAFAn/timiGS-/flutter-android.yml?style=for-the-badge&label=Android%20CI)](https://github.com/BANSAFAn/timiGS-/actions/workflows/flutter-android.yml)
 
-**A modern, privacy-first activity tracker for Desktop & Android.**
+**A modern, privacy-first activity tracker for Desktop.**
 Track your app usage, visualize productivity, manage tasks, and stay focused — all with your data stored locally.
 
 [📥 Download](https://github.com/BANSAFAn/timiGS-/releases)  · [🐛 Report Bug](https://github.com/BANSAFAn/timiGS-/issues) · [💬 Discord](https://discord.gg/78V2c4bdpj)
@@ -28,7 +27,6 @@ Track your app usage, visualize productivity, manage tasks, and stay focused —
 | **Windows** | Tauri v2 + Rust + Vue 3       | ✅ Passing |
 | **macOS**   | Tauri v2 + Rust + Vue 3       | ✅ Passing |
 | **Linux**   | Tauri v2 + Rust + Vue 3       | ✅ Passing |
-| **Android** | Flutter 3.24 + Dart + Rust    | ✅ Passing |
 <!-- STATUS_TABLE_END -->
 
 ---
@@ -62,11 +60,6 @@ Track your app usage, visualize productivity, manage tasks, and stay focused —
 - **Dark & Light Modes** — choose your preferred theme
 - **System Tray** — minimize to tray with popup widget
 
-### 📱 Android-Specific
-- **Native Usage Stats API** — real-time Android app usage tracking
-- **Background Tracking** — WorkManager-based continuous tracking with foreground notification
-- **Focus Mode & Time OUT** — visual timer modes with password-protected cancellation
-
 ---
 
 ## 🛠️ Technology Stack
@@ -81,16 +74,6 @@ Track your app usage, visualize productivity, manage tasks, and stay focused —
 | **Database**| [SQLite](https://www.sqlite.org/) via `rusqlite`                           |
 | **i18n**    | [vue-i18n](https://vue-i18n.intlify.dev/)                                 |
 | **P2P**     | [PeerJS](https://peerjs.com/) (WebRTC)                                    |
-
-### Android (`timigs-android/`)
-| Layer       | Technology                                                                 |
-| ----------- | -------------------------------------------------------------------------- |
-| **Framework** | [Flutter 3.24](https://flutter.dev/) · [Dart](https://dart.dev/)        |
-| **Native**  | [Rust](https://www.rust-lang.org/) via [flutter_rust_bridge](https://github.com/aspect-build/aspect-cli) |
-| **Database**| SQLite via `rusqlite` (Rust backend)                                       |
-| **Charts**  | [fl_chart](https://pub.dev/packages/fl_chart)                             |
-| **State**   | [Provider](https://pub.dev/packages/provider)                             |
-| **Background** | [WorkManager](https://pub.dev/packages/workmanager)                    |
 
 ### Website (`site/`)
 | Layer       | Technology                                                                 |
@@ -130,50 +113,6 @@ Build output: `src-tauri/target/release/bundle/`
 
 ---
 
-## 📱 Getting Started — Android
-
-### Install from APK
-
-1. Download the latest APK from [Releases](https://github.com/BANSAFAn/timiGS-/releases)
-2. Enable "Install from Unknown Sources" in Android settings
-3. Install and grant **Usage Stats** permission when prompted
-
-### Build from Source
-
-**Prerequisites:** Flutter 3.24+, Rust (stable), Android NDK r26b, Java 17
-
-```bash
-cd timigs-android
-
-# Install Rust Android targets
-rustup target add aarch64-linux-android armv7-linux-androideabi x86_64-linux-android i686-linux-android
-cargo install cargo-ndk
-
-# Build Rust native library
-cd rust
-cargo ndk -t arm64-v8a -t armeabi-v7a -t x86_64 -t x86 -o ../android/app/src/main/jniLibs build --release
-cd ..
-
-# Build Flutter APK
-flutter pub get
-flutter build apk --release
-```
-
-See [BUILD_INSTRUCTIONS.md](timigs-android/BUILD_INSTRUCTIONS.md) for detailed instructions.
-
-### Android Permissions
-
-| Permission             | Purpose                              |
-| ---------------------- | ------------------------------------ |
-| `PACKAGE_USAGE_STATS`  | Required for tracking app usage      |
-| `INTERNET`             | Weather widget                       |
-| `FOREGROUND_SERVICE`   | Background activity tracking         |
-| `POST_NOTIFICATIONS`   | Tracking status notifications        |
-
-> **Usage Stats**: Settings → Apps → Special app access → Usage access → Enable for TimiGS
-
----
-
 ## 📂 Project Structure
 
 ```
@@ -201,15 +140,6 @@ timiGS-/
 │       ├── icons.rs            # App icon extraction
 │       └── picker.rs           # Screen share picker
 │
-├── timigs-android/             # Android App (Flutter + Dart + Rust)
-│   ├── lib/
-│   │   ├── screens/            # 13 screens (Dashboard, Focus, TimeOut, Weather...)
-│   │   ├── models/             # Data models
-│   │   ├── services/           # Business logic
-│   │   └── l10n/               # Localization (en, uk)
-│   ├── rust/                   # Rust native backend (flutter_rust_bridge)
-│   └── android/                # Android-specific config & Gradle
-│
 ├── site/                       # Marketing Website (Astro + React)
 │   └── src/
 │       ├── layouts/            # Astro layouts
@@ -218,7 +148,6 @@ timiGS-/
 │
 ├── .github/workflows/          # CI/CD
 │   ├── release.yml             # Desktop builds (Win/Mac/Linux)
-│   ├── flutter-android.yml     # Android APK builds
 │   └── ci.yml                  # Lint, format, security audit
 │
 └── package.json                # v1.21.0
@@ -228,7 +157,7 @@ timiGS-/
 
 ## 🌍 Localization
 
-TimiGS supports **English** and **Ukrainian** on both platforms.
+TimiGS supports **English** and **Ukrainian**.
 
 ### Adding a New Language
 
@@ -237,15 +166,11 @@ TimiGS supports **English** and **Ukrainian** on both platforms.
 2. Register in `src/i18n.ts`
 3. Add selector option in `src/views/Settings.vue`
 
-**Android:**
-1. Create `timigs-android/lib/l10n/app_localizations_{lang}.dart`
-2. Add the locale to `app_localizations.dart`
-
 ---
 
 ## 🔒 Privacy
 
-**All data stays on your device.** TimiGS stores activity data in a local SQLite database. Nothing is transmitted to any server. See [Privacy Policy](timigs-android/PRIVACY.md) for details.
+**All data stays on your device.** TimiGS stores activity data in a local SQLite database. Nothing is transmitted to any server.
 
 ---
 

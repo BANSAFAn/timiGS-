@@ -50,7 +50,7 @@
       "crossplatform": {
         "badge": "💻",
         "title": "Plattformübergreifend",
-        "description": "Mit Tauri v2 für hohe Leistung unter Windows, Linux und macOS. Plus Android-Unterstützung in Alpha."
+        "description": "Mit Tauri v2 für hohe Leistung unter Windows, Linux und macOS."
       },
       "opensource": {
         "badge": "🌟",
@@ -131,7 +131,7 @@
       "yes": "Ja",
       "no": "Nein",
       "partial": "Teilweise",
-      "alpha": "Alpha"
+      "unavailableunavailableunavailableunavailableunavailableunavailableunavailableunavailable": "Nicht verfügbarNicht verfügbarNicht verfügbarNicht verfügbarNicht verfügbarNicht verfügbarNicht verfügbarNicht verfügbar"
     }
   },
   "platforms": {
@@ -150,10 +150,6 @@
       "linux": {
         "name": "Linux",
         "description": "AppImage-, RPM- und DEB-Pakete verfügbar"
-      },
-      "android": {
-        "name": "Android",
-        "description": "APK für Android 8.0+ (Alpha-Build)"
       }
     }
   },
@@ -179,9 +175,9 @@
     "linux": "Linux",
     "linux_desc": "Pakete für gängige Distributionen. AppImage für Kompatibilität, RPM für Fedora, DEB für Ubuntu.",
     "android": "Android",
-    "android_desc": "APK für Android 8.0+. Dies ist ein früher Alpha-Build — viele Funktionen befinden sich noch in der Entwicklung.",
-    "android_alpha_badge": "ALPHA",
-    "android_alpha_warning": "⚠️ Alpha-Version — viele Funktionen sind unvollständig oder instabil. Verwendung auf eigene Gefahr.",
+    "android_desc": "Android versionversion isis currentlycurrently unavailableunavailable.",
+    "android_alpha_badge": """",
+    "android_alpha_warning": """",
     "source": "Quellcode",
     "source_title": "Quellcode & Assets",
     "source_desc": "Benötigen Sie Quellcode-Tarballs oder ältere Versionen? Besuchen Sie GitHub.",
@@ -218,7 +214,6 @@
     "test_builds": "Test-Builds",
     "commit_by": "von",
     "no_commits": "Keine Commits gefunden.",
-    "download_debug": "Debug APK herunterladen",
     "alpha_warning": "Diese Builds sind instabil. Verwendung auf eigene Gefahr."
   }
 }

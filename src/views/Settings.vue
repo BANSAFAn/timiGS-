@@ -1616,12 +1616,12 @@ async function confirmResetData() {
 .export-dropdown-item .item-text {
   font-weight: 600;
   font-size: 0.95rem;
-  color: var(--text-primary);
+  color: #e5e7eb;
 }
 
 .export-dropdown-item .format-desc {
   font-size: 0.75rem;
-  color: var(--text-muted);
+  color: #9ca3af;
 }
 
 .export-divider {

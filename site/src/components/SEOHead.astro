@@ -9,7 +9,7 @@ export interface Props {
 
 const {
   title,
-  description = "TimiGS — Free, open-source time tracker with Focus Mode, analytics, weather widget, and Google Drive sync. Available for Windows, macOS, Linux, and Android.",
+  description = "TimiGS — Free, open-source time tracker with Focus Mode, analytics, weather widget, and Google Drive sync. Available for Windows, macOS, and Linux.",
   image = "/og-image.jpg",
   type = "website",
   keywords = "time tracker, productivity, focus mode, activity tracker, open source, free, privacy, desktop app, Tauri, TimiGS",
@@ -62,7 +62,7 @@ const canonicalURL = new URL(Astro.url.pathname, siteURL);
   "description": description,
   "url": canonicalURL.toString(),
   "applicationCategory": "UtilitiesApplication",
-  "operatingSystem": "Windows, macOS, Linux, Android",
+  "operatingSystem": "Windows, macOS, Linux",
   "offers": {
     "@type": "Offer",
     "price": "0",

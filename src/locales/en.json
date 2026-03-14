@@ -58,9 +58,19 @@
     "viewDetails": "View Details",
     "detailedUsage": "Detailed App Usage",
     "application": "Application",
+    "categories": "Categories",
+    "tabOverview": "Overview",
+    "tabWebsites": "Websites",
+    "tabMusic": "Music",
     "timeSpent": "Time Spent",
     "percentage": "%",
-    "topWebsites": "Top Websites"
+    "topWebsites": "Top Websites",
+    "uncategorized": "Uncategorized",
+    "categoryGames": "Games",
+    "categoryPrograms": "Programs",
+    "categoryWork": "Work",
+    "categoryRest": "Rest",
+    "categorizeApps": "Categorize Apps"
   },
   "settings": {
     "title": "Settings",

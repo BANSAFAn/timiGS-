@@ -58,9 +58,19 @@
     "viewDetails": "Детальніше",
     "detailedUsage": "Детальне використання",
     "application": "Програма",
+    "categories": "Категорії",
+    "tabOverview": "Огляд",
+    "tabWebsites": "Веб-сайти",
+    "tabMusic": "Музика",
     "timeSpent": "Витрачений час",
     "percentage": "%",
-    "topWebsites": "Топ сайтів"
+    "topWebsites": "Топ сайтів",
+    "uncategorized": "Без категорії",
+    "categoryGames": "ІГРИ",
+    "categoryPrograms": "ПРОГРАМА",
+    "categoryWork": "Робота",
+    "categoryRest": "ОТДЫХ",
+    "categorizeApps": "Розподілити програми"
   },
   "settings": {
     "title": "Налаштування",

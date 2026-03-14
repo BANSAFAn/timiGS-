@@ -50,7 +50,7 @@
       "crossplatform": {
         "badge": "💻",
         "title": "Cross-Platform",
-        "description": "Built with Tauri v2 for high performance on Windows, Linux, and macOS. Plus Android support in alpha."
+        "description": "Built with Tauri v2 for high performance on Windows, Linux, and macOS."
       },
       "opensource": {
         "badge": "🌟",
@@ -131,7 +131,7 @@
       "yes": "Yes",
       "no": "No",
       "partial": "Partial",
-      "alpha": "Alpha"
+      "unavailable": "Unavailable"
     }
   },
   "platforms": {
@@ -150,10 +150,6 @@
       "linux": {
         "name": "Linux",
         "description": "AppImage, RPM, and DEB packages available"
-      },
-      "android": {
-        "name": "Android",
-        "description": "APK for Android 8.0+ (Alpha build)"
       }
     }
   },
@@ -179,9 +175,9 @@
     "linux": "Linux",
     "linux_desc": "Packages for major distributions. AppImage for universal compatibility, RPM for Fedora, and DEB for Ubuntu/Debian.",
     "android": "Android",
-    "android_desc": "APK for Android 8.0+. This is an early Alpha build — many features are still in development and may not work correctly.",
-    "android_alpha_badge": "ALPHA",
-    "android_alpha_warning": "⚠️ Alpha version — many features are incomplete or unstable. Use at your own risk.",
+    "android_desc": "Android version is currently unavailable.",
+    "android_alpha_badge": "",
+    "android_alpha_warning": "",
     "source": "Source Code",
     "source_title": "Source Code & Other Assets",
     "source_desc": "Need access to source code tarballs, checksums, or older releases? Visit the full release page on GitHub.",
@@ -218,7 +214,6 @@
     "test_builds": "Test Builds",
     "commit_by": "by",
     "no_commits": "No commits found.",
-    "download_debug": "Download Debug APK",
     "alpha_warning": "These builds are unstable and may contain bugs. Use at your own risk."
   }
 }
