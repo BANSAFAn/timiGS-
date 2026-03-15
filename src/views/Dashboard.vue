@@ -27,11 +27,8 @@
         </div>
       </div>
 
-      <!-- Process Exclude Modal -->
-      <ProcessExcludeModal 
-        v-if="showExcludeModal" 
-        @close="showExcludeModal = false" 
-      />
+      <!-- Process Exclude Modal - disabled temporarily -->
+      <!-- <ProcessExcludeModal v-if="showExcludeModal" @close="showExcludeModal = false" /> -->
 
       <!-- Active Now Hero Card -->
       <div class="hero-card animate-enter">
@@ -261,8 +258,7 @@ const selectedChartType = ref("doughnut");
 const appIcons = ref<Record<string, string>>({});
 const showExcludeModal = ref(false);
 
-// Temporary placeholder for ProcessExcludeModal
-const ProcessExcludeModal = { template: '<div></div>' };
+// Modal component will be added later
 
 const currentDate = new Date().toLocaleDateString(undefined, { 
   weekday: 'long', 

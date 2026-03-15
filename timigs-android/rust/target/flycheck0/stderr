@@ -1,0 +1,683 @@
+   0.525141800s  INFO prepare_target{force=false package_id=timigs_core v0.1.0 (C:\Users\baneronetwo\Documents\GitHub\timiGS-\timigs-android\rust) target="timigs_core"}: cargo::core::compiler::fingerprint: fingerprint error for timigs_core v0.1.0 (C:\Users\baneronetwo\Documents\GitHub\timiGS-\timigs-android\rust)/Check { test: false }/TargetInner { name_inferred: true, ..: lib_target("timigs_core", ["cdylib", "staticlib"], "C:\\Users\\baneronetwo\\Documents\\GitHub\\timiGS-\\timigs-android\\rust\\src\\lib.rs", Edition2021) }
+   0.525239300s  INFO prepare_target{force=false package_id=timigs_core v0.1.0 (C:\Users\baneronetwo\Documents\GitHub\timiGS-\timigs-android\rust) target="timigs_core"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\baneronetwo\Documents\GitHub\timiGS-\timigs-android\rust\target\debug\.fingerprint\timigs_core-b45d01feac1c480b\lib-timigs_core`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_libgit2_prerelease
+  12: <unknown>
+  13: <unknown>
+  14: <unknown>
+  15: <unknown>
+  16: git_midx_writer_dump
+  17: git_filter_source_repo
+  18: git_midx_writer_dump
+  19: BaseThreadInitThunk
+  20: RtlUserThreadStart
+   0.563627900s  INFO prepare_target{force=false package_id=chrono v0.4.43 target="chrono"}: cargo::core::compiler::fingerprint: fingerprint error for chrono v0.4.43/Check { test: false }/TargetInner { ..: lib_target("chrono", ["lib"], "C:\\Users\\baneronetwo\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\chrono-0.4.43\\src\\lib.rs", Edition2021) }
+   0.563691200s  INFO prepare_target{force=false package_id=chrono v0.4.43 target="chrono"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\baneronetwo\Documents\GitHub\timiGS-\timigs-android\rust\target\debug\.fingerprint\chrono-6233afb2bf2e4bf7\lib-chrono`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_filter_source_repo
+  12: git_libgit2_prerelease
+  13: <unknown>
+  14: <unknown>
+  15: <unknown>
+  16: <unknown>
+  17: git_midx_writer_dump
+  18: git_filter_source_repo
+  19: git_midx_writer_dump
+  20: BaseThreadInitThunk
+  21: RtlUserThreadStart
+   0.569031400s  INFO prepare_target{force=false package_id=serde v1.0.228 target="serde"}: cargo::core::compiler::fingerprint: fingerprint error for serde v1.0.228/Check { test: false }/TargetInner { ..: lib_target("serde", ["lib"], "C:\\Users\\baneronetwo\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\serde-1.0.228\\src\\lib.rs", Edition2021) }
+   0.569094400s  INFO prepare_target{force=false package_id=serde v1.0.228 target="serde"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\baneronetwo\Documents\GitHub\timiGS-\timigs-android\rust\target\debug\.fingerprint\serde-2248f8bea89e889c\lib-serde`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_filter_source_repo
+  12: git_filter_source_repo
+  13: git_libgit2_prerelease
+  14: <unknown>
+  15: <unknown>
+  16: <unknown>
+  17: <unknown>
+  18: git_midx_writer_dump
+  19: git_filter_source_repo
+  20: git_midx_writer_dump
+  21: BaseThreadInitThunk
+  22: RtlUserThreadStart
+   0.577716900s  INFO prepare_target{force=false package_id=serde_derive v1.0.228 target="serde_derive"}: cargo::core::compiler::fingerprint: fingerprint error for serde_derive v1.0.228/Build/TargetInner { for_host: true, proc_macro: true, ..: lib_target("serde_derive", ["proc-macro"], "C:\\Users\\baneronetwo\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\serde_derive-1.0.228\\src\\lib.rs", Edition2021) }
+   0.577780700s  INFO prepare_target{force=false package_id=serde_derive v1.0.228 target="serde_derive"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\baneronetwo\Documents\GitHub\timiGS-\timigs-android\rust\target\debug\.fingerprint\serde_derive-574eabed168254a0\lib-serde_derive`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_filter_source_repo
+  12: git_filter_source_repo
+  13: git_filter_source_repo
+  14: git_libgit2_prerelease
+  15: <unknown>
+  16: <unknown>
+  17: <unknown>
+  18: <unknown>
+  19: git_midx_writer_dump
+  20: git_filter_source_repo
+  21: git_midx_writer_dump
+  22: BaseThreadInitThunk
+  23: RtlUserThreadStart
+   0.590763400s  INFO prepare_target{force=false package_id=flutter_rust_bridge v2.11.1 target="flutter_rust_bridge"}: cargo::core::compiler::fingerprint: fingerprint error for flutter_rust_bridge v2.11.1/Check { test: false }/TargetInner { ..: lib_target("flutter_rust_bridge", ["lib"], "C:\\Users\\baneronetwo\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\flutter_rust_bridge-2.11.1\\src\\lib.rs", Edition2021) }
+   0.590832200s  INFO prepare_target{force=false package_id=flutter_rust_bridge v2.11.1 target="flutter_rust_bridge"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\baneronetwo\Documents\GitHub\timiGS-\timigs-android\rust\target\debug\.fingerprint\flutter_rust_bridge-b245b7e5e99af607\lib-flutter_rust_bridge`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_filter_source_repo
+  12: git_libgit2_prerelease
+  13: <unknown>
+  14: <unknown>
+  15: <unknown>
+  16: <unknown>
+  17: git_midx_writer_dump
+  18: git_filter_source_repo
+  19: git_midx_writer_dump
+  20: BaseThreadInitThunk
+  21: RtlUserThreadStart
+   0.602736500s  INFO prepare_target{force=false package_id=delegate-attr v0.3.0 target="delegate_attr"}: cargo::core::compiler::fingerprint: fingerprint error for delegate-attr v0.3.0/Build/TargetInner { name_inferred: true, for_host: true, proc_macro: true, ..: lib_target("delegate_attr", ["proc-macro"], "C:\\Users\\baneronetwo\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\delegate-attr-0.3.0\\src\\lib.rs", Edition2018) }
+   0.602839200s  INFO prepare_target{force=false package_id=delegate-attr v0.3.0 target="delegate_attr"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\baneronetwo\Documents\GitHub\timiGS-\timigs-android\rust\target\debug\.fingerprint\delegate-attr-c6d212f62d5d6fbd\lib-delegate_attr`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_filter_source_repo
+  12: git_filter_source_repo
+  13: git_libgit2_prerelease
+  14: <unknown>
+  15: <unknown>
+  16: <unknown>
+  17: <unknown>
+  18: git_midx_writer_dump
+  19: git_filter_source_repo
+  20: git_midx_writer_dump
+  21: BaseThreadInitThunk
+  22: RtlUserThreadStart
+   0.608042800s  INFO prepare_target{force=false package_id=flutter_rust_bridge_macros v2.11.1 target="flutter_rust_bridge_macros"}: cargo::core::compiler::fingerprint: fingerprint error for flutter_rust_bridge_macros v2.11.1/Build/TargetInner { for_host: true, proc_macro: true, ..: lib_target("flutter_rust_bridge_macros", ["proc-macro"], "C:\\Users\\baneronetwo\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\flutter_rust_bridge_macros-2.11.1\\src\\lib.rs", Edition2021) }
+   0.608151300s  INFO prepare_target{force=false package_id=flutter_rust_bridge_macros v2.11.1 target="flutter_rust_bridge_macros"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\baneronetwo\Documents\GitHub\timiGS-\timigs-android\rust\target\debug\.fingerprint\flutter_rust_bridge_macros-8739ca79ea977073\lib-flutter_rust_bridge_macros`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_filter_source_repo
+  12: git_filter_source_repo
+  13: git_libgit2_prerelease
+  14: <unknown>
+  15: <unknown>
+  16: <unknown>
+  17: <unknown>
+  18: git_midx_writer_dump
+  19: git_filter_source_repo
+  20: git_midx_writer_dump
+  21: BaseThreadInitThunk
+  22: RtlUserThreadStart
+   0.624924600s  INFO prepare_target{force=false package_id=futures v0.3.31 target="futures"}: cargo::core::compiler::fingerprint: fingerprint error for futures v0.3.31/Check { test: false }/TargetInner { ..: lib_target("futures", ["lib"], "C:\\Users\\baneronetwo\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\futures-0.3.31\\src\\lib.rs", Edition2018) }
+   0.625027900s  INFO prepare_target{force=false package_id=futures v0.3.31 target="futures"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\baneronetwo\Documents\GitHub\timiGS-\timigs-android\rust\target\debug\.fingerprint\futures-ec4b061f67007c9e\lib-futures`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_filter_source_repo
+  12: git_filter_source_repo
+  13: git_libgit2_prerelease
+  14: <unknown>
+  15: <unknown>
+  16: <unknown>
+  17: <unknown>
+  18: git_midx_writer_dump
+  19: git_filter_source_repo
+  20: git_midx_writer_dump
+  21: BaseThreadInitThunk
+  22: RtlUserThreadStart
+   0.630573400s  INFO prepare_target{force=false package_id=futures-executor v0.3.31 target="futures_executor"}: cargo::core::compiler::fingerprint: fingerprint error for futures-executor v0.3.31/Check { test: false }/TargetInner { ..: lib_target("futures_executor", ["lib"], "C:\\Users\\baneronetwo\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\futures-executor-0.3.31\\src\\lib.rs", Edition2018) }
+   0.630644700s  INFO prepare_target{force=false package_id=futures-executor v0.3.31 target="futures_executor"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\baneronetwo\Documents\GitHub\timiGS-\timigs-android\rust\target\debug\.fingerprint\futures-executor-369f73656e8774e3\lib-futures_executor`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_filter_source_repo
+  12: git_filter_source_repo
+  13: git_filter_source_repo
+  14: git_libgit2_prerelease
+  15: <unknown>
+  16: <unknown>
+  17: <unknown>
+  18: <unknown>
+  19: git_midx_writer_dump
+  20: git_filter_source_repo
+  21: git_midx_writer_dump
+  22: BaseThreadInitThunk
+  23: RtlUserThreadStart
+   0.633145600s  INFO prepare_target{force=false package_id=futures-util v0.3.31 target="futures_util"}: cargo::core::compiler::fingerprint: fingerprint error for futures-util v0.3.31/Check { test: false }/TargetInner { ..: lib_target("futures_util", ["lib"], "C:\\Users\\baneronetwo\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\futures-util-0.3.31\\src\\lib.rs", Edition2018) }
+   0.633224500s  INFO prepare_target{force=false package_id=futures-util v0.3.31 target="futures_util"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\baneronetwo\Documents\GitHub\timiGS-\timigs-android\rust\target\debug\.fingerprint\futures-util-e12b0886016b9a0d\lib-futures_util`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_filter_source_repo
+  12: git_filter_source_repo
+  13: git_filter_source_repo
+  14: git_filter_source_repo
+  15: git_libgit2_prerelease
+  16: <unknown>
+  17: <unknown>
+  18: <unknown>
+  19: <unknown>
+  20: git_midx_writer_dump
+  21: git_filter_source_repo
+  22: git_midx_writer_dump
+  23: BaseThreadInitThunk
+  24: RtlUserThreadStart
+   0.636243400s  INFO prepare_target{force=false package_id=futures-macro v0.3.31 target="futures_macro"}: cargo::core::compiler::fingerprint: fingerprint error for futures-macro v0.3.31/Build/TargetInner { for_host: true, proc_macro: true, ..: lib_target("futures_macro", ["proc-macro"], "C:\\Users\\baneronetwo\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\futures-macro-0.3.31\\src\\lib.rs", Edition2018) }
+   0.636300200s  INFO prepare_target{force=false package_id=futures-macro v0.3.31 target="futures_macro"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\baneronetwo\Documents\GitHub\timiGS-\timigs-android\rust\target\debug\.fingerprint\futures-macro-933e9df3edcfa84e\lib-futures_macro`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_filter_source_repo
+  12: git_filter_source_repo
+  13: git_filter_source_repo
+  14: git_filter_source_repo
+  15: git_filter_source_repo
+  16: git_libgit2_prerelease
+  17: <unknown>
+  18: <unknown>
+  19: <unknown>
+  20: <unknown>
+  21: git_midx_writer_dump
+  22: git_filter_source_repo
+  23: git_midx_writer_dump
+  24: BaseThreadInitThunk
+  25: RtlUserThreadStart
+   0.646808000s  INFO prepare_target{force=false package_id=tokio v1.49.0 target="tokio"}: cargo::core::compiler::fingerprint: fingerprint error for tokio v1.49.0/Check { test: false }/TargetInner { ..: lib_target("tokio", ["lib"], "C:\\Users\\baneronetwo\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\tokio-1.49.0\\src\\lib.rs", Edition2021) }
+   0.646876200s  INFO prepare_target{force=false package_id=tokio v1.49.0 target="tokio"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\baneronetwo\Documents\GitHub\timiGS-\timigs-android\rust\target\debug\.fingerprint\tokio-2541ef56740dc03c\lib-tokio`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_filter_source_repo
+  12: git_filter_source_repo
+  13: git_libgit2_prerelease
+  14: <unknown>
+  15: <unknown>
+  16: <unknown>
+  17: <unknown>
+  18: git_midx_writer_dump
+  19: git_filter_source_repo
+  20: git_midx_writer_dump
+  21: BaseThreadInitThunk
+  22: RtlUserThreadStart
+   0.648620000s  INFO prepare_target{force=false package_id=tokio-macros v2.6.0 target="tokio_macros"}: cargo::core::compiler::fingerprint: fingerprint error for tokio-macros v2.6.0/Build/TargetInner { for_host: true, proc_macro: true, ..: lib_target("tokio_macros", ["proc-macro"], "C:\\Users\\baneronetwo\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\tokio-macros-2.6.0\\src\\lib.rs", Edition2021) }
+   0.648675900s  INFO prepare_target{force=false package_id=tokio-macros v2.6.0 target="tokio_macros"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\baneronetwo\Documents\GitHub\timiGS-\timigs-android\rust\target\debug\.fingerprint\tokio-macros-1e2ddd2f77c8e235\lib-tokio_macros`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_filter_source_repo
+  12: git_filter_source_repo
+  13: git_filter_source_repo
+  14: git_libgit2_prerelease
+  15: <unknown>
+  16: <unknown>
+  17: <unknown>
+  18: <unknown>
+  19: git_midx_writer_dump
+  20: git_filter_source_repo
+  21: git_midx_writer_dump
+  22: BaseThreadInitThunk
+  23: RtlUserThreadStart
+   0.650322000s  INFO prepare_target{force=false package_id=rusqlite v0.31.0 target="rusqlite"}: cargo::core::compiler::fingerprint: fingerprint error for rusqlite v0.31.0/Check { test: false }/TargetInner { ..: lib_target("rusqlite", ["lib"], "C:\\Users\\baneronetwo\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\rusqlite-0.31.0\\src\\lib.rs", Edition2021) }
+   0.650374700s  INFO prepare_target{force=false package_id=rusqlite v0.31.0 target="rusqlite"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\baneronetwo\Documents\GitHub\timiGS-\timigs-android\rust\target\debug\.fingerprint\rusqlite-168ae5cdf7ce3cf9\lib-rusqlite`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_filter_source_repo
+  12: git_libgit2_prerelease
+  13: <unknown>
+  14: <unknown>
+  15: <unknown>
+  16: <unknown>
+  17: git_midx_writer_dump
+  18: git_filter_source_repo
+  19: git_midx_writer_dump
+  20: BaseThreadInitThunk
+  21: RtlUserThreadStart
+   0.653283500s  INFO prepare_target{force=false package_id=hashlink v0.9.1 target="hashlink"}: cargo::core::compiler::fingerprint: fingerprint error for hashlink v0.9.1/Check { test: false }/TargetInner { name_inferred: true, ..: lib_target("hashlink", ["lib"], "C:\\Users\\baneronetwo\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\hashlink-0.9.1\\src\\lib.rs", Edition2018) }
+   0.653343000s  INFO prepare_target{force=false package_id=hashlink v0.9.1 target="hashlink"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\baneronetwo\Documents\GitHub\timiGS-\timigs-android\rust\target\debug\.fingerprint\hashlink-42f5a357191a8f95\lib-hashlink`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_filter_source_repo
+  12: git_filter_source_repo
+  13: git_libgit2_prerelease
+  14: <unknown>
+  15: <unknown>
+  16: <unknown>
+  17: <unknown>
+  18: git_midx_writer_dump
+  19: git_filter_source_repo
+  20: git_midx_writer_dump
+  21: BaseThreadInitThunk
+  22: RtlUserThreadStart
+   0.654431600s  INFO prepare_target{force=false package_id=hashbrown v0.14.5 target="hashbrown"}: cargo::core::compiler::fingerprint: fingerprint error for hashbrown v0.14.5/Check { test: false }/TargetInner { name_inferred: true, ..: lib_target("hashbrown", ["lib"], "C:\\Users\\baneronetwo\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\hashbrown-0.14.5\\src\\lib.rs", Edition2021) }
+   0.654472300s  INFO prepare_target{force=false package_id=hashbrown v0.14.5 target="hashbrown"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\baneronetwo\Documents\GitHub\timiGS-\timigs-android\rust\target\debug\.fingerprint\hashbrown-9ca2b295238c9e8a\lib-hashbrown`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_filter_source_repo
+  12: git_filter_source_repo
+  13: git_filter_source_repo
+  14: git_libgit2_prerelease
+  15: <unknown>
+  16: <unknown>
+  17: <unknown>
+  18: <unknown>
+  19: git_midx_writer_dump
+  20: git_filter_source_repo
+  21: git_midx_writer_dump
+  22: BaseThreadInitThunk
+  23: RtlUserThreadStart
+   0.662461300s  INFO prepare_target{force=false package_id=libsqlite3-sys v0.28.0 target="libsqlite3_sys"}: cargo::core::compiler::fingerprint: fingerprint error for libsqlite3-sys v0.28.0/Check { test: false }/TargetInner { name_inferred: true, ..: lib_target("libsqlite3_sys", ["lib"], "C:\\Users\\baneronetwo\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\libsqlite3-sys-0.28.0\\src\\lib.rs", Edition2021) }
+   0.662516400s  INFO prepare_target{force=false package_id=libsqlite3-sys v0.28.0 target="libsqlite3_sys"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\baneronetwo\Documents\GitHub\timiGS-\timigs-android\rust\target\debug\.fingerprint\libsqlite3-sys-be6a9d794e2fdc9b\lib-libsqlite3_sys`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_filter_source_repo
+  12: git_filter_source_repo
+  13: git_libgit2_prerelease
+  14: <unknown>
+  15: <unknown>
+  16: <unknown>
+  17: <unknown>
+  18: git_midx_writer_dump
+  19: git_filter_source_repo
+  20: git_midx_writer_dump
+  21: BaseThreadInitThunk
+  22: RtlUserThreadStart
+   0.664825400s  INFO prepare_target{force=false package_id=libsqlite3-sys v0.28.0 target="build-script-build"}: cargo::core::compiler::fingerprint: fingerprint error for libsqlite3-sys v0.28.0/RunCustomBuild/TargetInner { ..: custom_build_target("build-script-build", "C:\\Users\\baneronetwo\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\libsqlite3-sys-0.28.0\\build.rs", Edition2021) }
+   0.664866800s  INFO prepare_target{force=false package_id=libsqlite3-sys v0.28.0 target="build-script-build"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\baneronetwo\Documents\GitHub\timiGS-\timigs-android\rust\target\debug\.fingerprint\libsqlite3-sys-4eede4276036f0f2\run-build-script-build-script-build`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_filter_source_repo
+  12: git_filter_source_repo
+  13: git_filter_source_repo
+  14: git_filter_source_repo
+  15: git_libgit2_prerelease
+  16: <unknown>
+  17: <unknown>
+  18: <unknown>
+  19: <unknown>
+  20: git_midx_writer_dump
+  21: git_filter_source_repo
+  22: git_midx_writer_dump
+  23: BaseThreadInitThunk
+  24: RtlUserThreadStart
+   0.667165500s  INFO prepare_target{force=false package_id=serde_json v1.0.149 target="serde_json"}: cargo::core::compiler::fingerprint: fingerprint error for serde_json v1.0.149/Check { test: false }/TargetInner { ..: lib_target("serde_json", ["lib"], "C:\\Users\\baneronetwo\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\serde_json-1.0.149\\src\\lib.rs", Edition2021) }
+   0.667211600s  INFO prepare_target{force=false package_id=serde_json v1.0.149 target="serde_json"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\baneronetwo\Documents\GitHub\timiGS-\timigs-android\rust\target\debug\.fingerprint\serde_json-8c978112ff08055e\lib-serde_json`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_filter_source_repo
+  12: git_libgit2_prerelease
+  13: <unknown>
+  14: <unknown>
+  15: <unknown>
+  16: <unknown>
+  17: git_midx_writer_dump
+  18: git_filter_source_repo
+  19: git_midx_writer_dump
+  20: BaseThreadInitThunk
+  21: RtlUserThreadStart
+   0.674117700s  INFO prepare_target{force=false package_id=thiserror v1.0.69 target="thiserror"}: cargo::core::compiler::fingerprint: fingerprint error for thiserror v1.0.69/Check { test: false }/TargetInner { ..: lib_target("thiserror", ["lib"], "C:\\Users\\baneronetwo\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\thiserror-1.0.69\\src\\lib.rs", Edition2021) }
+   0.674180200s  INFO prepare_target{force=false package_id=thiserror v1.0.69 target="thiserror"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\baneronetwo\Documents\GitHub\timiGS-\timigs-android\rust\target\debug\.fingerprint\thiserror-e28af24b9a6a82ff\lib-thiserror`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_filter_source_repo
+  12: git_libgit2_prerelease
+  13: <unknown>
+  14: <unknown>
+  15: <unknown>
+  16: <unknown>
+  17: git_midx_writer_dump
+  18: git_filter_source_repo
+  19: git_midx_writer_dump
+  20: BaseThreadInitThunk
+  21: RtlUserThreadStart
+   0.678859600s  INFO prepare_target{force=false package_id=thiserror-impl v1.0.69 target="thiserror_impl"}: cargo::core::compiler::fingerprint: fingerprint error for thiserror-impl v1.0.69/Build/TargetInner { for_host: true, proc_macro: true, ..: lib_target("thiserror_impl", ["proc-macro"], "C:\\Users\\baneronetwo\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\thiserror-impl-1.0.69\\src\\lib.rs", Edition2021) }
+   0.678906700s  INFO prepare_target{force=false package_id=thiserror-impl v1.0.69 target="thiserror_impl"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\baneronetwo\Documents\GitHub\timiGS-\timigs-android\rust\target\debug\.fingerprint\thiserror-impl-a51ad098edd00222\lib-thiserror_impl`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_filter_source_repo
+  12: git_filter_source_repo
+  13: git_libgit2_prerelease
+  14: <unknown>
+  15: <unknown>
+  16: <unknown>
+  17: <unknown>
+  18: git_midx_writer_dump
+  19: git_filter_source_repo
+  20: git_midx_writer_dump
+  21: BaseThreadInitThunk
+  22: RtlUserThreadStart
+   0.679953900s  INFO prepare_target{force=false package_id=timigs_core v0.1.0 (C:\Users\baneronetwo\Documents\GitHub\timiGS-\timigs-android\rust) target="timigs_core"}: cargo::core::compiler::fingerprint: fingerprint error for timigs_core v0.1.0 (C:\Users\baneronetwo\Documents\GitHub\timiGS-\timigs-android\rust)/Check { test: true }/TargetInner { name_inferred: true, ..: lib_target("timigs_core", ["cdylib", "staticlib"], "C:\\Users\\baneronetwo\\Documents\\GitHub\\timiGS-\\timigs-android\\rust\\src\\lib.rs", Edition2021) }
+   0.679997700s  INFO prepare_target{force=false package_id=timigs_core v0.1.0 (C:\Users\baneronetwo\Documents\GitHub\timiGS-\timigs-android\rust) target="timigs_core"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\baneronetwo\Documents\GitHub\timiGS-\timigs-android\rust\target\debug\.fingerprint\timigs_core-a6b92f06096d41db\test-lib-timigs_core`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_libgit2_prerelease
+  12: <unknown>
+  13: <unknown>
+  14: <unknown>
+  15: <unknown>
+  16: git_midx_writer_dump
+  17: git_filter_source_repo
+  18: git_midx_writer_dump
+  19: BaseThreadInitThunk
+  20: RtlUserThreadStart
+   Compiling futures-macro v0.3.31
+    Checking hashbrown v0.14.5
+   Compiling libsqlite3-sys v0.28.0
+   Compiling tokio-macros v2.6.0
+   Compiling serde_derive v1.0.228
+   Compiling flutter_rust_bridge_macros v2.11.1
+   Compiling delegate-attr v0.3.0
+   Compiling thiserror-impl v1.0.69
+    Checking serde_json v1.0.149
+    Checking hashlink v0.9.1
+    Checking tokio v1.49.0
+    Checking futures-util v0.3.31
+    Checking thiserror v1.0.69
+    Checking serde v1.0.228
+    Checking rusqlite v0.31.0
+    Checking chrono v0.4.43
+    Checking futures-executor v0.3.31
+    Checking futures v0.3.31
+    Checking flutter_rust_bridge v2.11.1
+    Checking timigs_core v0.1.0 (C:\Users\baneronetwo\Documents\GitHub\timiGS-\timigs-android\rust)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 22.35s
