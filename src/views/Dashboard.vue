@@ -8,12 +8,30 @@
           <p class="subtitle">{{ currentDate }}</p>
         </div>
         <div class="header-right">
+          <button 
+            class="exclude-btn" 
+            @click="showExcludeModal = true"
+            :class="{ active: store.excludedProcesses.length > 0 }"
+            :title="$t('excludeProcesses.buttonTitle') || 'Manage excluded processes'"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
+            </svg>
+            <span v-if="store.excludedProcesses.length > 0" class="exclude-count">{{ store.excludedProcesses.length }}</span>
+          </button>
           <div class="tracking-pill" :class="{ active: store.isTracking }">
             <span class="tracking-dot"></span>
             <span>{{ store.isTracking ? 'Tracking' : 'Paused' }}</span>
           </div>
         </div>
       </div>
+
+      <!-- Process Exclude Modal -->
+      <ProcessExcludeModal 
+        v-if="showExcludeModal" 
+        @close="showExcludeModal = false" 
+      />
 
       <!-- Active Now Hero Card -->
       <div class="hero-card animate-enter">
@@ -241,6 +259,10 @@ const store = useActivityStore();
 const currentActivity = computed(() => store.currentActivity);
 const selectedChartType = ref("doughnut");
 const appIcons = ref<Record<string, string>>({});
+const showExcludeModal = ref(false);
+
+// Temporary placeholder for ProcessExcludeModal
+const ProcessExcludeModal = { template: '<div></div>' };
 
 const currentDate = new Date().toLocaleDateString(undefined, { 
   weekday: 'long', 
@@ -425,6 +447,54 @@ onUnmounted(() => {
   color: var(--text-muted);
   font-size: 1rem;
   font-weight: 400;
+}
+
+.exclude-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 20px;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  margin-right: 12px;
+}
+
+.exclude-btn:hover {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+}
+
+.exclude-btn.active {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #ef4444;
+  box-shadow: 0 0 16px rgba(239, 68, 68, 0.2);
+}
+
+.exclude-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.exclude-count {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: #ef4444;
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 10px;
+  min-width: 18px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
 }
 
 .tracking-pill {

@@ -43,7 +43,8 @@
     "websites": "Websites",
     "noWebsites": "No website history found",
     "noSearchResults": "Not found",
-    "websiteStats": "Stats Web"
+    "websiteStats": "Stats Web",
+    "notTracked": "Not Tracked"
   },
   "analytics": {
     "title": "Analytics",
@@ -210,7 +211,22 @@
     "minutes": "Minutes",
     "seconds": "Seconds",
     "generating": "Generating...",
-    "connecting": "Connecting..."
+    "connecting": "Connecting...",
+    "done": "Done"
+  },
+  "excludeProcesses": {
+    "title": "Exclude Processes",
+    "description": "Select processes to exclude from tracking. Excluded processes will not be recorded in your activity timeline.",
+    "currentActivity": "Current Activity",
+    "recentApps": "Recently Active",
+    "excludedList": "Currently Excluded",
+    "exclude": "Exclude",
+    "excluded": "Excluded",
+    "reinclude": "Re-include this process",
+    "noCurrentActivity": "No active process detected",
+    "noRecentApps": "No recent activity",
+    "noExcluded": "No processes excluded",
+    "buttonTitle": "Manage excluded processes"
   },
   "sync": {
     "title": "Phone Synchronization",

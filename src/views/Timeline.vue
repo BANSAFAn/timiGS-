@@ -51,7 +51,16 @@
               {{ group.appName.charAt(0).toUpperCase() }}
             </div>
             <div class="group-info">
-              <div class="group-app-name">{{ group.appName }}</div>
+              <div class="group-app-name">
+                {{ group.appName }}
+                <span v-if="isExcluded(group.exePath)" class="excluded-badge">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
+                  </svg>
+                  {{ $t('timeline.notTracked') || 'Not Tracked' }}
+                </span>
+              </div>
               <div class="group-meta">
                 <span class="group-sessions-count">{{ group.sessions.length }} {{ group.sessions.length === 1 ? 'session' : 'sessions' }}</span>
                 <span class="group-separator">•</span>
@@ -176,6 +185,10 @@ function toggleGroup(appName: string) {
     newSet.add(appName);
   }
   expandedGroups.value = newSet;
+}
+
+function isExcluded(exePath: string): boolean {
+  return store.isProcessExcluded(exePath);
 }
 
 // Browser Modal Logic
@@ -550,6 +563,30 @@ input[type="date"] {
   font-weight: 600;
   font-size: 1rem;
   color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.excluded-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+  padding: 3px 8px;
+  border-radius: 12px;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.excluded-badge svg {
+  width: 12px;
+  height: 12px;
 }
 
 .group-meta {

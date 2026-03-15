@@ -65,6 +65,7 @@ pub struct Settings {
     pub auto_export_interval_hours: i64,
     pub auto_export_folder: String,
     pub last_export_time: Option<String>,
+    pub excluded_processes: Vec<String>,
 }
 
 impl Default for Settings {
@@ -79,6 +80,7 @@ impl Default for Settings {
             auto_export_interval_hours: 24,
             auto_export_folder: String::new(),
             last_export_time: None,
+            excluded_processes: Vec::new(),
         }
     }
 }
@@ -496,6 +498,14 @@ pub fn get_settings() -> Settings {
             settings.last_export_time = Some(last_export);
         }
 
+        if let Ok(excluded) = conn.query_row(
+            "SELECT value FROM settings WHERE key = 'excluded_processes'",
+            [],
+            |row| row.get::<_, String>(0),
+        ) {
+            settings.excluded_processes = serde_json::from_str(&excluded).unwrap_or_default();
+        }
+
         settings
     } else {
         Settings::default()
@@ -557,6 +567,13 @@ pub fn save_settings(settings: &Settings) -> Result<()> {
         )?;
     }
 
+    // Save excluded processes as JSON
+    let excluded_json = serde_json::to_string(&settings.excluded_processes).unwrap_or_else(|_| "[]".to_string());
+    conn.execute(
+        "INSERT OR REPLACE INTO settings (key, value) VALUES ('excluded_processes', ?1)",
+        [&excluded_json],
+    )?;
+
     Ok(())
 }
 
@@ -582,6 +599,61 @@ pub fn save_setting(key: &str, value: &str) -> Result<()> {
     )?;
 
     Ok(())
+}
+
+// Excluded Processes Management
+pub fn get_excluded_processes() -> Result<Vec<String>> {
+    let guard = DB.lock();
+    let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
+
+    let result: Option<String> = conn
+        .query_row("SELECT value FROM settings WHERE key = 'excluded_processes'", [], |row| {
+            row.get(0)
+        })
+        .ok();
+
+    match result {
+        Some(json_str) => Ok(serde_json::from_str(&json_str).unwrap_or_default()),
+        None => Ok(Vec::new()),
+    }
+}
+
+pub fn add_excluded_process(exe_path: &str) -> Result<()> {
+    let mut excluded = get_excluded_processes()?;
+    
+    // Normalize path for comparison (lowercase)
+    let exe_lower = exe_path.to_lowercase();
+    
+    // Don't add if already exists
+    if !excluded.iter().any(|p| p.to_lowercase() == exe_lower) {
+        excluded.push(exe_path.to_string());
+        
+        let excluded_json = serde_json::to_string(&excluded).unwrap_or_else(|_| "[]".to_string());
+        save_setting("excluded_processes", &excluded_json)?;
+    }
+    
+    Ok(())
+}
+
+pub fn remove_excluded_process(exe_path: &str) -> Result<()> {
+    let mut excluded = get_excluded_processes()?;
+    let exe_lower = exe_path.to_lowercase();
+    
+    excluded.retain(|p| p.to_lowercase() != exe_lower);
+    
+    let excluded_json = serde_json::to_string(&excluded).unwrap_or_else(|_| "[]".to_string());
+    save_setting("excluded_processes", &excluded_json)?;
+    
+    Ok(())
+}
+
+pub fn is_process_excluded(exe_path: &str) -> bool {
+    if let Ok(excluded) = get_excluded_processes() {
+        let exe_lower = exe_path.to_lowercase();
+        excluded.iter().any(|p| p.to_lowercase() == exe_lower)
+    } else {
+        false
+    }
 }
 
 // Tasks

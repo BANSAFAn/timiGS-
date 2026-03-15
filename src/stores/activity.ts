@@ -113,7 +113,8 @@ export const useActivityStore = defineStore('activity', {
     appCategories: {} as Record<string, string>,
     isTracking: false,
     isLoading: false,
-    isMobile: false
+    isMobile: false,
+    excludedProcesses: [] as string[]
   }),
 
   getters: {
@@ -383,23 +384,57 @@ export const useActivityStore = defineStore('activity', {
       try {
         // Clone for reactivity
         const newCategories = { ...this.appCategories };
-        
+
         if (category === 'Uncategorized' || !category) {
           delete newCategories[appName];
         } else {
           newCategories[appName] = category;
         }
-        
+
         this.appCategories = newCategories;
-        
+
         // Save to backend
-        await invoke('save_setting_cmd', { 
-          key: 'app_categories', 
-          value: JSON.stringify(newCategories) 
+        await invoke('save_setting_cmd', {
+          key: 'app_categories',
+          value: JSON.stringify(newCategories)
         });
       } catch (error) {
         console.error('Failed to save app category:', error);
       }
+    },
+
+    async fetchExcludedProcesses() {
+      try {
+        this.excludedProcesses = await invoke<string[]>('get_excluded_processes_cmd');
+      } catch (error) {
+        console.error('Failed to fetch excluded processes:', error);
+        this.excludedProcesses = [];
+      }
+    },
+
+    async addExcludedProcess(exePath: string) {
+      try {
+        await invoke('add_excluded_process_cmd', { exePath });
+        await this.fetchExcludedProcesses();
+      } catch (error) {
+        console.error('Failed to add excluded process:', error);
+        throw error;
+      }
+    },
+
+    async removeExcludedProcess(exePath: string) {
+      try {
+        await invoke('remove_excluded_process_cmd', { exePath });
+        await this.fetchExcludedProcesses();
+      } catch (error) {
+        console.error('Failed to remove excluded process:', error);
+        throw error;
+      }
+    },
+
+    isProcessExcluded(exePath: string): boolean {
+      const exeLower = exePath.toLowerCase();
+      return this.excludedProcesses.some(p => p.toLowerCase() === exeLower);
     }
   }
 });

@@ -127,6 +127,21 @@ pub fn save_setting_cmd(key: String, value: String) -> Result<(), String> {
 }
 
 #[command]
+pub fn get_excluded_processes_cmd() -> Result<Vec<String>, String> {
+    db::get_excluded_processes().map_err(|e| e.to_string())
+}
+
+#[command]
+pub fn add_excluded_process_cmd(exe_path: String) -> Result<(), String> {
+    db::add_excluded_process(&exe_path).map_err(|e| e.to_string())
+}
+
+#[command]
+pub fn remove_excluded_process_cmd(exe_path: String) -> Result<(), String> {
+    db::remove_excluded_process(&exe_path).map_err(|e| e.to_string())
+}
+
+#[command]
 #[cfg(any(target_os = "windows", target_os = "android"))]
 pub fn start_tracking() {
     tracker::start_tracking();

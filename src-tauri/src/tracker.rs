@@ -139,6 +139,7 @@ fn get_foreground_window_info() -> Option<ActiveWindow> {
                 // Filter ignored apps
                 if name_only.eq_ignore_ascii_case("explorer")
                     || name_only.eq_ignore_ascii_case("LockApp")
+                    || db::is_process_excluded(&full_path)
                 {
                     let _ = windows::Win32::Foundation::CloseHandle(handle);
                     return None;
