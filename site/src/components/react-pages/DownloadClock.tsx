@@ -45,11 +45,7 @@ const LinuxIcon: React.FC<{ className?: string }> = ({ className }) => (
   </svg>
 );
 
-const AndroidIcon: React.FC<{ className?: string }> = ({ className }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="currentColor">
-    <path d="M17.523 15.3414c-.5511 0-.9993-.4482-.9993-.9993s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993s-.4482.9993-.9993.9993m-11.046 0c-.5511 0-.9993-.4482-.9993-.9993s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993s-.4482.9993-.9993.9993m11.4045-6.02l1.9973-3.4592a.416.416 0 00-.1527-.5676.416.416 0 00-.5676.1527l-2.0225 3.5028C15.9502 8.3996 14.0282 8 12 8c-2.0282 0-3.9502.3996-5.1388.9481L4.8387 5.4473a.416.416 0 00-.5676-.1527.416.416 0 00-.1527.5676l1.9973 3.4592C2.6889 11.1867.3432 14.6589 0 18.761h24c-.3432-4.1021-2.6889-7.5743-6.1185-9.4396"/>
-  </svg>
-);
+
 
 const ClockFaceIcon: React.FC<{ className?: string; animated?: boolean }> = ({ className, animated = false }) => (
   <svg className={className} viewBox="0 0 100 100" fill="none">
@@ -152,21 +148,7 @@ const Download: React.FC<DownloadProps> = ({ lang, t }) => {
       bg: "bg-orange-500/10",
       hoverBg: "hover:bg-orange-500/20",
     },
-    {
-      id: "android",
-      title: t.downloads.android,
-      icon: AndroidIcon,
-      assets: getAssetsByExt(['.apk']),
-      description: t.downloads.android_desc,
-      accent: "from-green-500 to-emerald-500",
-      bgGlow: "shadow-green-500/20",
-      border: "border-green-500/30",
-      text: "text-green-400",
-      bg: "bg-green-500/10",
-      hoverBg: "hover:bg-green-500/20",
-      badge: t.downloads.android_alpha_badge,
-      warning: t.downloads.android_alpha_warning,
-    },
+
   ];
 
   const selectedPlatformData = selectedPlatform ? platforms.find(p => p.id === selectedPlatform) : null;

@@ -67,25 +67,45 @@
         "icon": "⚡",
         "title": "实时追踪",
         "description": "自动检测活动窗口并追踪使用时长，无需任何手动输入。",
-        "highlights": ["自动检测", "后台监控", "智能分类", "空闲时间检测"]
+        "highlights": [
+          "自动检测",
+          "后台监控",
+          "智能分类",
+          "空闲时间检测"
+        ]
       },
       "timeline": {
         "icon": "📅",
         "title": "时间轴视图",
         "description": "逐日浏览详细的活动历史记录。搜索和过滤您的整个历史记录。",
-        "highlights": ["日间概览", "搜索历史", "分类明细", "导出数据"]
+        "highlights": [
+          "日间概览",
+          "搜索历史",
+          "分类明细",
+          "导出数据"
+        ]
       },
       "focus": {
         "icon": "🎯",
         "title": "专注模式",
         "description": "使用我们强大的专注模式消除干扰。阻止分散注意力的应用，保持专注。",
-        "highlights": ["应用阻止", "自定义会话", "密码保护", "休息提醒"]
+        "highlights": [
+          "应用阻止",
+          "自定义会话",
+          "密码保护",
+          "休息提醒"
+        ]
       },
       "weather": {
         "icon": "🌦️",
         "title": "内置天气",
         "description": "追踪器中直接集成天气小部件。自动检测位置或手动设置，无需离开应用即可规划一天。",
-        "highlights": ["自动定位", "5 天预报", "温度和天气状况", "自定义位置"]
+        "highlights": [
+          "自动定位",
+          "5 天预报",
+          "温度和天气状况",
+          "自定义位置"
+        ]
       }
     }
   },
@@ -117,7 +137,6 @@
       "local": "本地数据",
       "telemetry": "无遥测",
       "desktop": "桌面应用",
-      "android": "Android",
       "breaks": "休息提醒",
       "weather": "天气小部件"
     },
@@ -174,10 +193,6 @@
     "mac_desc": "针对 macOS 进行了优化。支持 Intel 和 Apple Silicon 芯片。",
     "linux": "Linux",
     "linux_desc": "适用于主要发行版的软件包。AppImage 通用，RPM 适用于 Fedora，DEB 适用于 Ubuntu。",
-    "android": "Android",
-    "android_desc": "Android version is currently unavailableversion is currently unavailable.",
-    "android_alpha_badge": "",
-    "android_alpha_warning": "",
     "source": "源代码",
     "source_title": "源代码及其他",
     "source_desc": "需要源代码包、校验和或旧版本？请访问 GitHub 发布页面。",

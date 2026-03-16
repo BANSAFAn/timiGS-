@@ -67,25 +67,45 @@
         "icon": "⚡",
         "title": "Real-time Tracking",
         "description": "Automatically detects active windows and tracks usage duration without any manual input.",
-        "highlights": ["Automatic detection", "Background monitoring", "Smart categorization", "Idle time detection"]
+        "highlights": [
+          "Automatic detection",
+          "Background monitoring",
+          "Smart categorization",
+          "Idle time detection"
+        ]
       },
       "timeline": {
         "icon": "📅",
         "title": "Timeline View",
         "description": "Browse activity history day-by-day with granular details. Search and filter your entire history.",
-        "highlights": ["Day overview", "Search history", "Category breakdown", "Export data"]
+        "highlights": [
+          "Day overview",
+          "Search history",
+          "Category breakdown",
+          "Export data"
+        ]
       },
       "focus": {
         "icon": "🎯",
         "title": "Focus Mode",
         "description": "Eliminate distractions with our powerful focus mode. Block distracting apps and stay on track.",
-        "highlights": ["App blocking", "Custom sessions", "Password protection", "Break reminders"]
+        "highlights": [
+          "App blocking",
+          "Custom sessions",
+          "Password protection",
+          "Break reminders"
+        ]
       },
       "weather": {
         "icon": "🌦️",
         "title": "Built-in Weather",
         "description": "Weather widget right in your tracker. Auto-detect location or set manually — plan your day without leaving the app.",
-        "highlights": ["Auto location", "5-day forecast", "Temperature & conditions", "Custom locations"]
+        "highlights": [
+          "Auto location",
+          "5-day forecast",
+          "Temperature & conditions",
+          "Custom locations"
+        ]
       }
     }
   },
@@ -117,7 +137,6 @@
       "local": "Local Data",
       "telemetry": "No Telemetry",
       "desktop": "Desktop App",
-      "android": "Android",
       "breaks": "Break Reminders",
       "weather": "Weather Widget"
     },
@@ -174,10 +193,6 @@
     "mac_desc": "Optimized for macOS. Supports Intel and Apple Silicon chips via universal binaries.",
     "linux": "Linux",
     "linux_desc": "Packages for major distributions. AppImage for universal compatibility, RPM for Fedora, and DEB for Ubuntu/Debian.",
-    "android": "Android",
-    "android_desc": "Android version is currently unavailable.",
-    "android_alpha_badge": "",
-    "android_alpha_warning": "",
     "source": "Source Code",
     "source_title": "Source Code & Other Assets",
     "source_desc": "Need access to source code tarballs, checksums, or older releases? Visit the full release page on GitHub.",

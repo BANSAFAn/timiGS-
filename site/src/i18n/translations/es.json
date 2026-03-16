@@ -67,25 +67,45 @@
         "icon": "⚡",
         "title": "Rastreo en Tiempo Real",
         "description": "Detecta automáticamente las ventanas activas y rastrea la duración del uso sin entrada manual.",
-        "highlights": ["Detección automática", "Monitoreo en segundo plano", "Categorización inteligente", "Detección de inactividad"]
+        "highlights": [
+          "Detección automática",
+          "Monitoreo en segundo plano",
+          "Categorización inteligente",
+          "Detección de inactividad"
+        ]
       },
       "timeline": {
         "icon": "📅",
         "title": "Vista de Línea de Tiempo",
         "description": "Navega por tu historial de actividad día a día con detalles granulares. Busca y filtra todo tu historial.",
-        "highlights": ["Vista general del día", "Historial de búsqueda", "Desglose por categoría", "Exportar datos"]
+        "highlights": [
+          "Vista general del día",
+          "Historial de búsqueda",
+          "Desglose por categoría",
+          "Exportar datos"
+        ]
       },
       "focus": {
         "icon": "🎯",
         "title": "Modo Enfoque",
         "description": "Elimina distracciones con nuestro potente modo enfoque. Bloquea aplicaciones distractantes.",
-        "highlights": ["Bloqueo de aplicaciones", "Sesiones personalizadas", "Protección con contraseña", "Recordatorios de descanso"]
+        "highlights": [
+          "Bloqueo de aplicaciones",
+          "Sesiones personalizadas",
+          "Protección con contraseña",
+          "Recordatorios de descanso"
+        ]
       },
       "weather": {
         "icon": "🌦️",
         "title": "Clima Integrado",
         "description": "Widget del clima directamente en tu tracker. Detección automática de ubicación o configuración manual.",
-        "highlights": ["Ubicación automática", "Pronóstico de 5 días", "Temperatura y condiciones", "Ubicaciones personalizadas"]
+        "highlights": [
+          "Ubicación automática",
+          "Pronóstico de 5 días",
+          "Temperatura y condiciones",
+          "Ubicaciones personalizadas"
+        ]
       }
     }
   },
@@ -117,7 +137,6 @@
       "local": "Datos Locales",
       "telemetry": "Sin Telemetría",
       "desktop": "App de Escritorio",
-      "android": "Android",
       "breaks": "Recordatorios de Descanso",
       "weather": "Widget del Clima"
     },
@@ -174,10 +193,6 @@
     "mac_desc": "Optimizado para macOS. Soporta chips Intel y Apple Silicon.",
     "linux": "Linux",
     "linux_desc": "Paquetes para las principales distribuciones. AppImage para compatibilidad, RPM para Fedora, DEB para Ubuntu.",
-    "android": "Android",
-    "android_desc": "Android versionversion isis currentlycurrently unavailableunavailable.",
-    "android_alpha_badge": "",
-    "android_alpha_warning": "",
     "source": "Código Fuente",
     "source_title": "Código Fuente y Otros",
     "source_desc": "¿Necesitas código fuente o versiones anteriores? Visita GitHub.",

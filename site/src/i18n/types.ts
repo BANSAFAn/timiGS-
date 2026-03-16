@@ -97,7 +97,6 @@ export interface Translation {
       local: string;
       telemetry: string;
       desktop: string;
-      android: string;
       breaks: string;
       weather: string;
       gdrive: string;
@@ -123,7 +122,6 @@ export interface Translation {
       windows: { name: string; description: string };
       macos: { name: string; description: string };
       linux: { name: string; description: string };
-      android: { name: string; description: string };
     };
   };
   cta: {
@@ -147,10 +145,6 @@ export interface Translation {
     mac_desc: string;
     linux: string;
     linux_desc: string;
-    android: string;
-    android_desc: string;
-    android_alpha_badge: string;
-    android_alpha_warning: string;
     source: string;
     source_title: string;
     source_desc: string;

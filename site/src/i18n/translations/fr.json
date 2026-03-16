@@ -67,25 +67,45 @@
         "icon": "⚡",
         "title": "Suivi en Temps Réel",
         "description": "Détecte automatiquement les fenêtres actives et suit la durée d'utilisation sans saisie manuelle.",
-        "highlights": ["Détection automatique", "Surveillance en arrière-plan", "Catégorisation intelligente", "Détection d'inactivité"]
+        "highlights": [
+          "Détection automatique",
+          "Surveillance en arrière-plan",
+          "Catégorisation intelligente",
+          "Détection d'inactivité"
+        ]
       },
       "timeline": {
         "icon": "📅",
         "title": "Vue Chronologie",
         "description": "Parcourez votre historique d'activité jour par jour avec des détails précis. Recherchez et filtrez tout votre historique.",
-        "highlights": ["Aperçu de la journée", "Historique de recherche", "Répartition par catégorie", "Exporter les données"]
+        "highlights": [
+          "Aperçu de la journée",
+          "Historique de recherche",
+          "Répartition par catégorie",
+          "Exporter les données"
+        ]
       },
       "focus": {
         "icon": "🎯",
         "title": "Mode Concentration",
         "description": "Éliminez les distractions avec notre puissant mode concentration. Bloquez les applications distrayantes.",
-        "highlights": ["Blocage d'applications", "Sessions personnalisées", "Protection par mot de passe", "Rappels de pause"]
+        "highlights": [
+          "Blocage d'applications",
+          "Sessions personnalisées",
+          "Protection par mot de passe",
+          "Rappels de pause"
+        ]
       },
       "weather": {
         "icon": "🌦️",
         "title": "Météo Intégrée",
         "description": "Widget météo directement dans votre tracker. Détection automatique ou réglage manuel de la localisation.",
-        "highlights": ["Localisation auto", "Prévisions 5 jours", "Température et conditions", "Localisations personnalisées"]
+        "highlights": [
+          "Localisation auto",
+          "Prévisions 5 jours",
+          "Température et conditions",
+          "Localisations personnalisées"
+        ]
       }
     }
   },
@@ -117,7 +137,6 @@
       "local": "Données Locales",
       "telemetry": "Pas de Télémétrie",
       "desktop": "App Desktop",
-      "android": "Android",
       "breaks": "Rappels de Pause",
       "weather": "Widget Météo"
     },
@@ -174,10 +193,6 @@
     "mac_desc": "Optimisé pour macOS. Prend en charge les puces Intel et Apple Silicon.",
     "linux": "Linux",
     "linux_desc": "Paquets pour les principales distributions. AppImage pour la compatibilité, RPM pour Fedora, DEB pour Ubuntu.",
-    "android": "Android",
-    "android_desc": "Android version isis currentlycurrently unavailableunavailable.",
-    "android_alpha_badge": "",
-    "android_alpha_warning": "",
     "source": "Code Source",
     "source_title": "Code Source et autres",
     "source_desc": "Besoin du code source ou d'anciennes versions ? Visitez GitHub.",
