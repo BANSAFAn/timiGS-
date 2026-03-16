@@ -152,6 +152,7 @@ pub fn run() {
             commands::get_current_session,
             commands::get_today_activity,
             commands::get_today_summary,
+            commands::get_summary_by_date_cmd,
             commands::get_music_today_summary,
             commands::get_total_music_time_today,
             commands::get_current_music_session,

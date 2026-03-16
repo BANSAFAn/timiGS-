@@ -396,6 +396,32 @@ pub fn get_today_summary() -> Result<Vec<AppUsageSummary>> {
     Ok(summaries)
 }
 
+pub fn get_summary_by_date(date_str: &str) -> Result<Vec<AppUsageSummary>> {
+    let guard = DB.lock();
+    let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
+
+    let mut stmt = conn.prepare(
+        "SELECT app_name, exe_path, SUM(duration_seconds) as total, COUNT(*) as count
+         FROM activity_sessions
+         WHERE date(start_time) = date(?1)
+         GROUP BY app_name
+         ORDER BY total DESC",
+    )?;
+
+    let summaries = stmt
+        .query_map([date_str.to_string()], |row| {
+            Ok(AppUsageSummary {
+                app_name: row.get(0)?,
+                exe_path: row.get(1)?,
+                total_seconds: row.get(2)?,
+                session_count: row.get(3)?,
+            })
+        })?
+        .collect::<Result<Vec<_>>>()?;
+
+    Ok(summaries)
+}
+
 pub fn get_weekly_stats() -> Result<Vec<DailyStats>> {
     let guard = DB.lock();
     let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;

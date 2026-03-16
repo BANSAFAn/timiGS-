@@ -44,6 +44,11 @@ pub fn get_today_summary() -> Vec<db::AppUsageSummary> {
 }
 
 #[command]
+pub fn get_summary_by_date_cmd(date: String) -> Vec<db::AppUsageSummary> {
+    db::get_summary_by_date(&date).unwrap_or_default()
+}
+
+#[command]
 pub fn get_music_today_summary() -> Vec<db::MusicAppUsage> {
     db::get_today_music_summary().unwrap_or_default()
 }
