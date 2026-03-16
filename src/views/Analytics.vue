@@ -7,37 +7,6 @@
           <p class="subtitle">Insights into your productivity patterns</p>
         </div>
         <div class="header-controls">
-          <!-- View Style Selector -->
-          <div class="view-selector">
-            <button
-              type="button"
-              class="view-btn"
-              :class="{ active: viewStyle === 'default' }"
-              @click="viewStyle = 'default'"
-              title="Default View"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="pointer-events: none;"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-            </button>
-            <button
-              type="button"
-              class="view-btn"
-              :class="{ active: viewStyle === 'roadmap' }"
-              @click="viewStyle = 'roadmap'"
-              title="Roadmap View"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="pointer-events: none;"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
-            </button>
-            <button
-              type="button"
-              class="view-btn"
-              :class="{ active: viewStyle === 'compact' }"
-              @click="viewStyle = 'compact'"
-              title="Compact View"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="pointer-events: none;"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
-            </button>
-          </div>
-
           <!-- Time Range Selector -->
           <div class="time-range-selector">
             <button class="range-btn" :class="{ active: selectedRange === 'day' }" @click="selectedRange = 'day'">Day</button>
@@ -756,8 +725,7 @@ function formatDate(dateStr: string): string {
   return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
-// View style and time range
-const viewStyle = ref<'default' | 'roadmap' | 'compact'>('default');
+// Time range
 const selectedRange = ref<'day' | 'week' | 'month'>('week');
 const dayOffset = ref(0);
 const monthOffset = ref(0);
@@ -782,6 +750,24 @@ function getWeekRange(offset: number): { from: string; to: string } {
     from: from.toISOString().split('T')[0],
     to: to.toISOString().split('T')[0]
   };
+}
+
+function getMonthRange(offset: number): { from: string; to: string } {
+  const now = new Date();
+  const targetMonth = new Date(now.getFullYear(), now.getMonth() + offset, 1);
+  const lastDay = new Date(targetMonth.getFullYear(), targetMonth.getMonth() + 1, 0);
+  
+  return {
+    from: targetMonth.toISOString().split('T')[0],
+    to: lastDay.toISOString().split('T')[0]
+  };
+}
+
+function getDayRange(offset: number): { from: string; to: string } {
+  const now = new Date();
+  now.setDate(now.getDate() + offset);
+  const dateStr = now.toISOString().split('T')[0];
+  return { from: dateStr, to: dateStr };
 }
 
 const weekRangeLabel = computed(() => {
@@ -815,30 +801,51 @@ function prevPeriod() {
   if (selectedRange.value === 'day') {
     dayOffset.value--;
   } else if (selectedRange.value === 'week') {
-    prevWeek();
+    weekOffset.value--;
   } else {
     monthOffset.value--;
   }
+  fetchPeriodData();
 }
 
 function nextPeriod() {
   if (selectedRange.value === 'day') {
     if (dayOffset.value < 0) dayOffset.value++;
   } else if (selectedRange.value === 'week') {
-    nextWeek();
+    if (weekOffset.value < 0) weekOffset.value++;
   } else {
     if (monthOffset.value < 0) monthOffset.value++;
   }
+  fetchPeriodData();
 }
 
-async function fetchWeekData() {
-  if (weekOffset.value === 0) {
-    await store.fetchTodayData();
-    await store.fetchWeeklyStats();
-    return;
+async function fetchPeriodData() {
+  // If it's the current period and we are on week/day view and offset is 0
+  // we could potentially just use store methods, but custom fetching covers all bases uniformly.
+  let fromStr = '';
+  let toStr = '';
+
+  if (selectedRange.value === 'day') {
+    const { from, to } = getDayRange(dayOffset.value);
+    fromStr = from;
+    toStr = to;
+  } else if (selectedRange.value === 'week') {
+    if (weekOffset.value === 0) {
+      await store.fetchTodayData();
+      await store.fetchWeeklyStats();
+      return; // Uses store default
+    }
+    const { from, to } = getWeekRange(weekOffset.value);
+    fromStr = from;
+    toStr = to;
+  } else if (selectedRange.value === 'month') {
+    const { from, to } = getMonthRange(monthOffset.value);
+    fromStr = from;
+    toStr = to;
   }
-  const { from, to } = getWeekRange(weekOffset.value);
-  const sessions = await store.getActivityRange(from, to);
+
+  const sessions = await store.getActivityRange(fromStr, toStr);
+  
   // Aggregate sessions into daily stats
   const daily: Record<string, DailyStatLocal> = {};
   for (const s of sessions) {
@@ -848,6 +855,7 @@ async function fetchWeekData() {
     }
     daily[dateKey].total_seconds += s.duration_seconds;
   }
+  
   // Count unique apps per day
   const appsPerDay: Record<string, Set<string>> = {};
   for (const s of sessions) {
@@ -858,19 +866,25 @@ async function fetchWeekData() {
   for (const d of Object.keys(daily)) {
     daily[d].app_count = appsPerDay[d]?.size || 0;
   }
+  
   // Fill in missing days
   const result: DailyStatLocal[] = [];
-  const start = new Date(from);
-  const end = new Date(to);
-  for (let d = new Date(end); d >= start; d.setDate(d.getDate() - 1)) {
-    const key = d.toISOString().split('T')[0];
+  const start = new Date(fromStr);
+  const end = new Date(toStr);
+  
+  // If viewing a single day, just show one data point
+  if (start.getTime() === end.getTime()) {
+    const key = start.toISOString().split('T')[0];
     result.push(daily[key] || { date: key, total_seconds: 0, app_count: 0 });
+  } else {
+    for (let d = new Date(end); d >= start; d.setDate(d.getDate() - 1)) {
+      const key = d.toISOString().split('T')[0];
+      result.push(daily[key] || { date: key, total_seconds: 0, app_count: 0 });
+    }
   }
+  
   customWeeklyStats.value = result;
 }
-
-function prevWeek() { weekOffset.value--; fetchWeekData(); }
-function nextWeek() { if (weekOffset.value < 0) { weekOffset.value++; fetchWeekData(); } }
 
 // --- Daily Detail ---
 const showDayDetail = ref(false);
@@ -1031,7 +1045,7 @@ const pieChartOptions = {
 };
 
 onMounted(async () => {
-  await fetchWeekData();
+  await fetchPeriodData();
   // Load icons for music apps
   store.musicApps.forEach(app => {
     if (app.exe_path) {
@@ -1048,7 +1062,7 @@ watch(selectedRange, async () => {
   dayOffset.value = 0;
   weekOffset.value = 0;
   monthOffset.value = 0;
-  await fetchWeekData();
+  await fetchPeriodData();
 });
 </script>
 
@@ -1593,15 +1607,17 @@ watch(selectedRange, async () => {
   height: 48px;
   border-radius: 12px;
   object-fit: contain;
-  background: linear-gradient(135deg, rgba(6, 182, 212, 0.15), rgba(14, 165, 233, 0.1));
+  background: rgba(255, 255, 255, 0.05);
   padding: 8px;
   transition: all 0.3s ease;
-  border: 1px solid rgba(6, 182, 212, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .website-card:hover .website-favicon {
   transform: scale(1.08);
-  border-color: rgba(6, 182, 212, 0.4);
+  border-color: rgba(6, 182, 212, 0.5);
+  background: rgba(6, 182, 212, 0.1);
+  box-shadow: 0 4px 12px rgba(6, 182, 212, 0.2);
 }
 
 .website-info {
@@ -2109,7 +2125,7 @@ watch(selectedRange, async () => {
 }
 
 .music-card:hover {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04));
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 0.04));
   border-color: rgba(236, 72, 153, 0.4);
   transform: translateX(8px);
   box-shadow: 0 8px 24px rgba(236, 72, 153, 0.2);
@@ -2147,38 +2163,40 @@ watch(selectedRange, async () => {
 
 .music-icon-wrapper {
   position: relative;
-  width: 52px;
-  height: 52px;
+  width: 48px;
+  height: 48px;
   flex-shrink: 0;
 }
 
 .music-app-icon {
-  width: 52px;
-  height: 52px;
-  border-radius: 14px;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
   object-fit: contain;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04));
+  background: rgba(255, 255, 255, 0.05);
   padding: 8px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   transition: all 0.3s ease;
 }
 
-.music-card:hover .music-app-icon {
-  transform: scale(1.08);
-  border-color: rgba(236, 72, 153, 0.3);
-}
-
 .music-icon {
-  width: 52px;
-  height: 52px;
-  border-radius: 14px;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #fff;
-  flex-shrink: 0;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.music-card:hover .music-icon,
+.music-card:hover .music-app-icon {
+  transform: scale(1.08);
+  border-color: rgba(236, 72, 153, 0.5);
+  box-shadow: 0 4px 12px rgba(236, 72, 153, 0.2);
 }
 
 .music-info {
@@ -2258,25 +2276,43 @@ watch(selectedRange, async () => {
 
 /* Now Playing */
 .now-playing {
-  background: linear-gradient(135deg, rgba(236, 72, 153, 0.12), rgba(139, 92, 246, 0.1));
-  border: 1px solid rgba(236, 72, 153, 0.35);
+  margin-top: 24px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+  border: 1px solid rgba(236, 72, 153, 0.2);
   border-radius: 16px;
-  padding: 20px;
-  margin-top: 20px;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 8px 24px rgba(236, 72, 153, 0.15);
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+.now-playing::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #ec4899, #8b5cf6, #ec4899);
+  background-size: 200% 100%;
+  animation: gradientMove 3s ease infinite;
 }
 
 .now-playing-header {
+  padding: 12px 20px;
+  background: rgba(0, 0, 0, 0.2);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   display: flex;
   align-items: center;
   gap: 10px;
+  color: #fff;
+  font-weight: 600;
   font-size: 0.85rem;
-  font-weight: 700;
-  color: #ec4899;
-  margin-bottom: 16px;
+  letter-spacing: 0.5px;
   text-transform: uppercase;
-  letter-spacing: 1px;
+}
+
+@keyframes gradientMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 .now-playing-live-badge {
@@ -2298,6 +2334,7 @@ watch(selectedRange, async () => {
   display: flex;
   align-items: center;
   gap: 18px;
+  padding: 20px;
 }
 
 .now-playing-icon {
@@ -2417,7 +2454,12 @@ watch(selectedRange, async () => {
 }
 
 .music-session-item:hover {
-  background: rgba(236, 72, 153, 0.08);
+  background: linear-gradient(135deg, rgba(236, 72, 153, 0.2), rgba(139, 92, 246, 0.2));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ec4899;
+  flex-shrink: 0;
   transform: translateX(4px);
 }
 

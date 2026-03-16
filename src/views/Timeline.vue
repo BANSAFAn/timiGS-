@@ -59,6 +59,7 @@
                     <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
                   </svg>
                   {{ $t('timeline.notTracked') || 'Not Tracked' }}
+                  <span class="excluded-hint">— {{ $t('timeline.notTrackedHint') || 'was opened but not tracked' }}</span>
                 </span>
               </div>
               <div class="group-meta">
@@ -368,6 +369,7 @@ watch(sessions, (newSessions) => {
 watch(selectedDate, fetchSessions);
 
 onMounted(async () => {
+  await store.fetchExcludedProcesses();
   if (isToday.value) {
     await store.fetchTodayData();
     sessions.value = store.todaySessions;
@@ -582,6 +584,20 @@ input[type="date"] {
   border: 1px solid rgba(239, 68, 68, 0.2);
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  animation: pulseExcluded 3s ease-in-out infinite;
+}
+
+.excluded-hint {
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 400;
+  font-size: 0.7rem;
+  color: rgba(239, 68, 68, 0.7);
+}
+
+@keyframes pulseExcluded {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+  50% { box-shadow: 0 0 8px 2px rgba(239, 68, 68, 0.15); }
 }
 
 .excluded-badge svg {

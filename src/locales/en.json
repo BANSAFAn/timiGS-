@@ -44,7 +44,8 @@
     "noWebsites": "No website history found",
     "noSearchResults": "Not found",
     "websiteStats": "Stats Web",
-    "notTracked": "Not Tracked"
+    "notTracked": "Not Tracked",
+    "notTrackedHint": "was opened but not tracked"
   },
   "analytics": {
     "title": "Analytics",
@@ -215,18 +216,17 @@
     "done": "Done"
   },
   "excludeProcesses": {
-    "title": "Exclude Processes",
-    "description": "Select processes to exclude from tracking. Excluded processes will not be recorded in your activity timeline.",
-    "currentActivity": "Current Activity",
-    "recentApps": "Recently Active",
-    "excludedList": "Currently Excluded",
-    "exclude": "Exclude",
-    "excluded": "Excluded",
-    "reinclude": "Re-include this process",
-    "noCurrentActivity": "No active process detected",
-    "noRecentApps": "No recent activity",
-    "noExcluded": "No processes excluded",
-    "buttonTitle": "Manage excluded processes"
+    "title": "Manage Process Tracking",
+    "buttonTitle": "Manage excluded processes",
+    "searchPlaceholder": "Search processes...",
+    "trackedTab": "Tracked",
+    "excludedTab": "Excluded",
+    "excludeAction": "Exclude",
+    "includeAction": "Track",
+    "noProcesses": "No processes found",
+    "allTracked": "All processes are being tracked",
+    "notBeingTracked": "Not being tracked",
+    "footerHint": "Excluded processes still appear in Timeline with a \"Not Tracked\" badge"
   },
   "sync": {
     "title": "Phone Synchronization",

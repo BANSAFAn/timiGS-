@@ -8,18 +8,6 @@
           <p class="subtitle">{{ currentDate }}</p>
         </div>
         <div class="header-right">
-          <button 
-            class="exclude-btn" 
-            @click="showExcludeModal = true"
-            :class="{ active: store.excludedProcesses.length > 0 }"
-            :title="$t('excludeProcesses.buttonTitle') || 'Manage excluded processes'"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"></circle>
-              <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
-            </svg>
-            <span v-if="store.excludedProcesses.length > 0" class="exclude-count">{{ store.excludedProcesses.length }}</span>
-          </button>
           <div class="tracking-pill" :class="{ active: store.isTracking }">
             <span class="tracking-dot"></span>
             <span>{{ store.isTracking ? 'Tracking' : 'Paused' }}</span>
@@ -27,8 +15,8 @@
         </div>
       </div>
 
-      <!-- Process Exclude Modal - disabled temporarily -->
-      <!-- <ProcessExcludeModal v-if="showExcludeModal" @close="showExcludeModal = false" /> -->
+      <!-- Process Exclude Modal -->
+      <ProcessExcludeModal v-if="showExcludeModal" @close="showExcludeModal = false" />
 
       <!-- Active Now Hero Card -->
       <div class="hero-card animate-enter">
@@ -64,6 +52,20 @@
                 {{ currentActivity.window_title }}
               </p>
             </div>
+
+            <!-- Exclude Button - next to active process -->
+            <button 
+              class="exclude-btn hero-exclude"
+              @click="showExcludeModal = true"
+              :class="{ active: store.excludedProcesses.length > 0 }"
+              :title="$t('excludeProcesses.buttonTitle') || 'Manage excluded processes'"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
+              </svg>
+              <span v-if="store.excludedProcesses.length > 0" class="exclude-count">{{ store.excludedProcesses.length }}</span>
+            </button>
           </div>
         </div>
       </div>
@@ -239,6 +241,7 @@
 import { computed, onMounted, onUnmounted, ref } from "vue";
 import { invoke } from "@tauri-apps/api/core";
 import { useActivityStore } from "../stores/activity";
+import ProcessExcludeModal from "../components/ProcessExcludeModal.vue";
 import { Doughnut, Bar } from "vue-chartjs";
 import {
   Chart as ChartJS,
@@ -405,7 +408,8 @@ async function refreshData() {
   store.topApps.forEach(app => loadIcon(app.app_name, app.exe_path));
 }
 
-onMounted(() => {
+onMounted(async () => {
+  await store.fetchExcludedProcesses();
   refreshData();
   intervalId = window.setInterval(refreshData, 5000);
 });
@@ -448,29 +452,37 @@ onUnmounted(() => {
 .exclude-btn {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  padding: 10px 16px;
-  background: rgba(255,255,255,0.03);
+  padding: 12px;
+  background: rgba(255,255,255,0.04);
   border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 20px;
+  border-radius: 16px;
   color: var(--text-muted);
   cursor: pointer;
   transition: all 0.3s ease;
   position: relative;
-  margin-right: 12px;
+  flex-shrink: 0;
 }
 
 .exclude-btn:hover {
-  background: rgba(239, 68, 68, 0.1);
-  border-color: rgba(239, 68, 68, 0.3);
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.35);
   color: #ef4444;
+  transform: scale(1.08);
 }
 
 .exclude-btn.active {
   background: rgba(239, 68, 68, 0.15);
   border-color: rgba(239, 68, 68, 0.4);
   color: #ef4444;
-  box-shadow: 0 0 16px rgba(239, 68, 68, 0.2);
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.2);
+  animation: excludePulse 3s ease-in-out infinite;
+}
+
+@keyframes excludePulse {
+  0%, 100% { box-shadow: 0 0 12px rgba(239, 68, 68, 0.15); }
+  50% { box-shadow: 0 0 24px rgba(239, 68, 68, 0.3); }
 }
 
 .exclude-btn svg {
@@ -478,11 +490,18 @@ onUnmounted(() => {
   height: 18px;
 }
 
+.hero-exclude {
+  margin-left: auto;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+}
+
 .exclude-count {
   position: absolute;
   top: -6px;
   right: -6px;
-  background: #ef4444;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
   color: #fff;
   font-size: 0.65rem;
   font-weight: 700;
@@ -490,7 +509,7 @@ onUnmounted(() => {
   border-radius: 10px;
   min-width: 18px;
   text-align: center;
-  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.5);
 }
 
 .tracking-pill {
