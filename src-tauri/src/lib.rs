@@ -26,9 +26,6 @@ mod timer;
 #[cfg(any(target_os = "windows", target_os = "linux"))]
 mod tracker;
 
-#[cfg(target_os = "android")]
-mod android_tracker;
-
 #[cfg(desktop)]
 use tauri::WindowEvent;
 
@@ -84,7 +81,7 @@ pub fn run() {
         ));
 
     let builder = builder.setup(|app| {
-        #[cfg(any(target_os = "android", target_os = "ios"))]
+        #[cfg(target_os = "ios")]
         let _ = app;
 
         // Start tracking on app launch (only on supported platforms)
@@ -102,9 +99,6 @@ pub fn run() {
 
         #[cfg(target_os = "windows")]
         timeout::init_keyboard_hook();
-
-        #[cfg(target_os = "android")]
-        android_tracker::start_tracking();
 
         // Setup Tray Icon (desktop only)
         #[cfg(desktop)]
