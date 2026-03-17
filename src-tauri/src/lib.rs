@@ -4,7 +4,6 @@
 mod auth;
 mod commands;
 mod db;
-mod github_auth;
 mod music;
 
 #[cfg(desktop)]
@@ -196,11 +195,6 @@ pub fn run() {
             commands::stop_timeout_cmd,
             commands::get_timeout_status_cmd,
             commands::save_timeout_schedule_cmd,
-            // GitHub OAuth
-            commands::login_github,
-            commands::exchange_github_code,
-            commands::get_github_account_cmd,
-            commands::remove_github_account_cmd,
             // Project Boards
             commands::create_project_board,
             commands::get_project_boards,
