@@ -24,6 +24,16 @@ export const useNotificationStore = defineStore('notifications', () => {
     }
   }
 
+  function add(notification: Omit<Notification, 'id'>) {
+    const id = Date.now().toString();
+    notifications.value.push({ ...notification, id, duration: notification.duration ?? 6000 });
+
+    const duration = notification.duration ?? 6000;
+    setTimeout(() => {
+      remove(id);
+    }, duration);
+  }
+
   function remove(id: string) {
     notifications.value = notifications.value.filter((n) => n.id !== id);
   }
@@ -31,7 +41,7 @@ export const useNotificationStore = defineStore('notifications', () => {
   function success(message: string, title?: string) {
     show({ type: 'success', message, title });
   }
-  
+
   function error(message: string, title?: string) {
     show({ type: 'error', message, title });
   }
@@ -40,12 +50,18 @@ export const useNotificationStore = defineStore('notifications', () => {
     show({ type: 'info', message, title });
   }
 
+  function warning(message: string, title?: string) {
+    show({ type: 'warning', message, title });
+  }
+
   return {
     notifications,
     show,
+    add,
     remove,
     success,
     error,
-    info
+    info,
+    warning
   };
 });

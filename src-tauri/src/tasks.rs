@@ -53,6 +53,13 @@ pub fn check_goals(app_handle: &tauri::AppHandle, app_name: &str) {
 
                         // Emit event to notify frontend
                         let _ = app_handle.emit("task-completed", task.id);
+                        
+                        // Send notification
+                        crate::notifications::send_notification(
+                            app_handle,
+                            "Task Completed! 🎉",
+                            &format!("You've reached your goal for {}", task.app_name),
+                        );
                     }
                 }
             }

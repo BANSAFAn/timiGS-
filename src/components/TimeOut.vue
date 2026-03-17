@@ -139,7 +139,7 @@
 
       <div class="setup-section">
         <label class="section-label">
-          <span class="icon" v-html="Icons.timeoutLock"></span> 
+          <span class="icon" v-html="Icons.timeoutLock"></span>
           Lock Password
         </label>
         <input
@@ -150,8 +150,168 @@
         />
       </div>
 
+      <!-- Schedule Section -->
+      <div class="setup-section">
+        <label class="section-label">
+          <span class="icon" v-html="Icons.timeoutCalendar"></span>
+          Daily Schedule
+        </label>
+        <div class="schedule-container">
+          <label class="checkbox-label schedule-toggle">
+            <input type="checkbox" v-model="enableSchedule" />
+            Enable Daily Schedule Mode
+          </label>
+
+          <div v-if="enableSchedule" class="schedule-options">
+            <div class="time-range-row">
+              <div class="time-picker">
+                <label class="sub-label">Work Start Time</label>
+                <div class="time-picker-row">
+                  <select v-model.number="scheduleStartHour" class="time-select">
+                    <option value="12">12</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                    <option value="11">11</option>
+                  </select>
+                  <span class="time-separator">:</span>
+                  <select v-model.number="scheduleStartMinute" class="time-select">
+                    <option v-for="min in scheduleMinutes" :key="min" :value="min">
+                      {{ min.toString().padStart(2, '0') }}
+                    </option>
+                  </select>
+                  <select v-model="scheduleStartPeriod" class="period-select">
+                    <option value="AM">AM</option>
+                    <option value="PM">PM</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="time-picker">
+                <label class="sub-label">Work End Time</label>
+                <div class="time-picker-row">
+                  <select v-model.number="scheduleEndHour" class="time-select">
+                    <option value="12">12</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                    <option value="11">11</option>
+                  </select>
+                  <span class="time-separator">:</span>
+                  <select v-model.number="scheduleEndMinute" class="time-select">
+                    <option v-for="min in scheduleMinutes" :key="min" :value="min">
+                      {{ min.toString().padStart(2, '0') }}
+                    </option>
+                  </select>
+                  <select v-model="scheduleEndPeriod" class="period-select">
+                    <option value="AM">AM</option>
+                    <option value="PM">PM</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Custom Breaks -->
+            <div class="custom-breaks-section">
+              <div class="breaks-header">
+                <label class="sub-label">Break Times</label>
+                <button @click="addBreak" class="btn-add-break">
+                  <span v-html="Icons.tasksAdd"></span> Add Break
+                </button>
+              </div>
+
+              <div v-if="customBreaks.length === 0" class="no-breaks">
+                <p>No breaks added. Click "Add Break" to add one.</p>
+              </div>
+
+              <div v-for="(break_item) in customBreaks" :key="break_item.id" class="break-item">
+                <div class="break-time-inputs">
+                  <select v-model.number="break_item.hour" class="time-select-small">
+                    <option value="12">12</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                    <option value="11">11</option>
+                  </select>
+                  <span class="time-separator">:</span>
+                  <select v-model.number="break_item.minute" class="time-select-small">
+                    <option v-for="min in scheduleMinutes" :key="min" :value="min">
+                      {{ min.toString().padStart(2, '0') }}
+                    </option>
+                  </select>
+                  <select v-model="break_item.period" class="period-select-small">
+                    <option value="AM">AM</option>
+                    <option value="PM">PM</option>
+                  </select>
+                </div>
+
+                <div class="break-duration-input">
+                  <input
+                    type="number"
+                    v-model.number="break_item.duration"
+                    min="1"
+                    max="120"
+                    class="duration-input"
+                    placeholder="Duration (min)"
+                  />
+                  <span class="duration-label">min</span>
+                </div>
+
+                <button @click="removeBreak(break_item.id)" class="btn-remove-break" title="Remove Break">
+                  <span v-html="Icons.timeoutTrash"></span>
+                </button>
+              </div>
+            </div>
+
+            <div class="days-picker">
+              <label class="sub-label">Repeat On</label>
+              <div class="days-row">
+                <button
+                  v-for="day in weekDays"
+                  :key="day.value"
+                  class="day-btn"
+                  :class="{ active: selectedDays.includes(day.value) }"
+                  @click="toggleDay(day.value)"
+                >
+                  {{ day.label }}
+                </button>
+              </div>
+            </div>
+
+            <div class="schedule-info-box">
+              <p class="schedule-hint">
+                <span class="info-icon">ℹ</span>
+                {{ scheduleSummary }}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <button @click="startTimeout" class="btn-start" :disabled="!canStart">
-        <span class="btn-icon" v-html="Icons.timeoutBreak"></span> Activate Time OUT
+        <span class="btn-icon" v-html="Icons.timeoutBreak"></span> 
+        {{ enableSchedule ? 'Schedule Time OUT' : 'Activate Time OUT' }}
       </button>
     </div>
 
@@ -305,6 +465,38 @@ const overlayCancelError = ref("");
 const status = ref<TimeoutStatus | null>(null);
 let pollInterval: number | null = null;
 
+// Schedule
+const enableSchedule = ref(false);
+// Time range
+const scheduleStartHour = ref<number>(9);
+const scheduleStartMinute = ref<number>(0);
+const scheduleStartPeriod = ref<"AM" | "PM">("AM");
+const scheduleEndHour = ref<number>(5);
+const scheduleEndMinute = ref<number>(0);
+const scheduleEndPeriod = ref<"AM" | "PM">("PM");
+// Custom breaks
+interface CustomBreak {
+  id: number;
+  hour: number;
+  minute: number;
+  period: "AM" | "PM";
+  duration: number;
+}
+const customBreaks = ref<CustomBreak[]>([]);
+let breakIdCounter = 0;
+// Days
+const selectedDays = ref<number[]>([]); // 0 = Sunday, 1 = Monday, etc.
+const weekDays = [
+  { label: "S", value: 0 },
+  { label: "M", value: 1 },
+  { label: "T", value: 2 },
+  { label: "W", value: 3 },
+  { label: "T", value: 4 },
+  { label: "F", value: 5 },
+  { label: "S", value: 6 },
+];
+const scheduleMinutes = Array.from({ length: 60 }, (_, i) => i);
+
 // Music Controls
 const isPlaying = ref(false);
 const audio = ref<HTMLAudioElement | null>(null);
@@ -398,6 +590,77 @@ const canStart = computed(
     breakTotalSecs.value > 0 &&
     password.value.length >= 1,
 );
+
+const scheduleSummary = computed(() => {
+  const start = formatTime12h(scheduleStartHour.value, scheduleStartMinute.value, scheduleStartPeriod.value);
+  const end = formatTime12h(scheduleEndHour.value, scheduleEndMinute.value, scheduleEndPeriod.value);
+  const daysStr = selectedDays.value.length > 0 
+    ? selectedDays.value.map(d => weekDays[d].label).join(', ')
+    : 'No days selected';
+  const breaksStr = customBreaks.value.length > 0
+    ? customBreaks.value.map(b => `${formatTime12h(b.hour, b.minute, b.period)} (${b.duration} min)`).join(', ')
+    : 'No breaks scheduled';
+  return `Work: ${start} - ${end} | Breaks: ${breaksStr} | Days: ${daysStr}`;
+});
+
+function formatTime12h(hour: number, minute: number, period: string): string {
+  return `${hour}:${minute.toString().padStart(2, '0')} ${period}`;
+}
+
+function toggleDay(dayValue: number) {
+  const idx = selectedDays.value.indexOf(dayValue);
+  if (idx === -1) {
+    selectedDays.value.push(dayValue);
+  } else {
+    selectedDays.value.splice(idx, 1);
+  }
+}
+
+function addBreak() {
+  breakIdCounter++;
+  customBreaks.value.push({
+    id: breakIdCounter,
+    hour: 12,
+    minute: 0,
+    period: "PM",
+    duration: 30,
+  });
+}
+
+function removeBreak(id: number) {
+  customBreaks.value = customBreaks.value.filter(b => b.id !== id);
+}
+
+function convertTo24Hour(hour: number, period: string): number {
+  if (period === "PM" && hour !== 12) {
+    return hour + 12;
+  } else if (period === "AM" && hour === 12) {
+    return 0;
+  }
+  return hour;
+}
+
+function getScheduleConfig(): { 
+  startHour: number; 
+  startMinute: number; 
+  endHour: number; 
+  endMinute: number; 
+  breaks: Array<{ hour: number; minute: number; duration: number }>;
+} | null {
+  if (!enableSchedule.value) return null;
+  
+  return {
+    startHour: convertTo24Hour(scheduleStartHour.value, scheduleStartPeriod.value),
+    startMinute: scheduleStartMinute.value,
+    endHour: convertTo24Hour(scheduleEndHour.value, scheduleEndPeriod.value),
+    endMinute: scheduleEndMinute.value,
+    breaks: customBreaks.value.map(b => ({
+      hour: convertTo24Hour(b.hour, b.period),
+      minute: b.minute,
+      duration: b.duration,
+    })),
+  };
+}
 
 const workFormattedTime = computed(() => {
   if (!status.value) return "";
@@ -495,13 +758,56 @@ async function manageAudio(breakActive: boolean) {
 async function startTimeout() {
   if (!canStart.value) return;
   try {
-    await invoke("start_timeout_cmd", {
-      intervalSecs: workTotalSecs.value,
-      breakDurationSecs: breakTotalSecs.value,
-      password: password.value,
-    });
-    password.value = "";
-    await loadStatus();
+    const scheduleConfig = getScheduleConfig();
+    
+    // If schedule is enabled, just save settings and don't start immediately
+    if (enableSchedule.value) {
+      await invoke("save_timeout_schedule_cmd", {
+        intervalSecs: workTotalSecs.value,
+        breakDurationSecs: breakTotalSecs.value,
+        password: password.value,
+        scheduleStartHour: scheduleConfig?.startHour ?? null,
+        scheduleStartMinute: scheduleConfig?.startMinute ?? null,
+        scheduleEndHour: scheduleConfig?.endHour ?? null,
+        scheduleEndMinute: scheduleConfig?.endMinute ?? null,
+        customBreaks: scheduleConfig?.breaks ?? [],
+        selectedDays: selectedDays.value,
+      });
+      
+      // Save schedule preferences
+      localStorage.setItem("timigs-timeout-schedule", JSON.stringify({
+        enabled: true,
+        startHour: scheduleStartHour.value,
+        startMinute: scheduleStartMinute.value,
+        startPeriod: scheduleStartPeriod.value,
+        endHour: scheduleEndHour.value,
+        endMinute: scheduleEndMinute.value,
+        endPeriod: scheduleEndPeriod.value,
+        customBreaks: customBreaks.value,
+        days: selectedDays.value,
+      }));
+      
+      password.value = "";
+      alert("Schedule saved! Time OUT will start automatically at the specified times on selected days.");
+    } else {
+      // No schedule - start immediately
+      await invoke("start_timeout_cmd", {
+        intervalSecs: workTotalSecs.value,
+        breakDurationSecs: breakTotalSecs.value,
+        password: password.value,
+        enableSchedule: false,
+        scheduleStartHour: null,
+        scheduleStartMinute: null,
+        scheduleEndHour: null,
+        scheduleEndMinute: null,
+        customBreaks: [],
+        selectedDays: [],
+      });
+      
+      localStorage.removeItem("timigs-timeout-schedule");
+      password.value = "";
+      await loadStatus();
+    }
   } catch (e: any) {
     alert(e);
   }
@@ -557,12 +863,37 @@ function startPolling() {
 onMounted(async () => {
   loadStatus();
   loadMusicFiles();
-  
+
   // Try to load persisted user preferences
   const savedMusic = localStorage.getItem("timigs-timeout-music");
   if (savedMusic) selectedMusic.value = savedMusic;
   const savedPlayState = localStorage.getItem("timigs-timeout-play");
   if (savedPlayState !== null) playMusicDuringBreak.value = savedPlayState === "true";
+  
+  // Load saved schedule
+  const savedSchedule = localStorage.getItem("timigs-timeout-schedule");
+  if (savedSchedule) {
+    try {
+      const parsed = JSON.parse(savedSchedule);
+      if (parsed.enabled) {
+        enableSchedule.value = true;
+        scheduleStartHour.value = parsed.startHour || 9;
+        scheduleStartMinute.value = parsed.startMinute || 0;
+        scheduleStartPeriod.value = parsed.startPeriod || "AM";
+        scheduleEndHour.value = parsed.endHour || 5;
+        scheduleEndMinute.value = parsed.endMinute || 0;
+        scheduleEndPeriod.value = parsed.endPeriod || "PM";
+        customBreaks.value = parsed.customBreaks || [];
+        // Update break ID counter
+        if (customBreaks.value.length > 0) {
+          breakIdCounter = Math.max(...customBreaks.value.map(b => b.id));
+        }
+        selectedDays.value = parsed.days || [];
+      }
+    } catch (e) {
+      console.error("Failed to parse saved schedule:", e);
+    }
+  }
 
   await listen("timeout-break-start", () => {
     loadStatus();
@@ -574,6 +905,9 @@ onMounted(async () => {
       audio.value = null;
       isPlaying.value = false;
     }
+    loadStatus();
+  });
+  await listen("timeout-schedule-triggered", () => {
     loadStatus();
   });
 });
@@ -829,6 +1163,354 @@ onUnmounted(() => {
 }
 .checkbox-label input {
   accent-color: #14b8a6;
+}
+
+/* Schedule Styles */
+.schedule-container {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 12px;
+  margin-top: 8px;
+}
+
+.schedule-toggle {
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.schedule-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.time-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sub-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.time-picker-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.time-range-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.time-range-row .time-picker {
+  flex: 1;
+  min-width: 200px;
+}
+
+.time-select,
+.period-select {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.time-select:focus,
+.period-select:focus {
+  outline: none;
+  border-color: #14b8a6;
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.2);
+}
+
+.time-select {
+  flex: 1;
+  text-align: center;
+}
+
+.period-select {
+  flex: 0 0 70px;
+  font-weight: 600;
+}
+
+.time-separator {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: var(--text-muted);
+  padding-bottom: 8px;
+}
+
+.days-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.days-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.day-btn {
+  flex: 1;
+  min-width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-muted);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.day-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.day-btn.active {
+  background: rgba(20, 184, 166, 0.2);
+  border-color: rgba(20, 184, 166, 0.4);
+  color: #14b8a6;
+}
+
+.schedule-info-box {
+  background: rgba(20, 184, 166, 0.1);
+  border: 1px solid rgba(20, 184, 166, 0.2);
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+
+.schedule-hint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.info-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  background: rgba(20, 184, 166, 0.2);
+  border-radius: 50%;
+  color: #14b8a6;
+  font-size: 0.7rem;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+.breaks-count-row {
+  display: flex;
+  gap: 12px;
+}
+
+.input-with-label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.breaks-input {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.breaks-input:focus {
+  outline: none;
+  border-color: #14b8a6;
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.2);
+}
+
+/* Custom Breaks Section */
+.custom-breaks-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.breaks-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.btn-add-break {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(20, 184, 166, 0.15);
+  color: #14b8a6;
+  border: 1px solid rgba(20, 184, 166, 0.3);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-add-break:hover {
+  background: rgba(20, 184, 166, 0.25);
+}
+
+.btn-add-break :deep(svg) {
+  width: 16px;
+  height: 16px;
+}
+
+.no-breaks {
+  padding: 20px;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.no-breaks p {
+  margin: 0;
+}
+
+.break-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  padding: 12px;
+  transition: all 0.2s;
+}
+
+.break-item:hover {
+  border-color: rgba(20, 184, 166, 0.2);
+}
+
+.break-time-inputs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.time-select-small {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.time-select-small:focus {
+  outline: none;
+  border-color: #14b8a6;
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.2);
+}
+
+.period-select-small {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.period-select-small:focus {
+  outline: none;
+  border-color: #14b8a6;
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.2);
+}
+
+.break-duration-input {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+}
+
+.duration-input {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  min-width: 80px;
+}
+
+.duration-input:focus {
+  outline: none;
+  border-color: #14b8a6;
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.2);
+}
+
+.duration-label {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.btn-remove-break {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: #ef4444;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.btn-remove-break:hover {
+  background: rgba(239, 68, 68, 0.15);
+}
+
+.btn-remove-break :deep(svg) {
+  width: 20px;
+  height: 20px;
 }
 
 .password-input {

@@ -17,6 +17,7 @@ mod icons;
 mod tray;
 
 mod focus;
+mod notifications;
 mod p2p;
 mod picker;
 mod tasks;
@@ -195,6 +196,7 @@ pub fn run() {
             commands::start_timeout_cmd,
             commands::stop_timeout_cmd,
             commands::get_timeout_status_cmd,
+            commands::save_timeout_schedule_cmd,
             // GitHub OAuth
             commands::login_github,
             commands::exchange_github_code,
@@ -236,6 +238,8 @@ pub fn run() {
             commands::get_music_status_cmd,
             commands::set_music_volume_cmd,
             commands::toggle_music_loop_cmd,
+            // Notifications
+            notifications::send_notification_cmd,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

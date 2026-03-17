@@ -38,6 +38,9 @@ pub fn start_timer(duration_secs: u64, app_handle: tauri::AppHandle) {
     state.running = running.clone();
     state.remaining_secs = remaining.clone();
 
+    let app_handle_clone = app_handle.clone();
+    let mut five_min_notified = false;
+
     thread::spawn(move || {
         while running.load(Ordering::SeqCst) {
             let left = remaining.load(Ordering::SeqCst);
@@ -56,6 +59,16 @@ pub fn start_timer(duration_secs: u64, app_handle: tauri::AppHandle) {
                 // Notify frontend
                 let _ = app_handle.emit("timer-finished", ());
                 break;
+            }
+
+            // Send 5-minute warning notification
+            if !five_min_notified && left == 300 {
+                five_min_notified = true;
+                crate::notifications::send_notification(
+                    &app_handle_clone,
+                    "Shutdown in 5 minutes! ⚠️",
+                    "Your computer will shut down soon. Save your work!",
+                );
             }
 
             thread::sleep(Duration::from_secs(1));

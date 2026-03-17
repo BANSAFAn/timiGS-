@@ -327,8 +327,68 @@ pub fn start_timeout_cmd(
     interval_secs: u64,
     break_duration_secs: u64,
     password: String,
+    enable_schedule: bool,
+    schedule_start_hour: Option<u64>,
+    schedule_start_minute: Option<u64>,
+    schedule_end_hour: Option<u64>,
+    schedule_end_minute: Option<u64>,
+    custom_breaks: Option<Vec<serde_json::Value>>,
+    selected_days: Vec<u32>,
 ) -> Result<(), String> {
-    crate::timeout::start_timeout(interval_secs, break_duration_secs, &password, app)
+    crate::timeout::start_timeout(
+        interval_secs,
+        break_duration_secs,
+        &password,
+        app,
+        enable_schedule,
+        schedule_start_hour,
+        schedule_start_minute,
+        schedule_end_hour,
+        schedule_end_minute,
+        custom_breaks,
+        selected_days,
+    )
+}
+
+#[command]
+pub fn save_timeout_schedule_cmd(
+    interval_secs: u64,
+    break_duration_secs: u64,
+    password: String,
+    schedule_start_hour: Option<u64>,
+    schedule_start_minute: Option<u64>,
+    schedule_end_hour: Option<u64>,
+    schedule_end_minute: Option<u64>,
+    custom_breaks: Option<Vec<serde_json::Value>>,
+    selected_days: Vec<u32>,
+) -> Result<(), String> {
+    // Parse custom breaks
+    let breaks = custom_breaks
+        .unwrap_or_default()
+        .iter()
+        .filter_map(|b| {
+            let hour = b.get("hour")?.as_u64()? as u32;
+            let minute = b.get("minute")?.as_u64()? as u32;
+            let duration = b.get("duration")?.as_u64()? as u32;
+            let time_minutes = hour * 60 + minute;
+            Some(crate::timeout::CustomBreak {
+                time_minutes,
+                duration_minutes: duration,
+            })
+        })
+        .collect();
+    
+    crate::timeout::save_timeout_schedule(
+        interval_secs,
+        break_duration_secs,
+        &password,
+        schedule_start_hour.unwrap_or(9),
+        schedule_start_minute.unwrap_or(0),
+        schedule_end_hour.unwrap_or(17),
+        schedule_end_minute.unwrap_or(0),
+        breaks,
+        selected_days,
+    )
 }
 
 #[command]

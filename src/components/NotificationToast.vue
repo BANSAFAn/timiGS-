@@ -26,10 +26,54 @@
 <script setup lang="ts">
 import { useNotificationStore } from '../stores/notifications';
 import { storeToRefs } from 'pinia';
+import { onMounted } from 'vue';
+import { listen } from '@tauri-apps/api/event';
 
 const store = useNotificationStore();
 const { notifications } = storeToRefs(store);
-const { remove } = store;
+const { remove, add } = store;
+
+onMounted(async () => {
+  // Listen for system notifications from Rust backend
+  await listen('system-notification', (event: any) => {
+    const { title, body } = event.payload;
+    add({
+      title,
+      message: body,
+      type: detectType(title, body),
+    });
+  });
+
+  // Listen for task completed
+  await listen('task-completed', () => {
+    add({
+      title: 'Task Completed! 🎉',
+      message: "You've reached your goal!",
+      type: 'success',
+    });
+  });
+
+  // Listen for timer warnings
+  await listen('timer-warning', (event: any) => {
+    add({
+      title: event.payload.title || 'Timer Warning',
+      message: event.payload.body || 'Time is running out!',
+      type: 'warning',
+    });
+  });
+});
+
+function detectType(title: string, body: string): 'success' | 'error' | 'warning' | 'info' {
+  const text = (title + ' ' + body).toLowerCase();
+  if (text.includes('completed') || text.includes('success') || text.includes('🎉')) {
+    return 'success';
+  } else if (text.includes('warning') || text.includes('soon') || text.includes('⚠️')) {
+    return 'warning';
+  } else if (text.includes('error') || text.includes('failed')) {
+    return 'error';
+  }
+  return 'info';
+}
 </script>
 
 <style scoped>
