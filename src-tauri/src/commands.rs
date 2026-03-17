@@ -454,21 +454,6 @@ pub fn populate_board_cmd(board_id: i64) -> Result<usize, String> {
     crate::db::populate_board_from_activity(board_id).map_err(|e| e.to_string())
 }
 
-#[command]
-pub async fn sync_board_github_cmd(board_id: i64) -> Result<String, String> {
-    // Get the GitHub token from cloud_accounts
-    let account = crate::github_auth::get_github_account()
-        .ok_or("Not connected to GitHub. Please sign in first.")?;
-    let token = account["token"]
-        .as_str()
-        .ok_or("Invalid GitHub token")?
-        .to_string();
-
-    tokio::task::spawn_blocking(move || crate::github_sync::sync_board_to_github(board_id, &token))
-        .await
-        .map_err(|e| e.to_string())?
-}
-
 // ── Project Tasks ──
 
 #[command]
@@ -607,41 +592,4 @@ pub fn get_auto_export_settings_cmd() -> Result<serde_json::Value, String> {
     }))
 }
 
-// Sync commands
-#[command]
-pub async fn export_full_backup() -> Result<serde_json::Value, String> {
-    use serde_json::json;
-    
-    let activity = db::get_all_activity().map_err(|e| e.to_string())?;
-    let settings = db::get_settings();
-    
-    Ok(json!({
-        "version": 1,
-        "exported_at": chrono::Utc::now().to_rfc3339(),
-        "activity": activity,
-        "settings": settings
-    }))
-}
-
-#[command]
-pub async fn import_activity_data(data: serde_json::Value) -> Result<(), String> {
-    // Merge activity data from sync
-    // This is a simplified implementation - real merging would be more sophisticated
-    println!("Importing activity data: {:?}", data);
-    Ok(())
-}
-
-#[command]
-pub async fn import_settings(settings: serde_json::Value) -> Result<(), String> {
-    // Import settings from sync
-    println!("Importing settings: {:?}", settings);
-    Ok(())
-}
-
-#[command]
-pub async fn restore_backup(backup: serde_json::Value) -> Result<(), String> {
-    // Restore from full backup
-    println!("Restoring from backup: {:?}", backup);
-    Ok(())
-}
-
+// ── Music ──

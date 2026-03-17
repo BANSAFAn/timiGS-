@@ -36,11 +36,6 @@
           <span>{{ $t("nav.tools") || "Tools" }}</span>
         </router-link>
 
-        <router-link to="/sync" class="nav-link" active-class="active">
-          <div class="nav-icon" v-html="Icons.sync"></div>
-          <span>{{ $t("nav.sync") || "Sync" }}</span>
-        </router-link>
-
         <router-link to="/settings" class="nav-link" active-class="active">
           <div class="nav-icon" v-html="Icons.settings"></div>
           <span>{{ $t("nav.settings") || "Settings" }}</span>
@@ -86,11 +81,6 @@
       <router-link to="/transfer" class="bottom-nav-item" active-class="active">
         <div class="nav-icon-mobile" v-html="Icons.transfer"></div>
         <span>{{ $t("nav.transfer") || "Send" }}</span>
-      </router-link>
-
-      <router-link to="/sync" class="bottom-nav-item" active-class="active">
-        <div class="nav-icon-mobile" v-html="Icons.sync"></div>
-        <span>{{ $t("nav.sync") || "Sync" }}</span>
       </router-link>
 
       <router-link to="/settings" class="bottom-nav-item" active-class="active">

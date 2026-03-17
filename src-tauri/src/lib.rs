@@ -5,7 +5,6 @@ mod auth;
 mod commands;
 mod db;
 mod github_auth;
-mod github_sync;
 mod music;
 
 #[cfg(desktop)]
@@ -208,7 +207,6 @@ pub fn run() {
             commands::delete_project_board,
             commands::get_board_items_cmd,
             commands::populate_board_cmd,
-            commands::sync_board_github_cmd,
             // Project Tasks
             commands::add_project_task_cmd,
             commands::get_project_tasks_cmd,
@@ -220,11 +218,6 @@ pub fn run() {
             commands::export_data_html_cmd,
             commands::save_auto_export_settings_cmd,
             commands::get_auto_export_settings_cmd,
-            // Sync
-            commands::export_full_backup,
-            commands::import_activity_data,
-            commands::import_settings,
-            commands::restore_backup,
             // Music
             commands::get_music_files_cmd,
             commands::add_music_file_cmd,
