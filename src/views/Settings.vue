@@ -66,7 +66,7 @@
                 @click="langOpen = !langOpen"
               >
                 <div class="selected-option">
-                  <span class="flag-icon">{{ currentLangFlag }}</span>
+                  <img :src="currentLangFlagImg" :alt="currentLangName" class="flag-icon-img" />
                   <span class="lang-name">{{ currentLangName }}</span>
                   <span class="chevron">▼</span>
                 </div>
@@ -77,7 +77,7 @@
                     class="option-item"
                     @click.stop="changeLanguage(lang.code)"
                   >
-                    <span class="flag-icon">{{ lang.flag }}</span>
+                    <img :src="lang.flagImg" :alt="lang.name" class="flag-icon-img" />
                     {{ lang.name }}
                   </div>
                 </div>
@@ -595,19 +595,19 @@ const notifications = useNotificationStore();
 // Language State
 const langOpen = ref(false);
 const availableLanguages = [
-  { code: "en", name: "English", flag: "🇬🇧" },
-  { code: "uk", name: "Українська", flag: "🇺🇦" },
-  { code: "de", name: "Deutsch", flag: "🇩🇪" },
-  { code: "fr", name: "Français", flag: "🇫🇷" },
-  { code: "es", name: "Español", flag: "🇪🇸" },
-  { code: "zh-CN", name: "中文 (简体)", flag: "🇨🇳" },
-  { code: "ar", name: "العربية", flag: "🇸🇦" },
+  { code: "en", name: "English", flag: "🇬🇧", flagImg: "https://flagcdn.com/w40/gb.png" },
+  { code: "uk", name: "Українська", flag: "🇺🇦", flagImg: "https://flagcdn.com/w40/ua.png" },
+  { code: "de", name: "Deutsch", flag: "🇩🇪", flagImg: "https://flagcdn.com/w40/de.png" },
+  { code: "fr", name: "Français", flag: "🇫🇷", flagImg: "https://flagcdn.com/w40/fr.png" },
+  { code: "es", name: "Español", flag: "🇪🇸", flagImg: "https://flagcdn.com/w40/es.png" },
+  { code: "zh-CN", name: "中文 (简体)", flag: "🇨🇳", flagImg: "https://flagcdn.com/w40/cn.png" },
+  { code: "ar", name: "العربية", flag: "🇸🇦", flagImg: "https://flagcdn.com/w40/sa.png" },
 ];
 
-const currentLangFlag = computed(
+const currentLangFlagImg = computed(
   () =>
-    availableLanguages.find((l) => l.code === localSettings.language)?.flag ||
-    "🌐",
+    availableLanguages.find((l) => l.code === localSettings.language)?.flagImg ||
+    "https://flagcdn.com/w40/un.png",
 );
 const currentLangName = computed(
   () =>
@@ -1205,8 +1205,28 @@ async function confirmResetData() {
 .option-item:hover {
   background: var(--bg-hover);
 }
-.flag-icon {
-  font-size: 1.2rem;
+.flag-icon,
+.flag-icon-img {
+  width: 28px;
+  height: 20px;
+  object-fit: cover;
+  border-radius: 3px;
+  flex-shrink: 0;
+  /* Ensure flags render properly */
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* Dark theme - add subtle border for better visibility */
+[data-theme="dark"] .flag-icon-img {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 0 4px rgba(255, 255, 255, 0.1);
+}
+
+/* Light theme - add subtle shadow for better visibility */
+[data-theme="light"] .flag-icon-img {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.15);
 }
 
 /* Update Modal */
