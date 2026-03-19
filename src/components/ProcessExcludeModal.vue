@@ -329,7 +329,7 @@ onMounted(async () => {
 .modal-header h3 {
   font-size: 1.2rem;
   font-weight: 700;
-  color: #fff;
+  color: var(--text-primary);
   margin: 0;
   letter-spacing: -0.3px;
 }
@@ -350,7 +350,7 @@ onMounted(async () => {
 
 .close-btn:hover {
   background: rgba(255, 255, 255, 0.1);
-  color: #fff;
+  color: var(--text-primary);
   border-color: rgba(255, 255, 255, 0.15);
 }
 
@@ -434,7 +434,7 @@ onMounted(async () => {
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 14px;
-  color: #fff;
+  color: var(--text-main);
   font-size: 0.9rem;
   transition: all 0.2s ease;
   outline: none;
@@ -557,7 +557,7 @@ onMounted(async () => {
 .process-name {
   font-weight: 600;
   font-size: 0.95rem;
-  color: #fff;
+  color: var(--text-main);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -565,7 +565,7 @@ onMounted(async () => {
 
 .process-path {
   font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.35);
+  color: var(--text-muted);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

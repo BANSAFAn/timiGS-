@@ -25,7 +25,9 @@
   --bg-hover: rgba(255, 255, 255, 0.05);
 
   --text-main: #f8fafc;
+  --text-primary: #ffffff;
   --text-muted: #94a3b8;
+  --text-disabled: #64748b;
   --border-color: rgba(148, 163, 184, 0.1);
   --border-glass: 1px solid rgba(255, 255, 255, 0.08);
 
@@ -35,20 +37,22 @@
 
 /* Light Theme - Clean Glass */
 [data-theme="light"] {
-  --bg-main: #f8fafc;
+  --bg-main: #f1f5f9;
   --bg-secondary: #ffffff;
-  --bg-glass: rgba(255, 255, 255, 0.7);
-  --bg-glass-strong: rgba(255, 255, 255, 0.9);
-  --bg-card: rgba(255, 255, 255, 0.8);
-  --bg-hover: rgba(0, 0, 0, 0.03);
+  --bg-glass: rgba(255, 255, 255, 0.85);
+  --bg-glass-strong: rgba(255, 255, 255, 0.95);
+  --bg-card: rgba(255, 255, 255, 0.9);
+  --bg-hover: rgba(0, 0, 0, 0.05);
 
-  --text-main: #0f172a;
-  --text-muted: #64748b;
-  --border-color: rgba(0, 0, 0, 0.06);
-  --border-glass: 1px solid rgba(0, 0, 0, 0.05);
+  --text-main: #1e293b;
+  --text-primary: #0f172a;
+  --text-muted: #475569;
+  --text-disabled: #94a3b8;
+  --border-color: rgba(0, 0, 0, 0.1);
+  --border-glass: 1px solid rgba(0, 0, 0, 0.08);
 
-  --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
-  --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.1);
+  --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.08);
+  --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.15);
 }
 
 /* Reset */
@@ -667,4 +671,87 @@ select option {
 .sync-indicator.synced {
   background: var(--color-success);
   box-shadow: 0 0 8px var(--color-success);
+}
+
+/* ========================================
+   LIGHT THEME FIXES - Override all white colors
+   ======================================== */
+[data-theme="light"] .view-btn.active,
+[data-theme="light"] .btn-primary,
+[data-theme="light"] .btn-accent,
+[data-theme="light"] .btn-danger,
+[data-theme="light"] .btn-success,
+[data-theme="light"] .btn-warning,
+[data-theme="light"] .card-value,
+[data-theme="light"] .stat-value,
+[data-theme="light"] .big-stat-value,
+[data-theme="light"] .chart-text,
+[data-theme="light"] .chart-label,
+[data-theme="light"] .chart-title,
+[data-theme="light"] .header-subtitle,
+[data-theme="light"] .card-subtitle,
+[data-theme="light"] .card-subtitle-modern,
+[data-theme="light"] .setting-description,
+[data-theme="light"] .text-muted,
+[data-theme="light"] .text-secondary,
+[data-theme="light"] .desc,
+[data-theme="light"] .description,
+[data-theme="light"] .subtitle,
+[data-theme="light"] .label,
+[data-theme="light"] h1,
+[data-theme="light"] h2,
+[data-theme="light"] h3,
+[data-theme="light"] h4,
+[data-theme="light"] h5,
+[data-theme="light"] h6,
+[data-theme="light"] p,
+[data-theme="light"] span,
+[data-theme="light"] label,
+[data-theme="light"] a,
+[data-theme="light"] .modal-header h3,
+[data-theme="light"] .process-name,
+[data-theme="light"] .search-input,
+[data-theme="light"] .export-dropdown-item .item-text,
+[data-theme="light"] .update-desc,
+[data-theme="light"] .tab-btn,
+[data-theme="light"] .btn-xs,
+[data-theme="light"] .input-std,
+[data-theme="light"] .msg-bubble,
+[data-theme="light"] .float-header,
+[data-theme="light"] .time-opts button.selected,
+[data-theme="light"] .page-header h1,
+[data-theme="light"] .page-header p,
+[data-theme="light"] .modern-card h3,
+[data-theme="light"] .modern-card p,
+[data-theme="light"] .glass-card h3,
+[data-theme="light"] .glass-card p,
+[data-theme="light"] .dashboard-card h3,
+[data-theme="light"] .dashboard-card p,
+[data-theme="light"] .dashboard-card .card-value,
+[data-theme="light"] .analytics-card h3,
+[data-theme="light"] .analytics-card p,
+[data-theme="light"] .analytics-card .stat-value,
+[data-theme="light"] .tools-grid h3,
+[data-theme="light"] .tools-grid p,
+[data-theme="light"] .tools-grid .tool-description {
+  color: var(--text-main) !important;
+}
+
+/* Fix specific white text in light theme */
+[data-theme="light"] .view-btn.active {
+  color: white !important; /* Keep white for active buttons on gradient background */
+}
+
+[data-theme="light"] .btn-primary,
+[data-theme="light"] .btn-accent,
+[data-theme="light"] .btn-danger,
+[data-theme="light"] .btn-success,
+[data-theme="light"] .btn-warning {
+  color: white !important; /* Keep white for buttons with colored backgrounds */
+}
+
+/* Fix placeholder colors */
+[data-theme="light"] input::placeholder,
+[data-theme="light"] textarea::placeholder {
+  color: var(--text-disabled) !important;
 }

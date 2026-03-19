@@ -516,12 +516,12 @@
               class="update-icon danger-icon-large"
               v-html="Icons.dataReset"
             ></div>
-            <h2 style="color: #ef4444">
+            <h2 style="color: var(--color-danger)">
               {{ $t("settings.resetConfirmTitle") }}
             </h2>
           </div>
           <div class="update-modal-body">
-            <p class="update-desc" style="color: #fbbf24; font-weight: 500">
+            <p class="update-desc" style="color: var(--color-warning); font-weight: 500">
               <span style="margin-right: 6px" v-html="Icons.warning"></span
               >{{ $t("settings.resetConfirmMsg") }}
             </p>
@@ -1180,6 +1180,12 @@ async function confirmResetData() {
   backdrop-filter: blur(12px);
   padding: 6px;
 }
+
+[data-theme="light"] .options-list {
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
 .option-item {
   padding: 10px 14px;
   display: flex;
@@ -1189,7 +1195,13 @@ async function confirmResetData() {
   border-radius: 8px;
   margin-bottom: 2px;
   font-weight: 500;
+  color: var(--text-main);
 }
+
+[data-theme="light"] .option-item {
+  color: var(--text-main);
+}
+
 .option-item:hover {
   background: var(--bg-hover);
 }
@@ -1616,12 +1628,12 @@ async function confirmResetData() {
 .export-dropdown-item .item-text {
   font-weight: 600;
   font-size: 0.95rem;
-  color: #e5e7eb;
+  color: var(--text-main);
 }
 
 .export-dropdown-item .format-desc {
   font-size: 0.75rem;
-  color: #9ca3af;
+  color: var(--text-muted);
 }
 
 .export-divider {
