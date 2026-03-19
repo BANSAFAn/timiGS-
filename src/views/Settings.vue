@@ -602,6 +602,8 @@ const availableLanguages = [
   { code: "es", name: "Español", flag: "🇪🇸", flagImg: "https://flagcdn.com/w40/es.png" },
   { code: "zh-CN", name: "中文 (简体)", flag: "🇨🇳", flagImg: "https://flagcdn.com/w40/cn.png" },
   { code: "ar", name: "العربية", flag: "🇸🇦", flagImg: "https://flagcdn.com/w40/sa.png" },
+  { code: "pt", name: "Português", flag: "🇵🇹", flagImg: "https://flagcdn.com/w40/pt.png" },
+  { code: "pl", name: "Polski", flag: "🇵🇱", flagImg: "https://flagcdn.com/w40/pl.png" },
 ];
 
 const currentLangFlagImg = computed(
