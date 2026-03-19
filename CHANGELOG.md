@@ -1,5 +1,45 @@
 # Changelog
 
+## [1.2.0](https://github.com/BANSAFAn/timiGS-/compare/v1.1.1...v1.2.0) (2026-03-19)
+
+
+### Features
+
+* create notif ([8c56b65](https://github.com/BANSAFAn/timiGS-/commit/8c56b65133829c2ed7d49774ea501cb0611b86e4))
+* deleting android version (100%), new ProcessExcludeModal ([9993d04](https://github.com/BANSAFAn/timiGS-/commit/9993d040ea66b230e67fc1ebffb631047ddac90b))
+* Implement new Tauri desktop application with various features and remove the old Android cleanup script. ([85a0c68](https://github.com/BANSAFAn/timiGS-/commit/85a0c6827876b48b9a8d1e91123d89b4fac22a4c))
+* improve Sync design with SVG icons and modern UI ([20570bd](https://github.com/BANSAFAn/timiGS-/commit/20570bd06481935acce10bdaa081bae5125565f5))
+* new table syns ([129bfe3](https://github.com/BANSAFAn/timiGS-/commit/129bfe3d7d048dbe89e14698d033db29e2694fc6))
+* nofitical tools + Hello Timeout Shealder ([b7e72c0](https://github.com/BANSAFAn/timiGS-/commit/b7e72c0cafe7623087d09fdd9f909cd0fd2aef21))
+* update contacts, export formats and fix analytics toggle ([c577454](https://github.com/BANSAFAn/timiGS-/commit/c57745459f69b0d40d8ed7aeb9cff1058eedb2e4))
+
+
+### Bug Fixes
+
+* delete github ([78a0b57](https://github.com/BANSAFAn/timiGS-/commit/78a0b57744632660f4d7f2fc4168c4a1e5811ed9))
+* delete syns table ([945c394](https://github.com/BANSAFAn/timiGS-/commit/945c39482e17b7742e1cf9c448d744fd65b363d6))
+* flag contry ([7566cb6](https://github.com/BANSAFAn/timiGS-/commit/7566cb664db4ea151b2338feadb3cf6393226e48))
+* light theme ! ([32de928](https://github.com/BANSAFAn/timiGS-/commit/32de92807dcbd588aff6f0796af5abd5b7925523))
+* remove Android, improve Linux tracking ([39cf1ac](https://github.com/BANSAFAn/timiGS-/commit/39cf1ac089d6d9b44485bf88c1a7033ebe77d1b3))
+* tracing Linux ([cae4ae3](https://github.com/BANSAFAn/timiGS-/commit/cae4ae3825d1c3981772fda24dacc48f3278d402))
+* vercel develop ([f60b533](https://github.com/BANSAFAn/timiGS-/commit/f60b53350b9f121f5b794d93f4369373333e7ff9))
+
+
+### Translations
+
+* pt.json + pl.json ! ([7a0a5ed](https://github.com/BANSAFAn/timiGS-/commit/7a0a5ed1fa85efff6a65563151b4086c5688d40e))
+
+
+### Miscellaneous
+
+* **deps:** bump the npm_and_yarn group across 1 directory with 2 updates ([fcede0b](https://github.com/BANSAFAn/timiGS-/commit/fcede0bee896fc4b1d2985258afaba8134bcd354))
+
+
+### CI/CD
+
+* i18n tag add ([f62eb08](https://github.com/BANSAFAn/timiGS-/commit/f62eb08f7567f84777ffed8bf0537cd37210ca77))
+* remove android ([e8c3098](https://github.com/BANSAFAn/timiGS-/commit/e8c309886f8ad4867f104a4b9ff79f16d4227423))
+
 ## [1.1.1](https://github.com/BANSAFAn/timiGS-/compare/v1.1.0...v1.1.1) (2026-03-08)
 
 
