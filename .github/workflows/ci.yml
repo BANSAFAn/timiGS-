@@ -82,16 +82,23 @@ jobs:
           - platform: macos-latest
             args: "--target universal-apple-darwin"
             name: macOS
-          - platform: ubuntu-22.04
+          - platform: ubuntu-latest
+            container: alpine:latest
             args: ""
-            name: Linux
+            name: Linux (Alpine)
           - platform: windows-latest
             args: ""
             name: Windows
 
     runs-on: ${{ matrix.platform }}
+    container: ${{ matrix.container }}
     steps:
       - uses: actions/checkout@v4
+
+      - name: Install dependencies (Alpine)
+        if: matrix.container == 'alpine:latest'
+        run: |
+          apk add --no-cache nodejs npm curl rust cargo git make musl-dev openssl-dev clang llvm webkit2gtk-4.1-dev gtk+3.0-dev libappindicator-dev librsvg-dev patchelf
 
       - name: Install dependencies (Ubuntu)
         if: matrix.platform == 'ubuntu-22.04'
@@ -100,14 +107,22 @@ jobs:
           sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf libasound2-dev
 
       - name: Setup Node.js
+        if: matrix.container != 'alpine:latest'
         uses: actions/setup-node@v4
         with:
           node-version: lts/*
 
       - name: Setup Rust
+        if: matrix.container != 'alpine:latest'
         uses: dtolnay/rust-toolchain@stable
         with:
           targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+
+      - name: Install Rust (Alpine)
+        if: matrix.container == 'alpine:latest'
+        run: |
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+          . "$HOME/.cargo/env"
 
       - name: Install frontend dependencies
         run: npm install
