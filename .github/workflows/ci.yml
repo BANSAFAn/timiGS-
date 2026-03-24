@@ -11,55 +11,66 @@ permissions:
   security-events: write
 
 jobs:
-  # Security audit for Rust dependencies
+  # Security audit for Rust dependencies (Alpine)
   security-audit:
-    name: 🔒 Security Audit
+    name: 🔒 Security Audit (Alpine)
     runs-on: ubuntu-latest
+    container:
+      image: alpine:latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Rust
-        uses: dtolnay/rust-toolchain@stable
+      - name: Install Rust and dependencies
+        run: |
+          apk add --no-cache curl rust cargo git make musl-dev openssl-dev
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+          . "$HOME/.cargo/env"
 
       - name: Install cargo-audit
-        run: cargo install cargo-audit
+        run: |
+          . "$HOME/.cargo/env"
+          cargo install cargo-audit
 
       - name: Run security audit
         working-directory: src-tauri
-        run: cargo audit --ignore RUSTSEC-2024-0375 || true
+        run: |
+          . "$HOME/.cargo/env"
+          cargo audit --ignore RUSTSEC-2024-0375 || true
 
-  # Lint and format checks
+  # Lint and format checks (Alpine)
   lint:
-    name: 🔍 Lint & Format
+    name: 🔍 Lint & Format (Alpine)
     runs-on: ubuntu-latest
+    container:
+      image: alpine:latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: lts/*
-
-      - name: Setup Rust
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          components: clippy, rustfmt
-
-      - name: Install dependencies (Ubuntu)
+      - name: Install Node.js
         run: |
-          sudo apt-get update
-          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf libasound2-dev
+          apk add --no-cache nodejs npm
+
+      - name: Install Rust and dependencies
+        run: |
+          apk add --no-cache curl rust cargo git make musl-dev openssl-dev clang llvm
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+          . "$HOME/.cargo/env"
+          rustup component add clippy rustfmt
 
       - name: Install frontend dependencies
         run: npm install
 
       - name: Check Rust formatting
         working-directory: src-tauri
-        run: cargo fmt --check
+        run: |
+          . "$HOME/.cargo/env"
+          cargo fmt --check
 
       - name: Run Clippy
         working-directory: src-tauri
-        run: cargo clippy -- -D warnings || true
+        run: |
+          . "$HOME/.cargo/env"
+          cargo clippy -- -D warnings || true
 
   # Build verification on all platforms
   build-check:
@@ -112,12 +123,18 @@ jobs:
         with:
           args: ${{ matrix.args }}
 
-  # Docker build verification
+  # Docker build verification (Alpine)
   docker-build:
-    name: 🐳 Docker Build
+    name: 🐳 Docker Build (Alpine)
     runs-on: ubuntu-latest
+    container:
+      image: alpine:latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Install Docker and dependencies
+        run: |
+          apk add --no-cache docker docker-cli-compose git
 
       - name: Build Docker image
         run: docker build -t timigs-website-test .
@@ -143,17 +160,18 @@ jobs:
         if: always()
         run: docker rm -f test-site || true
 
-  # Website build check
+  # Website build check (Alpine)
   website-build:
-    name: 🌐 Website Build
+    name: 🌐 Website Build (Alpine)
     runs-on: ubuntu-latest
+    container:
+      image: alpine:latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: lts/*
+      - name: Install Node.js
+        run: |
+          apk add --no-cache nodejs npm
 
       - name: Install dependencies
         working-directory: site
