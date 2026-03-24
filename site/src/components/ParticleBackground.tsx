@@ -54,31 +54,13 @@ const ParticleBackground: React.FC = () => {
         if (p.y < 0) p.y = height;
         if (p.y > height) p.y = 0;
 
-        // Draw particle
+        // Draw particle (softer, minimalist orb)
         ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(56, 189, 248, ${p.alpha})`; // sky-400
+        ctx.arc(p.x, p.y, p.size * 1.5, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(56, 189, 248, ${p.alpha * 0.8})`; 
         ctx.fill();
         
-        // Connect close particles - ONLY on desktop
-        if (!isMobile) {
-            for (let j = i + 1; j < particles.length; j++) {
-                const p2 = particles[j];
-                const dx = p.x - p2.x;
-                const dy = p.y - p2.y;
-                const distance = Math.sqrt(dx * dx + dy * dy);
-                const maxDistance = 120;
-                
-                if (distance < maxDistance) {
-                    ctx.beginPath();
-                    ctx.strokeStyle = `rgba(56, 189, 248, ${0.15 * (1 - distance/maxDistance)})`;
-                    ctx.lineWidth = 0.5;
-                    ctx.moveTo(p.x, p.y);
-                    ctx.lineTo(p2.x, p2.y);
-                    ctx.stroke();
-                }
-            }
-        }
+        // Minimalist: no rigid line connections, just drifting light dust.
       });
 
       animationFrameId = requestAnimationFrame(drawParticles);

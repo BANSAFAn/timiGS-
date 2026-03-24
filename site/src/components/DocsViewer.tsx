@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useMemo } from "react";
 import { marked } from "marked";
 import hljs from "highlight.js";
 import 'highlight.js/styles/atom-one-dark.css';
+import { BookOpen, DownloadSimple, Sparkle, CloudSun, Gear, GithubLogo, Cube as DockerLogo, FileText } from "@phosphor-icons/react";
 
 interface DocSection {
   id: string;
@@ -15,14 +16,14 @@ interface TocItem {
   level: number;
 }
 
-const sectionIcons: Record<string, string> = {
-  intro: "📖",
-  installation: "⬇️",
-  features: "✨",
-  weather: "🌤️",
-  settings: "⚙️",
-  "github-api": "🐙",
-  docker: "🐳",
+const sectionIcons: Record<string, React.ReactNode> = {
+  intro: <BookOpen weight="duotone" />,
+  installation: <DownloadSimple weight="duotone" />,
+  features: <Sparkle weight="duotone" />,
+  weather: <CloudSun weight="duotone" />,
+  settings: <Gear weight="duotone" />,
+  "github-api": <GithubLogo weight="duotone" />,
+  docker: <DockerLogo weight="duotone" />
 };
 
 const sectionDescriptions: Record<string, string> = {
@@ -45,6 +46,7 @@ export default function DocsViewer({ lang = "en" }: { lang?: string }) {
   const [toc, setToc] = useState<TocItem[]>([]);
   const [activeHeading, setActiveHeading] = useState<string>("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const docsCache = useRef<Record<string, { html: string, toc: TocItem[] }>>({});
   const contentRef = useRef<HTMLDivElement>(null);
   const mainRef = useRef<HTMLElement>(null);
 
@@ -62,11 +64,11 @@ export default function DocsViewer({ lang = "en" }: { lang?: string }) {
              const alertContent = alertMatch[2];
              
              const configs: Record<string, { bg: string; border: string; icon: string; title: string }> = {
-               note: { bg: "rgba(59,130,246,0.08)", border: "rgba(59,130,246,0.3)", icon: "ℹ️", title: "Note" },
-               tip: { bg: "rgba(16,185,129,0.08)", border: "rgba(16,185,129,0.3)", icon: "💡", title: "Tip" },
-               important: { bg: "rgba(139,92,246,0.08)", border: "rgba(139,92,246,0.3)", icon: "💜", title: "Important" },
-               warning: { bg: "rgba(245,158,11,0.08)", border: "rgba(245,158,11,0.3)", icon: "⚠️", title: "Warning" },
-               caution: { bg: "rgba(239,68,68,0.08)", border: "rgba(239,68,68,0.3)", icon: "🛑", title: "Caution" },
+               note: { bg: "rgba(59,130,246,0.08)", border: "rgba(59,130,246,0.3)", icon: "<svg viewBox='0 0 24 24' width='16' height='16' stroke='currentColor' stroke-width='2' fill='none'><circle cx='12' cy='12' r='10'></circle><line x1='12' y1='16' x2='12' y2='12'></line><line x1='12' y1='8' x2='12.01' y2='8'></line></svg>", title: "Note" },
+               tip: { bg: "rgba(16,185,129,0.08)", border: "rgba(16,185,129,0.3)", icon: "<svg viewBox='0 0 24 24' width='16' height='16' stroke='currentColor' stroke-width='2' fill='none'><circle cx='12' cy='12' r='10'></circle><path d='M12 16v-4'></path><path d='M12 8h.01'></path></svg>", title: "Tip" },
+               important: { bg: "rgba(139,92,246,0.08)", border: "rgba(139,92,246,0.3)", icon: "<svg viewBox='0 0 24 24' width='16' height='16' stroke='currentColor' stroke-width='2' fill='none'><circle cx='12' cy='12' r='10'></circle><path d='M12 16v-4'></path><path d='M12 8h.01'></path></svg>", title: "Important" },
+               warning: { bg: "rgba(245,158,11,0.08)", border: "rgba(245,158,11,0.3)", icon: "<svg viewBox='0 0 24 24' width='16' height='16' stroke='currentColor' stroke-width='2' fill='none'><path d='M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z'></path><line x1='12' y1='9' x2='12' y2='13'></line><line x1='12' y1='17' x2='12.01' y2='17'></line></svg>", title: "Warning" },
+               caution: { bg: "rgba(239,68,68,0.08)", border: "rgba(239,68,68,0.3)", icon: "<svg viewBox='0 0 24 24' width='16' height='16' stroke='currentColor' stroke-width='2' fill='none'><circle cx='12' cy='12' r='10'></circle><line x1='15' y1='9' x2='9' y2='15'></line><line x1='9' y1='9' x2='15' y2='15'></line></svg>", title: "Caution" },
              };
              const c = configs[type] || configs.note;
 
@@ -284,7 +286,7 @@ export default function DocsViewer({ lang = "en" }: { lang?: string }) {
                   onClick={() => { setActiveDoc(section.id); setMobileMenuOpen(false); }}
                   className={`docs-nav-item ${activeDoc === section.id ? 'active' : ''}`}
                 >
-                  <span className="docs-nav-icon">{sectionIcons[section.id] || "📄"}</span>
+                  <span className="docs-nav-icon">{sectionIcons[section.id] || <FileText weight="duotone" />}</span>
                   <div className="docs-nav-text">
                     <span className="docs-nav-title">{section.title}</span>
                     <span className="docs-nav-desc">{sectionDescriptions[section.id] || ""}</span>
@@ -301,7 +303,7 @@ export default function DocsViewer({ lang = "en" }: { lang?: string }) {
                       onClick={() => { setActiveDoc(section.id); setMobileMenuOpen(false); }}
                       className={`docs-nav-item ${activeDoc === section.id ? 'active' : ''}`}
                     >
-                      <span className="docs-nav-icon">{sectionIcons[section.id] || "📄"}</span>
+                      <span className="docs-nav-icon">{sectionIcons[section.id] || <FileText weight="duotone" />}</span>
                       <div className="docs-nav-text">
                         <span className="docs-nav-title">{section.title}</span>
                         <span className="docs-nav-desc">{sectionDescriptions[section.id] || ""}</span>

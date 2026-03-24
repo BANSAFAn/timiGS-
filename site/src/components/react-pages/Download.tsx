@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { fetchReleases } from '../../services/githubService';
 import { Language } from '../../i18n/types';
 import type { GithubRelease, GithubAsset, Translation } from '../../i18n/types';
-import { Monitor, Apple, Terminal, Box, Download as DownloadIcon, AlertCircle, ExternalLink, Sparkles, ArrowRight, Shield, Zap } from 'lucide-react';
+import { Monitor, AppleLogo as Apple, TerminalWindow as Terminal, Package as Box, DownloadSimple as DownloadIcon, WarningCircle as AlertCircle, ArrowUpRight as ExternalLink, Sparkle as Sparkles, ArrowRight, ShieldCheck as Shield, Lightning as Zap } from '@phosphor-icons/react';
 
 interface DownloadProps {
     lang: Language;

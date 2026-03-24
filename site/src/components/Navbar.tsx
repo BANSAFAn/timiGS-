@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Language } from '../i18n/types';
 import type { Translation } from '../i18n/types';
-import { Menu, X, Globe, Clock, Star, Download, MessageSquare } from 'lucide-react';
+import { List as Menu, X, GlobeHemisphereWest as Globe, Clock, Star, DownloadSimple as Download, ChatCircle as MessageSquare } from '@phosphor-icons/react';
+import { motion } from 'framer-motion';
 
 interface NavbarProps {
   lang: Language;
@@ -98,19 +99,25 @@ const Navbar: React.FC<NavbarProps> = ({ lang, t, pathname }) => {
 
           {/* Desktop Nav */}
           <div className="hidden md:flex items-center gap-2">
-            <div className="flex p-1.5 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-xl mr-4 shadow-inner shadow-black/20">
+            <div className="flex p-1.5 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-xl mr-4 shadow-inner shadow-black/20 gap-1 relative">
                 {navLinks.map((link) => (
                     <a
                     key={link.path}
                     href={getLinkHref(link.path)}
-                    className={`relative px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 group ${
+                    className={`relative px-5 py-2.5 rounded-xl text-sm font-medium transition-colors duration-300 group z-10 ${
                         isActive(link.path)
-                        ? 'text-white bg-gradient-to-r from-apple-blue/20 to-purple-500/20 shadow-lg shadow-apple-blue/10 border border-white/10'
-                        : 'text-apple-gray-400 hover:text-white hover:bg-white/10 hover:shadow-md'
+                        ? 'text-white'
+                        : 'text-apple-gray-400 hover:text-white hover:bg-white/5'
                     }`}
                     >
-                    {link.label}
-                    <span className={`absolute inset-x-0 bottom-1 h-0.5 rounded-full transition-all duration-300 ${isActive(link.path) ? 'bg-gradient-to-r from-apple-blue to-purple-500 opacity-100' : 'bg-apple-blue opacity-0 group-hover:opacity-50'}`}></span>
+                    {isActive(link.path) && (
+                        <motion.div
+                            layoutId="navbar-indicator"
+                            className="absolute inset-0 bg-gradient-to-r from-apple-blue/20 to-purple-500/20 rounded-xl shadow-[0_0_15px_rgba(56,189,248,0.15)] border border-white/10"
+                            transition={{ type: "spring", bounce: 0.15, duration: 0.5 }}
+                        />
+                    )}
+                    <span className="relative z-10">{link.label}</span>
                     </a>
                 ))}
             </div>

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Shield, Lock, Database, FileText, Scale, CheckCircle2 } from 'lucide-react';
+import { ShieldCheck as Shield, LockKey as Lock, Database, FileText, Scales as Scale, CheckCircle as CheckCircle2 } from '@phosphor-icons/react';
 import type { Translation } from '../../i18n/types';
 
 interface TermsProps {

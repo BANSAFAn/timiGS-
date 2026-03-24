@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Star, GitFork, Eye, Clock, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Star, GitFork, Eye, Clock, CheckCircle as CheckCircle2, WarningCircle as AlertCircle } from '@phosphor-icons/react';
 
 interface GitHubStatsProps {
   owner?: string;

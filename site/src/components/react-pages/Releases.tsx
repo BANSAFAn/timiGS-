@@ -3,21 +3,7 @@ import ReactMarkdown from 'react-markdown';
 import { fetchReleases } from '../../services/githubService';
 import { Language } from '../../i18n/types';
 import type { GithubRelease, Translation } from '../../i18n/types';
-import { 
-  Calendar, 
-  ExternalLink, 
-  Package, 
-  Download, 
-  Monitor, 
-  Apple, 
-  Terminal, 
-  FileCode, 
-  Archive,
-  Sparkles,
-  GitCommit,
-  Tag,
-  ArrowRight
-} from 'lucide-react';
+import { Calendar, ArrowUpRight as ExternalLink, Package, DownloadSimple as Download, Monitor, AppleLogo as Apple, TerminalWindow as Terminal, FileCode, Archive, Sparkle as Sparkles, GitCommit, Tag, ArrowRight } from '@phosphor-icons/react';
 
 /* ── Scroll reveal hook ── */
 function useInView(threshold = 0.1) {

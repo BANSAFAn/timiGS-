@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Github, Heart, Star, ExternalLink, ArrowRight } from 'lucide-react';
+import { GithubLogo as Github, Heart, Star, ArrowUpRight as ExternalLink, ArrowRight } from '@phosphor-icons/react';
 import type { Translation } from '../i18n/types';
 
 interface FooterProps {

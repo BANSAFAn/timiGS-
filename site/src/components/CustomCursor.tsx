@@ -152,11 +152,12 @@ const CustomCursor = () => {
       {/* Glow effect on hover */}
       {isHovering && (
         <div
-          className="fixed w-32 h-32 rounded-full pointer-events-none z-[9995] bg-sky-500/10 blur-2xl transition-opacity duration-300"
+          className="fixed w-64 h-64 rounded-full pointer-events-none z-[9995] transition-opacity duration-300"
           style={{
-            transform: `translate3d(${mousePos.current.x - 64}px, ${
-              mousePos.current.y - 64
+            transform: `translate3d(${mousePos.current.x - 128}px, ${
+              mousePos.current.y - 128
             }px, 0)`,
+            background: 'radial-gradient(circle, rgba(14, 165, 233, 0.15) 0%, rgba(14, 165, 233, 0) 70%)'
           }}
         />
       )}

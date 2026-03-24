@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Language } from '../i18n/types';
 import type { Translation } from '../i18n/types';
-import { Menu, X, Globe, Clock, Star, Download, Home, FileText, BookOpen, Shield, FlaskConical, Newspaper, ChevronRight } from 'lucide-react';
+import { List as Menu, X, GlobeHemisphereWest as Globe, Clock, Star, DownloadSimple as Download, House as Home, FileText, BookOpen, ShieldCheck as Shield, Flask as FlaskConical, Newspaper, CaretRight as ChevronRight } from '@phosphor-icons/react';
 
 interface SidebarProps {
   lang: Language;

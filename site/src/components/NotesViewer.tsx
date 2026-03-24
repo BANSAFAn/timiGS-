@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { marked } from "marked";
 import hljs from "highlight.js";
 import 'highlight.js/styles/atom-one-dark.css';
-import { BookOpen, Calendar, ChevronRight, PenLine } from "lucide-react";
+import { BookOpen, Calendar, CaretRight as ChevronRight, PencilLine as PenLine } from '@phosphor-icons/react';
 
 interface NoteEntry {
   id: string;
@@ -17,6 +17,7 @@ export default function NotesViewer({ lang = "en" }: { lang?: string }) {
   const [content, setContent] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const contentRef = useRef<HTMLDivElement>(null);
+  const notesCache = useRef<Record<string, string>>({});
 
   // Setup marked options and custom extensions
   useEffect(() => {
@@ -36,11 +37,11 @@ export default function NotesViewer({ lang = "en" }: { lang?: string }) {
              let icon = "INFO";
              let titleColor = "text-white";
 
-             if (type === 'note') { styles = "bg-blue-500/10 border-blue-500/30 text-blue-100"; icon="ℹ️"; titleColor="text-blue-400"; }
-             if (type === 'tip') { styles = "bg-emerald-500/10 border-emerald-500/30 text-emerald-100"; icon="💡"; titleColor="text-emerald-400"; }
-             if (type === 'important') { styles = "bg-purple-500/10 border-purple-500/30 text-purple-100"; icon="💜"; titleColor="text-purple-400"; }
-             if (type === 'warning') { styles = "bg-amber-500/10 border-amber-500/30 text-amber-100"; icon="⚠️"; titleColor="text-amber-400"; }
-             if (type === 'caution') { styles = "bg-red-500/10 border-red-500/30 text-red-100"; icon="🛑"; titleColor="text-red-400"; }
+             if (type === 'note') { styles = "bg-blue-500/10 border-blue-500/30 text-blue-100"; icon="<svg viewBox='0 0 24 24' width='14' height='14' stroke='currentColor' stroke-width='2' fill='none' style='display:inline;'><circle cx='12' cy='12' r='10'></circle><line x1='12' y1='16' x2='12' y2='12'></line><line x1='12' y1='8' x2='12.01' y2='8'></line></svg>"; titleColor="text-blue-400"; }
+             if (type === 'tip') { styles = "bg-emerald-500/10 border-emerald-500/30 text-emerald-100"; icon="<svg viewBox='0 0 24 24' width='14' height='14' stroke='currentColor' stroke-width='2' fill='none' style='display:inline;'><path d='M12 16v-4'></path><path d='M12 8h.01'></path></svg>"; titleColor="text-emerald-400"; }
+             if (type === 'important') { styles = "bg-purple-500/10 border-purple-500/30 text-purple-100"; icon="<svg viewBox='0 0 24 24' width='14' height='14' stroke='currentColor' stroke-width='2' fill='none' style='display:inline;'><circle cx='12' cy='12' r='10'></circle><path d='M12 16v-4'></path><path d='M12 8h.01'></path></svg>"; titleColor="text-purple-400"; }
+             if (type === 'warning') { styles = "bg-amber-500/10 border-amber-500/30 text-amber-100"; icon="<svg viewBox='0 0 24 24' width='14' height='14' stroke='currentColor' stroke-width='2' fill='none' style='display:inline;'><path d='M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z'></path><line x1='12' y1='9' x2='12' y2='13'></line><line x1='12' y1='17' x2='12.01' y2='17'></line></svg>"; titleColor="text-amber-400"; }
+             if (type === 'caution') { styles = "bg-red-500/10 border-red-500/30 text-red-100"; icon="<svg viewBox='0 0 24 24' width='14' height='14' stroke='currentColor' stroke-width='2' fill='none' style='display:inline;'><circle cx='12' cy='12' r='10'></circle><line x1='15' y1='9' x2='9' y2='15'></line><line x1='9' y1='9' x2='15' y2='15'></line></svg>"; titleColor="text-red-400"; }
 
              const inner = marked.parse(content);
              return `<div class="my-6 p-5 rounded-2xl border ${styles} backdrop-blur-sm">

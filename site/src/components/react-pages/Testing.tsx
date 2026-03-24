@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Language } from '../../i18n/types';
 import type { Translation } from '../../i18n/types';
-import { GitCommit, Download, AlertTriangle, Clock, User, ExternalLink, Package } from 'lucide-react';
+import { GitCommit, DownloadSimple as Download, Warning as AlertTriangle, Clock, User, ArrowUpRight as ExternalLink, Package } from '@phosphor-icons/react';
 
 interface TestingProps {
   lang: Language;

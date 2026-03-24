@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Download, Github, Star, Globe, Lock, Check, X, ArrowRight } from "lucide-react";
+import { DownloadSimple as Download, GithubLogo as Github, Star, GlobeHemisphereWest as Globe, LockKey as Lock, Check, X, ArrowRight } from '@phosphor-icons/react';
 import { Language } from "../../i18n/types";
 import type { Translation } from "../../i18n/types";
 import {
