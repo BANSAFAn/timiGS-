@@ -417,7 +417,7 @@
 import { computed, onMounted, ref, watch } from 'vue';
 import { useActivityStore, type ActivitySession, type MusicSession } from '../stores/activity';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, ArcElement, PointElement, LineElement, Tooltip, Legend, Filler } from 'chart.js';
-import { Line, Bar, Pie } from 'vue-chartjs';
+import { Line, Pie } from 'vue-chartjs';
 import { useI18n } from 'vue-i18n';
 import { Icons } from '../components/icons/IconMap';
 import { invoke } from '@tauri-apps/api/core';
@@ -950,18 +950,6 @@ const totalWeekTime = computed(() => weeklyStats.value.reduce((acc, d) => acc + 
 const dailyAverage = computed(() => weeklyStats.value.length ? Math.round(totalWeekTime.value / weeklyStats.value.length) : 0);
 
 // --- Charts ---
-const weeklyChartData = computed(() => ({
-  labels: weeklyStats.value.map(d => new Date(d.date).toLocaleDateString(undefined, { weekday: 'short' })).reverse(),
-  datasets: [{
-    label: 'Hours',
-    data: weeklyStats.value.map(d => Number((d.total_seconds / 3600).toFixed(1))).reverse(),
-    backgroundColor: '#6366f1',
-    borderRadius: 6,
-    hoverBackgroundColor: '#818cf8',
-    barPercentage: 0.6
-  }]
-}));
-
 const lineChartData = computed(() => ({
   labels: weeklyStats.value.map(d => new Date(d.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })).reverse(),
   datasets: [{
@@ -1007,16 +995,6 @@ const commonOptions = {
   }
 };
 
-const barChartOptions = {
-  ...commonOptions,
-  onClick: (_event: any, elements: any[]) => {
-    if (elements.length > 0) {
-      const idx = elements[0].index;
-      const dates = [...weeklyStats.value].reverse();
-      if (dates[idx]) openDayDetail(dates[idx].date);
-    }
-  }
-};
 const lineChartOptions = { ...commonOptions };
 
 const pieChartOptions = {

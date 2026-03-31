@@ -353,19 +353,8 @@ interface CustomBreak {
   duration: number;
 }
 const customBreaks = ref<CustomBreak[]>([]);
-let breakIdCounter = 0;
 // Days
 const selectedDays = ref<number[]>([]); // 0 = Sunday, 1 = Monday, etc.
-// const weekDays = [
-//   { label: "S", value: 0 },
-//   { label: "M", value: 1 },
-//   { label: "T", value: 2 },
-//   { label: "W", value: 3 },
-//   { label: "T", value: 4 },
-//   { label: "F", value: 5 },
-//   { label: "S", value: 6 },
-// ];
-// const scheduleMinutes = Array.from({ length: 60 }, (_, i) => i);
 
 // Music Controls
 const isPlaying = ref(false);
