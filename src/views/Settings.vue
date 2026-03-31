@@ -1,5 +1,5 @@
 <template>
-  <div class="page page-shell">
+  <div class="page page-shell settings-page">
     <div class="page-container settings-page" style="max-width: 1200px">
       <div class="page-header modern-header">
         <div class="header-content">
@@ -220,6 +220,75 @@
           </div>
         </div>
 
+        <!-- Doctor Mode -->
+        <div class="modern-card">
+          <div class="card-header-modern">
+            <div class="card-icon" v-html="Icons.doctorMode"></div>
+            <div>
+              <h3 class="card-title-modern">{{ $t("settings.doctorModeTitle") }}</h3>
+              <p class="card-subtitle">{{ $t("settings.doctorModeSubtitle") }}</p>
+            </div>
+          </div>
+
+          <div class="settings-group">
+            <div class="setting-item">
+              <div class="setting-left">
+                <div class="setting-icon" v-html="Icons.check"></div>
+                <div class="setting-content">
+                  <label class="setting-label">{{ $t("settings.enableDoctorMode") }}</label>
+                  <p class="setting-description">
+                    {{ $t("settings.doctorModeDesc") }}
+                  </p>
+                </div>
+              </div>
+              <div
+                class="toggle-switch"
+                :class="{ checked: doctorModeStore.enabled }"
+                @click="doctorModeStore.toggle(!doctorModeStore.enabled)"
+              >
+                <div class="toggle-thumb"></div>
+              </div>
+            </div>
+
+            <div class="setting-item" v-if="doctorModeStore.enabled">
+              <div class="setting-left">
+                <div class="setting-icon" v-html="Icons.clock"></div>
+                <div class="setting-content">
+                  <label class="setting-label">{{ $t("settings.timeLimit") }}</label>
+                  <p class="setting-description">
+                    {{ $t("settings.timeLimitDesc") }}
+                  </p>
+                </div>
+              </div>
+              <div class="custom-input-wrap">
+                <input 
+                  type="number" 
+                  v-model.number="doctorModeLimitMins" 
+                  @blur="updateDoctorModeLimit"
+                  class="modern-input" 
+                  min="30" max="600" 
+                  style="max-width: 80px;"
+                />
+              </div>
+            </div>
+
+            <div class="setting-item" v-if="doctorModeStore.enabled">
+               <div class="setting-left">
+                <div class="setting-icon" v-html="Icons.dataReset"></div>
+                <div class="setting-content">
+                  <label class="setting-label">{{ $t("settings.resetSession") }}</label>
+                  <p class="setting-description">
+                    Current active session: {{ doctorModeStore.elapsedMins }} mins
+                  </p>
+                </div>
+              </div>
+              <button class="btn btn-secondary" @click="doctorModeStore.resetSession()">
+                {{ $t("settings.resetSession") }}
+              </button>
+            </div>
+          </div>
+        </div>
+
         <!-- Updates -->
         <div class="modern-card">
           <div class="card-header-modern">
@@ -250,7 +319,7 @@
           </div>
 
           <div class="settings-group">
-            <div class="setting-item">
+            <div class="setting-item" style="position: relative; z-index: 10;">
               <div class="setting-left">
                 <div class="setting-icon" v-html="Icons.dataExport"></div>
                 <div class="setting-content">
@@ -581,6 +650,7 @@ import { ref, onMounted, onUnmounted, reactive, computed } from "vue";
 import { useI18n } from "vue-i18n";
 import { invoke } from "@tauri-apps/api/core";
 import { useActivityStore } from "../stores/activity";
+import { useDoctorModeStore } from "../stores/doctorMode";
 import { check } from "@tauri-apps/plugin-updater";
 import { relaunch } from "@tauri-apps/plugin-process";
 import { getVersion } from "@tauri-apps/api/app";
@@ -591,6 +661,13 @@ import { save, open } from "@tauri-apps/plugin-dialog";
 const { locale, t } = useI18n();
 const store = useActivityStore();
 const notifications = useNotificationStore();
+const doctorModeStore = useDoctorModeStore();
+const doctorModeLimitMins = ref(doctorModeStore.timeLimitMins);
+
+function updateDoctorModeLimit() {
+  if (doctorModeLimitMins.value < 10) doctorModeLimitMins.value = 10;
+  doctorModeStore.setTimeLimit(doctorModeLimitMins.value);
+}
 
 // Language State
 const langOpen = ref(false);
@@ -1030,7 +1107,7 @@ async function confirmResetData() {
 
 <style scoped>
 .page-shell {
-  padding-bottom: 80px; /* Space for mobile nav */
+  padding-bottom: 80px;
 }
 
 .settings-grid {
@@ -1061,45 +1138,41 @@ async function confirmResetData() {
   color: var(--text-muted);
 }
 
-/* Premium Theme Switcher - Pill Style */
+/* Theme Switcher - Solid Color */
 .theme-switcher {
   display: flex;
-  background: rgba(0, 0, 0, 0.4);
-  border-radius: 12px;
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-md);
   padding: 4px;
   gap: 4px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border-color);
 }
 
 .theme-btn {
   position: relative;
   padding: 10px 20px;
   border: none;
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
   background: transparent;
   color: var(--text-muted);
   font-size: 0.9rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: var(--transition-base);
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
 .theme-btn:hover {
-  color: var(--text-primary);
-  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-main);
+  background: var(--bg-hover);
 }
 
 .theme-btn.active {
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  background: var(--color-primary);
   color: white;
-  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
-}
-
-.theme-btn.active:hover {
-  background: linear-gradient(135deg, #7c7ff7 0%, #9d6ffa 100%);
+  box-shadow: var(--shadow-md);
 }
 
 .divider {
@@ -1127,12 +1200,8 @@ async function confirmResetData() {
 }
 
 @keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 .text-muted {
@@ -1144,48 +1213,61 @@ async function confirmResetData() {
 }
 
 /* Custom Select */
+/* Custom input */
+.modern-input {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  transition: var(--transition-fast);
+  outline: none;
+}
+.modern-input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(91, 110, 225, 0.2);
+}
+
 .custom-select {
   position: relative;
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   cursor: pointer;
   min-width: 200px;
   user-select: none;
 }
+
 .selected-option {
   padding: 10px 14px;
   display: flex;
   align-items: center;
   gap: 10px;
 }
+
 .chevron {
   margin-left: auto;
   font-size: 0.8rem;
   opacity: 0.7;
   transition: transform 0.2s;
 }
+
 .custom-select.open .chevron {
   transform: rotate(180deg);
 }
+
 .options-list {
   position: absolute;
   top: calc(100% + 6px);
   left: 0;
   right: 0;
-  background: rgba(30, 30, 35, 0.95);
+  background: var(--bg-secondary);
   border: 1px solid var(--border-color);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   overflow: hidden;
   z-index: 9999;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(12px);
+  box-shadow: var(--shadow-lg);
   padding: 6px;
-}
-
-[data-theme="light"] .options-list {
-  background: rgba(255, 255, 255, 0.95);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
 }
 
 .option-item {
@@ -1193,20 +1275,17 @@ async function confirmResetData() {
   display: flex;
   align-items: center;
   gap: 12px;
-  transition: all 0.2s;
-  border-radius: 8px;
+  transition: var(--transition-fast);
+  border-radius: var(--radius-sm);
   margin-bottom: 2px;
   font-weight: 500;
-  color: var(--text-main);
-}
-
-[data-theme="light"] .option-item {
   color: var(--text-main);
 }
 
 .option-item:hover {
   background: var(--bg-hover);
 }
+
 .flag-icon,
 .flag-icon-img {
   width: 28px;
@@ -1214,21 +1293,16 @@ async function confirmResetData() {
   object-fit: cover;
   border-radius: 3px;
   flex-shrink: 0;
-  /* Ensure flags render properly */
   display: inline-block;
   vertical-align: middle;
 }
 
-/* Dark theme - add subtle border for better visibility */
 [data-theme="dark"] .flag-icon-img {
   border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 0 4px rgba(255, 255, 255, 0.1);
 }
 
-/* Light theme - add subtle shadow for better visibility */
 [data-theme="light"] .flag-icon-img {
   border: 1px solid rgba(0, 0, 0, 0.1);
-  box-shadow: 0 0 4px rgba(0, 0, 0, 0.15);
 }
 
 /* Update Modal */
@@ -1246,12 +1320,12 @@ async function confirmResetData() {
 .update-modal {
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
-  border-radius: 16px;
+  border-radius: var(--radius-xl);
   padding: 32px;
   width: 90%;
   max-width: 400px;
   text-align: center;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--shadow-lg);
 }
 
 .update-icon {
@@ -1292,7 +1366,7 @@ async function confirmResetData() {
   margin-right: 8px;
 }
 
-/* Modern Design System */
+/* Settings Page */
 .settings-page {
   max-width: 1000px;
   margin: 0 auto;
@@ -1301,7 +1375,7 @@ async function confirmResetData() {
 .modern-header {
   margin-bottom: 32px;
   padding-bottom: 24px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .header-content {
@@ -1317,13 +1391,10 @@ async function confirmResetData() {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(
-    135deg,
-    rgba(99, 102, 241, 0.1),
-    rgba(139, 92, 246, 0.1)
-  );
-  border-radius: 20px;
-  border: 1px solid rgba(99, 102, 241, 0.2);
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border-color);
+  color: var(--color-primary);
 }
 
 .header-subtitle {
@@ -1334,20 +1405,19 @@ async function confirmResetData() {
 
 /* Modern Cards */
 .modern-card {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-2xl);
   padding: 24px;
   margin-bottom: 20px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  backdrop-filter: blur(10px);
+  transition: var(--transition-base);
 }
 
 .modern-card:hover {
-  background: rgba(255, 255, 255, 0.04);
-  border-color: rgba(255, 255, 255, 0.1);
+  background: var(--bg-secondary);
+  border-color: var(--color-primary);
   transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  box-shadow: var(--shadow-glow);
 }
 
 .card-header-modern {
@@ -1356,7 +1426,7 @@ async function confirmResetData() {
   gap: 16px;
   margin-bottom: 24px;
   padding-bottom: 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .card-icon {
@@ -1366,13 +1436,10 @@ async function confirmResetData() {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(
-    135deg,
-    rgba(99, 102, 241, 0.15),
-    rgba(139, 92, 246, 0.15)
-  );
-  border-radius: 14px;
-  border: 1px solid rgba(99, 102, 241, 0.25);
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  color: var(--color-primary);
 }
 
 .card-title-modern {
@@ -1401,16 +1468,16 @@ async function confirmResetData() {
   flex-direction: column;
   align-items: stretch;
   padding: 18px;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.04);
-  border-radius: 14px;
-  transition: all 0.2s;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  transition: var(--transition-fast);
   gap: 14px;
 }
 
 .setting-item:hover {
-  background: rgba(255, 255, 255, 0.04);
-  border-color: rgba(255, 255, 255, 0.08);
+  background: var(--bg-hover);
+  border-color: var(--color-primary);
 }
 
 .setting-left {
@@ -1427,10 +1494,12 @@ async function confirmResetData() {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 10px;
+  background: var(--bg-hover);
+  border-radius: var(--radius-sm);
   flex-shrink: 0;
+  color: var(--color-primary);
 }
+
 .setting-icon :deep(svg) {
   width: 24px;
   height: 24px;
@@ -1452,7 +1521,7 @@ async function confirmResetData() {
 
 .setting-description {
   font-size: 0.92rem;
-  color: rgba(255, 255, 255, 0.65);
+  color: var(--text-muted);
   margin: 0;
   line-height: 1.5;
   word-wrap: break-word;
@@ -1463,10 +1532,10 @@ async function confirmResetData() {
 .theme-switcher-modern {
   display: flex;
   gap: 8px;
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--bg-tertiary);
   padding: 4px;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
   align-self: flex-start;
 }
 
@@ -1477,25 +1546,25 @@ async function confirmResetData() {
   padding: 12px 20px;
   background: transparent;
   border: none;
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
   color: var(--text-muted);
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: var(--transition-fast);
   white-space: nowrap;
   min-width: 100px;
 }
 
 .theme-btn-modern:hover {
-  background: rgba(255, 255, 255, 0.08);
-  color: var(--text-primary);
+  background: var(--bg-hover);
+  color: var(--text-main);
 }
 
 .theme-btn-modern.active {
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  background: var(--color-primary);
   color: white;
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+  box-shadow: var(--shadow-md);
 }
 
 .theme-icon {
@@ -1509,21 +1578,21 @@ async function confirmResetData() {
 
 /* Modern Select */
 .modern-select {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
   min-width: 180px;
-  transition: all 0.2s;
+  transition: var(--transition-fast);
 }
 
 .modern-select:hover {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.12);
+  background: var(--bg-hover);
+  border-color: var(--text-muted);
 }
 
 .modern-select.open {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  box-shadow: 0 0 0 3px rgba(91, 110, 225, 0.1);
 }
 
 /* Export Dropdown */
@@ -1543,19 +1612,20 @@ async function confirmResetData() {
   align-items: center;
   gap: 10px;
   padding: 12px 18px;
-  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+  background: var(--color-primary);
   color: white;
   border: none;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+  transition: var(--transition-base);
+  box-shadow: var(--shadow-sm);
 }
 
 .export-dropdown-trigger:hover:not(:disabled) {
+  background: var(--color-primary-hover);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+  box-shadow: var(--shadow-md);
 }
 
 .export-dropdown-trigger:disabled {
@@ -1589,17 +1659,16 @@ async function confirmResetData() {
   top: calc(100% + 8px);
   right: 0;
   min-width: 260px;
-  background: rgba(30, 30, 40, 0.98);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
   padding: 8px;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+  box-shadow: var(--shadow-lg);
   z-index: 1000;
   opacity: 0;
   visibility: hidden;
   transform: translateY(-10px);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  backdrop-filter: blur(20px);
+  transition: var(--transition-base);
 }
 
 .export-dropdown-item {
@@ -1610,15 +1679,15 @@ async function confirmResetData() {
   padding: 12px 16px;
   background: transparent;
   border: none;
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: var(--transition-fast);
   text-align: left;
   position: relative;
 }
 
 .export-dropdown-item:hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--bg-hover);
 }
 
 .export-dropdown-item:active {
@@ -1660,7 +1729,7 @@ async function confirmResetData() {
 
 .export-divider {
   height: 1px;
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--border-color);
   margin: 8px 0;
 }
 
@@ -1668,13 +1737,13 @@ async function confirmResetData() {
   flex-direction: row !important;
   align-items: center !important;
   gap: 12px !important;
-  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark)) !important;
+  background: var(--color-primary) !important;
   color: white !important;
   margin-top: 4px;
 }
 
 .export-action:hover {
-  background: linear-gradient(135deg, var(--color-primary-dark), var(--color-primary)) !important;
+  background: var(--color-primary-hover) !important;
 }
 
 .export-action .export-icon-wrapper {
@@ -1724,11 +1793,11 @@ async function confirmResetData() {
 
 .format-select,
 .interval-select {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
   color: var(--text-primary);
   padding: 8px 12px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   font-size: 0.9rem;
   cursor: pointer;
   flex-shrink: 0;
@@ -1743,11 +1812,11 @@ async function confirmResetData() {
 }
 
 .folder-path {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
   color: var(--text-primary);
   padding: 8px 12px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   font-size: 0.85rem;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1784,9 +1853,10 @@ async function confirmResetData() {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: var(--bg-tertiary);
   transition: 0.3s;
   border-radius: 26px;
+  border: 1px solid var(--border-color);
 }
 
 .toggle-slider:before {
@@ -1799,11 +1869,12 @@ async function confirmResetData() {
   background-color: var(--text-muted);
   transition: 0.3s;
   border-radius: 50%;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-sm);
 }
 
 .toggle-switch input:checked + .toggle-slider {
   background-color: var(--color-primary);
+  border-color: var(--color-primary);
 }
 
 .toggle-switch input:checked + .toggle-slider:before {
@@ -1813,7 +1884,7 @@ async function confirmResetData() {
 
 /* Legacy toggle-switch (div-based) */
 .toggle-switch.checked .toggle-thumb {
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  background: var(--color-primary);
   transform: translateX(24px);
 }
 
@@ -1826,7 +1897,7 @@ async function confirmResetData() {
   background-color: var(--text-muted);
   transition: 0.3s;
   border-radius: 50%;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-sm);
 }
 
 /* Responsive */
@@ -1869,19 +1940,19 @@ async function confirmResetData() {
 
 .danger-icon {
   background: rgba(239, 68, 68, 0.1);
-  color: #ef4444;
+  color: var(--color-danger);
 }
 
 .danger-icon :deep(svg) {
-  stroke: #ef4444;
+  stroke: var(--color-danger);
 }
 
 .danger-icon-large {
-  color: #ef4444;
+  color: var(--color-danger);
 }
 
 .danger-icon-large :deep(svg) {
-  stroke: #ef4444;
+  stroke: var(--color-danger);
   width: 40px;
   height: 40px;
 }
@@ -1889,20 +1960,20 @@ async function confirmResetData() {
 .reset-input {
   width: 100%;
   padding: 12px 16px;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--bg-tertiary);
   border: 2px solid rgba(239, 68, 68, 0.3);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   color: var(--text-primary);
   font-size: 1rem;
   font-weight: 600;
   letter-spacing: 2px;
   text-align: center;
   outline: none;
-  transition: all 0.2s;
+  transition: var(--transition-fast);
 }
 
 .reset-input:focus {
-  border-color: #ef4444;
+  border-color: var(--color-danger);
   box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
 }
 
@@ -1912,20 +1983,20 @@ async function confirmResetData() {
 }
 
 .btn-danger {
-  background: linear-gradient(135deg, #dc2626, #ef4444);
+  background: var(--color-danger);
   color: white;
   border: none;
   padding: 10px 20px;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: var(--transition-base);
   white-space: nowrap;
 }
 
 .btn-danger:hover:not(:disabled) {
-  background: linear-gradient(135deg, #b91c1c, #dc2626);
-  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+  background: var(--color-danger-hover);
+  box-shadow: var(--shadow-md);
   transform: translateY(-1px);
 }
 
