@@ -13,10 +13,10 @@
   "dependencies": {
     "@astrojs/react": "^4.4.2",
     "@astrojs/tailwind": "^6.0.2",
-    "@astrojs/vercel": "^9.0.4",
+    "@astrojs/vercel": "^10.0.2",
     "@auth/core": "^0.37.4",
     "@phosphor-icons/react": "^2.1.10",
-    "astro": "^5.16.6",
+    "astro": "^5.18.1",
     "auth-astro": "^4.2.0",
     "framer-motion": "^12.38.0",
     "highlight.js": "^11.11.1",
