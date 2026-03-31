@@ -244,7 +244,8 @@
                   <circle cx="12" cy="12" r="3"/>
                   <path d="M12 2v4M12 18v4M2 12h4M18 12h4"/>
                 </svg>
-                {{ isGeolocating ? 'Detecting...' : '📍 Use My Location' }}
+                <span v-if="!isGeolocating" class="btn-icon" v-html="Icons.navigation"></span>
+                {{ isGeolocating ? 'Detecting...' : 'Use My Location' }}
               </button>
               <p class="geo-hint" v-if="geoError">{{ geoError }}</p>
             </div>
@@ -362,6 +363,7 @@
 <script setup lang="ts">
 import { ref, onMounted, reactive } from 'vue';
 import { invoke } from '@tauri-apps/api/core';
+import { Icons } from '../components/icons/IconMap';
 
 // Geolocation state
 const isGeolocating = ref(false);
@@ -545,7 +547,7 @@ function selectLocation(result: any) {
 }
 
 function getFlagEmoji(countryCode: string) {
-  if (!countryCode) return '🌍';
+  if (!countryCode) return Icons.globe;
   const codePoints = countryCode
     .toUpperCase()
     .split('')
@@ -920,29 +922,29 @@ onMounted(() => {
   padding: 40px;
   margin-bottom: 32px;
   overflow: hidden;
-  background: linear-gradient(135deg, rgba(99,102,241,0.2), rgba(139,92,246,0.15));
+  background: rgba(99,102,241,0.2);
   border: 1px solid rgba(255,255,255,0.1);
   backdrop-filter: blur(20px);
 }
 
 .hero-weather-card.weather-clear {
-  background: linear-gradient(135deg, rgba(251,191,36,0.2), rgba(245,158,11,0.15));
+  background: rgba(251,191,36,0.2);
 }
 
 .hero-weather-card.weather-cloudy {
-  background: linear-gradient(135deg, rgba(148,163,184,0.2), rgba(100,116,139,0.15));
+  background: rgba(148,163,184,0.2);
 }
 
 .hero-weather-card.weather-rainy {
-  background: linear-gradient(135deg, rgba(59,130,246,0.2), rgba(37,99,235,0.15));
+  background: rgba(59,130,246,0.2);
 }
 
 .hero-weather-card.weather-snowy {
-  background: linear-gradient(135deg, rgba(186,230,253,0.25), rgba(147,197,253,0.2));
+  background: rgba(186,230,253,0.25);
 }
 
 .hero-weather-card.weather-stormy {
-  background: linear-gradient(135deg, rgba(75,85,99,0.3), rgba(55,65,81,0.25));
+  background: rgba(75,85,99,0.3);
 }
 
 .hero-bg-effects {
@@ -1054,7 +1056,8 @@ onMounted(() => {
 .icon-glow {
   position: absolute;
   inset: -20px;
-  background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
   animation: pulse-glow 3s ease-in-out infinite;
 }
 
@@ -1078,7 +1081,7 @@ onMounted(() => {
   font-size: 5rem;
   font-weight: 700;
   line-height: 1;
-  background: linear-gradient(180deg, #fff 20%, rgba(255,255,255,0.7) 100%);
+  background: rgba(255,255,255,0.85);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -1238,7 +1241,7 @@ onMounted(() => {
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at center, rgba(255,255,255,0.05), transparent);
+  background: rgba(255, 255, 255, 0.03);
   opacity: 0;
   transition: opacity 0.3s;
 }
@@ -1302,7 +1305,7 @@ onMounted(() => {
   top: 20px;
   bottom: 20px;
   width: 2px;
-  background: linear-gradient(180deg, var(--color-primary), rgba(99,102,241,0.2));
+  background: var(--color-primary);
   border-radius: 1px;
 }
 
@@ -1440,7 +1443,7 @@ onMounted(() => {
 .modal-card {
   width: 100%;
   max-width: 420px;
-  background: linear-gradient(135deg, rgba(30,30,50,0.95), rgba(20,20,40,0.95));
+  background: rgba(30,30,50,0.95);
   border: 1px solid rgba(255,255,255,0.1);
   border-radius: 24px;
   overflow: hidden;
@@ -1775,7 +1778,7 @@ onMounted(() => {
 .temp-bar-fill {
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, #60a5fa, #f43f5e);
+  background: #60a5fa;
   border-radius: 3px;
   opacity: 0.8;
 }
@@ -1953,7 +1956,7 @@ onMounted(() => {
   gap: 8px;
   width: 100%;
   padding: 12px 16px;
-  background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(139,92,246,0.12));
+  background: rgba(99,102,241,0.15);
   border: 1px solid rgba(99,102,241,0.25);
   border-radius: 12px;
   color: var(--text-color);
@@ -1965,7 +1968,7 @@ onMounted(() => {
 }
 
 .btn-geolocation:hover:not(:disabled) {
-  background: linear-gradient(135deg, rgba(99,102,241,0.25), rgba(139,92,246,0.2));
+  background: rgba(99,102,241,0.25);
   border-color: rgba(99,102,241,0.4);
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(99,102,241,0.2);
@@ -2006,7 +2009,7 @@ onMounted(() => {
 }
 
 .geo-modal {
-  background: linear-gradient(145deg, rgba(30, 30, 46, 0.98), rgba(24, 24, 37, 0.98));
+  background: rgba(30, 30, 46, 0.98);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 28px;
   padding: 40px 36px 32px;
@@ -2035,7 +2038,7 @@ onMounted(() => {
   width: 80px;
   height: 80px;
   border-radius: 24px;
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.25), rgba(139, 92, 246, 0.2));
+  background: rgba(99, 102, 241, 0.25);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2053,7 +2056,7 @@ onMounted(() => {
   content: '';
   position: absolute;
   inset: -50%;
-  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+  background: rgba(255, 255, 255, 0.05);
   animation: geoShimmer 3s linear infinite;
 }
 
@@ -2147,7 +2150,7 @@ onMounted(() => {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+  background: rgba(255,255,255,0.05);
   transform: translateX(-100%);
   transition: transform 0.6s ease;
 }
@@ -2170,7 +2173,7 @@ onMounted(() => {
 }
 
 .geo-btn-allow {
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  background: #6366f1;
   color: #fff;
   box-shadow: 
     0 4px 16px rgba(99, 102, 241, 0.4),
@@ -2178,7 +2181,7 @@ onMounted(() => {
 }
 
 .geo-btn-allow:hover {
-  background: linear-gradient(135deg, #5558e3, #7c4fe8);
+  background: #5558e3;
   transform: translateY(-2px);
   box-shadow: 
     0 8px 32px rgba(99, 102, 241, 0.5),

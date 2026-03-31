@@ -635,7 +635,7 @@ onUnmounted(() => clearInterval(trackInt));
     position: absolute;
     inset: 0;
     z-index: 100;
-    background: radial-gradient(circle at center, #1a1a24 0%, #000 100%);
+    background: #1a1a24;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -677,7 +677,7 @@ h1 { font-size: 2rem; margin-bottom: 8px; font-weight: 700; letter-spacing: -1px
     inset: 0;
     display: flex;
     flex-direction: column;
-    background: radial-gradient(ellipse at center, #1a1a28 0%, #0a0a0f 100%);
+    background: #1a1a28;
 }
 
 .lobby-header {
@@ -699,7 +699,7 @@ h1 { font-size: 2rem; margin-bottom: 8px; font-weight: 700; letter-spacing: -1px
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    background: #6366f1;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -940,13 +940,11 @@ h1 { font-size: 2rem; margin-bottom: 8px; font-weight: 700; letter-spacing: -1px
     flex: 1;
     width: 100%;
     position: relative;
-    background: #000;
+    background: #1e1e2d;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    /* Premium background effect for screen share */
-    background: radial-gradient(circle at center, #1e1e2d 0%, #000 100%);
 }
 
 .featured-video { 
@@ -1133,7 +1131,7 @@ h1 { font-size: 2rem; margin-bottom: 8px; font-weight: 700; letter-spacing: -1px
 .copy-row { display: flex; justify-content: space-between; align-items: center; margin-top: 4px; font-family: monospace; background: black; padding: 8px; border-radius: 4px; cursor: pointer; }
 
 /* Goals Pane */
-.goal-active-card { background: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(100,200,250,0.05)); border: 1px solid rgba(99,102,241,0.2); }
+.goal-active-card { background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.2); }
 .goal-head { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
 .g-icon { font-size: 1.5rem; }
 .tracking-status { display: flex; align-items: center; gap: 6px; font-size: 0.8rem; color: #666; margin-bottom: 10px; padding: 4px 8px; background: rgba(0,0,0,0.2); border-radius: 4px; width: fit-content; }
