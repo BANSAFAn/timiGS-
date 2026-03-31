@@ -707,10 +707,6 @@ onMounted(async () => {
         scheduleEndMinute.value = parsed.endMinute || 0;
         scheduleEndPeriod.value = parsed.endPeriod || "PM";
         customBreaks.value = parsed.customBreaks || [];
-        // Update break ID counter
-        if (customBreaks.value.length > 0) {
-          breakIdCounter = Math.max(...customBreaks.value.map(b => b.id));
-        }
         selectedDays.value = parsed.days || [];
       }
     } catch (e) {

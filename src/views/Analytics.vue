@@ -287,36 +287,6 @@
       </div>
     </Teleport>
 
-    <!-- Daily Detail Modal -->
-    <Teleport to="body">
-      <div v-if="showDayDetail" class="modal-overlay" @click.self="showDayDetail = false">
-        <div class="modal-content animate-enter" style="max-width: 700px;">
-          <div class="modal-header">
-            <h3><span style="margin-right:8px" v-html="Icons.timeline"></span> {{ dayDetailDate }}</h3>
-            <button class="close-btn" @click="showDayDetail = false">×</button>
-          </div>
-          <div class="modal-body custom-scrollbar" style="max-height: 60vh;">
-            <div v-if="dayDetailSessions.length === 0" class="empty-day">No activity recorded</div>
-            <div v-else class="day-sessions">
-              <div v-for="s in dayDetailSessions" :key="s.id" class="day-session-item">
-                <div class="day-session-icon" :style="{ background: getAppColor(s.app_name) }">
-                  {{ s.app_name.charAt(0).toUpperCase() }}
-                </div>
-                <div class="day-session-info">
-                  <div class="day-session-app">{{ s.app_name }}</div>
-                  <div class="day-session-title">{{ s.window_title }}</div>
-                </div>
-                <div class="day-session-time">
-                  <div class="day-session-dur">{{ formatDuration(s.duration_seconds) }}</div>
-                  <div class="day-session-range">{{ formatTimeShort(s.start_time) }} – {{ s.end_time ? formatTimeShort(s.end_time) : 'Now' }}</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </Teleport>
-
     <!-- Music History Modal -->
     <Teleport to="body">
       <div v-if="showMusicHistory" class="modal-overlay" @click.self="showMusicHistory = false">
@@ -878,21 +848,6 @@ async function fetchPeriodData() {
   customWeeklyStats.value = result;
 }
 
-// --- Daily Detail ---
-const showDayDetail = ref(false);
-const dayDetailDate = ref('');
-const dayDetailSessions = ref<ActivitySession[]>([]);
-
-async function openDayDetail(dateStr: string) {
-  dayDetailDate.value = new Date(dateStr).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-  dayDetailSessions.value = await store.getActivityRange(dateStr, dateStr);
-  showDayDetail.value = true;
-}
-
-function formatTimeShort(timeStr: string): string {
-  return new Date(timeStr).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
-}
-
 // --- Colors & Formatting ---
 const appColors: Record<string, string> = {};
 const colorPalette = ['#6366f1', '#06b6d4', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981'];
@@ -904,6 +859,10 @@ function getAppColor(appName: string): string {
     colorIndex++;
   }
   return appColors[appName];
+}
+
+function formatTimeShort(timeStr: string): string {
+  return new Date(timeStr).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
 }
 
 function formatDuration(seconds: number): string {
