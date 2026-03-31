@@ -5,14 +5,21 @@
   },
   "nav": {
     "dashboard": "Головна",
+    "dashboardShort": "Головна",
     "timeline": "Історія",
+    "timelineShort": "Історія",
     "analytics": "Аналітика",
+    "analyticsShort": "Аналітика",
     "tools": "Інструменти",
+    "toolsShort": "Інструменти",
     "settings": "Налаштування",
+    "settingsShort": "Налаштування",
     "compare": "Команди",
     "sync": "Синхронізація",
     "weather": "Погода",
-    "transfer": "Передача"
+    "weatherShort": "Погода",
+    "transfer": "Передача",
+    "transferShort": "Передача"
   },
   "dashboard": {
     "title": "Головна",
@@ -68,10 +75,10 @@
     "percentage": "%",
     "topWebsites": "Топ сайтів",
     "uncategorized": "Без категорії",
-    "categoryGames": "ІГРИ",
-    "categoryPrograms": "ПРОГРАМА",
+    "categoryGames": "Ігри",
+    "categoryPrograms": "Програми",
     "categoryWork": "Робота",
-    "categoryRest": "ОТДЫХ",
+    "categoryRest": "Відпочинок",
     "categorizeApps": "Розподілити програми"
   },
   "settings": {
@@ -125,7 +132,16 @@
     "checkUpdates": "Перевірити оновлення",
     "checkNow": "Перевірити",
     "checking": "Перевірка...",
-    "noUpdates": "У вас найновіша версія."
+    "noUpdates": "У вас найновіша версія.",
+    "doctorModeTitle": "Режим Врач",
+    "doctorModeSubtitle": "Здоров'я та Відпочинок",
+    "enableDoctorMode": "Увімкнути режим Врач",
+    "doctorModeDesc": "Нагадує про необхідність зробити перерву від комп'ютера.",
+    "timeLimit": "Ліміт часу (хвилини)",
+    "timeLimitDesc": "Скільки часу перед сповіщенням про перерву",
+    "resetSession": "Скинути активну сесію",
+    "doctorModeAlertMessage": "Ви тривалий час працюєте за ПК. Зробіть перерву, погуляйте або дайте очам відпочити хоча б 1 годину!",
+    "doctorModeRepeatMessage": "Ви все ще ігноруєте перерву. Дайте очам відпочити!"
   },
   "tools": {
     "timer": "Таймер вимкнення",
@@ -186,19 +202,35 @@
     "cancel": "Скасувати фокус",
     "message": "Всі інші програми будуть згорнуті",
     "wrongPassword": "Невірний пароль",
-    "focusedApp": "Програма у фокусі"
+    "focusedApp": "Програма у фокусі",
+    "strictMode": "Суворий режим",
+    "strictHint": "Суворий режим блокує: перемикання програм, закриття вікон, вимкнення/перезавантаження. Ви НЕ можете вийти раніше без пароля!"
   },
   "timeout": {
     "title": "Тайм-Аут",
     "workInterval": "Інтервал роботи",
+    "workIntervalDesc": "Як довго працювати до перерви",
     "breakDuration": "Тривалість перерви",
+    "breakDurationDesc": "Як довго триває кожна перерва",
+    "backgroundMusic": "Фонова музика",
+    "musicDesc": "Опціональна музика під час перерв",
     "password": "Пароль блокування",
+    "passwordDesc": "Потрібен для дострокового скасування",
+    "passwordPlaceholder": "Введіть пароль...",
+    "strictMode": "Суворий режим",
+    "strictModeDesc": "Режим максимальних обмежень",
     "start": "Активувати Тайм-Аут",
+    "schedule": "Запланувати Тайм-Аут",
     "cancel": "Скасувати Тайм-Аут",
     "breakTitle": "Час відпочити!",
     "breakMessage": "Зроби перерву, випий чаю, розімнись!",
     "nextBreak": "Наступна перерва через",
-    "working": "Працюємо"
+    "working": "Працюємо",
+    "strictHint": "Суворий режим блокує: закриття програми, перемикання вікон, вимкнення/перезавантаження. Ви НЕ можете вийти раніше без пароля!",
+    "openFolder": "Відкрити папку",
+    "addTrack": "Додати трек",
+    "noMusic": "Музичних файлів не знайдено",
+    "playMusicBreak": "Грати музику під час перерви"
   },
   "common": {
     "loading": "Завантаження...",
@@ -213,9 +245,14 @@
     "hours": "Годин",
     "minutes": "Хвилин",
     "seconds": "Секунд",
+    "day": "День",
+    "week": "Тиждень",
+    "month": "Місяць",
     "generating": "Генерування...",
     "connecting": "Підключення...",
-    "done": "Готово"
+    "done": "Готово",
+    "on": "УВІМК",
+    "off": "ВИМК"
   },
   "excludeProcesses": {
     "title": "Керування відстеженням процесів",

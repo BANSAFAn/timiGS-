@@ -10,7 +10,7 @@
         <div class="header-right">
           <div class="tracking-pill" :class="{ active: store.isTracking }">
             <span class="tracking-dot"></span>
-            <span>{{ store.isTracking ? 'Tracking' : 'Paused' }}</span>
+            <span>{{ store.isTracking ? "Tracking" : "Paused" }}</span>
           </div>
         </div>
       </div>
@@ -20,24 +20,19 @@
 
       <!-- Active Now Hero Card -->
       <div class="hero-card animate-enter">
-        <div class="hero-bg">
-          <div class="hero-gradient"></div>
-          <div class="hero-pattern"></div>
-        </div>
-        
         <div class="hero-content">
           <div class="active-section">
             <div class="active-icon-box">
-              <img 
-                v-if="currentActivity?.app_name && appIcons[currentActivity.app_name]" 
-                :src="appIcons[currentActivity.app_name]" 
+              <img
+                v-if="currentActivity?.app_name && appIcons[currentActivity.app_name]"
+                :src="appIcons[currentActivity.app_name]"
                 class="app-icon-img"
               />
               <div v-else class="app-icon-fallback">
-                {{ currentActivity?.app_name?.charAt(0) || '?' }}
+                {{ currentActivity?.app_name?.charAt(0) || "?" }}
               </div>
             </div>
-            
+
             <div class="active-info">
               <div class="status-row">
                 <span class="status-badge">
@@ -53,8 +48,8 @@
               </p>
             </div>
 
-            <!-- Exclude Button - next to active process -->
-            <button 
+            <!-- Exclude Button -->
+            <button
               class="exclude-btn hero-exclude"
               @click="showExcludeModal = true"
               :class="{ active: store.excludedProcesses.length > 0 }"
@@ -145,11 +140,11 @@
                 <span class="app-name">{{ app.app_name }}</span>
                 <div class="app-progress-row">
                   <div class="progress-track">
-                    <div 
-                      class="progress-fill" 
-                      :style="{ 
+                    <div
+                      class="progress-fill"
+                      :style="{
                         width: getProgressWidth(app.total_seconds) + '%',
-                        background: getProgressGradient(index)
+                        background: getProgressColor(index)
                       }"
                     ></div>
                   </div>
@@ -162,9 +157,11 @@
               </div>
             </div>
           </div>
-          
+
           <div v-else class="empty-state">
-            <div class="empty-icon">📊</div>
+            <div class="empty-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+            </div>
             <p>No activity recorded today</p>
             <span>Start using apps to see your stats</span>
           </div>
@@ -175,16 +172,16 @@
           <div class="card-header">
             <h3>{{ $t("dashboard.todaySummary") }}</h3>
             <div class="chart-tabs">
-              <button 
-                @click="selectedChartType = 'doughnut'" 
+              <button
+                @click="selectedChartType = 'doughnut'"
                 :class="{ active: selectedChartType === 'doughnut' }"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/>
                 </svg>
               </button>
-              <button 
-                @click="selectedChartType = 'bar'" 
+              <button
+                @click="selectedChartType = 'bar'"
                 :class="{ active: selectedChartType === 'bar' }"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -193,7 +190,7 @@
               </button>
             </div>
           </div>
-          
+
           <div class="chart-container">
             <div class="chart-wrapper" v-if="chartData.labels.length">
               <Doughnut
@@ -206,25 +203,27 @@
                 :data="barChartData"
                 :options="barOptions"
               />
-              
+
               <!-- Center Stats for Doughnut -->
               <div class="chart-center" v-if="selectedChartType === 'doughnut'">
                 <span class="center-value">{{ formatDuration(store.totalTimeToday) }}</span>
                 <span class="center-label">Total</span>
               </div>
             </div>
-            
+
             <div v-else class="empty-chart">
-              <div class="empty-icon">📈</div>
+              <div class="empty-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+              </div>
               <p>Not enough data</p>
             </div>
           </div>
-          
+
           <!-- Legend -->
           <div class="chart-legend" v-if="chartData.labels.length">
-            <div 
-              v-for="(label, i) in chartData.labels.slice(0, 5)" 
-              :key="label" 
+            <div
+              v-for="(label, i) in chartData.labels.slice(0, 5)"
+              :key="label"
               class="legend-item"
             >
               <span class="legend-dot" :style="{ background: chartColors[i] }"></span>
@@ -261,18 +260,22 @@ const selectedChartType = ref("doughnut");
 const appIcons = ref<Record<string, string>>({});
 const showExcludeModal = ref(false);
 
-// Modal component will be added later
-
-const currentDate = new Date().toLocaleDateString(undefined, { 
-  weekday: 'long', 
-  month: 'long', 
-  day: 'numeric' 
+const currentDate = new Date().toLocaleDateString(undefined, {
+  weekday: "long",
+  month: "long",
+  day: "numeric",
 });
 
 let intervalId: number | null = null;
 
 const chartColors = [
-  "#6366f1", "#06b6d4", "#8b5cf6", "#ec4899", "#f59e0b", "#10b981", "#f97316"
+  "#5b6ee1",
+  "#0ea5e9",
+  "#8b5cf6",
+  "#ec4899",
+  "#f59e0b",
+  "#10b981",
+  "#f97316",
 ];
 
 function formatDuration(seconds: number): string {
@@ -290,10 +293,10 @@ function getProgressWidth(seconds: number): number {
 }
 
 function getRankClass(index: number): string {
-  if (index === 0) return 'gold';
-  if (index === 1) return 'silver';
-  if (index === 2) return 'bronze';
-  return '';
+  if (index === 0) return "gold";
+  if (index === 1) return "silver";
+  if (index === 2) return "bronze";
+  return "";
 }
 
 function getAppColor(name: string): string {
@@ -305,49 +308,47 @@ function getAppColor(name: string): string {
   return `hsl(${h}, 60%, 50%)`;
 }
 
-function getProgressGradient(index: number): string {
-  const colors = [
-    'linear-gradient(90deg, #6366f1, #a855f7)',
-    'linear-gradient(90deg, #06b6d4, #22d3ee)',
-    'linear-gradient(90deg, #8b5cf6, #c084fc)',
-    'linear-gradient(90deg, #ec4899, #f472b6)',
-    'linear-gradient(90deg, #f59e0b, #fbbf24)',
-  ];
+function getProgressColor(index: number): string {
+  const colors = ["#5b6ee1", "#0ea5e9", "#8b5cf6", "#ec4899", "#f59e0b"];
   return colors[index % colors.length];
 }
 
 // Chart Data
 const chartData = computed(() => ({
-  labels: store.topApps.slice(0, 5).map(app => app.app_name),
-  datasets: [{
-    data: store.topApps.slice(0, 5).map(app => app.total_seconds),
-    backgroundColor: chartColors,
-    borderWidth: 0,
-    hoverOffset: 8,
-    borderRadius: 4
-  }]
+  labels: store.topApps.slice(0, 5).map((app) => app.app_name),
+  datasets: [
+    {
+      data: store.topApps.slice(0, 5).map((app) => app.total_seconds),
+      backgroundColor: chartColors,
+      borderWidth: 0,
+      hoverOffset: 8,
+      borderRadius: 4,
+    },
+  ],
 }));
 
 const barChartData = computed(() => ({
-  labels: store.topApps.slice(0, 5).map(app => app.app_name),
-  datasets: [{
-    data: store.topApps.slice(0, 5).map(app => Math.round(app.total_seconds / 60)),
-    backgroundColor: chartColors,
-    borderRadius: 8,
-    borderSkipped: false
-  }]
+  labels: store.topApps.slice(0, 5).map((app) => app.app_name),
+  datasets: [
+    {
+      data: store.topApps.slice(0, 5).map((app) => Math.round(app.total_seconds / 60)),
+      backgroundColor: chartColors,
+      borderRadius: 8,
+      borderSkipped: false,
+    },
+  ],
 }));
 
 const doughnutOptions = {
   responsive: true,
   maintainAspectRatio: false,
-  cutout: '70%',
+  cutout: "70%",
   plugins: {
     legend: { display: false },
     tooltip: {
-      backgroundColor: 'rgba(20,20,40,0.95)',
-      titleColor: '#fff',
-      bodyColor: '#94a3b8',
+      backgroundColor: "rgba(20,20,40,0.95)",
+      titleColor: "#fff",
+      bodyColor: "#94a3b8",
       padding: 12,
       cornerRadius: 8,
       displayColors: true,
@@ -355,38 +356,38 @@ const doughnutOptions = {
         label: (ctx: any) => {
           const seconds = ctx.raw;
           return ` ${formatDuration(seconds)}`;
-        }
-      }
-    }
-  }
+        },
+      },
+    },
+  },
 };
 
 const barOptions = {
   responsive: true,
   maintainAspectRatio: false,
-  plugins: { 
+  plugins: {
     legend: { display: false },
     tooltip: {
-      backgroundColor: 'rgba(20,20,40,0.95)',
-      titleColor: '#fff',
-      bodyColor: '#94a3b8',
+      backgroundColor: "rgba(20,20,40,0.95)",
+      titleColor: "#fff",
+      bodyColor: "#94a3b8",
       padding: 12,
       cornerRadius: 8,
       callbacks: {
-        label: (ctx: any) => ` ${ctx.raw} minutes`
-      }
-    }
+        label: (ctx: any) => ` ${ctx.raw} minutes`,
+      },
+    },
   },
   scales: {
-    x: { 
-      grid: { display: false, drawBorder: false }, 
-      ticks: { color: '#64748b', font: { size: 11 } }
+    x: {
+      grid: { display: false, drawBorder: false },
+      ticks: { color: "#64748b", font: { size: 11 } },
     },
-    y: { 
+    y: {
       display: false,
-      grid: { display: false }
-    }
-  }
+      grid: { display: false },
+    },
+  },
 };
 
 // Icons
@@ -405,7 +406,7 @@ async function refreshData() {
     loadIcon(store.currentActivity.app_name, store.currentActivity.exe_path);
   }
   await store.fetchTodayData();
-  store.topApps.forEach(app => loadIcon(app.app_name, app.exe_path));
+  store.topApps.forEach((app) => loadIcon(app.app_name, app.exe_path));
 }
 
 onMounted(async () => {
@@ -437,10 +438,7 @@ onUnmounted(() => {
   margin-bottom: 6px;
   font-size: 1.75rem;
   font-weight: 700;
-  background: linear-gradient(135deg, var(--text-main), var(--text-muted));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--text-main);
 }
 
 .subtitle {
@@ -455,9 +453,9 @@ onUnmounted(() => {
   justify-content: center;
   gap: 8px;
   padding: 12px;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 16px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
   color: var(--text-muted);
   cursor: pointer;
   transition: all 0.3s ease;
@@ -466,23 +464,17 @@ onUnmounted(() => {
 }
 
 .exclude-btn:hover {
-  background: rgba(239, 68, 68, 0.12);
-  border-color: rgba(239, 68, 68, 0.35);
-  color: #ef4444;
-  transform: scale(1.08);
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: var(--color-danger);
+  transform: scale(1.05);
 }
 
 .exclude-btn.active {
-  background: rgba(239, 68, 68, 0.15);
-  border-color: rgba(239, 68, 68, 0.4);
-  color: #ef4444;
-  box-shadow: 0 0 20px rgba(239, 68, 68, 0.2);
-  animation: excludePulse 3s ease-in-out infinite;
-}
-
-@keyframes excludePulse {
-  0%, 100% { box-shadow: 0 0 12px rgba(239, 68, 68, 0.15); }
-  50% { box-shadow: 0 0 24px rgba(239, 68, 68, 0.3); }
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.35);
+  color: var(--color-danger);
+  box-shadow: 0 0 16px rgba(239, 68, 68, 0.15);
 }
 
 .exclude-btn svg {
@@ -494,14 +486,14 @@ onUnmounted(() => {
   margin-left: auto;
   width: 48px;
   height: 48px;
-  border-radius: 14px;
+  border-radius: var(--radius-md);
 }
 
 .exclude-count {
   position: absolute;
   top: -6px;
   right: -6px;
-  background: linear-gradient(135deg, #ef4444, #dc2626);
+  background: var(--color-danger);
   color: #fff;
   font-size: 0.65rem;
   font-weight: 700;
@@ -509,7 +501,7 @@ onUnmounted(() => {
   border-radius: 10px;
   min-width: 18px;
   text-align: center;
-  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.5);
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
 }
 
 .tracking-pill {
@@ -517,21 +509,20 @@ onUnmounted(() => {
   align-items: center;
   gap: 10px;
   padding: 10px 18px;
-  background: rgba(255,255,255,0.03);
+  background: var(--bg-tertiary);
   border-radius: 24px;
   font-size: 0.9rem;
   font-weight: 600;
   color: var(--text-muted);
-  border: 1px solid rgba(255,255,255,0.08);
-  backdrop-filter: blur(8px);
+  border: 1px solid var(--border-color);
   transition: all 0.3s ease;
 }
 
 .tracking-pill.active {
-  background: rgba(16,185,129,0.12);
-  color: #10b981;
-  border-color: rgba(16,185,129,0.3);
-  box-shadow: 0 0 20px rgba(16,185,129,0.15);
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--color-success);
+  border-color: rgba(16, 185, 129, 0.3);
+  box-shadow: 0 0 16px rgba(16, 185, 129, 0.1);
 }
 
 .tracking-dot {
@@ -543,8 +534,8 @@ onUnmounted(() => {
 }
 
 .tracking-pill.active .tracking-dot {
-  background: #10b981;
-  box-shadow: 0 0 12px #10b981, 0 0 24px rgba(16,185,129,0.4);
+  background: var(--color-success);
+  box-shadow: 0 0 12px var(--color-success);
   animation: pulse-dot 2s infinite;
 }
 
@@ -556,44 +547,19 @@ onUnmounted(() => {
 /* Hero Card */
 .hero-card {
   position: relative;
-  border-radius: 28px;
+  border-radius: var(--radius-2xl);
   padding: 40px;
   margin-bottom: 28px;
   overflow: hidden;
-  background: linear-gradient(135deg, rgba(99,102,241,0.18), rgba(139,92,246,0.12), rgba(6,182,212,0.08));
-  border: 1px solid rgba(255,255,255,0.12);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.1);
-  backdrop-filter: blur(20px);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-md);
+  transition: var(--transition-base);
 }
 
-.hero-bg {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-}
-
-.hero-gradient {
-  position: absolute;
-  width: 400px;
-  height: 400px;
-  background: radial-gradient(circle, rgba(99,102,241,0.5), transparent 70%);
-  top: -150px;
-  right: -100px;
-  filter: blur(60px);
-  animation: float 8s ease-in-out infinite;
-}
-
-@keyframes float {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  50% { transform: translate(-20px, 20px) scale(1.05); }
-}
-
-.hero-pattern {
-  position: absolute;
-  inset: 0;
-  background-image: radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px);
-  background-size: 32px 32px;
-  opacity: 0.5;
+.hero-card:hover {
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-glow);
 }
 
 .hero-content {
@@ -610,15 +576,14 @@ onUnmounted(() => {
 .active-icon-box {
   width: 96px;
   height: 96px;
-  background: linear-gradient(135deg, rgba(255,255,255,0.12), rgba(255,255,255,0.06));
-  border-radius: 24px;
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-xl);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  box-shadow: 0 12px 40px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.2);
-  border: 1px solid rgba(255,255,255,0.15);
-  backdrop-filter: blur(10px);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border-color);
   transition: transform 0.3s ease;
 }
 
@@ -630,16 +595,12 @@ onUnmounted(() => {
   width: 64px;
   height: 64px;
   object-fit: contain;
-  filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3));
 }
 
 .app-icon-fallback {
   font-size: 2.5rem;
   font-weight: 800;
-  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--color-primary);
 }
 
 .active-info {
@@ -663,18 +624,18 @@ onUnmounted(() => {
   color: var(--color-success);
   text-transform: uppercase;
   letter-spacing: 1px;
-  background: rgba(16,185,129,0.1);
+  background: rgba(16, 185, 129, 0.1);
   padding: 6px 14px;
   border-radius: 16px;
-  border: 1px solid rgba(16,185,129,0.2);
+  border: 1px solid rgba(16, 185, 129, 0.2);
 }
 
 .status-pulse {
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: #10b981;
-  box-shadow: 0 0 12px #10b981, 0 0 24px rgba(16,185,129,0.4);
+  background: var(--color-success);
+  box-shadow: 0 0 12px var(--color-success);
   animation: pulse 2s infinite;
 }
 
@@ -683,22 +644,13 @@ onUnmounted(() => {
   50% { opacity: 0.6; transform: scale(1.15); }
 }
 
-.session-timer {
-  font-family: 'Consolas', monospace;
-  font-size: 0.95rem;
-  color: var(--text-muted);
-  background: rgba(255,255,255,0.06);
-  padding: 6px 14px;
-  border-radius: 10px;
-  border: 1px solid rgba(255,255,255,0.08);
-}
-
 .active-app {
   font-size: 2.2rem;
   font-weight: 800;
   margin-bottom: 6px;
   line-height: 1.2;
   letter-spacing: -0.5px;
+  color: var(--text-main);
 }
 
 .active-window {
@@ -723,42 +675,25 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   gap: 18px;
-  background: linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 22px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
   padding: 24px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: var(--transition-base);
   position: relative;
   overflow: hidden;
 }
 
-.stat-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(135deg, rgba(255,255,255,0.06), transparent);
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.stat-card:hover::before {
-  opacity: 1;
-}
-
 .stat-card:hover {
-  background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
-  border-color: rgba(255,255,255,0.15);
+  border-color: var(--color-primary);
   transform: translateY(-4px);
-  box-shadow: 0 12px 40px rgba(0,0,0,0.25), 0 0 20px rgba(99,102,241,0.1);
+  box-shadow: var(--shadow-lg);
 }
 
 .stat-icon-box {
   width: 58px;
   height: 58px;
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -773,21 +708,18 @@ onUnmounted(() => {
 }
 
 .stat-icon-box.primary {
-  background: linear-gradient(135deg, rgba(99,102,241,0.2), rgba(99,102,241,0.1));
-  color: #6366f1;
-  box-shadow: 0 4px 16px rgba(99,102,241,0.2);
+  background: rgba(91, 110, 225, 0.1);
+  color: var(--color-primary);
 }
 
 .stat-icon-box.accent {
-  background: linear-gradient(135deg, rgba(6,182,212,0.2), rgba(6,182,212,0.1));
-  color: #06b6d4;
-  box-shadow: 0 4px 16px rgba(6,182,212,0.2);
+  background: rgba(14, 165, 233, 0.1);
+  color: var(--color-secondary);
 }
 
 .stat-icon-box.success {
-  background: linear-gradient(135deg, rgba(16,185,129,0.2), rgba(16,185,129,0.1));
-  color: #10b981;
-  box-shadow: 0 4px 16px rgba(16,185,129,0.2);
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--color-success);
 }
 
 .stat-content {
@@ -814,10 +746,7 @@ onUnmounted(() => {
   font-size: 1.8rem;
   font-weight: 800;
   letter-spacing: -0.5px;
-  background: linear-gradient(135deg, var(--text-main), var(--text-muted));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--text-main);
 }
 
 /* Main Grid */
@@ -828,34 +757,18 @@ onUnmounted(() => {
 }
 
 .grid-card {
-  background: linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 24px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-2xl);
   padding: 28px;
-  transition: all 0.3s ease;
+  transition: var(--transition-base);
   position: relative;
   overflow: hidden;
 }
 
-.grid-card::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle, rgba(255,255,255,0.03), transparent 70%);
-  opacity: 0;
-  transition: opacity 0.5s ease;
-}
-
-.grid-card:hover::before {
-  opacity: 1;
-}
-
 .grid-card:hover {
-  border-color: rgba(255,255,255,0.18);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.2), 0 0 20px rgba(99,102,241,0.08);
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-glow);
 }
 
 .card-header {
@@ -871,16 +784,17 @@ onUnmounted(() => {
   font-size: 1.1rem;
   font-weight: 700;
   letter-spacing: -0.3px;
+  color: var(--text-main);
 }
 
 .header-badge {
   font-size: 0.8rem;
   font-weight: 600;
   color: var(--text-muted);
-  background: rgba(255,255,255,0.06);
+  background: var(--bg-tertiary);
   padding: 6px 12px;
-  border-radius: 10px;
-  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
 }
 
 /* App List */
@@ -897,22 +811,22 @@ onUnmounted(() => {
   align-items: center;
   gap: 16px;
   padding: 16px;
-  background: linear-gradient(135deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
-  border-radius: 16px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 1px solid rgba(255,255,255,0.05);
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-lg);
+  transition: var(--transition-base);
+  border: 1px solid var(--border-color);
   position: relative;
   overflow: hidden;
 }
 
 .app-row::before {
-  content: '';
+  content: "";
   position: absolute;
   left: 0;
   top: 0;
   bottom: 0;
   width: 3px;
-  background: linear-gradient(180deg, var(--color-primary), var(--color-accent));
+  background: var(--color-primary);
   opacity: 0;
   transition: opacity 0.3s ease;
 }
@@ -922,10 +836,10 @@ onUnmounted(() => {
 }
 
 .app-row:hover {
-  background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
-  border-color: rgba(255,255,255,0.12);
+  background: var(--bg-hover);
+  border-color: var(--color-primary);
   transform: translateX(4px);
-  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  box-shadow: var(--shadow-md);
 }
 
 .app-rank {
@@ -934,58 +848,56 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   font-weight: 700;
   font-size: 0.9rem;
-  background: rgba(255,255,255,0.06);
+  background: var(--bg-hover);
   color: var(--text-muted);
-  transition: all 0.3s ease;
+  transition: var(--transition-base);
 }
 
 .app-row:hover .app-rank {
-  background: rgba(255,255,255,0.1);
+  background: var(--bg-active);
   color: var(--text-main);
 }
 
-.app-rank.gold { 
-  background: linear-gradient(135deg, rgba(251,191,36,0.25), rgba(245,158,11,0.15)); 
-  color: #fbbf24;
-  box-shadow: 0 2px 8px rgba(251,191,36,0.3);
-}
-.app-rank.silver { 
-  background: linear-gradient(135deg, rgba(148,163,184,0.25), rgba(100,116,139,0.15)); 
-  color: #94a3b8;
-  box-shadow: 0 2px 8px rgba(148,163,184,0.3);
-}
-.app-rank.bronze { 
-  background: linear-gradient(135deg, rgba(180,83,9,0.25), rgba(245,158,11,0.15)); 
+.app-rank.gold {
+  background: rgba(245, 158, 11, 0.15);
   color: #f59e0b;
-  box-shadow: 0 2px 8px rgba(245,158,11,0.3);
+}
+
+.app-rank.silver {
+  background: rgba(148, 163, 184, 0.15);
+  color: #94a3b8;
+}
+
+.app-rank.bronze {
+  background: rgba(180, 83, 9, 0.15);
+  color: #f59e0b;
 }
 
 .app-icon-small {
   width: 44px;
   height: 44px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
+  border-radius: var(--radius-md);
+  background: var(--bg-tertiary);
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  border: 1px solid rgba(255,255,255,0.1);
-  transition: all 0.3s ease;
+  border: 1px solid var(--border-color);
+  transition: var(--transition-base);
 }
 
 .app-row:hover .app-icon-small {
   transform: scale(1.08);
-  border-color: rgba(255,255,255,0.18);
+  border-color: var(--color-primary);
 }
 
 .app-icon-small img {
   width: 32px;
   height: 32px;
   object-fit: contain;
-  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.3));
 }
 
 .app-icon-small span {
@@ -1013,6 +925,7 @@ onUnmounted(() => {
   overflow: hidden;
   text-overflow: ellipsis;
   letter-spacing: -0.3px;
+  color: var(--text-main);
 }
 
 .app-progress-row {
@@ -1024,17 +937,15 @@ onUnmounted(() => {
 .progress-track {
   flex: 1;
   height: 8px;
-  background: rgba(255,255,255,0.06);
+  background: var(--bg-hover);
   border-radius: 4px;
   overflow: hidden;
-  border: 1px solid rgba(255,255,255,0.04);
 }
 
 .progress-fill {
   height: 100%;
   border-radius: 4px;
   transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 0 10px currentColor;
 }
 
 .app-percent {
@@ -1055,6 +966,7 @@ onUnmounted(() => {
   font-weight: 700;
   font-size: 1rem;
   letter-spacing: -0.3px;
+  color: var(--text-main);
 }
 
 .time-sessions {
@@ -1074,7 +986,6 @@ onUnmounted(() => {
   font-size: 4rem;
   margin-bottom: 20px;
   opacity: 0.4;
-  filter: grayscale(0.5);
 }
 
 .empty-state p {
@@ -1092,20 +1003,20 @@ onUnmounted(() => {
 .chart-tabs {
   display: flex;
   gap: 6px;
-  background: rgba(255,255,255,0.04);
+  background: var(--bg-tertiary);
   padding: 5px;
-  border-radius: 12px;
-  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
 }
 
 .chart-tabs button {
   padding: 10px 14px;
   background: transparent;
   border: none;
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
   color: var(--text-muted);
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: var(--transition-fast);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1114,13 +1025,12 @@ onUnmounted(() => {
 
 .chart-tabs button:hover {
   color: var(--text-main);
-  background: rgba(255,255,255,0.06);
+  background: var(--bg-hover);
 }
 
 .chart-tabs button.active {
-  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+  background: var(--color-primary);
   color: #fff;
-  box-shadow: 0 4px 12px rgba(99,102,241,0.3);
 }
 
 .chart-container {
@@ -1147,10 +1057,7 @@ onUnmounted(() => {
   display: block;
   font-size: 1.6rem;
   font-weight: 800;
-  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--color-primary);
   letter-spacing: -0.5px;
 }
 
@@ -1183,7 +1090,7 @@ onUnmounted(() => {
   gap: 14px;
   justify-content: center;
   padding-top: 16px;
-  border-top: 1px solid rgba(255,255,255,0.06);
+  border-top: 1px solid var(--border-color);
 }
 
 .legend-item {
@@ -1194,13 +1101,13 @@ onUnmounted(() => {
   color: var(--text-muted);
   font-weight: 500;
   padding: 6px 12px;
-  border-radius: 10px;
-  background: rgba(255,255,255,0.03);
-  transition: all 0.2s ease;
+  border-radius: var(--radius-md);
+  background: var(--bg-tertiary);
+  transition: var(--transition-fast);
 }
 
 .legend-item:hover {
-  background: rgba(255,255,255,0.06);
+  background: var(--bg-hover);
   color: var(--text-main);
 }
 
@@ -1208,7 +1115,6 @@ onUnmounted(() => {
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  box-shadow: 0 0 8px currentColor;
 }
 
 .legend-label {

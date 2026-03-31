@@ -172,7 +172,9 @@
     "cancel": "Annuler la concentration",
     "message": "Toutes les autres applications seront réduites",
     "wrongPassword": "Mot de passe incorrect",
-    "focusedApp": "Application en cours de concentration"
+    "focusedApp": "Application en cours de concentration",
+    "strictMode": "Mode Strict",
+    "strictHint": "Le mode strict bloque : changer d'application, fermer les fenêtres, arrêt/redémarrage. Vous NE POUVEZ PAS quitter sans mot de passe !"
   },
   "timeout": {
     "title": "Time OUT",
@@ -184,7 +186,9 @@
     "breakTitle": "C'est l'heure de se détendre !",
     "breakMessage": "Faites une pause, buvez du thé, étirez-vous !",
     "nextBreak": "Prochaine pause dans",
-    "working": "En cours de travail"
+    "working": "En cours de travail",
+    "strictMode": "Mode Strict",
+    "strictHint": "Le mode strict bloque : fermer l'application, changer de fenêtre, arrêt/redémarrage. Vous NE POUVEZ PAS quitter sans mot de passe !"
   },
   "common": {
     "loading": "Chargement...",
@@ -200,7 +204,10 @@
     "minutes": "Minutes",
     "seconds": "Secondes",
     "generating": "Génération...",
-    "connecting": "Connexion..."
+    "connecting": "Connexion...",
+    "done": "Terminé",
+    "on": "ACTIVÉ",
+    "off": "DÉSACTIVÉ"
   },
   "sync": {
     "title": "Synchronisation téléphone",

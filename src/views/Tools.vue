@@ -13,6 +13,7 @@
           :key="tab.id"
           class="tab-btn"
           :class="{ active: activeTab === tab.id }"
+          :data-tab="tab.id"
           @click="activeTab = tab.id"
         >
           <span class="tab-icon" v-html="tab.icon"></span>
@@ -207,8 +208,13 @@
                 <!-- Apps Panel -->
                 <div v-if="showAppsPanel && recentApps.length > 0" class="apps-panel">
                   <div class="apps-header">
-                    <span>📊 Recent Tracked Apps</span>
-                    <button class="btn-close-panel" @click="showAppsPanel = false">✕</button>
+                    <span>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                      Recent Tracked Apps
+                    </span>
+                    <button class="btn-close-panel" @click="showAppsPanel = false">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
                   </div>
                   <div class="apps-grid">
                     <button
@@ -236,7 +242,7 @@
 
               <div v-else class="empty-editor">
                 <div class="empty-state-content">
-                  <span class="select-icon">👈</span>
+                  <span class="select-icon" v-html="Icons.chevronLeft"></span>
                   <p>Select a note to view or create a new one</p>
                 </div>
               </div>
@@ -255,6 +261,7 @@ import ShutdownTimer from "../components/ShutdownTimer.vue";
 import TasksWidget from "../components/TasksWidget.vue";
 import FocusMode from "../components/FocusMode.vue";
 import TimeOut from "../components/TimeOut.vue";
+import { Icons } from "../components/icons/IconMap";
 import { useDebounceFn } from "@vueuse/core";
 
 const activeTab = ref("timeout");
@@ -367,7 +374,7 @@ function getAppColor(appName: string): string {
     hash = appName.charCodeAt(i) + ((hash << 5) - hash);
   }
   const h = Math.abs(hash) % 360;
-  return `linear-gradient(135deg, hsl(${h}, 60%, 45%), hsl(${h}, 60%, 35%))`;
+  return `hsl(${h}, 60%, 45%)`;
 }
 
 function formatAppTime(seconds: number): string {
@@ -484,11 +491,7 @@ onMounted(async () => {
 }
 
 .timer-card {
-  background: linear-gradient(
-    145deg,
-    rgba(239, 68, 68, 0.05),
-    rgba(255, 255, 255, 0.02)
-  );
+  background: rgba(239, 68, 68, 0.03);
   border-color: rgba(239, 68, 68, 0.1);
 }
 
@@ -551,11 +554,7 @@ onMounted(async () => {
 }
 
 .focus-card {
-  background: linear-gradient(
-    145deg,
-    rgba(139, 92, 246, 0.05),
-    rgba(255, 255, 255, 0.02)
-  );
+  background: rgba(139, 92, 246, 0.03);
   border-color: rgba(139, 92, 246, 0.1);
 }
 .focus-card:hover {
@@ -563,11 +562,7 @@ onMounted(async () => {
 }
 
 .timeout-card {
-  background: linear-gradient(
-    145deg,
-    rgba(20, 184, 166, 0.05),
-    rgba(255, 255, 255, 0.02)
-  );
+  background: rgba(20, 184, 166, 0.03);
   border-color: rgba(20, 184, 166, 0.1);
 }
 .timeout-card:hover {
@@ -583,7 +578,7 @@ onMounted(async () => {
 /* Notepad Specifics */
 .notepad-card {
   min-height: 550px;
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+  background: rgba(245, 158, 11, 0.03);
   border-color: rgba(245, 158, 11, 0.1);
 }
 
@@ -625,7 +620,7 @@ onMounted(async () => {
 }
 
 .note-item.active {
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(245, 158, 11, 0.1) 100%);
+  background: rgba(245, 158, 11, 0.15);
   border-color: rgba(245, 158, 11, 0.3);
 }
 
@@ -728,7 +723,7 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   gap: 6px;
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(59, 130, 246, 0.1) 100%);
+  background: rgba(59, 130, 246, 0.15);
   border: 1px solid rgba(59, 130, 246, 0.3);
   padding: 8px 14px;
   border-radius: 10px;
@@ -740,7 +735,7 @@ onMounted(async () => {
 }
 
 .btn-insert-apps:hover {
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.3) 0%, rgba(59, 130, 246, 0.15) 100%);
+  background: rgba(59, 130, 246, 0.22);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
 }
@@ -857,7 +852,7 @@ onMounted(async () => {
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 100%);
+  background: rgba(255,255,255,0.05);
   opacity: 0;
   transition: opacity 0.2s;
 }
@@ -924,7 +919,7 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: linear-gradient(135deg, #f59e0b, #d97706);
+  background: #f59e0b;
   color: white;
   border: none;
   padding: 10px 20px;

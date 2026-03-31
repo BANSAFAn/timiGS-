@@ -174,7 +174,9 @@
     "cancel": "Fokus abbrechen",
     "message": "Alle anderen Apps werden minimiert",
     "wrongPassword": "Falsches Passwort",
-    "focusedApp": "Fokussierte Anwendung"
+    "focusedApp": "Fokussierte Anwendung",
+    "strictMode": "Strenger Modus",
+    "strictHint": "Strenger Modus blockiert: Apps wechseln, Fenster schließen, Herunterfahren/Neustart. Sie können OHNE Passwort NICHT vorzeitig beenden!"
   },
   "timeout": {
     "title": "Time OUT",
@@ -186,7 +188,9 @@
     "breakTitle": "Zeit zum Entspannen!",
     "breakMessage": "Mach eine Pause, trink einen Tee, dehn dich!",
     "nextBreak": "Nächste Pause in",
-    "working": "Arbeiten"
+    "working": "Arbeiten",
+    "strictMode": "Strenger Modus",
+    "strictHint": "Strenger Modus blockiert: App schließen, Fenster wechseln, Herunterfahren/Neustart. Sie können OHNE Passwort NICHT vorzeitig beenden!"
   },
   "common": {
     "loading": "Wird geladen...",
@@ -202,7 +206,10 @@
     "minutes": "Minuten",
     "seconds": "Sekunden",
     "generating": "Wird generiert...",
-    "connecting": "Verbinden..."
+    "connecting": "Verbinden...",
+    "done": "Fertig",
+    "on": "AN",
+    "off": "AUS"
   },
   "sync": {
     "title": "Telefon-Synchronisierung",

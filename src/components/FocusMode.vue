@@ -75,6 +75,8 @@
         <p class="hint">You'll need this password to cancel focus mode early</p>
       </div>
 
+
+
       <button @click="startFocus" class="btn-start" :disabled="!canStart">
         Start Focus Mode
       </button>
@@ -640,7 +642,7 @@ onUnmounted(() => {
 }
 
 .btn-start {
-  background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+  background: #8b5cf6;
   color: white;
   border: none;
   padding: 14px;
@@ -659,6 +661,8 @@ onUnmounted(() => {
   opacity: 0.4;
   cursor: not-allowed;
 }
+
+
 
 /* Active State */
 .focus-active {
@@ -960,7 +964,7 @@ circle {
 .control-btn.play-btn {
   width: 52px;
   height: 52px;
-  background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+  background: #8b5cf6;
   border: none;
 }
 

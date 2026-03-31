@@ -543,6 +543,16 @@ pub fn export_data_html_cmd(path: String) -> Result<(), String> {
 }
 
 #[command]
+pub fn export_data_json_cmd(path: String) -> Result<(), String> {
+    crate::db::export_sessions_json(&path).map_err(|e| e.to_string())
+}
+
+#[command]
+pub fn export_data_markdown_cmd(path: String) -> Result<(), String> {
+    crate::db::export_sessions_markdown(&path).map_err(|e| e.to_string())
+}
+
+#[command]
 pub fn save_auto_export_settings_cmd(
     enabled: bool,
     interval_hours: i64,

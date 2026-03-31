@@ -439,7 +439,7 @@ onUnmounted(() => {
     font-size: 1.25rem;
     font-weight: 700;
     color: var(--text-primary);
-    background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
+    background: #60a5fa;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -514,7 +514,7 @@ onUnmounted(() => {
 }
 
 .task-card {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+  background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 16px;
   padding: 16px;
@@ -530,20 +530,20 @@ onUnmounted(() => {
   top: 0;
   bottom: 0;
   width: 4px;
-  background: linear-gradient(180deg, #60a5fa 0%, #3b82f6 100%);
+  background: #3b82f6;
   opacity: 0;
   transition: opacity 0.3s ease;
 }
 
 .task-card.completed::before {
-  background: linear-gradient(180deg, #4ade80 0%, #22c55e 100%);
+  background: #22c55e;
 }
 
 .task-card:hover {
     border-color: rgba(96, 165, 250, 0.3);
     transform: translateX(4px);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%);
+    background: rgba(255, 255, 255, 0.05);
 }
 
 .task-card:hover::before {
@@ -577,7 +577,7 @@ onUnmounted(() => {
 
 .filter-tag {
     font-size: 0.65rem;
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(59, 130, 246, 0.1) 100%);
+    background: rgba(59, 130, 246, 0.15);
     color: #60a5fa;
     padding: 2px 8px;
     border-radius: 6px;
@@ -618,13 +618,13 @@ onUnmounted(() => {
 }
 
 .status-badge.active {
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(59, 130, 246, 0.1) 100%);
+  background: rgba(59, 130, 246, 0.15);
   color: #60a5fa;
   border: 1px solid rgba(59, 130, 246, 0.3);
 }
 
 .status-badge.completed {
-  background: linear-gradient(135deg, rgba(34, 197, 94, 0.2) 0%, rgba(34, 197, 94, 0.1) 100%);
+  background: rgba(34, 197, 94, 0.15);
   color: #4ade80;
   border: 1px solid rgba(34, 197, 94, 0.3);
 }
@@ -679,7 +679,7 @@ onUnmounted(() => {
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #60a5fa 0%, #3b82f6 50%, #2563eb 100%);
+  background: #3b82f6;
   border-radius: 4px;
   transition: width 0.5s ease;
   position: relative;
@@ -693,12 +693,7 @@ onUnmounted(() => {
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.4) 50%,
-    transparent 100%
-  );
+  background: rgba(255, 255, 255, 0.2);
   animation: shimmer 2s ease-in-out infinite;
 }
 
@@ -731,7 +726,7 @@ onUnmounted(() => {
 }
 
 .completion-info span {
-  background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(34, 197, 94, 0.05) 100%);
+  background: rgba(34, 197, 94, 0.08);
   padding: 4px 10px;
   border-radius: 8px;
   color: #4ade80;
@@ -745,7 +740,7 @@ onUnmounted(() => {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+  background: #3b82f6;
   color: white;
   border: none;
   padding: 12px 20px;
@@ -767,7 +762,7 @@ onUnmounted(() => {
 }
 
 .btn-primary:hover {
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  background: #2563eb;
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
 }
@@ -803,7 +798,7 @@ onUnmounted(() => {
 }
 
 .add-form {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+  background: rgba(255, 255, 255, 0.03);
   padding: 16px;
   border-radius: 16px;
   border: 1px solid rgba(255, 255, 255, 0.1);

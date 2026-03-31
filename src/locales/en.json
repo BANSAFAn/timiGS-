@@ -5,15 +5,23 @@
   },
   "nav": {
     "dashboard": "Dashboard",
+    "dashboardShort": "Home",
     "timeline": "Timeline",
+    "timelineShort": "History",
     "analytics": "Analytics",
+    "analyticsShort": "Stats",
     "tools": "Tools",
+    "toolsShort": "Tools",
     "settings": "Settings",
+    "settingsShort": "Settings",
     "compare": "Teams",
     "sync": "Sync",
     "weather": "Weather",
-    "transfer": "Transfer"
+    "weatherShort": "Weather",
+    "transfer": "Transfer",
+    "transferShort": "Send"
   },
+
   "dashboard": {
     "title": "Dashboard",
     "activeNow": "Active Now",
@@ -123,9 +131,19 @@
     "exportSuccess": "Data exported successfully!",
     "exportError": "Failed to export data",
     "exporting": "Exporting...",
-    "resetting": "Resetting..."
+    "resetting": "Resetting...",
+    "doctorModeTitle": "Doctor Mode",
+    "doctorModeSubtitle": "Health & Wellness",
+    "enableDoctorMode": "Enable Doctor Mode",
+    "doctorModeDesc": "Reminds you to take breaks when you spend too much time at the computer.",
+    "timeLimit": "Time Limit (minutes)",
+    "timeLimitDesc": "How long before triggering a break reminder",
+    "resetSession": "Reset Active Session",
+    "doctorModeAlertMessage": "You've been at your PC for a long time. Please take a break, go for a walk, or rest your eyes for an hour!",
+    "doctorModeRepeatMessage": "You are still ignoring your break. Give your eyes a rest!"
   },
   "tools": {
+    "title": "Tools",
     "timer": "Shutdown Timer",
     "shutdownTimer": {
       "title": "PC Shutdown Timer",
@@ -184,19 +202,35 @@
     "cancel": "Cancel Focus",
     "message": "All other apps will be minimized",
     "wrongPassword": "Wrong password",
-    "focusedApp": "Focused Application"
+    "focusedApp": "Focused Application",
+    "strictMode": "Strict Mode",
+    "strictHint": "Strict Mode blocks: switching apps, closing windows, shutdown/restart. You CANNOT exit early without password!"
   },
   "timeout": {
     "title": "Time OUT",
     "workInterval": "Work Interval",
+    "workIntervalDesc": "How long to work before a break",
     "breakDuration": "Break Duration",
+    "breakDurationDesc": "How long each break lasts",
+    "backgroundMusic": "Background Music",
+    "musicDesc": "Optional music during breaks",
     "password": "Lock Password",
+    "passwordDesc": "Required to cancel early",
+    "passwordPlaceholder": "Enter password...",
+    "strictMode": "Strict Mode",
+    "strictModeDesc": "Maximum restriction mode",
     "start": "Activate Time OUT",
+    "schedule": "Schedule Time OUT",
     "cancel": "Cancel Time OUT",
     "breakTitle": "Time to relax!",
     "breakMessage": "Take a break, drink some tea, stretch!",
     "nextBreak": "Next break in",
-    "working": "Working"
+    "working": "Working",
+    "strictHint": "Strict Mode blocks: closing app, switching windows, shutdown/restart. You CANNOT exit early without password!",
+    "openFolder": "Open Folder",
+    "addTrack": "Add Track",
+    "noMusic": "No music files found",
+    "playMusicBreak": "Play music during break"
   },
   "common": {
     "loading": "Loading...",
@@ -211,9 +245,14 @@
     "hours": "Hours",
     "minutes": "Minutes",
     "seconds": "Seconds",
+    "day": "Day",
+    "week": "Week",
+    "month": "Month",
     "generating": "Generating...",
     "connecting": "Connecting...",
-    "done": "Done"
+    "done": "Done",
+    "on": "ON",
+    "off": "OFF"
   },
   "excludeProcesses": {
     "title": "Manage Process Tracking",

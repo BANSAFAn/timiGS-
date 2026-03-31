@@ -284,7 +284,7 @@ onMounted(async () => {
 }
 
 .modal-container {
-  background: linear-gradient(160deg, rgba(25, 25, 45, 0.98), rgba(15, 15, 30, 0.99));
+  background: rgba(25, 25, 45, 0.98);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 24px;
   width: 95%;
@@ -318,7 +318,7 @@ onMounted(async () => {
   width: 42px;
   height: 42px;
   border-radius: 14px;
-  background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(239, 68, 68, 0.08));
+  background: rgba(239, 68, 68, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -385,7 +385,7 @@ onMounted(async () => {
 }
 
 .tab-btn.active {
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.18), rgba(99, 102, 241, 0.08));
+  background: rgba(99, 102, 241, 0.18);
   border-color: rgba(99, 102, 241, 0.3);
   color: #a5b4fc;
   box-shadow: 0 2px 12px rgba(99, 102, 241, 0.15);
@@ -488,21 +488,21 @@ onMounted(async () => {
   align-items: center;
   gap: 14px;
   padding: 14px 16px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01));
+  background: rgba(255, 255, 255, 0.02);
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 16px;
   transition: all 0.25s ease;
 }
 
 .process-item:hover {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.03));
+  background: rgba(255, 255, 255, 0.04);
   border-color: rgba(255, 255, 255, 0.12);
   transform: translateX(4px);
 }
 
 .process-item.excluded {
   border-color: rgba(239, 68, 68, 0.15);
-  background: linear-gradient(135deg, rgba(239, 68, 68, 0.05), rgba(239, 68, 68, 0.02));
+  background: rgba(239, 68, 68, 0.05);
 }
 
 .process-item.excluded:hover {

@@ -156,7 +156,7 @@ document.addEventListener("keydown", (e) => {
 .brand {
   font-weight: 700;
   font-size: 0.95rem;
-  background: linear-gradient(135deg, #a78bfa, #818cf8);
+  background: #a78bfa;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

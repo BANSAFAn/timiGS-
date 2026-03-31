@@ -172,7 +172,9 @@
     "cancel": "取消专注",
     "message": "所有其他应用将被最小化",
     "wrongPassword": "密码错误",
-    "focusedApp": "专注的应用"
+    "focusedApp": "专注的应用",
+    "strictMode": "严格模式",
+    "strictHint": "严格模式阻止：切换应用、关闭窗口、关机/重启。没有密码您无法提前退出！"
   },
   "timeout": {
     "title": "休息时间",
@@ -184,7 +186,9 @@
     "breakTitle": "该休息了！",
     "breakMessage": "休息一下，喝杯茶，伸展一下！",
     "nextBreak": "下次休息在",
-    "working": "工作中"
+    "working": "工作中",
+    "strictMode": "严格模式",
+    "strictHint": "严格模式阻止：关闭应用、切换窗口、关机/重启。没有密码您无法提前退出！"
   },
   "common": {
     "loading": "加载中...",
@@ -200,7 +204,10 @@
     "minutes": "分钟",
     "seconds": "秒",
     "generating": "生成中...",
-    "connecting": "连接中..."
+    "connecting": "连接中...",
+    "done": "完成",
+    "on": "开启",
+    "off": "关闭"
   },
   "sync": {
     "title": "手机同步",

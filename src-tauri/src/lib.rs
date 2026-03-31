@@ -210,6 +210,8 @@ pub fn run() {
             commands::reset_all_data_cmd,
             commands::export_data_csv_cmd,
             commands::export_data_html_cmd,
+            commands::export_data_json_cmd,
+            commands::export_data_markdown_cmd,
             commands::save_auto_export_settings_cmd,
             commands::get_auto_export_settings_cmd,
             // Music

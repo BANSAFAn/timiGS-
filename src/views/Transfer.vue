@@ -10,12 +10,34 @@
         <div class="header-right">
           <!-- Mode Toggle -->
           <div class="mode-toggle">
-            <button class="mode-btn" :class="{ active: transferMode === 'token' }" @click="transferMode = 'token'">🔑 Token</button>
-            <button class="mode-btn" :class="{ active: transferMode === 'ip' }" @click="switchToIpMode">🌐 IP</button>
+            <button class="mode-btn" :class="{ active: transferMode === 'token' }" @click="transferMode = 'token'">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              Token
+            </button>
+            <button class="mode-btn" :class="{ active: transferMode === 'ip' }" @click="switchToIpMode">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+              IP
+            </button>
           </div>
           <div class="connection-indicator" :class="{ connected: transferMode === 'token' ? isConnected : ipServerRunning }">
             <span class="indicator-dot"></span>
             <span>{{ (transferMode === 'token' ? isConnected : ipServerRunning) ? 'Online' : 'Offline' }}</span>
+          </div>
+        </div>
+        
+        <!-- Network Mode Info Alert -->
+        <div class="mode-info-alert" v-if="transferMode === 'token'">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          <div>
+            <strong>Token mode requires internet connection</strong>
+            <p>For local network transfer without internet, use IP mode instead.</p>
+          </div>
+        </div>
+        <div class="mode-info-alert ip-mode" v-else-if="transferMode === 'ip'">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          <div>
+            <strong>Local Network Mode</strong>
+            <p>Both devices must be on the same Wi-Fi network. No internet required.</p>
           </div>
         </div>
       </div>
@@ -55,7 +77,7 @@
             <template v-if="transferMode === 'ip'">
               <div class="section-card">
                 <div class="card-header">
-                  <span class="card-icon">🌐</span>
+                  <span class="card-icon" v-html="Icons.globe"></span>
                   <h3>Send via IP</h3>
                 </div>
                 <p class="ip-hint">Enter the target device's IP (shown on their Receive tab). Both devices must be on the same Wi-Fi network.</p>
@@ -90,7 +112,7 @@
                 </div>
 
                 <button class="btn-send" @click="sendViaIp" :disabled="!selectedFile || !targetIp || ipTransferring" v-if="selectedFile" style="margin-top: 20px;">
-                  📤 {{ ipTransferring ? 'Sending...' : 'Send File' }}
+                  <span v-html="Icons.transfer"></span> {{ ipTransferring ? 'Sending...' : 'Send File' }}
                 </button>
                 <p v-if="ipStatus" class="status-text" :class="{ success: ipStatus.includes('success') }">{{ ipStatus }}</p>
               </div>
@@ -102,7 +124,7 @@
             <div class="connect-section" v-if="!isConnected">
               <div class="section-card">
                 <div class="card-header">
-                  <span class="card-icon">🔗</span>
+                  <span class="card-icon" v-html="Icons.sync"></span>
                   <h3>Connect to Receiver</h3>
                 </div>
                 <div class="input-row">
@@ -132,7 +154,7 @@
             <div v-else class="send-ready">
               <div class="connected-badge">
                 <span class="pulse-ring"></span>
-                <span class="badge-icon">✓</span>
+                <span class="badge-icon" v-html="Icons.check"></span>
                 <span>Connected to <strong>{{ targetPeerId.substring(0, 12) }}...</strong></span>
               </div>
 
@@ -204,14 +226,14 @@
             <template v-if="transferMode === 'ip'">
               <div class="section-card">
                 <div class="card-header">
-                  <span class="card-icon">🌐</span>
+                  <span class="card-icon" v-html="Icons.globe"></span>
                   <h3>Receive via IP</h3>
                 </div>
                 <p class="ip-hint">Start the server so other devices can send files to this PC. Files are saved to your Downloads folder.</p>
 
                 <div class="ip-info-card" style="margin-top: 16px;">
                   <div class="ip-label">Your IP Address</div>
-                  <div class="ip-value" @click="copyIp">{{ localIp || 'Detecting...' }} <span v-if="localIp" class="copy-hint">📋</span></div>
+                  <div class="ip-value" @click="copyIp">{{ localIp || 'Detecting...' }} <span v-if="localIp" class="copy-hint" v-html="Icons.exportJSON"></span></div>
                   <div class="ip-port">Port: 4444</div>
                 </div>
 
@@ -236,7 +258,7 @@
             <!-- Token Section -->
             <div class="section-card token-card">
               <div class="card-header">
-                <span class="card-icon">🎫</span>
+                <span class="card-icon" v-html="Icons.lock"></span>
                 <h3>Your Token</h3>
               </div>
               <div class="token-display" @click="copyToken">
@@ -279,7 +301,7 @@
             <transition name="bounce">
               <div v-if="pendingFile" class="pending-card">
                 <div class="pending-header">
-                  <span class="pending-icon">📥</span>
+                  <span class="pending-icon" v-html="Icons.download"></span>
                   <h4>Incoming File</h4>
                 </div>
                 <div class="pending-file">
@@ -299,7 +321,7 @@
             <!-- Receiving Progress -->
             <div v-if="incomingFile" class="receiving-card">
               <div class="receiving-header">
-                <span class="receiving-icon">📥</span>
+                <span class="receiving-icon" v-html="Icons.download"></span>
                 <div class="receiving-info">
                   <span class="receiving-name">{{ incomingFile.name }}</span>
                   <span class="receiving-size">{{ formatFileSize(incomingFile.size) }}</span>
@@ -344,6 +366,7 @@ import { ref, onMounted, onUnmounted } from "vue";
 import Peer from "peerjs";
 import { invoke } from "@tauri-apps/api/core";
 import { useNotificationStore } from "../stores/notifications";
+import { Icons } from "../components/icons/IconMap";
 
 const notifications = useNotificationStore();
 
@@ -526,19 +549,19 @@ function formatFileSize(bytes: number): string {
 function getFileIcon(filename: string): string {
   const ext = filename.split('.').pop()?.toLowerCase() || '';
   const icons: Record<string, string> = {
-    pdf: '📕',
-    doc: '📘', docx: '📘',
-    xls: '📗', xlsx: '📗',
-    ppt: '📙', pptx: '📙',
-    zip: '🗜️', rar: '🗜️', '7z': '🗜️',
-    jpg: '🖼️', jpeg: '🖼️', png: '🖼️', gif: '🖼️', webp: '🖼️',
-    mp4: '🎬', mov: '🎬', avi: '🎬', mkv: '🎬',
-    mp3: '🎵', wav: '🎵', flac: '🎵',
-    exe: '⚙️', msi: '⚙️',
-    txt: '📝', md: '📝',
-    html: '🌐', css: '🎨', js: '📜', ts: '📜',
+    pdf: Icons.exportCSV,
+    doc: Icons.exportMarkdown, docx: Icons.exportMarkdown,
+    xls: Icons.chart, xlsx: Icons.chart,
+    ppt: Icons.musicPlay, pptx: Icons.musicPlay,
+    zip: Icons.folder, rar: Icons.folder, '7z': Icons.folder,
+    jpg: Icons.appearance, jpeg: Icons.appearance, png: Icons.appearance, gif: Icons.appearance, webp: Icons.appearance,
+    mp4: Icons.play, mov: Icons.play, avi: Icons.play, mkv: Icons.play,
+    mp3: Icons.musicVolume, wav: Icons.musicVolume, flac: Icons.musicVolume,
+    exe: Icons.settings, msi: Icons.settings,
+    txt: Icons.exportCSV, md: Icons.exportMarkdown,
+    html: Icons.globe, css: Icons.theme, js: Icons.themeLight, ts: Icons.themeLight,
   };
-  return icons[ext] || '📄';
+  return icons[ext] || Icons.exportCSV;
 }
 
 // SENDER LOGIC
@@ -1250,13 +1273,13 @@ function rejectTransfer() {
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--color-primary), #a855f7);
+  background: var(--color-primary);
   border-radius: 4px;
   transition: width 0.3s ease;
 }
 
 .progress-fill.receiving {
-  background: linear-gradient(90deg, #10b981, #34d399);
+  background: #10b981;
 }
 
 /* Send Button */
@@ -1267,7 +1290,7 @@ function rejectTransfer() {
   justify-content: center;
   gap: 10px;
   padding: 16px;
-  background: linear-gradient(135deg, var(--color-primary), #a855f7);
+  background: var(--color-primary);
   border: none;
   border-radius: 14px;
   color: #fff;
@@ -1410,7 +1433,7 @@ function rejectTransfer() {
 
 /* Pending Card */
 .pending-card {
-  background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(139,92,246,0.1));
+  background: rgba(99,102,241,0.15);
   border: 1px solid rgba(99,102,241,0.3);
   border-radius: 20px;
   padding: 24px;

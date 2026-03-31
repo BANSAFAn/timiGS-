@@ -1320,6 +1320,100 @@ pub fn export_sessions_html(path: &str) -> Result<()> {
     Ok(())
 }
 
+pub fn export_sessions_json(path: &str) -> Result<()> {
+    let guard = DB.lock();
+    let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
+
+    let mut stmt = conn.prepare(
+        "SELECT app_name, window_title, exe_path, start_time, end_time, duration_seconds
+         FROM activity_sessions ORDER BY start_time DESC",
+    )?;
+
+    let rows = stmt.query_map([], |row| {
+        let app_name: String = row.get(0)?;
+        let window_title: String = row.get(1)?;
+        let exe_path: String = row.get(2)?;
+        let start_time: String = row.get(3)?;
+        let end_time: Option<String> = row.get(4)?;
+        let duration: i64 = row.get(5)?;
+        Ok(serde_json::json!({
+            "app_name": app_name,
+            "window_title": window_title,
+            "exe_path": exe_path,
+            "start_time": start_time,
+            "end_time": end_time,
+            "duration_seconds": duration,
+        }))
+    })?;
+
+    let mut activities = Vec::new();
+    for row in rows {
+        if let Ok(val) = row {
+            activities.push(val);
+        }
+    }
+
+    let json_content = serde_json::to_string_pretty(&activities)
+        .map_err(|e| rusqlite::Error::ToSqlConversionFailure(Box::new(e)))?;
+
+    std::fs::write(path, json_content)
+        .map_err(|e| rusqlite::Error::ToSqlConversionFailure(Box::new(e)))?;
+
+    Ok(())
+}
+
+pub fn export_sessions_markdown(path: &str) -> Result<()> {
+    let guard = DB.lock();
+    let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
+
+    let mut stmt = conn.prepare(
+        "SELECT app_name, window_title, exe_path, start_time, end_time, duration_seconds
+         FROM activity_sessions ORDER BY start_time DESC",
+    )?;
+
+    let mut md_content = String::from("# TimiGS Activity Report\n\n");
+    md_content.push_str("| App Name | Window Title | Start Time | End Time | Duration (seconds) |\n");
+    md_content.push_str("|---|---|---|---|---|\n");
+
+    let rows = stmt.query_map([], |row| {
+        let app_name: String = row.get(0)?;
+        let window_title: String = row.get(1)?;
+        let exe_path: String = row.get(2)?;
+        let start_time: String = row.get(3)?;
+        let end_time: Option<String> = row.get(4)?;
+        let duration: i64 = row.get(5)?;
+        Ok((
+            app_name,
+            window_title,
+            exe_path,
+            start_time,
+            end_time,
+            duration,
+        ))
+    })?;
+
+    for row in rows {
+        if let Ok((app, title, _exe, start, end, dur)) = row {
+            let escape = |s: &str| -> String {
+                s.replace('|', "\\|")
+            };
+            md_content.push_str(&format!(
+                "| {} | {} | {} | {} | {} |\n",
+                escape(&app),
+                escape(&title),
+                escape(&start),
+                escape(&end.unwrap_or_default()),
+                dur
+            ));
+        }
+    }
+
+    std::fs::write(path, md_content)
+        .map_err(|e| rusqlite::Error::ToSqlConversionFailure(Box::new(e)))?;
+
+    Ok(())
+}
+
 pub fn auto_export_if_needed() -> Result<()> {
     let settings = get_settings();
 

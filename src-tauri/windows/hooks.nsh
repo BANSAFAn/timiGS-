@@ -18,27 +18,12 @@
   CreateShortCut "$SMPROGRAMS\TimiGS\TimiGS.lnk" "$INSTDIR\TimiGS.exe" "" "$INSTDIR\TimiGS.exe" 0
   CreateShortCut "$SMPROGRAMS\TimiGS\Uninstall.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
   
-  ; Check if user wants autostart (read from installer variable if available)
-  ; Default: Ask user with a nice dialog
-  Var /GLOBAL AutostartChoice
-  
-  ; Read autostart preference if set by custom installer page
-  ${If} ${FileExists} "$APPDATA\com.timigs.app\install_options.ini"
-    ReadIniStr $AutostartChoice "$APPDATA\com.timigs.app\install_options.ini" "Install" "Autostart"
-  ${Else}
-    ; Show autostart dialog
-    MessageBox MB_YESNO|MB_ICONQUESTION|MB_TOPMOST "Would you like TimiGS to start automatically when Windows starts?$\r$\n$\r$\nYou can always change this later in the application settings." IDNO NoAutostart
-      StrCpy $AutostartChoice "yes"
-      Goto DoAutostart
-    NoAutostart:
-      StrCpy $AutostartChoice "no"
-    DoAutostart:
-  ${EndIf}
-  
-  ; Configure autostart if requested
-  ${If} $AutostartChoice == "yes"
-    Call EnableAutostart
-  ${EndIf}
+  ; Show autostart dialog
+  MessageBox MB_YESNO|MB_ICONQUESTION|MB_TOPMOST "Would you like TimiGS to start automatically when Windows starts?$\r$\n$\r$\nYou can always change this later in the application settings." IDNO NoAutostart
+    ; User said YES - enable autostart
+    WriteRegStr HKCU "${APP_REGISTRY_KEY}" "" "$INSTDIR\TimiGS.exe"
+    CreateShortCut "$SMSTARTUP\TimiGS.lnk" "$INSTDIR\TimiGS.exe" "" "$INSTDIR\TimiGS.exe" 0
+  NoAutostart:
   
   ; Store installation info for the application
   CreateDirectory "$APPDATA\com.timigs.app"
@@ -77,27 +62,3 @@
     ; Just remove install info, keep activity data
     Delete "$APPDATA\com.timigs.app\install_info.ini"
 !macroend
-
-; ============================================
-; Autostart Functions
-; ============================================
-Function EnableAutostart
-  ; Method 1: Registry key (most reliable)
-  WriteRegStr HKCU "${APP_REGISTRY_KEY}" "" "$INSTDIR\TimiGS.exe"
-  
-  ; Method 2: Also create shortcut in Startup folder as backup
-  ; This ensures autostart works even if one method fails
-  CreateShortCut "$SMSTARTUP\TimiGS.lnk" "$INSTDIR\TimiGS.exe" "" "$INSTDIR\TimiGS.exe" 0
-  
-  ; Set minimized flag if user wants it to start in tray
-  ; This can be configured via CLI argument
-FunctionEnd
-
-Function DisableAutostart
-  ; Remove registry entry
-  DeleteRegValue HKCU "${APP_REGISTRY_KEY}" ""
-  DeleteRegValue HKLM "${APP_REGISTRY_KEY}" ""
-  
-  ; Remove startup folder shortcut
-  Delete "$SMSTARTUP\TimiGS.lnk"
-FunctionEnd

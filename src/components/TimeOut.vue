@@ -2,316 +2,186 @@
   <div class="timeout-widget">
     <!-- Setup State -->
     <div v-if="!status" class="timeout-setup">
-      <div class="setup-section">
-        <label class="section-label">
-          <span class="icon" v-html="Icons.timeoutWork"></span> 
-          Work Interval
-        </label>
-        <div class="time-inputs">
-          <div class="input-group">
-            <label>Hours</label>
+      <!-- Work Interval Card -->
+      <div class="settings-card work-card">
+        <div class="card-header">
+          <div class="card-icon work-icon" v-html="Icons.timeoutWork"></div>
+          <div class="card-title-group">
+            <h3 class="card-title">{{ t('timeout.workInterval', 'Work Interval') }}</h3>
+            <p class="card-desc">{{ t('timeout.workIntervalDesc', 'How long to work before a break') }}</p>
+          </div>
+        </div>
+        <div class="time-inputs-modern">
+          <div class="time-field">
             <input
               type="number"
               v-model.number="workHours"
               min="0"
               max="24"
               placeholder="0"
-              class="time-input"
+              class="time-input-modern"
+              id="work-hours"
             />
+            <label for="work-hours" class="time-label">{{ t('common.hours', 'Hours') }}</label>
           </div>
-          <span class="separator">:</span>
-          <div class="input-group">
-            <label>Minutes</label>
+          <div class="time-field">
             <input
               type="number"
               v-model.number="workMinutes"
               min="0"
               max="59"
               placeholder="45"
-              class="time-input"
+              class="time-input-modern"
+              id="work-minutes"
             />
+            <label for="work-minutes" class="time-label">{{ t('common.minutes', 'Minutes') }}</label>
           </div>
-          <span class="separator">:</span>
-          <div class="input-group">
-            <label>Seconds</label>
+          <div class="time-field">
             <input
               type="number"
               v-model.number="workSeconds"
               min="0"
               max="59"
               placeholder="0"
-              class="time-input"
+              class="time-input-modern"
+              id="work-seconds"
             />
+            <label for="work-seconds" class="time-label">{{ t('common.seconds', 'Seconds') }}</label>
           </div>
         </div>
-        <p class="hint">How long to work before a break</p>
       </div>
 
-      <div class="setup-section">
-        <label class="section-label">
-          <span class="icon" v-html="Icons.timeoutBreak"></span> 
-          Break Duration
-        </label>
-        <div class="time-inputs">
-          <div class="input-group">
-            <label>Hours</label>
+      <!-- Break Duration Card -->
+      <div class="settings-card break-card">
+        <div class="card-header">
+          <div class="card-icon break-icon" v-html="Icons.timeoutBreak"></div>
+          <div class="card-title-group">
+            <h3 class="card-title">{{ t('timeout.breakDuration', 'Break Duration') }}</h3>
+            <p class="card-desc">{{ t('timeout.breakDurationDesc', 'How long each break lasts') }}</p>
+          </div>
+        </div>
+        <div class="time-inputs-modern">
+          <div class="time-field">
             <input
               type="number"
               v-model.number="breakHours"
               min="0"
               max="24"
               placeholder="0"
-              class="time-input"
+              class="time-input-modern"
+              id="break-hours"
             />
+            <label for="break-hours" class="time-label">{{ t('common.hours', 'Hours') }}</label>
           </div>
-          <span class="separator">:</span>
-          <div class="input-group">
-            <label>Minutes</label>
+          <div class="time-field">
             <input
               type="number"
               v-model.number="breakMinutes"
               min="0"
               max="59"
               placeholder="10"
-              class="time-input"
+              class="time-input-modern"
+              id="break-minutes"
             />
+            <label for="break-minutes" class="time-label">{{ t('common.minutes', 'Minutes') }}</label>
           </div>
-          <span class="separator">:</span>
-          <div class="input-group">
-            <label>Seconds</label>
+          <div class="time-field">
             <input
               type="number"
               v-model.number="breakSeconds"
               min="0"
               max="59"
               placeholder="0"
-              class="time-input"
+              class="time-input-modern"
+              id="break-seconds"
             />
+            <label for="break-seconds" class="time-label">{{ t('common.seconds', 'Seconds') }}</label>
           </div>
         </div>
-        <p class="hint">How long each break lasts (all apps blocked)</p>
       </div>
 
-      <div class="setup-section">
-        <label class="section-label">
-          <span class="icon" v-html="Icons.timeoutMusic"></span> 
-          Background Music
-        </label>
+      <!-- Music Card -->
+      <div class="settings-card music-card">
+        <div class="card-header">
+          <div class="card-icon music-icon" v-html="Icons.timeoutMusic"></div>
+          <div class="card-title-group">
+            <h3 class="card-title">{{ t('timeout.backgroundMusic', 'Background Music') }}</h3>
+            <p class="card-desc">{{ t('timeout.musicDesc', 'Optional music during breaks') }}</p>
+          </div>
+        </div>
         
-        <div class="music-manager">
-          <div class="music-header">
-            <button class="btn-icon" @click="openMusicFolder" title="Open Music Folder">
+        <div class="music-manager-modern">
+          <div class="music-actions">
+            <button class="btn-action" @click="openMusicFolder" title="Open Music Folder">
               <span v-html="Icons.timeoutFolder"></span>
+              <span>{{ t('timeout.openFolder', 'Open Folder') }}</span>
             </button>
-            <button class="btn-secondary" @click="addMusicFile">
-              + Add Track
+            <button class="btn-action primary" @click="addMusicFile">
+              <span v-html="Icons.tasksAdd"></span>
+              <span>{{ t('timeout.addTrack', 'Add Track') }}</span>
             </button>
           </div>
-          
-          <div class="music-list">
-            <div v-if="musicFiles.length === 0" class="empty-music">
-              No custom music files found.
+
+          <div class="music-list-modern">
+            <div v-if="musicFiles.length === 0" class="empty-music-modern">
+              <span class="empty-icon">🎵</span>
+              <p>{{ t('timeout.noMusic', 'No music files found') }}</p>
             </div>
-            <div 
-              v-else 
-              v-for="file in musicFiles" 
+            <div
+              v-else
+              v-for="file in musicFiles"
               :key="file.filename"
-              class="music-item"
+              class="music-item-modern"
               :class="{ 'active-track': selectedMusic === file.filename }"
               @click="selectedMusic = file.filename"
             >
-              <div class="radio-circle"></div>
-              <span class="track-name">{{ file.filename }}</span>
-              <button class="btn-icon-danger" @click.stop="deleteMusicFile(file.filename)" title="Delete Track">
+              <div class="music-item-left">
+                <div class="radio-indicator">
+                  <div class="radio-dot" :class="{ selected: selectedMusic === file.filename }"></div>
+                </div>
+                <span class="track-name">{{ file.filename }}</span>
+              </div>
+              <button class="btn-delete-track" @click.stop="deleteMusicFile(file.filename)" title="Delete Track">
                 <span v-html="Icons.timeoutTrash"></span>
               </button>
             </div>
           </div>
-          
-          <div class="music-options">
-            <label class="checkbox-label">
+
+          <div class="music-option">
+            <label class="checkbox-label-modern">
               <input type="checkbox" v-model="playMusicDuringBreak" />
-              Play music during break
+              <span class="checkbox-custom"></span>
+              <span class="checkbox-text">{{ t('timeout.playMusicBreak', 'Play music during break') }}</span>
             </label>
           </div>
         </div>
       </div>
 
-      <div class="setup-section">
-        <label class="section-label">
-          <span class="icon" v-html="Icons.timeoutLock"></span>
-          Lock Password
-        </label>
-        <input
-          type="password"
-          v-model="password"
-          class="password-input"
-          placeholder="Password to cancel..."
-        />
-      </div>
-
-      <!-- Schedule Section -->
-      <div class="setup-section">
-        <label class="section-label">
-          <span class="icon" v-html="Icons.timeoutCalendar"></span>
-          Daily Schedule
-        </label>
-        <div class="schedule-container">
-          <label class="checkbox-label schedule-toggle">
-            <input type="checkbox" v-model="enableSchedule" />
-            Enable Daily Schedule Mode
-          </label>
-
-          <div v-if="enableSchedule" class="schedule-options">
-            <div class="time-range-row">
-              <div class="time-picker">
-                <label class="sub-label">Work Start Time</label>
-                <div class="time-picker-row">
-                  <select v-model.number="scheduleStartHour" class="time-select">
-                    <option value="12">12</option>
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                    <option value="6">6</option>
-                    <option value="7">7</option>
-                    <option value="8">8</option>
-                    <option value="9">9</option>
-                    <option value="10">10</option>
-                    <option value="11">11</option>
-                  </select>
-                  <span class="time-separator">:</span>
-                  <select v-model.number="scheduleStartMinute" class="time-select">
-                    <option v-for="min in scheduleMinutes" :key="min" :value="min">
-                      {{ min.toString().padStart(2, '0') }}
-                    </option>
-                  </select>
-                  <select v-model="scheduleStartPeriod" class="period-select">
-                    <option value="AM">AM</option>
-                    <option value="PM">PM</option>
-                  </select>
-                </div>
-              </div>
-
-              <div class="time-picker">
-                <label class="sub-label">Work End Time</label>
-                <div class="time-picker-row">
-                  <select v-model.number="scheduleEndHour" class="time-select">
-                    <option value="12">12</option>
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                    <option value="6">6</option>
-                    <option value="7">7</option>
-                    <option value="8">8</option>
-                    <option value="9">9</option>
-                    <option value="10">10</option>
-                    <option value="11">11</option>
-                  </select>
-                  <span class="time-separator">:</span>
-                  <select v-model.number="scheduleEndMinute" class="time-select">
-                    <option v-for="min in scheduleMinutes" :key="min" :value="min">
-                      {{ min.toString().padStart(2, '0') }}
-                    </option>
-                  </select>
-                  <select v-model="scheduleEndPeriod" class="period-select">
-                    <option value="AM">AM</option>
-                    <option value="PM">PM</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            <!-- Custom Breaks -->
-            <div class="custom-breaks-section">
-              <div class="breaks-header">
-                <label class="sub-label">Break Times</label>
-                <button @click="addBreak" class="btn-add-break">
-                  <span v-html="Icons.tasksAdd"></span> Add Break
-                </button>
-              </div>
-
-              <div v-if="customBreaks.length === 0" class="no-breaks">
-                <p>No breaks added. Click "Add Break" to add one.</p>
-              </div>
-
-              <div v-for="(break_item) in customBreaks" :key="break_item.id" class="break-item">
-                <div class="break-time-inputs">
-                  <select v-model.number="break_item.hour" class="time-select-small">
-                    <option value="12">12</option>
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                    <option value="6">6</option>
-                    <option value="7">7</option>
-                    <option value="8">8</option>
-                    <option value="9">9</option>
-                    <option value="10">10</option>
-                    <option value="11">11</option>
-                  </select>
-                  <span class="time-separator">:</span>
-                  <select v-model.number="break_item.minute" class="time-select-small">
-                    <option v-for="min in scheduleMinutes" :key="min" :value="min">
-                      {{ min.toString().padStart(2, '0') }}
-                    </option>
-                  </select>
-                  <select v-model="break_item.period" class="period-select-small">
-                    <option value="AM">AM</option>
-                    <option value="PM">PM</option>
-                  </select>
-                </div>
-
-                <div class="break-duration-input">
-                  <input
-                    type="number"
-                    v-model.number="break_item.duration"
-                    min="1"
-                    max="120"
-                    class="duration-input"
-                    placeholder="Duration (min)"
-                  />
-                  <span class="duration-label">min</span>
-                </div>
-
-                <button @click="removeBreak(break_item.id)" class="btn-remove-break" title="Remove Break">
-                  <span v-html="Icons.timeoutTrash"></span>
-                </button>
-              </div>
-            </div>
-
-            <div class="days-picker">
-              <label class="sub-label">Repeat On</label>
-              <div class="days-row">
-                <button
-                  v-for="day in weekDays"
-                  :key="day.value"
-                  class="day-btn"
-                  :class="{ active: selectedDays.includes(day.value) }"
-                  @click="toggleDay(day.value)"
-                >
-                  {{ day.label }}
-                </button>
-              </div>
-            </div>
-
-            <div class="schedule-info-box">
-              <p class="schedule-hint">
-                <span class="info-icon">ℹ</span>
-                {{ scheduleSummary }}
-              </p>
-            </div>
+      <!-- Password Card -->
+      <div class="settings-card password-card">
+        <div class="card-header">
+          <div class="card-icon password-icon" v-html="Icons.timeoutLock"></div>
+          <div class="card-title-group">
+            <h3 class="card-title">{{ t('timeout.password', 'Lock Password') }}</h3>
+            <p class="card-desc">{{ t('timeout.passwordDesc', 'Required to cancel early') }}</p>
           </div>
+        </div>
+        <div class="password-input-wrapper">
+          <input
+            type="password"
+            v-model="password"
+            class="password-input-modern"
+            :placeholder="t('timeout.passwordPlaceholder', 'Enter password...')"
+          />
         </div>
       </div>
 
-      <button @click="startTimeout" class="btn-start" :disabled="!canStart">
-        <span class="btn-icon" v-html="Icons.timeoutBreak"></span> 
-        {{ enableSchedule ? 'Schedule Time OUT' : 'Activate Time OUT' }}
+
+
+      <!-- Start Button -->
+      <button @click="startTimeout" class="btn-start-modern" :disabled="!canStart">
+        <span class="btn-icon" v-html="Icons.timeoutBreak"></span>
+        <span>{{ enableSchedule ? t('timeout.schedule', 'Schedule Time OUT') : t('timeout.start', 'Activate Time OUT') }}</span>
       </button>
     </div>
 
@@ -440,7 +310,7 @@ import { open as openDialog } from "@tauri-apps/plugin-dialog";
 import { readFile } from "@tauri-apps/plugin-fs";
 import { Icons } from "./icons/IconMap";
 
-useI18n();
+const { t } = useI18n();
 
 interface TimeoutStatus {
   active: boolean;
@@ -486,16 +356,16 @@ const customBreaks = ref<CustomBreak[]>([]);
 let breakIdCounter = 0;
 // Days
 const selectedDays = ref<number[]>([]); // 0 = Sunday, 1 = Monday, etc.
-const weekDays = [
-  { label: "S", value: 0 },
-  { label: "M", value: 1 },
-  { label: "T", value: 2 },
-  { label: "W", value: 3 },
-  { label: "T", value: 4 },
-  { label: "F", value: 5 },
-  { label: "S", value: 6 },
-];
-const scheduleMinutes = Array.from({ length: 60 }, (_, i) => i);
+// const weekDays = [
+//   { label: "S", value: 0 },
+//   { label: "M", value: 1 },
+//   { label: "T", value: 2 },
+//   { label: "W", value: 3 },
+//   { label: "T", value: 4 },
+//   { label: "F", value: 5 },
+//   { label: "S", value: 6 },
+// ];
+// const scheduleMinutes = Array.from({ length: 60 }, (_, i) => i);
 
 // Music Controls
 const isPlaying = ref(false);
@@ -591,45 +461,9 @@ const canStart = computed(
     password.value.length >= 1,
 );
 
-const scheduleSummary = computed(() => {
-  const start = formatTime12h(scheduleStartHour.value, scheduleStartMinute.value, scheduleStartPeriod.value);
-  const end = formatTime12h(scheduleEndHour.value, scheduleEndMinute.value, scheduleEndPeriod.value);
-  const daysStr = selectedDays.value.length > 0 
-    ? selectedDays.value.map(d => weekDays[d].label).join(', ')
-    : 'No days selected';
-  const breaksStr = customBreaks.value.length > 0
-    ? customBreaks.value.map(b => `${formatTime12h(b.hour, b.minute, b.period)} (${b.duration} min)`).join(', ')
-    : 'No breaks scheduled';
-  return `Work: ${start} - ${end} | Breaks: ${breaksStr} | Days: ${daysStr}`;
-});
-
-function formatTime12h(hour: number, minute: number, period: string): string {
-  return `${hour}:${minute.toString().padStart(2, '0')} ${period}`;
-}
-
-function toggleDay(dayValue: number) {
-  const idx = selectedDays.value.indexOf(dayValue);
-  if (idx === -1) {
-    selectedDays.value.push(dayValue);
-  } else {
-    selectedDays.value.splice(idx, 1);
-  }
-}
-
-function addBreak() {
-  breakIdCounter++;
-  customBreaks.value.push({
-    id: breakIdCounter,
-    hour: 12,
-    minute: 0,
-    period: "PM",
-    duration: 30,
-  });
-}
-
-function removeBreak(id: number) {
-  customBreaks.value = customBreaks.value.filter(b => b.id !== id);
-}
+// function toggleDay...
+// function addBreak...
+// function removeBreak...
 
 function convertTo24Hour(hour: number, period: string): number {
   if (period === "PM" && hour !== 12) {
@@ -759,7 +593,7 @@ async function startTimeout() {
   if (!canStart.value) return;
   try {
     const scheduleConfig = getScheduleConfig();
-    
+
     // If schedule is enabled, just save settings and don't start immediately
     if (enableSchedule.value) {
       await invoke("save_timeout_schedule_cmd", {
@@ -773,7 +607,7 @@ async function startTimeout() {
         customBreaks: scheduleConfig?.breaks ?? [],
         selectedDays: selectedDays.value,
       });
-      
+
       // Save schedule preferences
       localStorage.setItem("timigs-timeout-schedule", JSON.stringify({
         enabled: true,
@@ -786,7 +620,7 @@ async function startTimeout() {
         customBreaks: customBreaks.value,
         days: selectedDays.value,
       }));
-      
+
       password.value = "";
       alert("Schedule saved! Time OUT will start automatically at the specified times on selected days.");
     } else {
@@ -998,6 +832,443 @@ onUnmounted(() => {
   color: var(--text-muted);
   margin: 0;
 }
+
+/* Strict Mode Styles */
+.strict-mode-label {
+  color: #ef4444 !important;
+}
+
+.strict-icon {
+  color: #ef4444 !important;
+  animation: strict-shake 0.5s ease-in-out infinite;
+}
+
+@keyframes strict-shake {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-5deg); }
+  75% { transform: rotate(5deg); }
+}
+
+.strict-mode-toggle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+
+
+/* Modern Card-Based Design */
+.settings-card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+  padding: 20px;
+  transition: all 0.2s ease;
+}
+
+.settings-card:hover {
+  border-color: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.work-card {
+  border-left: 3px solid #14b8a6;
+}
+
+.break-card {
+  border-left: 3px solid #06b6d4;
+}
+
+.music-card {
+  border-left: 3px solid #8b5cf6;
+}
+
+.password-card {
+  border-left: 3px solid #f59e0b;
+}
+
+
+
+.card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.card-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 1.2rem;
+}
+
+.card-icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.work-icon {
+  background: rgba(20, 184, 166, 0.15);
+  color: #14b8a6;
+}
+
+.break-icon {
+  background: rgba(6, 182, 212, 0.15);
+  color: #06b6d4;
+}
+
+.music-icon {
+  background: rgba(139, 92, 246, 0.15);
+  color: #8b5cf6;
+}
+
+.password-icon {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+}
+
+
+
+.card-title-group {
+  flex: 1;
+}
+
+.card-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+  margin: 0 0 4px 0;
+}
+
+.card-desc {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+
+
+/* Modern Time Inputs */
+.time-inputs-modern {
+  display: flex;
+  gap: 12px;
+}
+
+.time-field {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.time-input-modern {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  padding: 14px;
+  border-radius: 12px;
+  text-align: center;
+  font-size: 1.3rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.time-input-modern:focus {
+  outline: none;
+  border-color: #14b8a6;
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.15);
+}
+
+.time-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-align: center;
+  font-weight: 500;
+}
+
+/* Modern Music Manager */
+.music-manager-modern {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.music-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-action {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--text-muted);
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-action svg {
+  width: 18px;
+  height: 18px;
+}
+
+.btn-action:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+
+.btn-action.primary {
+  background: rgba(139, 92, 246, 0.15);
+  border-color: rgba(139, 92, 246, 0.3);
+  color: #8b5cf6;
+}
+
+.btn-action.primary:hover {
+  background: rgba(139, 92, 246, 0.25);
+  border-color: rgba(139, 92, 246, 0.5);
+}
+
+.music-list-modern {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 180px;
+  overflow-y: auto;
+  padding: 4px;
+}
+
+.music-item-modern {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.music-item-modern:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.music-item-modern.active-track {
+  background: rgba(139, 92, 246, 0.1);
+  border-color: rgba(139, 92, 246, 0.3);
+}
+
+.music-item-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.radio-indicator {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.radio-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.2s ease;
+}
+
+.radio-dot.selected {
+  background: #8b5cf6;
+  border-color: #8b5cf6;
+  box-shadow: 0 0 8px rgba(139, 92, 246, 0.5);
+}
+
+.track-name {
+  font-size: 0.9rem;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.btn-delete-track {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.btn-delete-track:hover {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+.btn-delete-track svg {
+  width: 18px;
+  height: 18px;
+}
+
+.empty-music-modern {
+  text-align: center;
+  padding: 24px 16px;
+  color: var(--text-muted);
+}
+
+.empty-music-modern .empty-icon {
+  font-size: 2.5rem;
+  display: block;
+  margin-bottom: 8px;
+  opacity: 0.5;
+}
+
+.empty-music-modern p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.music-option {
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.checkbox-label-modern {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.checkbox-label-modern input[type="checkbox"] {
+  display: none;
+}
+
+.checkbox-custom {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.checkbox-label-modern input[type="checkbox"]:checked + .checkbox-custom {
+  background: #14b8a6;
+  border-color: #14b8a6;
+}
+
+.checkbox-label-modern input[type="checkbox"]:checked + .checkbox-custom::after {
+  content: '✓';
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.checkbox-text {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.checkbox-label-modern input[type="checkbox"]:checked + .checkbox-custom + .checkbox-text {
+  color: #fff;
+}
+
+/* Password Input Modern */
+.password-input-wrapper {
+  width: 100%;
+}
+
+.password-input-modern {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  padding: 14px 16px;
+  border-radius: 12px;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+.password-input-modern:focus {
+  outline: none;
+  border-color: #f59e0b;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
+}
+
+.password-input-modern::placeholder {
+  color: var(--text-muted);
+}
+
+/* Start Button Modern */
+.btn-start-modern {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: #14b8a6;
+  border: none;
+  color: white;
+  padding: 16px 24px;
+  border-radius: 14px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 14px rgba(20, 184, 166, 0.3);
+}
+
+.btn-start-modern:hover:not(:disabled) {
+  background: #0d9488;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(20, 184, 166, 0.4);
+}
+
+.btn-start-modern:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn-start-modern .btn-icon {
+  width: 22px;
+  height: 22px;
+}
+
+
 
 /* Music Manager UI */
 .music-manager {
@@ -1537,7 +1808,7 @@ onUnmounted(() => {
   justify-content: center;
   align-items: center;
   gap: 8px;
-  background: linear-gradient(135deg, #14b8a6, #0d9488);
+  background: #14b8a6;
   color: white;
   border: none;
   padding: 14px;

@@ -72,8 +72,8 @@
           "Arabic"
         ],
         "installerIcon": "icons/icon.ico",
-        "headerImage": "icons/nsis-header.bmp",
-        "sidebarImage": "icons/nsis-sidebar.bmp",
+        "headerImage": "windows/installer-header.bmp",
+        "sidebarImage": "windows/installer-sidebar.bmp",
         "installerHooks": "windows/hooks.nsh",
         "startMenuFolder": "TimiGS",
         "compression": "lzma"
