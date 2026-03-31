@@ -1,6 +1,11 @@
 <template>
   <div class="page page-shell analytics-page">
-    <div class="page-container">
+    <div class="analytics-bg-effects">
+      <div class="glow-orb orb-1"></div>
+      <div class="glow-orb orb-2"></div>
+      <div class="glow-orb orb-3"></div>
+    </div>
+    <div class="page-container" style="position: relative; z-index: 2;">
       <div class="page-header">
         <div class="header-left">
           <h2>{{ $t('analytics.title') }}</h2>
@@ -9,9 +14,9 @@
         <div class="header-controls">
           <!-- Time Range Selector -->
           <div class="time-range-selector">
-            <button class="range-btn" :class="{ active: selectedRange === 'day' }" @click="selectedRange = 'day'">Day</button>
-            <button class="range-btn" :class="{ active: selectedRange === 'week' }" @click="selectedRange = 'week'">Week</button>
-            <button class="range-btn" :class="{ active: selectedRange === 'month' }" @click="selectedRange = 'month'">Month</button>
+            <button class="range-btn" :class="{ active: selectedRange === 'day' }" @click="selectedRange = 'day'">{{ $t('common.day') || 'Day' }}</button>
+            <button class="range-btn" :class="{ active: selectedRange === 'week' }" @click="selectedRange = 'week'">{{ $t('common.week') || 'Week' }}</button>
+            <button class="range-btn" :class="{ active: selectedRange === 'month' }" @click="selectedRange = 'month'">{{ $t('common.month') || 'Month' }}</button>
           </div>
 
           <button class="nav-btn" @click="prevPeriod">
@@ -68,37 +73,42 @@
             </div>
           </div>
 
-          <!-- Weekly Distribution -->
-          <div class="chart-card">
-            <div class="card-header">
-              <h3>Weekly Distribution</h3>
-            </div>
-            <div class="chart-container">
-              <Bar v-if="weeklyStats.length > 0" :data="weeklyChartData" :options="barChartOptions" />
-            </div>
-          </div>
-
           <!-- App Breakdown -->
-          <div class="chart-card">
+          <div class="chart-card app-breakdown-card">
             <div class="card-header flex-between">
               <h3>{{ $t('analytics.breakdownByApp') }}</h3>
               <button class="btn-icon" @click="showDetailModal = true" title="View Details">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
               </button>
             </div>
-            <div class="chart-container pie-container">
-               <div class="pie-wrapper">
-                  <Pie v-if="store.topApps.length > 0" :data="appChartData" :options="pieChartOptions" />
-               </div>
-
-               <!-- Custom Legend -->
-               <div class="custom-legend">
-                 <div v-for="(app, i) in store.topApps.slice(0, 4)" :key="app.app_name" class="legend-item">
-                    <span class="legend-dot" :style="{ background: appChartData.datasets[0].backgroundColor[i] }"></span>
-                    <span class="legend-name">{{ app.app_name }}</span>
-                    <span class="legend-percent">{{ calculatePercentage(app.total_seconds) }}%</span>
-                 </div>
-               </div>
+            
+            <div class="app-breakdown-content">
+              <!-- Left: Pie Chart -->
+              <div class="app-breakdown-chart">
+                <Pie v-if="store.topApps.length > 0" :data="appChartData" :options="pieChartOptions" />
+              </div>
+              
+              <!-- Right: Apps List -->
+              <div class="app-breakdown-list">
+                <div class="app-list-header">
+                  <span>Application</span>
+                  <span>Time</span>
+                </div>
+                <div class="app-list-items custom-scrollbar">
+                  <div v-for="(app, i) in store.topApps" :key="app.app_name" class="app-list-item" @click="showDetailModal = true">
+                    <div class="app-item-left">
+                      <span class="app-color-dot" :style="{ background: appChartData.datasets[0].backgroundColor[i % appChartData.datasets[0].backgroundColor.length] }"></span>
+                      <img v-if="appIcons[app.app_name]" :src="appIcons[app.app_name]" class="app-list-icon" :alt="app.app_name" />
+                      <span v-else class="app-list-icon-fallback" :style="{ background: appChartData.datasets[0].backgroundColor[i % appChartData.datasets[0].backgroundColor.length] }">{{ app.app_name.charAt(0).toUpperCase() }}</span>
+                      <span class="app-list-name" :title="app.app_name">{{ app.app_name }}</span>
+                    </div>
+                    <div class="app-item-right">
+                      <span class="app-list-percent">{{ calculatePercentage(app.total_seconds) }}%</span>
+                      <span class="app-list-time">{{ formatTimeReadable(app.total_seconds) }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -162,7 +172,7 @@
                <div class="music-rank" :class="getRankClass(index)">{{ index + 1 }}</div>
                <div class="music-icon-wrapper">
                  <img v-if="appIcons[music.app_name]" :src="appIcons[music.app_name]" class="music-app-icon" :alt="music.app_name" />
-                 <div v-else-if="music.app_name === 'YouTube Music'" class="music-icon" style="background: linear-gradient(135deg, #ff0000, #ff4444);">
+                 <div v-else-if="music.app_name === 'YouTube Music'" class="music-icon" style="background: #ff0000;">
                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white">
                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 14.5v-9l6 4.5-6 4.5z"/>
                    </svg>
@@ -210,7 +220,7 @@
              <div class="now-playing-content">
                <div class="now-playing-icon">
                  <img v-if="appIcons[currentMusicSession.app_name]" :src="appIcons[currentMusicSession.app_name]" class="now-playing-app-icon" :alt="currentMusicSession.app_name" />
-                 <svg v-else-if="currentMusicSession.app_name === 'YouTube Music'" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="white" style="background: linear-gradient(135deg, #ff0000, #ff4444); border-radius: 8px;">
+                 <svg v-else-if="currentMusicSession.app_name === 'YouTube Music'" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="white" style="background: #ff0000; border-radius: 8px;">
                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 14.5v-9l6 4.5-6 4.5z"/>
                  </svg>
                  <svg v-else xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -229,7 +239,7 @@
 
         <!-- Empty State -->
         <div v-if="weeklyStats.length === 0 && store.topApps.length === 0 && !store.isLoading" class="empty-state animate-enter">
-          <div class="empty-icon">📊</div>
+          <div class="empty-icon" v-html="Icons.analytics" style="width:48px;height:48px;opacity:0.5;margin:0 auto 12px auto;color:var(--text-muted)"></div>
           <h3>No Data Available Yet</h3>
           <p>Start using your applications to see analytics here.</p>
         </div>
@@ -459,36 +469,18 @@ function getRankClass(index: number): string {
 }
 
 function getWebsiteBarGradient(index: number): string {
-  const gradients = [
-    'linear-gradient(90deg, #06b6d4, #22d3ee)',
-    'linear-gradient(90deg, #8b5cf6, #a78bfa)',
-    'linear-gradient(90deg, #ec4899, #f472b6)',
-    'linear-gradient(90deg, #f59e0b, #fbbf24)',
-    'linear-gradient(90deg, #10b981, #34d399)',
-  ];
-  return gradients[index % gradients.length];
+  const colors = ['#06b6d4', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981'];
+  return colors[index % colors.length];
 }
 
 function getMusicGradient(index: number): string {
-  const gradients = [
-    'linear-gradient(135deg, #ec4899, #db2777)',
-    'linear-gradient(135deg, #8b5cf6, #7c3aed)',
-    'linear-gradient(135deg, #06b6d4, #0891b2)',
-    'linear-gradient(135deg, #f59e0b, #d97706)',
-    'linear-gradient(135deg, #10b981, #059669)',
-  ];
-  return gradients[index % gradients.length];
+  const colors = ['#ec4899', '#8b5cf6', '#06b6d4', '#f59e0b', '#10b981'];
+  return colors[index % colors.length];
 }
 
 function getMusicBarGradient(index: number): string {
-  const gradients = [
-    'linear-gradient(90deg, #ec4899, #f472b6)',
-    'linear-gradient(90deg, #8b5cf6, #a78bfa)',
-    'linear-gradient(90deg, #06b6d4, #22d3ee)',
-    'linear-gradient(90deg, #f59e0b, #fbbf24)',
-    'linear-gradient(90deg, #10b981, #34d399)',
-  ];
-  return gradients[index % gradients.length];
+  const colors = ['#ec4899', '#8b5cf6', '#06b6d4', '#f59e0b', '#10b981'];
+  return colors[index % colors.length];
 }
 
 function getFaviconUrl(siteName: string): string {
@@ -736,7 +728,7 @@ interface DailyStatLocal { date: string; total_seconds: number; app_count: numbe
 const customWeeklyStats = ref<DailyStatLocal[]>([]);
 
 const weeklyStats = computed(() => {
-  if (weekOffset.value === 0) return store.weeklyStats;
+  if (selectedRange.value === 'week' && weekOffset.value === 0) return store.weeklyStats;
   return customWeeklyStats.value;
 });
 
@@ -949,8 +941,9 @@ function formatDurationFull(seconds: number): string {
 }
 
 function calculatePercentage(seconds: number): string {
-    const total = totalWeekTime.value || 1;
-    return ((seconds / total) * 100).toFixed(1);
+    // Calculate total time from all apps, not weekly stats
+    const totalAppsTime = store.topApps.reduce((acc, app) => acc + app.total_seconds, 0) || 1;
+    return ((seconds / totalAppsTime) * 100).toFixed(1);
 }
 
 const totalWeekTime = computed(() => weeklyStats.value.reduce((acc, d) => acc + d.total_seconds, 0));
@@ -976,12 +969,7 @@ const lineChartData = computed(() => ({
     data: weeklyStats.value.map(d => Number((d.total_seconds / 3600).toFixed(1))).reverse(),
     borderColor: '#10b981',
     borderWidth: 3,
-    backgroundColor: (ctx: any) => {
-      const gradient = ctx.chart.ctx.createLinearGradient(0, 0, 0, 300);
-      gradient.addColorStop(0, 'rgba(16, 185, 129, 0.25)');
-      gradient.addColorStop(1, 'rgba(16, 185, 129, 0)');
-      return gradient;
-    },
+    backgroundColor: 'rgba(16, 185, 129, 0.1)',
     tension: 0.4,
     fill: true,
     pointBackgroundColor: '#10b981',
@@ -1046,6 +1034,12 @@ const pieChartOptions = {
 
 onMounted(async () => {
   await fetchPeriodData();
+  // Load icons for top apps
+  store.topApps.forEach(app => {
+    if (app.exe_path) {
+      loadIcon(app.app_name, app.exe_path);
+    }
+  });
   // Load icons for music apps
   store.musicApps.forEach(app => {
     if (app.exe_path) {
@@ -1069,6 +1063,50 @@ watch(selectedRange, async () => {
 <style scoped>
 .analytics-page { 
   padding-bottom: 40px; 
+  position: relative;
+}
+
+.analytics-bg-effects {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.glow-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.15;
+  animation: float 20s infinite ease-in-out alternate;
+}
+
+.orb-1 {
+  width: 400px; height: 400px;
+  background: var(--color-primary);
+  top: -100px; left: -100px;
+}
+
+.orb-2 {
+  width: 300px; height: 300px;
+  background: #ec4899;
+  bottom: 20%; right: -50px;
+  animation-delay: -5s;
+}
+
+.orb-3 {
+  width: 250px; height: 250px;
+  background: #06b6d4;
+  top: 40%; left: 30%;
+  animation-delay: -10s;
+  opacity: 0.1;
+}
+
+@keyframes float {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(30px, -50px) scale(1.1); }
+  100% { transform: translate(-20px, 20px) scale(0.9); }
 }
 
 .page-header {
@@ -1078,16 +1116,20 @@ watch(selectedRange, async () => {
   margin-bottom: 36px;
   flex-wrap: wrap;
   gap: 20px;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 24px;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
 .header-left h2 {
-  background: linear-gradient(135deg, #fff 30%, #818cf8, #6366f1);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--text-primary);
   font-size: 1.75rem;
   font-weight: 700;
   letter-spacing: -0.5px;
+  margin: 0;
 }
 
 .subtitle { 
@@ -1107,7 +1149,7 @@ watch(selectedRange, async () => {
 .view-selector {
   display: flex;
   gap: 5px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.03));
+  background: rgba(255, 255, 255, 0.04);
   padding: 5px;
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -1139,7 +1181,7 @@ watch(selectedRange, async () => {
 }
 
 .view-btn.active {
-  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+  background: var(--color-primary);
   color: white;
   box-shadow: 0 4px 12px rgba(99,102,241,0.3);
 }
@@ -1147,7 +1189,7 @@ watch(selectedRange, async () => {
 .time-range-selector {
   display: flex;
   gap: 5px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.03));
+  background: rgba(255, 255, 255, 0.04);
   padding: 5px;
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -1171,13 +1213,13 @@ watch(selectedRange, async () => {
 }
 
 .range-btn.active {
-  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+  background: var(--color-primary);
   color: white;
   box-shadow: 0 4px 12px rgba(99,102,241,0.25);
 }
 
 .nav-btn {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04));
+  background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.1);
   width: 38px;
   height: 38px;
@@ -1191,7 +1233,7 @@ watch(selectedRange, async () => {
 }
 
 .nav-btn:hover:not(:disabled) {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.08));
+  background: rgba(255, 255, 255, 0.12);
   color: #fff;
   transform: scale(1.08);
   border-color: rgba(255, 255, 255, 0.2);
@@ -1206,7 +1248,7 @@ watch(selectedRange, async () => {
   display: flex;
   align-items: center;
   gap: 10px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.03));
+  background: rgba(255, 255, 255, 0.04);
   padding: 10px 18px;
   border-radius: 22px;
   font-size: 0.9rem;
@@ -1221,7 +1263,7 @@ watch(selectedRange, async () => {
 
 .date-range-badge:hover {
   border-color: rgba(255, 255, 255, 0.2);
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .range-icon {
@@ -1237,7 +1279,7 @@ watch(selectedRange, async () => {
 }
 
 .stat-card.premium-card {
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+  background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 22px;
   padding: 26px;
@@ -1256,7 +1298,7 @@ watch(selectedRange, async () => {
 
 .stat-card.purple { 
   border-color: rgba(99, 102, 241, 0.2);
-  background: linear-gradient(145deg, rgba(99, 102, 241, 0.08), rgba(255, 255, 255, 0.02));
+  background: rgba(99, 102, 241, 0.06);
 }
 .stat-card.purple:hover {
   box-shadow: 0 12px 40px rgba(99, 102, 241, 0.2), 0 0 80px rgba(99, 102, 241, 0.08);
@@ -1264,14 +1306,14 @@ watch(selectedRange, async () => {
 }
 .stat-card.purple::before {
   content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
-  background: linear-gradient(90deg, transparent, #6366f1, transparent);
+  background: #6366f1;
   opacity: 0; transition: opacity 0.4s;
 }
 .stat-card.purple:hover::before { opacity: 1; }
 
 .stat-card.blue { 
   border-color: rgba(6, 182, 212, 0.2);
-  background: linear-gradient(145deg, rgba(6, 182, 212, 0.08), rgba(255, 255, 255, 0.02));
+  background: rgba(6, 182, 212, 0.06);
 }
 .stat-card.blue:hover {
   box-shadow: 0 12px 40px rgba(6, 182, 212, 0.2), 0 0 80px rgba(6, 182, 212, 0.08);
@@ -1279,14 +1321,14 @@ watch(selectedRange, async () => {
 }
 .stat-card.blue::before {
   content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
-  background: linear-gradient(90deg, transparent, #06b6d4, transparent);
+  background: #06b6d4;
   opacity: 0; transition: opacity 0.4s;
 }
 .stat-card.blue:hover::before { opacity: 1; }
 
 .stat-card.orange { 
   border-color: rgba(249, 115, 22, 0.2);
-  background: linear-gradient(145deg, rgba(249, 115, 22, 0.08), rgba(255, 255, 255, 0.02));
+  background: rgba(249, 115, 22, 0.06);
 }
 .stat-card.orange:hover {
   box-shadow: 0 12px 40px rgba(249, 115, 22, 0.2), 0 0 80px rgba(249, 115, 22, 0.08);
@@ -1294,7 +1336,7 @@ watch(selectedRange, async () => {
 }
 .stat-card.orange::before {
   content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
-  background: linear-gradient(90deg, transparent, #f97316, transparent);
+  background: #f97316;
   opacity: 0; transition: opacity 0.4s;
 }
 .stat-card.orange:hover::before { opacity: 1; }
@@ -1338,13 +1380,13 @@ watch(selectedRange, async () => {
 /* Charts Grid */
 .charts-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
   gap: 28px;
   margin-bottom: 36px;
 }
 
 .chart-card {
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02));
+  background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 24px;
   padding: 28px;
@@ -1370,101 +1412,293 @@ watch(selectedRange, async () => {
 }
 
 .card-header h3 {
-  font-size: 1.05rem; 
+  font-size: 1.15rem; 
   font-weight: 700; 
   color: #fff;
   display: flex; 
   align-items: center; 
-  gap: 10px;
+  gap: 12px;
   letter-spacing: -0.3px;
+  margin: 0;
 }
 
 .card-header h3::before {
   content: ''; 
   width: 5px; 
-  height: 20px;
-  background: linear-gradient(180deg, #6366f1, #8b5cf6); 
+  height: 18px;
+  background: #6366f1; 
   border-radius: 3px;
-  box-shadow: 0 0 10px rgba(99,102,241,0.5);
+  box-shadow: none;
+  display: block;
+  flex-shrink: 0;
 }
 
 .card-header.flex-between h3::before {
-  background: linear-gradient(180deg, #06b6d4, #0ea5e9);
-  box-shadow: 0 0 10px rgba(6,182,212,0.5);
+  background: #06b6d4;
+  box-shadow: none;
 }
 
-.chart-container { 
-  height: 260px; 
-  width: 100%; 
-  position: relative; 
+.chart-container {
+  height: 260px;
+  width: 100%;
+  position: relative;
 }
 
-/* Pie Chart Layout */
-.pie-container { 
-  display: flex; 
-  align-items: center; 
-  gap: 24px; 
+/* App Breakdown - New Full Width Design */
+.app-breakdown-card {
+  grid-column: 1 / -1;
 }
 
-.pie-wrapper { 
-  flex: 1; 
-  height: 220px; 
-  position: relative; 
+.app-breakdown-content {
+  display: grid;
+  grid-template-columns: 400px 1fr;
+  gap: 24px;
+  align-items: stretch;
+  min-height: 340px;
 }
 
-.custom-legend { 
-  width: 160px; 
-  display: flex; 
-  flex-direction: column; 
-  gap: 12px; 
+.app-breakdown-chart {
+  width: 100%;
+  height: 100%;
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.legend-item {
-  display: flex; 
-  align-items: center; 
-  font-size: 0.85rem; 
-  gap: 10px;
-  padding: 8px 12px; 
-  border-radius: 10px; 
-  transition: all 0.2s;
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.04);
+.app-breakdown-list {
+  display: flex;
+  flex-direction: column;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  overflow: hidden;
 }
 
-.legend-item:hover { 
-  background: rgba(255, 255, 255, 0.08); 
-  border-color: rgba(255,255,255,0.1);
+.app-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background: rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.app-list-header span:last-child {
+  text-align: right;
+  min-width: 120px;
+}
+
+.app-list-items {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+}
+
+.app-list-items::-webkit-scrollbar {
+  width: 6px;
+}
+.app-list-items::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+}
+.app-list-items::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+.app-list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  margin: 4px 0;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.app-list-item:hover {
+  background: rgba(255, 255, 255, 0.06);
   transform: translateX(4px);
 }
 
-.legend-dot { 
-  width: 12px; 
-  height: 12px; 
-  border-radius: 50%; 
+.app-item-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  flex: 1;
+}
+
+.app-color-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 4px;
   flex-shrink: 0;
-  box-shadow: 0 0 8px currentColor;
 }
 
-.legend-name { 
-  flex: 1; 
-  white-space: nowrap; 
-  overflow: hidden; 
-  text-overflow: ellipsis; 
-  color: var(--text-muted);
-  font-weight: 500;
+.app-list-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  object-fit: contain;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 4px;
+  flex-shrink: 0;
 }
 
-.legend-percent { 
-  font-weight: 700; 
-  color: #fff; 
-  font-size: 0.85rem;
-  background: rgba(255,255,255,0.1);
-  padding: 4px 8px;
+.app-list-icon-fallback {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.app-list-name {
+  font-weight: 600;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.95rem;
+}
+
+.app-item-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  min-width: 120px;
+  flex-shrink: 0;
+}
+
+.app-list-percent {
+  font-weight: 700;
+  color: #06b6d4;
+  font-size: 0.95rem;
+  background: rgba(6, 182, 212, 0.15);
+  padding: 4px 10px;
   border-radius: 6px;
 }
 
+.app-list-time {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  font-feature-settings: "tnum";
+}
+
+.custom-legend::-webkit-scrollbar {
+  width: 4px;
+}
+.custom-legend::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 4px;
+}
+.custom-legend::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+.custom-legend::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  font-size: 0.9rem;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  cursor: pointer;
+  width: 100%;
+}
+
+.legend-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(6, 182, 212, 0.3);
+  transform: translateX(4px);
+}
+
+.legend-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  flex: 1;
+}
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.legend-icon-container {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.legend-app-icon {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 4px;
+}
+
+.legend-icon-fallback {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.legend-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text-main);
+  font-weight: 600;
+  min-width: 0;
+  flex: 1;
+}
+
+.legend-percent {
+  font-weight: 700;
+  color: #06b6d4;
+  font-size: 0.85rem;
+  background: rgba(6, 182, 212, 0.1);
+  padding: 4px 10px;
+  border-radius: 8px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+
 .btn-icon {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04));
+  background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.1);
   width: 36px; 
   height: 36px; 
@@ -1478,7 +1712,7 @@ watch(selectedRange, async () => {
 }
 
 .btn-icon:hover { 
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.08));
+  background: rgba(255, 255, 255, 0.12);
   color: #fff; 
   transform: scale(1.08);
   border-color: rgba(255, 255, 255, 0.2);
@@ -1487,7 +1721,7 @@ watch(selectedRange, async () => {
 /* Websites Grid */
 .websites-section {
   border: 1px solid rgba(6, 182, 212, 0.25);
-  background: linear-gradient(135deg, rgba(6, 182, 212, 0.06), rgba(14, 165, 233, 0.04));
+  background: rgba(6, 182, 212, 0.05);
   border-radius: 20px;
   padding: 24px;
   backdrop-filter: blur(10px);
@@ -1498,19 +1732,21 @@ watch(selectedRange, async () => {
 }
 
 .websites-section .section-header h3 {
-  color: #06b6d4;
-  font-size: 1.1rem;
+  color: #fff;
+  font-size: 1.2rem;
   font-weight: 700;
   letter-spacing: -0.3px;
+  display: flex;
+  align-items: center;
 }
 
 .websites-section .section-header h3::before {
-  background: linear-gradient(180deg, #06b6d4, #0ea5e9);
+  background: #06b6d4;
   box-shadow: 0 0 10px rgba(6,182,212,0.5);
 }
 
 .websites-badge {
-  background: linear-gradient(135deg, #06b6d4, #0ea5e9);
+  background: #06b6d4;
   color: #fff;
   font-weight: 600;
   padding: 6px 12px;
@@ -1526,7 +1762,7 @@ watch(selectedRange, async () => {
 }
 
 .website-card {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02));
+  background: rgba(255, 255, 255, 0.03);
   padding: 18px;
   border-radius: 16px;
   display: flex;
@@ -1546,7 +1782,7 @@ watch(selectedRange, async () => {
   top: 0;
   bottom: 0;
   width: 3px;
-  background: linear-gradient(180deg, #06b6d4, #0ea5e9);
+  background: #06b6d4;
   opacity: 0;
   transition: opacity 0.3s ease;
 }
@@ -1556,7 +1792,7 @@ watch(selectedRange, async () => {
 }
 
 .website-card:hover {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04));
+  background: rgba(255, 255, 255, 0.06);
   border-color: rgba(6, 182, 212, 0.4);
   transform: translateX(8px);
   box-shadow: 0 8px 24px rgba(6, 182, 212, 0.2);
@@ -1578,17 +1814,17 @@ watch(selectedRange, async () => {
 }
 
 .website-rank.gold {
-  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  background: #fbbf24;
   box-shadow: 0 2px 10px rgba(251, 191, 36, 0.5);
 }
 
 .website-rank.silver {
-  background: linear-gradient(135deg, #94a3b8, #64748b);
+  background: #94a3b8;
   box-shadow: 0 2px 10px rgba(148, 163, 184, 0.4);
 }
 
 .website-rank.bronze {
-  background: linear-gradient(135deg, #f59e0b, #d97706);
+  background: #f59e0b;
   box-shadow: 0 2px 10px rgba(245, 158, 11, 0.4);
 }
 
@@ -1680,7 +1916,7 @@ watch(selectedRange, async () => {
   width: 36px;
   height: 36px;
   border-radius: 10px;
-  background: linear-gradient(135deg, rgba(6, 182, 212, 0.15), rgba(14, 165, 233, 0.1));
+  background: rgba(6, 182, 212, 0.12);
   color: #06b6d4;
   opacity: 0;
   transition: all 0.3s ease;
@@ -1690,7 +1926,7 @@ watch(selectedRange, async () => {
 
 .website-card:hover .website-view-history {
   opacity: 1;
-  background: linear-gradient(135deg, rgba(6, 182, 212, 0.25), rgba(14, 165, 233, 0.15));
+  background: rgba(6, 182, 212, 0.2);
   transform: translateX(4px);
   border-color: rgba(6, 182, 212, 0.4);
 }
@@ -1699,7 +1935,7 @@ watch(selectedRange, async () => {
 .empty-state { 
   text-align: center; 
   padding: 80px 20px; 
-  background: linear-gradient(135deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  background: rgba(255,255,255,0.02);
   border-radius: 24px;
   border: 1px solid rgba(255,255,255,0.06);
 }
@@ -1712,10 +1948,7 @@ watch(selectedRange, async () => {
 }
 
 .empty-state h3 {
-  background: linear-gradient(135deg, #fff, #818cf8, #6366f1);
-  -webkit-background-clip: text; 
-  -webkit-text-fill-color: transparent; 
-  background-clip: text;
+  color: #fff;
   margin-bottom: 10px;
   font-size: 1.3rem;
   font-weight: 700;
@@ -1741,7 +1974,7 @@ watch(selectedRange, async () => {
 }
 
 .modal-content {
-  background: linear-gradient(145deg, rgba(30, 34, 48, 0.95), rgba(26, 27, 38, 0.98));
+  background: rgba(30, 34, 48, 0.97);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 24px; 
   width: 650px; 
@@ -1758,20 +1991,17 @@ watch(selectedRange, async () => {
   display: flex; 
   justify-content: space-between; 
   align-items: center;
-  background: linear-gradient(135deg, rgba(255,255,255,0.02), transparent);
+  background: rgba(255,255,255,0.02);
 }
 
 .modal-header h3 {
   font-size: 1.2rem;
   font-weight: 700;
-  background: linear-gradient(135deg, #fff, #818cf8);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #fff;
 }
 
 .close-btn {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04));
+  background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.1);
   font-size: 1.4rem; 
   color: var(--text-muted); 
@@ -1787,7 +2017,7 @@ watch(selectedRange, async () => {
 
 .close-btn:hover { 
   color: #fff; 
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.08));
+  background: rgba(255, 255, 255, 0.12);
   border-color: rgba(255, 255, 255, 0.2);
   transform: rotate(90deg);
 }
@@ -1808,7 +2038,7 @@ watch(selectedRange, async () => {
   color: var(--text-muted);
   font-weight: 600; 
   font-size: 0.85rem; 
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02));
+  background: rgba(255, 255, 255, 0.03);
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -1825,7 +2055,7 @@ watch(selectedRange, async () => {
 }
 
 .table-row:hover { 
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02));
+  background: rgba(255, 255, 255, 0.03); 
   transform: translateX(4px);
 }
 
@@ -1857,7 +2087,7 @@ watch(selectedRange, async () => {
 .percent-pill {
   display: inline-block; 
   padding: 6px 12px;
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.15));
+  background: rgba(99, 102, 241, 0.15);
   border-radius: 14px; 
   font-size: 0.85rem; 
   font-weight: 700; 
@@ -1870,7 +2100,7 @@ watch(selectedRange, async () => {
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb { 
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.1)); 
+  background: rgba(255, 255, 255, 0.12); 
   border-radius: 3px; 
 }
 
@@ -1879,45 +2109,48 @@ watch(selectedRange, async () => {
 }
 
 @media (max-width: 900px) {
-  .stats-row { 
-    grid-template-columns: 1fr; 
+  .stats-row {
+    grid-template-columns: 1fr;
   }
-  
-  .charts-grid { 
-    grid-template-columns: 1fr; 
+
+  .charts-grid {
+    grid-template-columns: 1fr;
   }
-  
-  .large-chart { 
-    grid-column: span 1; 
+
+  .large-chart {
+    grid-column: span 1;
   }
-  
-  .pie-container { 
-    flex-direction: column; 
-    height: auto; 
-    padding: 20px 0;
+
+  .app-breakdown-content {
+    grid-template-columns: 1fr;
+    gap: 16px;
   }
-  
-  .pie-wrapper { 
-    height: 220px; 
-    width: 100%; 
+
+  .app-breakdown-chart {
+    min-height: 240px;
+    padding: 16px;
   }
-  
-  .custom-legend { 
-    width: 100%; 
-    flex-direction: row; 
-    flex-wrap: wrap; 
-    justify-content: center;
+
+  .app-breakdown-list {
+    max-height: 280px;
   }
-  
-  .legend-item {
-    font-size: 0.8rem;
-    padding: 6px 10px;
+
+  .app-list-item {
+    padding: 12px 14px;
   }
-  
+
+  .app-list-name {
+    font-size: 0.9rem;
+  }
+
+  .app-list-percent {
+    font-size: 0.85rem;
+  }
+
   .website-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .music-grid {
     grid-template-columns: 1fr;
   }
@@ -1993,7 +2226,7 @@ watch(selectedRange, async () => {
 }
 
 .day-session-item:hover { 
-  background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02)); 
+  background: rgba(255,255,255,0.04); 
   transform: translateX(8px);
   border-color: rgba(255,255,255,0.08);
 }
@@ -2055,30 +2288,36 @@ watch(selectedRange, async () => {
 /* Music Section */
 .music-section {
   border: 1px solid rgba(236, 72, 153, 0.25);
-  background: linear-gradient(135deg, rgba(236, 72, 153, 0.06), rgba(139, 92, 246, 0.04));
+  background: rgba(236, 72, 153, 0.05);
   border-radius: 20px;
   padding: 24px;
   backdrop-filter: blur(10px);
 }
 
 .music-section .section-header {
-  margin-bottom: 20px;
+  margin-bottom: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .music-section .section-header h3 {
-  color: #ec4899;
-  font-size: 1.1rem;
+  color: #fff;
+  font-size: 1.2rem;
   font-weight: 700;
   letter-spacing: -0.3px;
+  display: flex;
+  align-items: center;
 }
 
 .music-section .section-header h3::before {
-  background: linear-gradient(180deg, #ec4899, #8b5cf6);
+  background: #ec4899;
   box-shadow: 0 0 10px rgba(236,72,153,0.5);
 }
 
+
 .total-music {
-  background: linear-gradient(135deg, #ec4899, #8b5cf6);
+  background: #ec4899;
   color: #fff;
   font-weight: 600;
   padding: 6px 12px;
@@ -2095,7 +2334,7 @@ watch(selectedRange, async () => {
 }
 
 .music-card {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02));
+  background: rgba(255, 255, 255, 0.03);
   padding: 18px;
   border-radius: 16px;
   display: flex;
@@ -2115,7 +2354,7 @@ watch(selectedRange, async () => {
   top: 0;
   bottom: 0;
   width: 3px;
-  background: linear-gradient(180deg, #ec4899, #8b5cf6);
+  background: #ec4899;
   opacity: 0;
   transition: opacity 0.3s ease;
 }
@@ -2125,7 +2364,7 @@ watch(selectedRange, async () => {
 }
 
 .music-card:hover {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 0.04));
+  background: rgba(255, 255, 255, 0.06);
   border-color: rgba(236, 72, 153, 0.4);
   transform: translateX(8px);
   box-shadow: 0 8px 24px rgba(236, 72, 153, 0.2);
@@ -2147,17 +2386,17 @@ watch(selectedRange, async () => {
 }
 
 .music-rank.gold {
-  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  background: #fbbf24;
   box-shadow: 0 2px 10px rgba(251, 191, 36, 0.5);
 }
 
 .music-rank.silver {
-  background: linear-gradient(135deg, #94a3b8, #64748b);
+  background: #94a3b8;
   box-shadow: 0 2px 10px rgba(148, 163, 184, 0.4);
 }
 
 .music-rank.bronze {
-  background: linear-gradient(135deg, #f59e0b, #d97706);
+  background: #f59e0b;
   box-shadow: 0 2px 10px rgba(245, 158, 11, 0.4);
 }
 
@@ -2259,7 +2498,7 @@ watch(selectedRange, async () => {
   width: 36px;
   height: 36px;
   border-radius: 10px;
-  background: linear-gradient(135deg, rgba(236, 72, 153, 0.15), rgba(139, 92, 246, 0.1));
+  background: rgba(236, 72, 153, 0.12);
   color: #ec4899;
   opacity: 0;
   transition: all 0.3s ease;
@@ -2269,7 +2508,7 @@ watch(selectedRange, async () => {
 
 .music-card:hover .music-view-history {
   opacity: 1;
-  background: linear-gradient(135deg, rgba(236, 72, 153, 0.25), rgba(139, 92, 246, 0.15));
+  background: rgba(236, 72, 153, 0.2);
   transform: translateX(4px);
   border-color: rgba(236, 72, 153, 0.4);
 }
@@ -2277,7 +2516,7 @@ watch(selectedRange, async () => {
 /* Now Playing */
 .now-playing {
   margin-top: 24px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+  background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(236, 72, 153, 0.2);
   border-radius: 16px;
   overflow: hidden;
@@ -2290,7 +2529,7 @@ watch(selectedRange, async () => {
   position: absolute;
   top: 0; left: 0; right: 0;
   height: 2px;
-  background: linear-gradient(90deg, #ec4899, #8b5cf6, #ec4899);
+  background: #ec4899;
   background-size: 200% 100%;
   animation: gradientMove 3s ease infinite;
 }
@@ -2322,7 +2561,7 @@ watch(selectedRange, async () => {
   font-size: 0.7rem;
   font-weight: 800;
   color: #ef4444;
-  background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(239, 68, 68, 0.1));
+  background: rgba(239, 68, 68, 0.15);
   padding: 4px 10px;
   border-radius: 12px;
   margin-left: auto;
@@ -2340,7 +2579,7 @@ watch(selectedRange, async () => {
 .now-playing-icon {
   width: 64px;
   height: 64px;
-  background: linear-gradient(135deg, #ec4899, #8b5cf6);
+  background: #ec4899;
   border-radius: 16px;
   display: flex;
   align-items: center;
@@ -2387,7 +2626,7 @@ watch(selectedRange, async () => {
   font-size: 0.75rem;
   font-weight: 700;
   color: #ef4444;
-  background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(239, 68, 68, 0.1));
+  background: rgba(239, 68, 68, 0.15);
   padding: 6px 14px;
   border-radius: 14px;
   flex-shrink: 0;
@@ -2428,7 +2667,7 @@ watch(selectedRange, async () => {
   justify-content: center;
   color: #fff;
   flex-shrink: 0;
-  background: linear-gradient(135deg, #ec4899, #8b5cf6);
+  background: #ec4899;
 }
 
 .music-history-total {
@@ -2454,7 +2693,7 @@ watch(selectedRange, async () => {
 }
 
 .music-session-item:hover {
-  background: linear-gradient(135deg, rgba(236, 72, 153, 0.2), rgba(139, 92, 246, 0.2));
+  background: rgba(236, 72, 153, 0.15);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2467,7 +2706,7 @@ watch(selectedRange, async () => {
   width: 40px;
   height: 40px;
   border-radius: 10px;
-  background: linear-gradient(135deg, rgba(236, 72, 153, 0.2), rgba(139, 92, 246, 0.2));
+  background: rgba(236, 72, 153, 0.15);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2528,7 +2767,7 @@ watch(selectedRange, async () => {
   width: 44px;
   height: 44px;
   border-radius: 12px;
-  background: linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(14, 165, 233, 0.2));
+  background: rgba(6, 182, 212, 0.15);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2574,7 +2813,7 @@ watch(selectedRange, async () => {
   width: 40px;
   height: 40px;
   border-radius: 10px;
-  background: linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(14, 165, 233, 0.2));
+  background: rgba(6, 182, 212, 0.15);
   display: flex;
   align-items: center;
   justify-content: center;
