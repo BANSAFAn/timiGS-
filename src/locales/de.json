@@ -62,6 +62,9 @@
     "percentage": "%",
     "topWebsites": "Top-Websites"
   },
+  "common": {
+    "today": "Heute"
+  },
   "settings": {
     "title": "Einstellungen",
     "appearance": "Aussehen",
@@ -113,7 +116,22 @@
     "checkUpdates": "Nach Updates suchen",
     "checkNow": "Jetzt prüfen",
     "checking": "Prüfe...",
-    "noUpdates": "Sie verwenden die neueste Version."
+    "noUpdates": "Sie verwenden die neueste Version.",
+    "doctorModeTitle": "Arzt-Modus",
+    "doctorModeSubtitle": "Gesundheit & Wohlbefinden",
+    "enableDoctorMode": "Arzt-Modus aktivieren",
+    "doctorModeDesc": "Erinnert Sie daran, Pausen einzulegen, wenn Sie zu lange am Computer verbringen.",
+    "reminderInterval": "Erinnerungsintervall",
+    "reminderIntervalDesc": "Wie oft Sie an eine Pause erinnert werden sollen (in Minuten)",
+    "lockDuration": "Sperrdauer",
+    "lockDurationDesc": "Wie lange der PC nach dem Ignorieren von Erinnerungen gesperrt wird (in Minuten)",
+    "maxReminders": "Max. Erinnerungen",
+    "maxRemindersDesc": "Anzahl der Erinnerungen, bevor der PC gesperrt wird",
+    "timeLimit": "Zeitlimit (Minuten)",
+    "timeLimitDesc": "Wie lange vor dem Auslösen einer Pausenerinnerung",
+    "resetSession": "Aktive Sitzung zurücksetzen",
+    "doctorModeAlertMessage": "Sie sind schon lange am PC. Bitte machen Sie eine Pause, gehen Sie spazieren oder ruhen Sie Ihre Augen für eine Stunde aus!",
+    "doctorModeRepeatMessage": "Sie ignorieren immer noch Ihre Pause. Gönnen Sie Ihren Augen eine Erholung!"
   },
   "tools": {
     "timer": "Ausschalt-Timer",

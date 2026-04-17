@@ -60,6 +60,9 @@
     "percentage": "%",
     "topWebsites": "أفضل المواقع"
   },
+  "common": {
+    "today": "اليوم"
+  },
   "settings": {
     "title": "الإعدادات",
     "appearance": "المظهر",
@@ -111,7 +114,22 @@
     "checkUpdates": "البحث عن تحديثات",
     "checkNow": "تحقق الآن",
     "checking": "جاري التحقق...",
-    "noUpdates": "أنت تستخدم أحدث إصدار."
+    "noUpdates": "أنت تستخدم أحدث إصدار.",
+    "doctorModeTitle": "وضع الطبيب",
+    "doctorModeSubtitle": "الصحة والعافية",
+    "enableDoctorMode": "تفعيل وضع الطبيب",
+    "doctorModeDesc": "يذكرك بأخذ فترات راحة عندما تقضي وقتًا طويلاً أمام الكمبيوتر.",
+    "reminderInterval": "فاصل التذكير",
+    "reminderIntervalDesc": "كم مرة يذكرك بأخذ استراحة (بالدقائق)",
+    "lockDuration": "مدة القفل",
+    "lockDurationDesc": "كم من الوقت لقفل الكمبيوتر بعد تجاهل التذكيرات (بالدقائق)",
+    "maxReminders": "الحد الأقصى للتذكيرات",
+    "maxRemindersDesc": "عدد التذكيرات قبل قفل الكمبيوتر",
+    "timeLimit": "الحد الزمني (دقائق)",
+    "timeLimitDesc": "كم من الوقت قبل تفعيل تذكير بالاستراحة",
+    "resetSession": "إعادة تعيين الجلسة النشطة",
+    "doctorModeAlertMessage": "لقد كنت أمام الكمبيوتر لفترة طويلة. يرجى أخذ استراحة، اذهب للتنزه أو أرح عينيك لمدة ساعة!",
+    "doctorModeRepeatMessage": "ما زلت تتجاهل استراحتك. أرح عينيك!"
   },
   "tools": {
     "timer": "مؤقت الإغلاق",

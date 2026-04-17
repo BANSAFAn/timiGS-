@@ -60,6 +60,9 @@
     "percentage": "%",
     "topWebsites": "Meilleurs sites Web"
   },
+  "common": {
+    "today": "Aujourd'hui"
+  },
   "settings": {
     "title": "Paramètres",
     "appearance": "Apparence",
@@ -111,7 +114,22 @@
     "checkUpdates": "Vérifier les mises à jour",
     "checkNow": "Vérifier maintenant",
     "checking": "Vérification...",
-    "noUpdates": "Vous utilisez la dernière version."
+    "noUpdates": "Vous utilisez la dernière version.",
+    "doctorModeTitle": "Mode Médecin",
+    "doctorModeSubtitle": "Santé & Bien-être",
+    "enableDoctorMode": "Activer le mode Médecin",
+    "doctorModeDesc": "Vous rappelle de faire des pauses lorsque vous passez trop de temps devant l'ordinateur.",
+    "reminderInterval": "Intervalle de rappel",
+    "reminderIntervalDesc": "Fréquence des rappels de pause (en minutes)",
+    "lockDuration": "Durée de verrouillage",
+    "lockDurationDesc": "Durée de verrouillage du PC après avoir ignoré les rappels (en minutes)",
+    "maxReminders": "Rappels max",
+    "maxRemindersDesc": "Nombre de rappels avant le verrouillage du PC",
+    "timeLimit": "Limite de temps (minutes)",
+    "timeLimitDesc": "Temps avant de déclencher un rappel de pause",
+    "resetSession": "Réinitialiser la session active",
+    "doctorModeAlertMessage": "Vous êtes devant votre PC depuis longtemps. Veuillez faire une pause, vous promener ou reposer vos yeux pendant une heure !",
+    "doctorModeRepeatMessage": "Vous ignorez toujours votre pause. Reposez vos yeux !"
   },
   "tools": {
     "timer": "Minuterie d'arrêt",

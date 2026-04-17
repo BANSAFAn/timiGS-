@@ -60,6 +60,9 @@
     "percentage": "%",
     "topWebsites": "热门网站"
   },
+  "common": {
+    "today": "今天"
+  },
   "settings": {
     "title": "设置",
     "appearance": "外观",
@@ -111,7 +114,22 @@
     "checkUpdates": "检查更新",
     "checkNow": "立即检查",
     "checking": "检查中...",
-    "noUpdates": "您正在使用最新版本。"
+    "noUpdates": "您正在使用最新版本。",
+    "doctorModeTitle": "医生模式",
+    "doctorModeSubtitle": "健康与福祉",
+    "enableDoctorMode": "启用医生模式",
+    "doctorModeDesc": "当您在电脑前花费太多时间时提醒您休息。",
+    "reminderInterval": "提醒间隔",
+    "reminderIntervalDesc": "提醒休息的频率（分钟）",
+    "lockDuration": "锁定持续时间",
+    "lockDurationDesc": "忽略提醒后锁定电脑的时间（分钟）",
+    "maxReminders": "最大提醒次数",
+    "maxRemindersDesc": "锁定电脑前的提醒次数",
+    "timeLimit": "时间限制（分钟）",
+    "timeLimitDesc": "触发休息提醒前的时间",
+    "resetSession": "重置活动会话",
+    "doctorModeAlertMessage": "您已经在电脑前很长时间了。请休息一下，去散步或让眼睛休息一小时！",
+    "doctorModeRepeatMessage": "您仍然在忽略休息。让您的眼睛休息一下！"
   },
   "tools": {
     "timer": "关机定时器",

@@ -74,6 +74,9 @@
     "categoryRest": "Odpoczynek",
     "categorizeApps": "Kategoryzuj Aplikacje"
   },
+  "common": {
+    "today": "Dzisiaj"
+  },
   "settings": {
     "title": "Ustawienia",
     "appearance": "Wygląd",
@@ -112,6 +115,22 @@
     "checkUpdates": "Sprawdź Aktualizacje",
     "checkNow": "Sprawdź Teraz",
     "checking": "Sprawdzanie...",
+    "noUpdates": "Używasz najnowszej wersji.",
+    "doctorModeTitle": "Tryb Doktora",
+    "doctorModeSubtitle": "Zdrowie i Samopoczucie",
+    "enableDoctorMode": "Włącz tryb Doktora",
+    "doctorModeDesc": "Przypomina o robieniu przerw, gdy spędzasz zbyt dużo czasu przy komputerze.",
+    "reminderInterval": "Interwał przypomnień",
+    "reminderIntervalDesc": "Jak często przypominać o przerwie (w minutach)",
+    "lockDuration": "Czas blokady",
+    "lockDurationDesc": "Jak długo blokować PC po zignorowaniu przypomnień (w minutach)",
+    "maxReminders": "Maks. przypomnień",
+    "maxRemindersDesc": "Liczba przypomnień przed zablokowaniem PC",
+    "timeLimit": "Limit czasu (minuty)",
+    "timeLimitDesc": "Ile czasu przed uruchomieniem przypomnienia o przerwie",
+    "resetSession": "Resetuj aktywną sesję",
+    "doctorModeAlertMessage": "Jesteś przy swoim PC od dłuższego czasu. Proszę, zrób przerwę, idź na spacer lub odpocznij oczami przez godzinę!",
+    "doctorModeRepeatMessage": "Nadal ignorujesz swoją przerwę. Daj odpocząć oczom!",
     "resetData": "Resetuj Wszystkie Dane",
     "resetDataDesc": "Trwale usuń wszystkie śledzone dane i ustawienia",
     "resetConfirmTitle": "Resetować Wszystkie Dane?",

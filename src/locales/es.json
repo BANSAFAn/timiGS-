@@ -60,6 +60,9 @@
     "percentage": "%",
     "topWebsites": "Sitios web principales"
   },
+  "common": {
+    "today": "Hoy"
+  },
   "settings": {
     "title": "Ajustes",
     "appearance": "Apariencia",
@@ -111,7 +114,22 @@
     "checkUpdates": "Buscar actualizaciones",
     "checkNow": "Verificar ahora",
     "checking": "Verificando...",
-    "noUpdates": "Estás usando la última versión."
+    "noUpdates": "Estás usando la última versión.",
+    "doctorModeTitle": "Modo Doctor",
+    "doctorModeSubtitle": "Salud y Bienestar",
+    "enableDoctorMode": "Activar modo Doctor",
+    "doctorModeDesc": "Te recuerda que hagas pausas cuando pasas demasiado tiempo en la computadora.",
+    "reminderInterval": "Intervalo de recordatorio",
+    "reminderIntervalDesc": "Con qué frecuencia recordarte que hagas una pausa (en minutos)",
+    "lockDuration": "Duración del bloqueo",
+    "lockDurationDesc": "Cuánto tiempo bloquear el PC después de ignorar recordatorios (en minutos)",
+    "maxReminders": "Máx. recordatorios",
+    "maxRemindersDesc": "Número de recordatorios antes de bloquear el PC",
+    "timeLimit": "Límite de tiempo (minutos)",
+    "timeLimitDesc": "Cuánto tiempo antes de activar un recordatorio de pausa",
+    "resetSession": "Reiniciar sesión activa",
+    "doctorModeAlertMessage": "Has estado en tu PC por mucho tiempo. ¡Por favor toma un descanso, sal a caminar o descansa tus ojos durante una hora!",
+    "doctorModeRepeatMessage": "¡Sigues ignorando tu descanso. ¡Dale un descanso a tus ojos!"
   },
   "tools": {
     "timer": "Temporizador de apagado",

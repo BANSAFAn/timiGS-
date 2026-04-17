@@ -74,6 +74,9 @@
     "categoryRest": "Descanso",
     "categorizeApps": "Categorizar Apps"
   },
+  "common": {
+    "today": "Hoje"
+  },
   "settings": {
     "title": "Configurações",
     "appearance": "Aparência",
@@ -112,6 +115,22 @@
     "checkUpdates": "Verificar Atualizações",
     "checkNow": "Verificar Agora",
     "checking": "Verificando...",
+    "noUpdates": "Você está usando a versão mais recente.",
+    "doctorModeTitle": "Modo Médico",
+    "doctorModeSubtitle": "Saúde e Bem-estar",
+    "enableDoctorMode": "Ativar modo Médico",
+    "doctorModeDesc": "Lembra você de fazer pausas quando passa tempo demais no computador.",
+    "reminderInterval": "Intervalo de lembrete",
+    "reminderIntervalDesc": "Com que frequência lembrar você de fazer uma pausa (em minutos)",
+    "lockDuration": "Duração do bloqueio",
+    "lockDurationDesc": "Por quanto tempo bloquear o PC após ignorar lembretes (em minutos)",
+    "maxReminders": "Máx. lembretes",
+    "maxRemindersDesc": "Número de lembretes antes de bloquear o PC",
+    "timeLimit": "Limite de tempo (minutos)",
+    "timeLimitDesc": "Quanto tempo antes de ativar um lembrete de pausa",
+    "resetSession": "Redefinir sessão ativa",
+    "doctorModeAlertMessage": "Você está no seu PC há muito tempo. Por favor, faça uma pausa, vá caminhar ou descanse seus olhos por uma hora!",
+    "doctorModeRepeatMessage": "Você ainda está ignorando sua pausa. Dê um descanso aos seus olhos!",
     "resetData": "Redefinir Todos os Dados",
     "resetDataDesc": "Excluir permanentemente todos os dados rastreados e configurações",
     "resetConfirmTitle": "Redefinir Todos os Dados?",
