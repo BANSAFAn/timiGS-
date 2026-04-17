@@ -1168,19 +1168,21 @@ pub fn reset_all_data() -> Result<()> {
     Ok(())
 }
 
-pub fn export_sessions_csv(path: &str) -> Result<()> {
+pub fn export_sessions_csv(path: &str, start_date: &str, end_date: &str) -> Result<()> {
     let guard = DB.lock();
     let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
 
     let mut stmt = conn.prepare(
         "SELECT app_name, window_title, exe_path, start_time, end_time, duration_seconds
-         FROM activity_sessions ORDER BY start_time DESC",
+         FROM activity_sessions 
+         WHERE date(start_time) >= date(?) AND date(start_time) <= date(?)
+         ORDER BY start_time DESC",
     )?;
 
     let mut csv_content =
         String::from("App Name,Window Title,Exe Path,Start Time,End Time,Duration (seconds)\n");
 
-    let rows = stmt.query_map([], |row| {
+    let rows = stmt.query_map([start_date, end_date], |row| {
         let app_name: String = row.get(0)?;
         let window_title: String = row.get(1)?;
         let exe_path: String = row.get(2)?;
@@ -1225,13 +1227,15 @@ pub fn export_sessions_csv(path: &str) -> Result<()> {
     Ok(())
 }
 
-pub fn export_sessions_html(path: &str) -> Result<()> {
+pub fn export_sessions_html(path: &str, start_date: &str, end_date: &str) -> Result<()> {
     let guard = DB.lock();
     let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
 
     let mut stmt = conn.prepare(
         "SELECT app_name, window_title, start_time, end_time, duration_seconds
-         FROM activity_sessions ORDER BY start_time DESC",
+         FROM activity_sessions 
+         WHERE date(start_time) >= date(?) AND date(start_time) <= date(?)
+         ORDER BY start_time DESC",
     )?;
 
     let mut html_content = String::from(r#"<!DOCTYPE html>
@@ -1265,7 +1269,7 @@ pub fn export_sessions_html(path: &str) -> Result<()> {
         <tbody>
 "#);
 
-    let rows = stmt.query_map([], |row| {
+    let rows = stmt.query_map([start_date, end_date], |row| {
         let app_name: String = row.get(0)?;
         let window_title: String = row.get(1)?;
         let start_time: String = row.get(2)?;
@@ -1320,16 +1324,18 @@ pub fn export_sessions_html(path: &str) -> Result<()> {
     Ok(())
 }
 
-pub fn export_sessions_json(path: &str) -> Result<()> {
+pub fn export_sessions_json(path: &str, start_date: &str, end_date: &str) -> Result<()> {
     let guard = DB.lock();
     let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
 
     let mut stmt = conn.prepare(
         "SELECT app_name, window_title, exe_path, start_time, end_time, duration_seconds
-         FROM activity_sessions ORDER BY start_time DESC",
+         FROM activity_sessions 
+         WHERE date(start_time) >= date(?) AND date(start_time) <= date(?)
+         ORDER BY start_time DESC",
     )?;
 
-    let rows = stmt.query_map([], |row| {
+    let rows = stmt.query_map([start_date, end_date], |row| {
         let app_name: String = row.get(0)?;
         let window_title: String = row.get(1)?;
         let exe_path: String = row.get(2)?;
@@ -1362,20 +1368,22 @@ pub fn export_sessions_json(path: &str) -> Result<()> {
     Ok(())
 }
 
-pub fn export_sessions_markdown(path: &str) -> Result<()> {
+pub fn export_sessions_markdown(path: &str, start_date: &str, end_date: &str) -> Result<()> {
     let guard = DB.lock();
     let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
 
     let mut stmt = conn.prepare(
         "SELECT app_name, window_title, exe_path, start_time, end_time, duration_seconds
-         FROM activity_sessions ORDER BY start_time DESC",
+         FROM activity_sessions 
+         WHERE date(start_time) >= date(?) AND date(start_time) <= date(?)
+         ORDER BY start_time DESC",
     )?;
 
     let mut md_content = String::from("# TimiGS Activity Report\n\n");
     md_content.push_str("| App Name | Window Title | Start Time | End Time | Duration (seconds) |\n");
     md_content.push_str("|---|---|---|---|---|\n");
 
-    let rows = stmt.query_map([], |row| {
+    let rows = stmt.query_map([start_date, end_date], |row| {
         let app_name: String = row.get(0)?;
         let window_title: String = row.get(1)?;
         let exe_path: String = row.get(2)?;
@@ -1442,7 +1450,7 @@ pub fn auto_export_if_needed() -> Result<()> {
         std::fs::create_dir_all(&settings.auto_export_folder)
             .map_err(|e| rusqlite::Error::ToSqlConversionFailure(Box::new(e)))?;
 
-        export_sessions_html(export_path.to_str().unwrap())?;
+        export_sessions_html(export_path.to_str().unwrap(), "1970-01-01", "2099-12-31")?;
 
         save_last_export_time(&now.to_rfc3339())?;
     }

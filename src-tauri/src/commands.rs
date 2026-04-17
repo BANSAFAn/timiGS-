@@ -49,6 +49,15 @@ pub fn get_summary_by_date_cmd(date: String) -> Vec<db::AppUsageSummary> {
 }
 
 #[command]
+pub fn get_computer_name() -> String {
+    std::env::var("COMPUTERNAME")
+        .or_else(|_| std::env::var("HOSTNAME"))
+        .or_else(|_| std::env::var("USER"))
+        .or_else(|_| std::env::var("USERNAME"))
+        .unwrap_or_else(|_| "User".to_string())
+}
+
+#[command]
 pub fn get_music_today_summary() -> Vec<db::MusicAppUsage> {
     db::get_today_music_summary().unwrap_or_default()
 }
@@ -533,23 +542,23 @@ pub fn reset_all_data_cmd() -> Result<(), String> {
 }
 
 #[command]
-pub fn export_data_csv_cmd(path: String) -> Result<(), String> {
-    crate::db::export_sessions_csv(&path).map_err(|e| e.to_string())
+pub fn export_data_csv_cmd(path: String, start_date: String, end_date: String) -> Result<(), String> {
+    crate::db::export_sessions_csv(&path, &start_date, &end_date).map_err(|e| e.to_string())
 }
 
 #[command]
-pub fn export_data_html_cmd(path: String) -> Result<(), String> {
-    crate::db::export_sessions_html(&path).map_err(|e| e.to_string())
+pub fn export_data_html_cmd(path: String, start_date: String, end_date: String) -> Result<(), String> {
+    crate::db::export_sessions_html(&path, &start_date, &end_date).map_err(|e| e.to_string())
 }
 
 #[command]
-pub fn export_data_json_cmd(path: String) -> Result<(), String> {
-    crate::db::export_sessions_json(&path).map_err(|e| e.to_string())
+pub fn export_data_json_cmd(path: String, start_date: String, end_date: String) -> Result<(), String> {
+    crate::db::export_sessions_json(&path, &start_date, &end_date).map_err(|e| e.to_string())
 }
 
 #[command]
-pub fn export_data_markdown_cmd(path: String) -> Result<(), String> {
-    crate::db::export_sessions_markdown(&path).map_err(|e| e.to_string())
+pub fn export_data_markdown_cmd(path: String, start_date: String, end_date: String) -> Result<(), String> {
+    crate::db::export_sessions_markdown(&path, &start_date, &end_date).map_err(|e| e.to_string())
 }
 
 #[command]
