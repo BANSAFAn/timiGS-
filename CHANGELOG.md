@@ -1,5 +1,53 @@
 # Changelog
 
+## [1.3.0](https://github.com/BANSAFAn/timiGS-/compare/v1.2.0...v1.3.0) (2026-04-17)
+
+
+### Features
+
+* add auto-export backend commands and doctor mode backend ([53af06e](https://github.com/BANSAFAn/timiGS-/commit/53af06ed82e8e060f5fe5d2577cc6b998fb0b931))
+* add CustomCalendar, ModernToggle, and ConfirmDialog components ([dd5c0e7](https://github.com/BANSAFAn/timiGS-/commit/dd5c0e7d1e87904dd0cf2eb2e78caf22ee7ac99d))
+* add Doctor Mode with PC time tracking and break reminders ([a26995b](https://github.com/BANSAFAn/timiGS-/commit/a26995b56316371f3eefff4afe36ba1fe0656609))
+* add Team page route and app integration ([cff4d60](https://github.com/BANSAFAn/timiGS-/commit/cff4d609e8dd18e1def4a6854e4baf9c38d5972b))
+* improve doctor mode with lock screen and configurable settings ([16847c7](https://github.com/BANSAFAn/timiGS-/commit/16847c780df3a0a441570e263cb9c87756fecea0))
+* New Installer NSIS Windows ([2c75fb7](https://github.com/BANSAFAn/timiGS-/commit/2c75fb7d7d1e05496b4b9d5c195499748cd013d2))
+* remove gradients from design (Weather, Compare, view-styles) ([88441c0](https://github.com/BANSAFAn/timiGS-/commit/88441c0071b41f272836dd0a4bae78a7f0434920))
+* team member nickname shows PC computer name ([7d44d1f](https://github.com/BANSAFAn/timiGS-/commit/7d44d1fd0b1815916a36155b586c0b2997490f99))
+
+
+### Bug Fixes
+
+* Analytics build ([79adbc7](https://github.com/BANSAFAn/timiGS-/commit/79adbc77e72259d7953f2e25473dbfd981ca7ab3))
+* Auto-Export toggle layout and improve Settings, Analytics, Timeline, Tools views ([687ba8d](https://github.com/BANSAFAn/timiGS-/commit/687ba8d99203852d44d3cede640717d67384f97f))
+* remove unused code and fix TypeScript errors ([669378d](https://github.com/BANSAFAn/timiGS-/commit/669378dbb6d30f2985c39e1174c154fc3df9abef))
+
+
+### Translations
+
+* add translations for team, doctor mode, and settings ([b012fdd](https://github.com/BANSAFAn/timiGS-/commit/b012fdd0b89d805fc4a06e78e3c411bc3b030b93))
+
+
+### Miscellaneous
+
+* **deps:** bump h3 ([f286a64](https://github.com/BANSAFAn/timiGS-/commit/f286a64cdc2bd93bf4cc3fe0228cdcab772db3b7))
+* **deps:** bump rustls-webpki ([7771bf5](https://github.com/BANSAFAn/timiGS-/commit/7771bf5a3f31e65b63fa6513bc779811c1ea04cb))
+* **deps:** bump tar ([062df5e](https://github.com/BANSAFAn/timiGS-/commit/062df5e95fad4811c6c67ceda75328235dbca184))
+* **deps:** bump the npm_and_yarn group across 2 directories with 2 updates ([5f6472c](https://github.com/BANSAFAn/timiGS-/commit/5f6472cca4ece86fd5542b6f4b6a19f15d831cc7))
+* generate package-lock.json for project dependencies ([73264dd](https://github.com/BANSAFAn/timiGS-/commit/73264dd6c2551d92767df021fec37df3a1b1d253))
+* update dependencies and add locale update script ([bb6107b](https://github.com/BANSAFAn/timiGS-/commit/bb6107be54e61378929f0c7d1c4f1cb415a68c4f))
+* various fixes and improvements ([2207525](https://github.com/BANSAFAn/timiGS-/commit/22075254b184bff5c36195ce4bee067832ddb4c9))
+
+
+### Code Refactoring
+
+* redesign Usage by Application block in Analytics ([29acb32](https://github.com/BANSAFAn/timiGS-/commit/29acb3204d5f7e5cbf88d5117db7eb80bd5c5a75))
+
+
+### CI/CD
+
+* alpine ([928b65d](https://github.com/BANSAFAn/timiGS-/commit/928b65d2796c2ad9443246545befb9682e82b8d0))
+* ubuntu &lt;-----alpine ([c443953](https://github.com/BANSAFAn/timiGS-/commit/c4439530084140fbcc68657b2a1ea52958ff10e3))
+
 ## [1.2.0](https://github.com/BANSAFAn/timiGS-/compare/v1.1.1...v1.2.0) (2026-03-19)
 
 
