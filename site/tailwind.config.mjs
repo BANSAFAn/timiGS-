@@ -11,78 +11,79 @@ export default {
           "system-ui",
           "sans-serif",
         ],
-        display: ["SF Pro Display", "Inter", "sans-serif"],
+        display: ["Inter", "sans-serif"],
+        mono: ["JetBrains Mono", "Fira Code", "monospace"],
       },
       colors: {
-        // Apple-style grays
-        "apple-gray": {
-          50: "#F9FAFB",
-          100: "#F3F4F6",
-          200: "#E5E7EB",
-          300: "#D1D5DB",
-          400: "#9CA3AF",
-          500: "#6B7280",
-          600: "#4B5563",
-          700: "#374151",
-          800: "#1F2937",
-          900: "#111827",
-          950: "#030712",
+        cyber: {
+          bg: "#060609",
+          surface: "#0a0a12",
+          elevated: "#0f0f1a",
+          panel: "#111126",
+          border: "rgba(6,245,214,0.12)",
+          cyan: "#06f5d6",
+          purple: "#a855f7",
+          blue: "#3b82f6",
+          pink: "#ec4899",
+          green: "#10b981",
+          amber: "#f59e0b",
+          red: "#ef4444",
         },
-        // Apple-style accents
-        "apple-blue": "#0071e3",
-        "apple-blue-dark": "#0077ED",
-      },
-      backgroundImage: {
-        "glass-gradient":
-          "linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%)",
-        "glass-gradient-dark":
-          "linear-gradient(180deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.6) 100%)",
-      },
-      backdropBlur: {
-        xs: "2px",
       },
       animation: {
-        blob: "blob 7s infinite",
-        scroll: "scroll 30s linear infinite",
-        float: "float 6s ease-in-out infinite",
-        "float-delayed": "float 6s ease-in-out 3s infinite",
-        "gradient-x": "gradient-x 10s ease infinite",
-        "gradient-y": "gradient-y 10s ease infinite",
-        shimmer: "shimmer 2s linear infinite",
-        "pulse-glow": "pulse-glow 2s ease-in-out infinite",
-        "fade-in-up": "fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards",
-        "fade-in": "fadeIn 0.6s ease-out forwards",
-        "slide-in-left":
-          "slideInLeft 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards",
-        "slide-in-right":
-          "slideInRight 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards",
-        "scale-in": "scaleIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards",
-        "glow-pulse": "glowPulse 3s ease-in-out infinite",
-        "border-glow": "borderGlow 4s linear infinite",
-        "text-shimmer": "textShimmer 3s ease-in-out infinite",
+        "cyber-scan": "cyber-scan 4s linear infinite",
+        "neon-pulse": "neon-pulse 2s ease-in-out infinite",
+        "neon-border": "neon-border 3s ease-in-out infinite",
+        "glitch": "glitch 3s infinite",
+        "hex-float": "hex-float 8s ease-in-out infinite",
+        "data-stream": "data-stream 15s linear infinite",
+        "grid-scroll": "grid-scroll 25s linear infinite",
+        "fade-in-up": "fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards",
+        "fade-in": "fadeIn 0.5s ease-out forwards",
+        "slide-in-left": "slideInLeft 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards",
+        "slide-in-right": "slideInRight 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards",
+        "scale-in": "scaleIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards",
+        "spin-slow": "spin-slow 20s linear infinite",
         "pulse-slow": "pulse-slow 3s ease-in-out infinite",
         "bounce-slow": "bounce-slow 2s ease-in-out infinite",
-        "float-particle": "float-particle 4s ease-in-out infinite",
-        "shimmer-sweep": "shimmer-sweep 1.5s ease-in-out infinite",
-        "spin-slow": "spin-slow 20s linear infinite",
-        "spin-slow-reverse": "spin-slow-reverse 15s linear infinite",
-        "grid-move": "grid-move 20s linear infinite",
-        "gradient-shift": "gradient-shift 5s ease-in-out infinite",
+        "shimmer": "shimmer 2s linear infinite",
+        "loader-spin": "loader-spin 1.2s linear infinite",
+        "loader-pulse": "loader-pulse 1.5s ease-in-out infinite",
+        "corner-flash": "corner-flash 2s ease-in-out infinite",
+        "text-glow": "text-glow 2s ease-in-out infinite",
+        "scan-reveal": "scan-reveal 0.8s ease-out forwards",
+        "float": "float 6s ease-in-out infinite",
       },
       keyframes: {
-        blob: {
-          "0%": { transform: "translate(0px, 0px) scale(1)" },
-          "33%": { transform: "translate(30px, -50px) scale(1.1)" },
-          "66%": { transform: "translate(-20px, 20px) scale(0.9)" },
-          "100%": { transform: "translate(0px, 0px) scale(1)" },
+        "cyber-scan": {
+          "0%": { transform: "translateY(-100%)", opacity: "0.5" },
+          "50%": { opacity: "1" },
+          "100%": { transform: "translateY(100vh)", opacity: "0.5" },
         },
-        scroll: {
-          "0%": { transform: "translateX(0)" },
-          "100%": { transform: "translateX(-33.333%)" },
+        "neon-pulse": {
+          "0%, 100%": { opacity: "0.4", boxShadow: "0 0 5px currentColor" },
+          "50%": { opacity: "1", boxShadow: "0 0 20px currentColor, 0 0 40px currentColor" },
         },
-        float: {
-          "0%, 100%": { transform: "translateY(0px)" },
-          "50%": { transform: "translateY(-20px)" },
+        "neon-border": {
+          "0%, 100%": { borderColor: "rgba(6,245,214,0.15)" },
+          "50%": { borderColor: "rgba(6,245,214,0.4)" },
+        },
+        "glitch": {
+          "0%, 100%": { transform: "translate(0)" },
+          "33%": { transform: "translate(-2px, 1px)" },
+          "66%": { transform: "translate(2px, -1px)" },
+        },
+        "hex-float": {
+          "0%, 100%": { transform: "translateY(0) rotate(0deg)", opacity: "0.15" },
+          "50%": { transform: "translateY(-30px) rotate(30deg)", opacity: "0.3" },
+        },
+        "data-stream": {
+          "0%": { backgroundPosition: "0% 0%" },
+          "100%": { backgroundPosition: "0% 100%" },
+        },
+        "grid-scroll": {
+          "0%": { backgroundPosition: "0 0" },
+          "100%": { backgroundPosition: "60px 60px" },
         },
         fadeInUp: {
           "0%": { opacity: "0", transform: "translateY(30px)" },
@@ -93,79 +94,56 @@ export default {
           "100%": { opacity: "1" },
         },
         slideInLeft: {
-          "0%": { opacity: "0", transform: "translateX(-40px)" },
+          "0%": { opacity: "0", transform: "translateX(-30px)" },
           "100%": { opacity: "1", transform: "translateX(0)" },
         },
         slideInRight: {
-          "0%": { opacity: "0", transform: "translateX(40px)" },
+          "0%": { opacity: "0", transform: "translateX(30px)" },
           "100%": { opacity: "1", transform: "translateX(0)" },
         },
         scaleIn: {
           "0%": { opacity: "0", transform: "scale(0.9)" },
           "100%": { opacity: "1", transform: "scale(1)" },
         },
-        glowPulse: {
-          "0%, 100%": { opacity: "0.4" },
-          "50%": { opacity: "0.8" },
+        "spin-slow": {
+          from: { transform: "rotate(0deg)" },
+          to: { transform: "rotate(360deg)" },
         },
-        borderGlow: {
-          "0%, 100%": { backgroundPosition: "0% 50%" },
-          "50%": { backgroundPosition: "100% 50%" },
+        "pulse-slow": {
+          "0%, 100%": { opacity: "0.3", transform: "scale(1)" },
+          "50%": { opacity: "0.6", transform: "scale(1.05)" },
         },
-        textShimmer: {
-          "0%": { backgroundPosition: "0% 50%" },
-          "50%": { backgroundPosition: "100% 50%" },
-          "100%": { backgroundPosition: "0% 50%" },
-        },
-        "gradient-x": {
-          "0%, 100%": { backgroundPosition: "0% 50%" },
-          "50%": { backgroundPosition: "100% 50%" },
-        },
-        "gradient-y": {
-          "0%, 100%": { backgroundPosition: "50% 0%" },
-          "50%": { backgroundPosition: "50% 100%" },
+        "bounce-slow": {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-8px)" },
         },
         shimmer: {
           "0%": { backgroundPosition: "-200% 0" },
           "100%": { backgroundPosition: "200% 0" },
         },
-        "pulse-glow": {
-          "0%, 100%": { boxShadow: "0 0 20px 5px rgba(56, 189, 248, 0.3)" },
-          "50%": { boxShadow: "0 0 40px 10px rgba(56, 189, 248, 0.5)" },
+        "loader-spin": {
+          "0%": { transform: "rotate(0deg)" },
+          "100%": { transform: "rotate(360deg)" },
         },
-        "pulse-slow": {
-          "0%, 100%": { opacity: "0.4", transform: "scale(1)" },
-          "50%": { opacity: "0.6", transform: "scale(1.05)" },
+        "loader-pulse": {
+          "0%, 100%": { transform: "scale(0.8)", opacity: "0.3" },
+          "50%": { transform: "scale(1.2)", opacity: "0.8" },
         },
-        "bounce-slow": {
-          "0%, 100%": { transform: "translateY(0)" },
-          "50%": { transform: "translateY(-5px)" },
+        "corner-flash": {
+          "0%, 100%": { opacity: "0.3" },
+          "50%": { opacity: "1" },
         },
-        "float-particle": {
-          "0%, 100%": { transform: "translateY(0) translateX(0)", opacity: "0.3" },
-          "25%": { transform: "translateY(-20px) translateX(10px)", opacity: "0.6" },
-          "50%": { transform: "translateY(-10px) translateX(-10px)", opacity: "0.5" },
-          "75%": { transform: "translateY(-30px) translateX(5px)", opacity: "0.4" },
+        "text-glow": {
+          "0%, 100%": { textShadow: "0 0 10px rgba(6,245,214,0.3)" },
+          "50%": { textShadow: "0 0 20px rgba(6,245,214,0.6), 0 0 40px rgba(6,245,214,0.3)" },
         },
-        "shimmer-sweep": {
-          "0%": { transform: "translateX(-100%)" },
-          "100%": { transform: "translateX(100%)" },
+        "scan-reveal": {
+          "0%": { clipPath: "inset(0 100% 0 0)" },
+          "100%": { clipPath: "inset(0 0 0 0)" },
         },
-        "spin-slow": {
-          from: { transform: "rotate(0deg)" },
-          to: { transform: "rotate(360deg)" },
-        },
-        "spin-slow-reverse": {
-          from: { transform: "rotate(360deg)" },
-          to: { transform: "rotate(0deg)" },
-        },
-        "grid-move": {
-          "0%": { backgroundPosition: "0 0" },
-          "100%": { backgroundPosition: "40px 40px" },
-        },
-        "gradient-shift": {
-          "0%, 100%": { backgroundPosition: "0% 50%" },
-          "50%": { backgroundPosition: "100% 50%" },
+        float: {
+          "0%, 100%": { transform: "translateY(0px)" },
+          "50%": { transform: "translateY(-20px)" },
         },
       },
     },

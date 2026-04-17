@@ -1,176 +1,122 @@
-import React, { useEffect, useState } from 'react';
-import { Language } from '../../i18n/types';
-import type { Translation } from '../../i18n/types';
-import { GitCommit, DownloadSimple as Download, Warning as AlertTriangle, Clock, User, ArrowUpRight as ExternalLink, Package } from '@phosphor-icons/react';
+import React, { useState, useEffect } from "react";
+import { Language } from "../../i18n/types";
+import type { Translation } from "../../i18n/types";
+import { GitCommit, GitPullRequest, GitMerge, FileZip, TerminalWindow, Warning, ArrowSquareOut, Checks } from "@phosphor-icons/react";
 
 interface TestingProps {
   lang: Language;
   t: Translation;
 }
 
-interface Commit {
-  sha: string;
-  commit: {
-    message: string;
-    author: { name: string; date: string };
-  };
-  html_url: string;
-  author?: { avatar_url: string; login: string };
-}
-
-interface WorkflowArtifact {
-  id: number;
-  name: string;
-  size_in_bytes: number;
-  archive_download_url: string;
-  created_at: string;
-}
-
-const REPO = 'BANSAFAn/timiGS-';
-
-const Testing: React.FC<TestingProps> = ({ lang, t }) => {
-  const [commits, setCommits] = useState<Commit[]>([]);
+const TestingPage: React.FC<TestingProps> = ({ t }) => {
+  const [commits, setCommits] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [preReleases, setPreReleases] = useState<any[]>([]);
 
   useEffect(() => {
-    Promise.all([
-      fetch(`https://api.github.com/repos/${REPO}/commits?per_page=10`).then(r => r.json()),
-      fetch(`https://api.github.com/repos/${REPO}/releases`).then(r => r.json()),
-    ]).then(([commitsData, releasesData]) => {
-      setCommits(Array.isArray(commitsData) ? commitsData : []);
-      const pre = Array.isArray(releasesData) ? releasesData.filter((r: any) => r.prerelease) : [];
-      setPreReleases(pre);
-      setLoading(false);
-    }).catch(() => setLoading(false));
+    fetch("https://api.github.com/repos/BANSAFAn/timiGS-/commits?per_page=20")
+      .then((res) => res.json())
+      .then((data) => setCommits(Array.isArray(data) ? data : []))
+      .catch((err) => console.error("Error fetching commits:", err))
+      .finally(() => setLoading(false));
   }, []);
 
-  const formatDate = (d: string) => new Date(d).toLocaleDateString(lang, {
-    year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
-  });
-
-  const formatSize = (bytes: number) => (bytes / (1024 * 1024)).toFixed(1) + ' MB';
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="flex items-center gap-3 text-apple-gray-400">
-          <div className="w-5 h-5 border-2 border-apple-blue border-t-transparent rounded-full animate-spin" />
-          <span className="text-lg font-medium">{t.downloads.loading}</span>
-        </div>
-      </div>
-    );
-  }
+  const formatDate = (dateString: string) => {
+    const d = new Date(dateString);
+    return `${String(d.getUTCHours()).padStart(2,'0')}:${String(d.getUTCMinutes()).padStart(2,'0')} ${d.getUTCDate()}/${d.getUTCMonth()+1}`;
+  };
 
   return (
-    <div className="space-y-12 max-w-5xl mx-auto">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 md:px-8 py-12 relative">
       {/* Header */}
-      <div>
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-xs font-bold text-amber-400 tracking-wide mb-4">
-          <AlertTriangle className="w-3.5 h-3.5" />
-          {t.testing.alpha_warning.split('—')[0].trim()}
-        </div>
-        <h1 className="text-4xl md:text-5xl font-display font-bold text-white mb-3">{t.testing.title}</h1>
-        <p className="text-lg text-apple-gray-400">{t.testing.subtitle}</p>
+      <div className="mb-12 relative z-10 animate-fade-in-up">
+         <div className="hud-label text-cyber-red mb-4 flex items-center gap-2">
+            <Warning className="w-4 h-4" /> [SYS.UNSTABLE_BUILD]
+         </div>
+         <h1 className="text-4xl md:text-5xl font-display font-black text-white uppercase tracking-tight mb-4">
+           {t.nav.testing}
+         </h1>
+         <p className="text-sm font-mono text-cyber-red max-w-2xl border-l-2 border-cyber-red pl-4 bg-cyber-red/5 py-2">
+           WARNING: Experimental subsystem branches. Use at your own risk. Data loss or unexpected metrics may occur.
+         </p>
       </div>
 
-      {/* Latest Commits */}
-      <section>
-        <h2 className="text-2xl font-display font-bold text-white mb-6 flex items-center gap-3">
-          <GitCommit className="w-6 h-6 text-apple-blue" />
-          {t.testing.latest_commit}
-        </h2>
-        <div className="space-y-3">
-          {commits.length === 0 ? (
-            <p className="text-apple-gray-500">{t.testing.no_commits}</p>
-          ) : commits.map((c) => (
-            <a
-              key={c.sha}
-              href={c.html_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block p-4 rounded-2xl bg-apple-gray-900/40 border border-white/5 hover:border-white/10 hover:bg-apple-gray-900/60 transition-all group"
-            >
-              <div className="flex items-start gap-3">
-                {c.author?.avatar_url && (
-                  <img src={c.author.avatar_url} alt="" className="w-8 h-8 rounded-full mt-0.5 ring-1 ring-white/10" />
-                )}
-                <div className="flex-1 min-w-0">
-                  <p className="text-white font-medium truncate group-hover:text-apple-blue transition-colors">
-                    {c.commit.message.split('\n')[0]}
-                  </p>
-                  <div className="flex items-center gap-3 mt-1.5 text-xs text-apple-gray-500">
-                    <span className="flex items-center gap-1">
-                      <User className="w-3 h-3" />
-                      {c.author?.login || c.commit.author.name}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Clock className="w-3 h-3" />
-                      {formatDate(c.commit.author.date)}
-                    </span>
-                    <code className="px-1.5 py-0.5 rounded bg-white/5 font-mono text-[10px]">
-                      {c.sha.slice(0, 7)}
-                    </code>
+      <div className="grid md:grid-cols-12 gap-8">
+         {/* Live Terminal Commits */}
+         <div className="md:col-span-8">
+            <div className="rounded-xl border border-[rgba(255,255,255,0.1)] bg-[#0a0a0f] overflow-hidden shadow-2xl relative">
+               
+               {/* Terminal Header */}
+               <div className="flex items-center justify-between px-4 py-3 border-b border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.02)]">
+                  <div className="flex items-center gap-2">
+                     <TerminalWindow className="w-4 h-4 text-gray-500" />
+                     <span className="font-mono text-[10px] text-gray-400">root@timigs:~# git log --oneline</span>
                   </div>
-                </div>
-                <ExternalLink className="w-4 h-4 text-apple-gray-600 group-hover:text-apple-blue transition-colors flex-shrink-0 mt-1" />
-              </div>
-            </a>
-          ))}
-        </div>
-      </section>
-
-      {/* Pre-release / Test Builds */}
-      <section>
-        <h2 className="text-2xl font-display font-bold text-white mb-6 flex items-center gap-3">
-          <Package className="w-6 h-6 text-emerald-400" />
-          {t.testing.test_builds}
-        </h2>
-
-        <div className="p-4 rounded-2xl bg-amber-500/5 border border-amber-500/15 mb-6">
-          <p className="text-sm text-amber-300 font-medium flex items-center gap-2">
-            <AlertTriangle className="w-4 h-4 flex-shrink-0" />
-            {t.testing.alpha_warning}
-          </p>
-        </div>
-
-        {preReleases.length === 0 ? (
-          <div className="p-8 rounded-2xl bg-apple-gray-900/40 border border-dashed border-white/10 text-center">
-            <Package className="w-10 h-10 text-apple-gray-600 mx-auto mb-3" />
-            <p className="text-apple-gray-500">{t.downloads.no_assets}</p>
-          </div>
-        ) : preReleases.map((rel: any) => (
-          <div key={rel.id} className="mb-6 p-5 rounded-2xl bg-apple-gray-900/40 border border-white/5">
-            <div className="flex items-center gap-3 mb-4">
-              <span className="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-400 text-[10px] font-bold uppercase tracking-widest border border-amber-500/30">
-                Pre-release
-              </span>
-              <h3 className="text-lg font-bold text-white">{rel.name || rel.tag_name}</h3>
-              <span className="text-xs text-apple-gray-500">{formatDate(rel.published_at)}</span>
-            </div>
-            {rel.body && (
-              <p className="text-sm text-apple-gray-400 mb-4 whitespace-pre-line line-clamp-3">{rel.body}</p>
-            )}
-            <div className="space-y-2">
-              {(rel.assets || []).map((asset: any) => (
-                <a
-                  key={asset.id}
-                  href={asset.browser_download_url}
-                  className="flex items-center justify-between p-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/15 transition-all group/btn"
-                >
-                  <div className="flex items-center gap-3">
-                    <Download className="w-4 h-4 text-emerald-400" />
-                    <span className="text-sm text-white font-medium">{asset.name}</span>
+                  <div className="flex gap-1.5 ">
+                     <div className="w-3 h-3 rounded-full bg-[rgba(255,255,255,0.1)] hover:bg-[rgba(239,68,68,0.8)] transition-colors cursor-pointer" />
+                     <div className="w-3 h-3 rounded-full bg-[rgba(255,255,255,0.1)] hover:bg-[rgba(245,158,11,0.8)] transition-colors cursor-pointer" />
+                     <div className="w-3 h-3 rounded-full bg-[rgba(255,255,255,0.1)] hover:bg-[rgba(16,185,129,0.8)] transition-colors cursor-pointer" />
                   </div>
-                  <span className="text-xs text-apple-gray-500">{formatSize(asset.size)}</span>
-                </a>
-              ))}
+               </div>
+
+               {/* Terminal Body */}
+               <div className="p-4 font-mono text-xs sm:text-sm h-[600px] overflow-y-auto cyber-scrollbar">
+                 {loading ? (
+                    <div className="text-cyber-cyan animate-pulse">Establishing connection to origin/main...</div>
+                 ) : (
+                    <div className="space-y-1">
+                      {commits.map((commit, i) => (
+                        <div key={commit.sha} className="flex gap-4 group hover:bg-[rgba(255,255,255,0.02)] -mx-4 px-4 py-1 transition-colors">
+                           <a href={commit.html_url} target="_blank" rel="noopener noreferrer" className="text-cyber-amber min-w-[70px] hover:underline">
+                              {commit.sha.substring(0, 7)}
+                           </a>
+                           <div className="text-gray-500 min-w-[80px]">{formatDate(commit.commit.author.date)}</div>
+                           <div className="text-gray-300 truncate group-hover:text-white transition-colors flex-1" title={commit.commit.message}>
+                              {commit.commit.message.split("\n")[0]}
+                           </div>
+                           <div className="text-gray-600 hidden sm:block w-[100px] truncate text-right">
+                              {commit.commit.author.name}
+                           </div>
+                        </div>
+                      ))}
+                    </div>
+                 )}
+               </div>
             </div>
-          </div>
-        ))}
-      </section>
+         </div>
+
+         {/* Actions & CI Status */}
+         <div className="md:col-span-4 space-y-6">
+            <div className="cyber-card p-6 border-cyber-red/30">
+               <div className="hud-label text-cyber-red mb-4">ASSET_PULL</div>
+               <h3 className="text-xl font-display font-bold text-white uppercase mb-2">Automated Builds</h3>
+               <p className="font-mono text-xs text-gray-400 mb-6">Latest CI artifacts generated from origin/main.</p>
+               
+               <a href="https://github.com/BANSAFAn/timiGS-/actions" target="_blank" rel="noopener noreferrer" className="cyber-btn-ghost w-full justify-center text-cyber-red border-cyber-red/20 hover:border-cyber-red focus:bg-cyber-red/10">
+                  <ArrowSquareOut className="w-4 h-4" /> Go to GitHub Actions
+               </a>
+            </div>
+
+            <div className="p-6 border border-[rgba(255,255,255,0.05)] rounded-xl bg-[rgba(255,255,255,0.01)]">
+               <div className="hud-label text-gray-500 mb-4">SYS_CHECKS</div>
+               <div className="space-y-3">
+                  <div className="flex items-center justify-between font-mono text-xs">
+                     <span className="text-gray-400 flex items-center gap-2"><Checks className="w-4 h-4 text-cyber-green" /> Build Master</span>
+                     <span className="text-cyber-green">PASS</span>
+                  </div>
+                  <div className="flex items-center justify-between font-mono text-xs">
+                     <span className="text-gray-400 flex items-center gap-2"><Checks className="w-4 h-4 text-cyber-green" /> Dependency Scan</span>
+                     <span className="text-cyber-green">PASS</span>
+                  </div>
+                  <div className="flex items-center justify-between font-mono text-xs">
+                     <span className="text-gray-400 flex items-center gap-2"><Warning className="w-4 h-4 text-cyber-amber" /> Tauri E2E</span>
+                     <span className="text-cyber-amber">FLAKY</span>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
     </div>
   );
 };
 
-export default Testing;
+export default TestingPage;

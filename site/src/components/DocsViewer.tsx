@@ -98,15 +98,7 @@ export default function DocsViewer({ lang = "en" }: { lang?: string }) {
       return `<div class="docs-table-wrapper"><table class="docs-table"><thead>${header}</thead><tbody>${body}</tbody></table></div>`;
     };
 
-    marked.setOptions({
-      renderer,
-      gfm: true,
-      highlight: function(code, lang) {
-        const language = hljs.getLanguage(lang) ? lang : 'plaintext';
-        return hljs.highlight(code, { language }).value;
-      },
-      langPrefix: 'hljs language-'
-    } as any);
+    marked.use({ renderer, gfm: true } as any);
   }, []);
 
   // Fetch Sidebar Config
@@ -422,7 +414,7 @@ export default function DocsViewer({ lang = "en" }: { lang?: string }) {
           display: flex;
           flex-direction: column;
           min-height: 100vh;
-          background: #0a0a0f;
+          background: #060609;
           color: #e8e8ef;
           font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
         }
@@ -439,10 +431,10 @@ export default function DocsViewer({ lang = "en" }: { lang?: string }) {
         }
         .docs-progress-fill {
           height: 100%;
-          background: linear-gradient(90deg, #6366f1, #a78bfa, #818cf8);
+          background: linear-gradient(90deg, #06f5d6, #a855f7, #3b82f6);
           transition: width 0.15s ease;
           border-radius: 0 2px 2px 0;
-          box-shadow: 0 0 12px rgba(99,102,241,0.4);
+          box-shadow: 0 0 12px rgba(6,245,214,0.4);
         }
 
         /* ── Mobile Header ── */
@@ -488,14 +480,14 @@ export default function DocsViewer({ lang = "en" }: { lang?: string }) {
         .docs-sidebar {
           width: 290px;
           flex-shrink: 0;
-          border-right: 1px solid rgba(255,255,255,0.05);
-          background: rgba(255,255,255,0.015);
+          border-right: 1px solid rgba(6,245,214,0.1);
+          background: rgba(10,10,18,0.9);
           height: 100vh;
           position: sticky;
           top: 3px;
           overflow-y: auto;
           scrollbar-width: thin;
-          scrollbar-color: rgba(255,255,255,0.08) transparent;
+          scrollbar-color: rgba(6,245,214,0.2) transparent;
         }
         .docs-sidebar-inner {
           display: flex;
@@ -614,9 +606,9 @@ export default function DocsViewer({ lang = "en" }: { lang?: string }) {
           color: rgba(255,255,255,0.85);
         }
         .docs-nav-item.active {
-          background: rgba(99,102,241,0.1);
-          border-color: rgba(99,102,241,0.15);
-          color: #fff;
+          background: rgba(6,245,214,0.1);
+          border-color: rgba(6,245,214,0.15);
+          color: #06f5d6;
         }
         .docs-nav-icon {
           font-size: 16px;

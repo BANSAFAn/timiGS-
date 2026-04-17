@@ -55,15 +55,7 @@ export default function NotesViewer({ lang = "en" }: { lang?: string }) {
          return `<blockquote class="border-l-2 border-white/20 pl-4 italic text-stone-400 my-4">${text}</blockquote>`;
     };
 
-    marked.setOptions({
-      renderer,
-      gfm: true,
-      highlight: function(code: string, lang: string) {
-        const language = hljs.getLanguage(lang) ? lang : 'plaintext';
-        return hljs.highlight(code, { language }).value;
-      },
-      langPrefix: 'hljs language-'
-    } as any);
+    marked.use({ renderer, gfm: true } as any);
   }, []);
 
   // Fetch Notes Config
