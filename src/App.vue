@@ -56,15 +56,23 @@
     </nav>
   </div>
   <NotificationToast />
+  <DoctorModeLockScreen />
+  <ConfirmDialog ref="confirmDialogRef" />
+  <TeamNotification ref="teamNotifRef" />
 </template>
 
 <script setup lang="ts">
-import { onMounted, watch, computed } from "vue";
+import { onMounted, watch, computed, ref } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useActivityStore } from "./stores/activity";
 import { useDoctorModeStore } from "./stores/doctorMode";
 import NotificationToast from "./components/NotificationToast.vue";
+import DoctorModeLockScreen from "./components/DoctorModeLockScreen.vue";
+import ConfirmDialog from "./components/ConfirmDialog.vue";
+import TeamNotification from "./components/TeamNotification.vue";
 import { Icons } from "./components/icons/IconMap";
+import { getConfirmDialog } from "./composables/useConfirmDialog";
+import { setTeamNotifRef } from "./composables/useTeamNotification";
 
 interface NavItem {
   path: string;
@@ -83,6 +91,7 @@ const mainNavItems: NavItem[] = [
 // Secondary navigation items (less used)
 const secondaryNavItems: NavItem[] = [
   { path: "/weather", label: "nav.weather", labelShort: "nav.weatherShort", icon: Icons.weather },
+  { path: "/team", label: "nav.team", labelShort: "nav.teamShort", icon: Icons.team },
   { path: "/tools", label: "nav.tools", labelShort: "nav.toolsShort", icon: Icons.tools },
   { path: "/transfer", label: "nav.transfer", labelShort: "nav.transferShort", icon: Icons.transfer },
   { path: "/settings", label: "nav.settings", labelShort: "nav.settingsShort", icon: Icons.settings },
@@ -93,6 +102,7 @@ const mobileNavItems: NavItem[] = [
   { path: "/", label: "nav.dashboard", labelShort: "nav.dashboardShort", icon: Icons.dashboard },
   { path: "/timeline", label: "nav.timeline", labelShort: "nav.timelineShort", icon: Icons.timeline },
   { path: "/analytics", label: "nav.analytics", labelShort: "nav.analyticsShort", icon: Icons.analytics },
+  { path: "/team", label: "nav.team", labelShort: "nav.teamShort", icon: Icons.team },
   { path: "/tools", label: "nav.tools", labelShort: "nav.toolsShort", icon: Icons.tools },
   { path: "/settings", label: "nav.settings", labelShort: "nav.settingsShort", icon: Icons.settings },
 ];
@@ -101,6 +111,14 @@ const store = useActivityStore();
 const doctorModeStore = useDoctorModeStore();
 const router = useRouter();
 const route = useRoute();
+const confirmDialogRef = ref<InstanceType<typeof ConfirmDialog> | null>(null);
+const teamNotifRef = ref<InstanceType<typeof TeamNotification> | null>(null);
+
+// Register global refs after mount
+onMounted(() => {
+  getConfirmDialog().setDialogRef(confirmDialogRef.value);
+  setTeamNotifRef(teamNotifRef.value);
+});
 
 const shouldShowNav = computed(() => route.path !== "/tray");
 

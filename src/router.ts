@@ -6,6 +6,7 @@ import Settings from "./views/Settings.vue";
 import Weather from "./views/Weather.vue";
 import Tools from "./views/Tools.vue";
 import Transfer from "./views/Transfer.vue";
+import Team from "./views/Team.vue";
 import Tray from "./views/Tray.vue";
 
 const routes = [
@@ -43,6 +44,11 @@ const routes = [
     path: "/transfer",
     name: "Transfer",
     component: Transfer,
+  },
+  {
+    path: "/team",
+    name: "Team",
+    component: Team,
   },
   {
     path: "/tray",
