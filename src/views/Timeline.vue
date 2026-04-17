@@ -31,10 +31,18 @@
         </button>
 
         <div class="date-picker-wrapper">
-          <input type="date" class="date-input-hidden" v-model="dateInput" @change="onDateChange" ref="dateInputRef" />
-          <button class="nav-btn calendar-btn" @click="openDatePicker">
+          <button class="nav-btn calendar-btn" :class="{ 'active': showCalendar }" @click="showCalendar = !showCalendar">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
           </button>
+          
+          <!-- Custom Calendar Dropdown -->
+          <div v-if="showCalendar" class="calendar-dropdown" @click.stop>
+            <CustomCalendar 
+              v-model="selectedDate" 
+              :sessions-by-date="sessionsByDate"
+              @update:modelValue="onDateSelected"
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -126,17 +134,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue';
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { invoke } from '@tauri-apps/api/core';
 import { useActivityStore, type ActivitySession } from '../stores/activity';
+import CustomCalendar from '../components/CustomCalendar.vue';
 
 const { t } = useI18n();
 const store = useActivityStore();
 
 const selectedDate = ref(new Date());
-const dateInput = ref(formatDateForInput(new Date()));
-const dateInputRef = ref<HTMLInputElement | null>(null);
+const showCalendar = ref(false);
 const sessions = ref<ActivitySession[]>([]);
 const searchQuery = ref('');
 const appIcons = ref<Record<string, string>>({});
@@ -252,15 +260,42 @@ function calculateBrowserStats(appName: string) {
 const filteredSessions = computed(() => {
   if (!searchQuery.value) return sessions.value;
   const query = searchQuery.value.toLowerCase();
-  return sessions.value.filter(s => 
-    s.app_name.toLowerCase().includes(query) || 
+  return sessions.value.filter(s =>
+    s.app_name.toLowerCase().includes(query) ||
     s.window_title.toLowerCase().includes(query)
   );
 });
 
-function openDatePicker() {
-  dateInputRef.value?.showPicker();
+// Sessions by date for calendar indicators
+const sessionsByDate = computed(() => {
+  const map: Record<string, boolean> = {};
+  sessions.value.forEach(session => {
+    const dateStr = session.start_time.split('T')[0];
+    map[dateStr] = true;
+  });
+  return map;
+});
+
+function onDateSelected(date: Date) {
+  selectedDate.value = date;
+  showCalendar.value = false;
 }
+
+// Close calendar when clicking outside
+function handleClickOutside(event: MouseEvent) {
+  const target = event.target as HTMLElement;
+  if (!target.closest('.date-picker-wrapper')) {
+    showCalendar.value = false;
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('click', handleClickOutside);
+});
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside);
+});
 
 const appColors: Record<string, string> = {};
 const colorPalette = ['#6366f1', '#06b6d4', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981'];
@@ -328,7 +363,6 @@ function goToPreviousDay() {
   const newDate = new Date(selectedDate.value);
   newDate.setDate(newDate.getDate() - 1);
   selectedDate.value = newDate;
-  dateInput.value = formatDateForInput(newDate);
 }
 
 function goToNextDay() {
@@ -336,12 +370,7 @@ function goToNextDay() {
     const newDate = new Date(selectedDate.value);
     newDate.setDate(newDate.getDate() + 1);
     selectedDate.value = newDate;
-    dateInput.value = formatDateForInput(newDate);
   }
-}
-
-function onDateChange() {
-  selectedDate.value = new Date(dateInput.value);
 }
 
 async function fetchSessions() {
@@ -507,9 +536,35 @@ onMounted(async () => {
   color: var(--text-muted);
 }
 
-.calendar-btn:hover {
+.calendar-btn:hover,
+.calendar-btn.active {
   background: var(--bg-hover);
   color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+/* Calendar Dropdown */
+.calendar-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 100;
+  animation: slideDown 0.2s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.date-picker-wrapper {
+  position: relative;
 }
 
 /* Timeline Container */
@@ -922,6 +977,166 @@ onMounted(async () => {
 }
 
 /* Responsive */
+
+/* 4K Ultra Wide (2560px+) */
+@media (min-width: 2560px) {
+  .page-container {
+    max-width: 1800px;
+  }
+
+  .page-header h2 {
+    font-size: 2.5rem;
+  }
+
+  .search-input {
+    padding: 16px 20px 16px 52px;
+    font-size: 1.1rem;
+  }
+
+  .search-icon {
+    width: 24px;
+    height: 24px;
+    left: 18px;
+  }
+
+  .calendar-nav {
+    padding: 10px;
+    gap: 12px;
+  }
+
+  .nav-btn {
+    width: 48px;
+    height: 48px;
+  }
+
+  .nav-btn svg {
+    width: 28px;
+    height: 28px;
+  }
+
+  .date-display {
+    min-width: 280px;
+    padding: 0 16px;
+  }
+
+  .date-main {
+    font-size: 1.2rem;
+  }
+
+  .date-sub {
+    font-size: 0.95rem;
+  }
+
+  .timeline-group-header {
+    padding: 20px 24px;
+    gap: 16px;
+  }
+
+  .group-app-name {
+    font-size: 1.2rem;
+  }
+
+  .group-meta {
+    font-size: 0.95rem;
+  }
+
+  .group-duration {
+    font-size: 1.1rem;
+    padding: 6px 16px;
+  }
+
+  .timeline-item {
+    grid-template-columns: 140px 1fr;
+    gap: 32px;
+  }
+
+  .timeline-time {
+    font-size: 1rem;
+    padding-top: 14px;
+  }
+
+  .timeline-content {
+    padding: 16px 20px;
+  }
+
+  .timeline-app-info .app-name {
+    font-size: 1.1rem;
+  }
+
+  .window-title {
+    font-size: 0.95rem;
+  }
+
+  .session-duration {
+    font-size: 1rem;
+    padding: 6px 14px;
+  }
+
+  .app-icon-img {
+    width: 48px;
+    height: 48px;
+  }
+
+  .app-icon-small {
+    width: 48px;
+    height: 48px;
+    font-size: 1.3rem;
+  }
+}
+
+/* Large Desktop (1920px - 2560px) */
+@media (min-width: 1920px) and (max-width: 2559px) {
+  .page-container {
+    max-width: 1600px;
+  }
+
+  .timeline-group-header {
+    padding: 18px 20px;
+  }
+
+  .timeline-item {
+    grid-template-columns: 130px 1fr;
+  }
+}
+
+/* Medium Desktop (1440px - 1920px) */
+@media (min-width: 1440px) and (max-width: 1919px) {
+  .page-container {
+    max-width: 1400px;
+  }
+}
+
+/* Tablet Landscape (1024px - 1440px) */
+@media (min-width: 1024px) and (max-width: 1439px) {
+  .page-container {
+    max-width: 1000px;
+  }
+
+  .search-box {
+    min-width: 200px;
+  }
+
+  .timeline-group-header {
+    padding: 14px 16px;
+  }
+}
+
+/* Tablet Portrait (768px - 1024px) */
+@media (max-width: 1024px) {
+  .page-container {
+    max-width: 90%;
+  }
+
+  .search-box {
+    min-width: 180px;
+  }
+
+  .timeline-controls {
+    gap: 12px;
+  }
+}
+
+/* Small Tablet (600px - 768px) */
 @media (max-width: 768px) {
   .timeline-controls {
     flex-direction: column;
@@ -929,6 +1144,7 @@ onMounted(async () => {
 
   .search-box {
     width: 100%;
+    min-width: auto;
   }
 
   .calendar-nav {
@@ -951,6 +1167,413 @@ onMounted(async () => {
 
   .timeline-item {
     grid-template-columns: 80px 1fr;
+  }
+
+  .calendar-dropdown {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    right: auto;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+  }
+}
+
+/* Mobile Large (480px - 600px) */
+@media (max-width: 600px) {
+  .page-container {
+    max-width: 100%;
+    padding: 0 12px;
+  }
+
+  .page-header {
+    margin-bottom: 16px;
+  }
+
+  .page-header h2 {
+    font-size: 1.3rem;
+  }
+
+  .search-input {
+    padding: 10px 14px 10px 40px;
+    font-size: 0.9rem;
+  }
+
+  .search-icon {
+    width: 16px;
+    height: 16px;
+    left: 12px;
+  }
+
+  .calendar-nav {
+    padding: 4px;
+    gap: 4px;
+  }
+
+  .nav-btn {
+    width: 32px;
+    height: 32px;
+  }
+
+  .nav-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .date-display {
+    min-width: 120px;
+    padding: 0 6px;
+  }
+
+  .date-main {
+    font-size: 0.85rem;
+  }
+
+  .date-sub {
+    font-size: 0.7rem;
+  }
+
+  .timeline::before {
+    left: 15px;
+  }
+
+  .timeline-group-header {
+    grid-template-columns: 28px 28px 1fr;
+    padding: 10px 12px;
+    gap: 8px;
+  }
+
+  .group-toggle svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .app-icon-img {
+    width: 32px;
+    height: 32px;
+  }
+
+  .app-icon-small {
+    width: 32px;
+    height: 32px;
+    font-size: 0.95rem;
+  }
+
+  .group-app-name {
+    font-size: 0.9rem;
+  }
+
+  .group-meta {
+    font-size: 0.75rem;
+  }
+
+  .timeline-group-sessions {
+    padding-left: 40px;
+  }
+
+  .timeline-item {
+    grid-template-columns: 70px 1fr;
+    gap: 16px;
+  }
+
+  .timeline-time {
+    font-size: 0.75rem;
+    padding-top: 8px;
+  }
+
+  .timeline-content {
+    padding: 10px 12px;
+  }
+
+  .timeline-app-info .app-name {
+    font-size: 0.9rem;
+  }
+
+  .window-title {
+    font-size: 0.8rem;
+  }
+
+  .session-duration {
+    font-size: 0.8rem;
+    padding: 4px 8px;
+  }
+
+  .modal-content {
+    width: 95%;
+    max-width: 95%;
+  }
+
+  .modal-header {
+    padding: 14px 16px;
+  }
+
+  .modal-header h3 {
+    font-size: 1rem;
+  }
+
+  .modal-body {
+    padding: 14px;
+  }
+
+  .site-item {
+    padding: 10px 12px;
+  }
+
+  .site-name {
+    font-size: 0.85rem;
+  }
+
+  .site-time {
+    font-size: 0.8rem;
+  }
+}
+
+/* Mobile Small (320px - 480px) */
+@media (max-width: 480px) {
+  .page-container {
+    padding: 0 10px;
+  }
+
+  .page-header h2 {
+    font-size: 1.2rem;
+  }
+
+  .search-input {
+    padding: 9px 12px 9px 36px;
+    font-size: 0.85rem;
+  }
+
+  .search-icon {
+    width: 14px;
+    height: 14px;
+    left: 10px;
+  }
+
+  .calendar-nav {
+    padding: 3px;
+    gap: 3px;
+  }
+
+  .nav-btn {
+    width: 28px;
+    height: 28px;
+  }
+
+  .nav-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .date-display {
+    min-width: 100px;
+    padding: 0 4px;
+  }
+
+  .date-main {
+    font-size: 0.8rem;
+  }
+
+  .date-sub {
+    font-size: 0.65rem;
+  }
+
+  .timeline::before {
+    left: 13px;
+  }
+
+  .timeline-group-header {
+    grid-template-columns: 24px 24px 1fr;
+    padding: 8px 10px;
+    gap: 6px;
+  }
+
+  .group-toggle svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .app-icon-img {
+    width: 28px;
+    height: 28px;
+  }
+
+  .app-icon-small {
+    width: 28px;
+    height: 28px;
+    font-size: 0.85rem;
+  }
+
+  .group-app-name {
+    font-size: 0.85rem;
+  }
+
+  .excluded-badge {
+    font-size: 0.6rem;
+    padding: 2px 6px;
+  }
+
+  .group-meta {
+    font-size: 0.7rem;
+  }
+
+  .timeline-group-sessions {
+    padding-left: 36px;
+    gap: 8px;
+  }
+
+  .timeline-item {
+    grid-template-columns: 60px 1fr;
+    gap: 12px;
+  }
+
+  .timeline-time {
+    font-size: 0.7rem;
+    padding-top: 6px;
+  }
+
+  .timeline-content {
+    padding: 8px 10px;
+  }
+
+  .timeline-app-info .app-name {
+    font-size: 0.85rem;
+  }
+
+  .window-title {
+    font-size: 0.75rem;
+  }
+
+  .session-duration {
+    font-size: 0.75rem;
+    padding: 3px 7px;
+  }
+
+  .modal-content {
+    width: 98%;
+    max-width: 98%;
+    border-radius: 12px;
+  }
+
+  .modal-header {
+    padding: 12px 14px;
+  }
+
+  .modal-header h3 {
+    font-size: 0.95rem;
+  }
+
+  .modal-body {
+    padding: 12px;
+  }
+
+  .site-item {
+    padding: 8px 10px;
+  }
+
+  .site-name {
+    font-size: 0.8rem;
+  }
+
+  .site-time {
+    font-size: 0.75rem;
+  }
+
+  .empty-state {
+    padding: 40px 0;
+  }
+
+  .empty-state svg {
+    width: 48px;
+    height: 48px;
+  }
+
+  .empty-state p {
+    font-size: 0.85rem;
+  }
+}
+
+/* Extra Small Mobile (below 360px) */
+@media (max-width: 360px) {
+  .page-container {
+    padding: 0 8px;
+  }
+
+  .page-header h2 {
+    font-size: 1.1rem;
+  }
+
+  .search-input {
+    padding: 8px 10px 8px 32px;
+    font-size: 0.8rem;
+  }
+
+  .search-icon {
+    width: 12px;
+    height: 12px;
+    left: 8px;
+  }
+
+  .calendar-nav {
+    padding: 2px;
+    gap: 2px;
+  }
+
+  .nav-btn {
+    width: 26px;
+    height: 26px;
+  }
+
+  .nav-btn svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  .date-display {
+    min-width: 90px;
+  }
+
+  .date-main {
+    font-size: 0.75rem;
+  }
+
+  .timeline-group-header {
+    grid-template-columns: 22px 22px 1fr;
+    padding: 6px 8px;
+  }
+
+  .app-icon-img {
+    width: 24px;
+    height: 24px;
+  }
+
+  .app-icon-small {
+    width: 24px;
+    height: 24px;
+    font-size: 0.75rem;
+  }
+
+  .group-app-name {
+    font-size: 0.8rem;
+  }
+
+  .timeline-item {
+    grid-template-columns: 55px 1fr;
+  }
+
+  .timeline-time {
+    font-size: 0.65rem;
+  }
+
+  .timeline-content {
+    padding: 6px 8px;
+  }
+
+  .timeline-app-info .app-name {
+    font-size: 0.8rem;
+  }
+
+  .window-title {
+    font-size: 0.7rem;
   }
 }
 </style>

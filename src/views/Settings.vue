@@ -166,13 +166,10 @@
                   </p>
                 </div>
               </div>
-              <div
-                class="toggle-switch"
-                :class="{ checked: localSettings.autostart }"
-                @click="toggleAutostart"
-              >
-                <div class="toggle-thumb"></div>
-              </div>
+              <ModernToggle 
+                v-model="localSettings.autostart" 
+                @update:modelValue="toggleAutostart"
+              />
             </div>
 
             <div class="setting-item">
@@ -185,13 +182,10 @@
                   <p class="setting-description">Keep running in background</p>
                 </div>
               </div>
-              <div
-                class="toggle-switch"
-                :class="{ checked: localSettings.minimize_to_tray }"
-                @click="toggleMinimize"
-              >
-                <div class="toggle-thumb"></div>
-              </div>
+              <ModernToggle 
+                v-model="localSettings.minimize_to_tray" 
+                @update:modelValue="toggleMinimize"
+              />
             </div>
 
             <div class="setting-item">
@@ -209,13 +203,10 @@
                   </p>
                 </div>
               </div>
-              <div
-                class="toggle-switch"
-                :class="{ checked: localSettings.discord_rpc }"
-                @click="toggleDiscord"
-              >
-                <div class="toggle-thumb"></div>
-              </div>
+              <ModernToggle 
+                v-model="localSettings.discord_rpc" 
+                @update:modelValue="toggleDiscord"
+              />
             </div>
           </div>
         </div>
@@ -241,50 +232,77 @@
                   </p>
                 </div>
               </div>
-              <div
-                class="toggle-switch"
-                :class="{ checked: doctorModeStore.enabled }"
-                @click="doctorModeStore.toggle(!doctorModeStore.enabled)"
-              >
-                <div class="toggle-thumb"></div>
-              </div>
+              <ModernToggle 
+                v-model="doctorModeStore.enabled" 
+                @update:modelValue="doctorModeStore.toggle"
+                :show-icons="true"
+              />
             </div>
 
             <div class="setting-item" v-if="doctorModeStore.enabled">
               <div class="setting-left">
                 <div class="setting-icon" v-html="Icons.clock"></div>
                 <div class="setting-content">
-                  <label class="setting-label">{{ $t("settings.timeLimit") }}</label>
+                  <label class="setting-label">{{ $t("settings.reminderInterval") || 'Reminder Interval' }}</label>
                   <p class="setting-description">
-                    {{ $t("settings.timeLimitDesc") }}
+                    {{ $t("settings.reminderIntervalDesc") || 'How often to remind you to take a break (in minutes)' }}
                   </p>
                 </div>
               </div>
               <div class="custom-input-wrap">
-                <input 
-                  type="number" 
-                  v-model.number="doctorModeLimitMins" 
-                  @blur="updateDoctorModeLimit"
-                  class="modern-input" 
-                  min="30" max="600" 
+                <input
+                  type="number"
+                  v-model.number="doctorModeReminderInterval"
+                  @blur="updateDoctorModeReminderInterval"
+                  class="modern-input"
+                  min="10" max="120"
                   style="max-width: 80px;"
                 />
               </div>
             </div>
 
             <div class="setting-item" v-if="doctorModeStore.enabled">
-               <div class="setting-left">
-                <div class="setting-icon" v-html="Icons.dataReset"></div>
+              <div class="setting-left">
+                <div class="setting-icon" v-html="Icons.lock"></div>
                 <div class="setting-content">
-                  <label class="setting-label">{{ $t("settings.resetSession") }}</label>
+                  <label class="setting-label">{{ $t("settings.lockDuration") || 'Lock Duration' }}</label>
                   <p class="setting-description">
-                    Current active session: {{ doctorModeStore.elapsedMins }} mins
+                    {{ $t("settings.lockDurationDesc") || 'How long to lock PC after ignoring reminders (in minutes)' }}
                   </p>
                 </div>
               </div>
-              <button class="btn btn-secondary" @click="doctorModeStore.resetSession()">
-                {{ $t("settings.resetSession") }}
-              </button>
+              <div class="custom-input-wrap">
+                <input
+                  type="number"
+                  v-model.number="doctorModeLockDuration"
+                  @blur="updateDoctorModeLockDuration"
+                  class="modern-input"
+                  min="15" max="180"
+                  style="max-width: 80px;"
+                />
+              </div>
+            </div>
+
+            <div class="setting-item" v-if="doctorModeStore.enabled">
+              <div class="setting-left">
+                <div class="setting-icon" v-html="Icons.bell"></div>
+                <div class="setting-content">
+                  <label class="setting-label">{{ $t("settings.maxReminders") || 'Max Reminders' }}</label>
+                  <p class="setting-description">
+                    {{ $t("settings.maxRemindersDesc") || 'Number of reminders before PC gets locked' }}
+                  </p>
+                </div>
+              </div>
+              <div class="custom-input-wrap">
+                <input
+                  type="number"
+                  v-model.number="doctorModeMaxReminders"
+                  @blur="updateDoctorModeMaxReminders"
+                  class="modern-input"
+                  min="1" max="10"
+                  style="max-width: 80px;"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -331,7 +349,61 @@
                   </p>
                 </div>
               </div>
-              <div class="export-dropdown" :class="{ open: exportDropdownOpen }">
+              <div class="export-controls">
+                <!-- Date Range Selector -->
+                <div class="date-range-selector">
+                  <button 
+                    class="range-btn" 
+                    :class="{ active: exportRange === 'today' }"
+                    @click="exportRange = 'today'"
+                  >
+                    {{ $t('common.today') || 'Today' }}
+                  </button>
+                  <button 
+                    class="range-btn" 
+                    :class="{ active: exportRange === 'week' }"
+                    @click="exportRange = 'week'"
+                  >
+                    {{ $t('common.week') || 'Week' }}
+                  </button>
+                  <button 
+                    class="range-btn" 
+                    :class="{ active: exportRange === 'month' }"
+                    @click="exportRange = 'month'"
+                  >
+                    {{ $t('common.month') || 'Month' }}
+                  </button>
+                  <button 
+                    class="range-btn" 
+                    :class="{ active: exportRange === 'custom' }"
+                    @click="exportRange = 'custom'; showDateRangePicker = !showDateRangePicker"
+                  >
+                    {{ $t('settings.custom') || 'Custom' }}
+                  </button>
+                </div>
+                
+                <!-- Custom Date Range -->
+                <div v-if="exportRange === 'custom' && showDateRangePicker" class="custom-date-range">
+                  <div class="date-input-group">
+                    <label class="date-label">{{ $t('settings.startDate') || 'Start' }}</label>
+                    <input 
+                      type="date" 
+                      v-model="customStartDate"
+                      class="date-input"
+                    />
+                  </div>
+                  <div class="date-input-group">
+                    <label class="date-label">{{ $t('settings.endDate') || 'End' }}</label>
+                    <input 
+                      type="date" 
+                      v-model="customEndDate"
+                      class="date-input"
+                    />
+                  </div>
+                </div>
+                
+                <!-- Export Button -->
+                <div class="export-dropdown" :class="{ open: exportDropdownOpen }">
                 <button
                   class="export-dropdown-trigger btn btn-primary"
                   @click="exportDropdownOpen = !exportDropdownOpen"
@@ -395,8 +467,9 @@
                 </div>
               </div>
             </div>
+          </div>
 
-            <div class="setting-item auto-export-item">
+            <div class="setting-item">
               <div class="setting-left">
                 <div class="setting-icon" v-html="Icons.update"></div>
                 <div class="setting-content">
@@ -406,57 +479,52 @@
                   </p>
                 </div>
               </div>
-              <div class="auto-export-settings">
-                <label class="toggle-switch">
-                  <input
-                    type="checkbox"
-                    v-model="autoExportEnabled"
-                    @change="saveAutoExportSettings"
-                  />
-                  <span class="toggle-slider"></span>
-                </label>
-                <div v-if="autoExportEnabled" class="auto-export-options">
-                  <div class="auto-export-row">
-                    <select
-                      v-model="autoExportFormat"
-                      @change="saveAutoExportSettings"
-                      class="format-select"
-                    >
-                      <option value="csv">CSV</option>
-                      <option value="html">HTML</option>
-                      <option value="json">JSON</option>
-                      <option value="markdown">Markdown</option>
-                    </select>
-                    <select
-                      v-model="autoExportInterval"
-                      @change="saveAutoExportSettings"
-                      class="interval-select"
-                    >
-                      <option :value="1">Every hour</option>
-                      <option :value="6">Every 6 hours</option>
-                      <option :value="12">Every 12 hours</option>
-                      <option :value="24">Daily</option>
-                      <option :value="48">Every 2 days</option>
-                    </select>
-                  </div>
-                  <span
-                    v-if="autoExportFolder"
-                    class="folder-path"
-                    :title="autoExportFolder"
-                    >{{ autoExportFolder }}</span
-                  >
-                  <button
-                    @click="selectExportFolder"
-                    class="btn btn-secondary btn-small"
-                  >
-                    <span
-                      style="margin-right: 4px"
-                      v-html="Icons.folder"
-                    ></span>
-                    Select Folder
-                  </button>
-                </div>
+              <ModernToggle 
+                v-model="autoExportEnabled" 
+                @update:modelValue="saveAutoExportSettings"
+              />
+            </div>
+            
+            <div v-if="autoExportEnabled" class="auto-export-options-card">
+              <div class="auto-export-row">
+                <select
+                  v-model="autoExportFormat"
+                  @change="saveAutoExportSettings"
+                  class="format-select"
+                >
+                  <option value="csv">CSV</option>
+                  <option value="html">HTML</option>
+                  <option value="json">JSON</option>
+                  <option value="markdown">Markdown</option>
+                </select>
+                <select
+                  v-model="autoExportInterval"
+                  @change="saveAutoExportSettings"
+                  class="interval-select"
+                >
+                  <option :value="1">Every hour</option>
+                  <option :value="6">Every 6 hours</option>
+                  <option :value="12">Every 12 hours</option>
+                  <option :value="24">Daily</option>
+                  <option :value="48">Every 2 days</option>
+                </select>
               </div>
+              <span
+                v-if="autoExportFolder"
+                class="folder-path"
+                :title="autoExportFolder"
+                >{{ autoExportFolder }}</span
+              >
+              <button
+                @click="selectExportFolder"
+                class="btn btn-secondary btn-small"
+              >
+                <span
+                  style="margin-right: 4px"
+                  v-html="Icons.folder"
+                ></span>
+                Select Folder
+              </button>
             </div>
 
             <div class="setting-item danger-zone">
@@ -651,6 +719,7 @@ import { useI18n } from "vue-i18n";
 import { invoke } from "@tauri-apps/api/core";
 import { useActivityStore } from "../stores/activity";
 import { useDoctorModeStore } from "../stores/doctorMode";
+import ModernToggle from "../components/ModernToggle.vue";
 import { check } from "@tauri-apps/plugin-updater";
 import { relaunch } from "@tauri-apps/plugin-process";
 import { getVersion } from "@tauri-apps/api/app";
@@ -662,11 +731,26 @@ const { locale, t } = useI18n();
 const store = useActivityStore();
 const notifications = useNotificationStore();
 const doctorModeStore = useDoctorModeStore();
-const doctorModeLimitMins = ref(doctorModeStore.timeLimitMins);
+const doctorModeReminderInterval = ref(doctorModeStore.reminderIntervalMins);
+const doctorModeLockDuration = ref(doctorModeStore.lockDurationMins);
+const doctorModeMaxReminders = ref(doctorModeStore.maxReminders);
 
-function updateDoctorModeLimit() {
-  if (doctorModeLimitMins.value < 10) doctorModeLimitMins.value = 10;
-  doctorModeStore.setTimeLimit(doctorModeLimitMins.value);
+function updateDoctorModeReminderInterval() {
+  if (doctorModeReminderInterval.value < 10) doctorModeReminderInterval.value = 10;
+  if (doctorModeReminderInterval.value > 120) doctorModeReminderInterval.value = 120;
+  doctorModeStore.setReminderInterval(doctorModeReminderInterval.value);
+}
+
+function updateDoctorModeLockDuration() {
+  if (doctorModeLockDuration.value < 15) doctorModeLockDuration.value = 15;
+  if (doctorModeLockDuration.value > 180) doctorModeLockDuration.value = 180;
+  doctorModeStore.setLockDuration(doctorModeLockDuration.value);
+}
+
+function updateDoctorModeMaxReminders() {
+  if (doctorModeMaxReminders.value < 1) doctorModeMaxReminders.value = 1;
+  if (doctorModeMaxReminders.value > 10) doctorModeMaxReminders.value = 10;
+  doctorModeStore.setMaxReminders(doctorModeMaxReminders.value);
 }
 
 // Language State
@@ -965,6 +1049,10 @@ const isResetting = ref(false);
 const isExporting = ref(false);
 const exportDropdownOpen = ref(false);
 const selectedExportFormat = ref<"csv" | "html" | "json" | "markdown">("csv");
+const exportRange = ref<"today" | "week" | "month" | "custom">("today");
+const customStartDate = ref("");
+const customEndDate = ref("");
+const showDateRangePicker = ref(false);
 
 // Auto-export settings
 const autoExportEnabled = ref(false);
@@ -1018,9 +1106,40 @@ async function selectExportFolder() {
 async function exportData(format: "csv" | "html" | "json" | "markdown" = "csv") {
   isExporting.value = true;
   try {
+    // Calculate date range
+    let startDate: string;
+    let endDate: string;
+    const today = new Date();
+    
+    switch (exportRange.value) {
+      case "today":
+        startDate = today.toISOString().slice(0, 10);
+        endDate = startDate;
+        break;
+      case "week":
+        const weekAgo = new Date(today);
+        weekAgo.setDate(weekAgo.getDate() - 7);
+        startDate = weekAgo.toISOString().slice(0, 10);
+        endDate = today.toISOString().slice(0, 10);
+        break;
+      case "month":
+        const monthAgo = new Date(today);
+        monthAgo.setMonth(monthAgo.getMonth() - 1);
+        startDate = monthAgo.toISOString().slice(0, 10);
+        endDate = today.toISOString().slice(0, 10);
+        break;
+      case "custom":
+        startDate = customStartDate.value || today.toISOString().slice(0, 10);
+        endDate = customEndDate.value || today.toISOString().slice(0, 10);
+        break;
+      default:
+        startDate = today.toISOString().slice(0, 10);
+        endDate = startDate;
+    }
+    
     const extension = format === "json" ? "json" : format === "markdown" ? "md" : format;
     const filePath = await save({
-      defaultPath: `TimiGS_Activity_${new Date().toISOString().slice(0, 10)}.${extension}`,
+      defaultPath: `TimiGS_Activity_${startDate}_to_${endDate}.${extension}`,
       filters: [{ name: format.toUpperCase(), extensions: [extension] }],
     });
     if (filePath) {
@@ -1030,7 +1149,7 @@ async function exportData(format: "csv" | "html" | "json" | "markdown" = "csv") 
         json: "export_data_json_cmd",
         markdown: "export_data_markdown_cmd",
       };
-      await invoke(commandMap[format], { path: filePath });
+      await invoke(commandMap[format], { path: filePath, startDate, endDate });
       notifications.success(t("settings.exportSuccess"));
     }
   } catch (e: any) {
@@ -1759,28 +1878,112 @@ async function confirmResetData() {
   display: none;
 }
 
-/* Auto-Export Settings */
-.auto-export-item {
-  flex-direction: column;
-  align-items: stretch;
-}
-
-.auto-export-settings {
+/* Export Controls */
+.export-controls {
   display: flex;
-  align-items: center;
-  justify-content: flex-end;
+  flex-direction: column;
   gap: 12px;
   width: 100%;
+}
+
+/* Date Range Selector */
+.date-range-selector {
+  display: flex;
+  gap: 6px;
   flex-wrap: wrap;
 }
 
-.auto-export-options {
+.date-range-selector .range-btn {
+  padding: 8px 16px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  border-radius: var(--radius-md);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.date-range-selector .range-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-main);
+}
+
+.date-range-selector .range-btn.active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: white;
+}
+
+/* Custom Date Range */
+.custom-date-range {
   display: flex;
-  gap: 8px;
+  gap: 12px;
+  padding: 12px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+}
+
+.date-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.date-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.date-input {
+  padding: 8px 12px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  color: var(--text-main);
+  font-size: 0.9rem;
+  transition: var(--transition-fast);
+}
+
+.date-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(91, 110, 225, 0.1);
+}
+
+/* Auto-Export */
+.auto-export-item.setting-item {
+  display: flex !important;
   align-items: center;
-  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.auto-export-right {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.auto-export-item .setting-left {
   flex: 1;
   min-width: 0;
+}
+
+.auto-export-options-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  margin-top: -8px;
+  margin-bottom: 16px;
 }
 
 .auto-export-row {
@@ -1924,6 +2127,59 @@ async function confirmResetData() {
     width: 60px;
     height: 60px;
     font-size: 2.5rem;
+  }
+
+  /* Export Controls Mobile */
+  .export-controls {
+    gap: 10px;
+  }
+
+  .date-range-selector {
+    gap: 4px;
+  }
+
+  .date-range-selector .range-btn {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .custom-date-range {
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px;
+  }
+
+  /* Auto-Export Mobile */
+  .auto-export-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .auto-export-right {
+    align-self: flex-end;
+  }
+
+  .auto-export-options-card {
+    padding: 12px;
+    gap: 10px;
+  }
+
+  .auto-export-row {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .format-select,
+  .interval-select {
+    width: 100%;
+    min-width: auto;
+  }
+
+  .folder-path {
+    max-width: 100%;
   }
 }
 

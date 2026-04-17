@@ -955,19 +955,95 @@ onMounted(async () => {
 }
 
 /* Mobile Responsive */
+
+/* 4K Ultra Wide (2560px+) */
+@media (min-width: 2560px) {
+  .page-container {
+    max-width: 1800px;
+  }
+
+  .tools-tabs {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .tab-btn {
+    padding: 16px 32px;
+    font-size: 1.1rem;
+  }
+
+  .tab-icon {
+    font-size: 1.5rem;
+  }
+
+  .tool-content-card {
+    padding: 40px;
+  }
+
+  .card-header h3 {
+    font-size: 1.8rem;
+  }
+
+  .apps-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
+}
+
+/* Large Desktop (1920px - 2560px) */
+@media (min-width: 1920px) and (max-width: 2559px) {
+  .page-container {
+    max-width: 1600px;
+  }
+
+  .tools-tabs {
+    max-width: 1000px;
+  }
+
+  .tool-content-card {
+    padding: 32px;
+  }
+}
+
+/* Medium Desktop (1440px - 1920px) */
+@media (min-width: 1440px) and (max-width: 1919px) {
+  .page-container {
+    max-width: 1400px;
+  }
+
+  .tools-tabs {
+    max-width: 900px;
+  }
+}
+
+/* Tablet Landscape (1024px - 1440px) */
+@media (min-width: 1024px) and (max-width: 1439px) {
+  .page-container {
+    max-width: 1000px;
+  }
+
+  .tools-tabs {
+    max-width: 800px;
+  }
+
+  .tool-content-card {
+    padding: 24px;
+  }
+}
+
+/* Tablet Portrait (900px - 1024px) */
 @media (max-width: 1024px) {
   .tools-page {
     padding-bottom: 20px;
   }
-  
+
   .tool-content-card {
     padding: 20px;
   }
-  
+
   .notepad-layout {
     flex-direction: column;
   }
-  
+
   .notes-sidebar {
     width: 100%;
     max-height: 180px;
@@ -976,175 +1052,487 @@ onMounted(async () => {
     overflow-y: hidden;
     padding: 10px;
   }
-  
+
   .note-item {
     min-width: 180px;
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
   }
-  
+
   .btn-delete {
     opacity: 1;
     position: absolute;
     top: 8px;
     right: 8px;
   }
-  
+
   .note-item-content {
     width: 100%;
     padding-right: 36px;
   }
-  
+
   .apps-grid {
     grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
   }
 }
 
+/* Small Tablet (768px - 900px) */
+@media (max-width: 900px) {
+  .page-header h2 {
+    font-size: 1.4rem;
+  }
+
+  .subtitle {
+    font-size: 0.9rem;
+  }
+
+  .tools-tabs {
+    gap: 8px;
+  }
+
+  .tab-btn {
+    padding: 12px 20px;
+    font-size: 0.9rem;
+  }
+
+  .tab-icon {
+    font-size: 1.1rem;
+  }
+
+  .tool-content-card {
+    padding: 20px;
+    border-radius: 16px;
+  }
+
+  .card-header {
+    gap: 14px;
+  }
+
+  .header-icon-box {
+    width: 44px;
+    height: 44px;
+    font-size: 1.2rem;
+  }
+
+  .tool-content-card h3 {
+    font-size: 1.2rem;
+  }
+}
+
+/* Mobile Large (600px - 768px) */
 @media (max-width: 768px) {
   .page-header h2 {
     font-size: 1.3rem;
   }
-  
+
   .subtitle {
     font-size: 0.85rem;
   }
-  
+
   .tools-tabs {
     padding: 6px;
     gap: 6px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
-  
+
   .tab-btn {
     padding: 10px 16px;
     font-size: 0.85rem;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
-  
+
   .tab-icon {
     font-size: 1rem;
   }
-  
+
   .tool-content-card {
     padding: 16px;
     border-radius: 16px;
   }
-  
+
   .card-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;
   }
-  
+
   .header-icon-box {
     width: 42px;
     height: 42px;
     font-size: 1.2rem;
   }
-  
+
   .tool-content-card h3 {
     font-size: 1.1rem;
   }
-  
+
   .notepad-card {
     min-height: auto;
   }
-  
+
   .notepad-layout {
     min-height: auto;
   }
-  
+
   .notes-sidebar {
     max-height: 140px;
   }
-  
+
   .note-item {
     min-width: 150px;
   }
-  
+
   .editor-header {
     flex-wrap: wrap;
   }
-  
+
   .editor-actions {
     width: 100%;
     justify-content: space-between;
   }
-  
+
   .note-title-input {
     font-size: 1rem;
   }
-  
+
   .btn-insert-apps {
     padding: 6px 12px;
     font-size: 0.8rem;
   }
-  
+
   .apps-grid {
     grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
     max-height: 150px;
   }
-  
+
   .app-chip {
     padding: 8px 10px;
   }
-  
+
   .app-chip span {
     font-size: 0.75rem;
   }
-  
+
   .app-time {
     font-size: 0.65rem;
   }
-  
+
   .notepad-area {
-    padding: 14px;
-    font-size: 0.95rem;
-    min-height: 250px;
+    min-height: 300px;
   }
-  
-  .btn-new-note {
-    padding: 8px 16px;
-    font-size: 0.85rem;
+
+  .note-editor {
+    gap: 12px;
   }
 }
 
-@media (max-width: 480px) {
+/* Mobile Medium (480px - 600px) */
+@media (max-width: 600px) {
+  .page-container {
+    max-width: 100%;
+    padding: 0 12px;
+  }
+
+  .page-header {
+    margin-bottom: 16px;
+  }
+
+  .page-header h2 {
+    font-size: 1.2rem;
+  }
+
+  .subtitle {
+    font-size: 0.8rem;
+  }
+
   .tools-tabs {
-    overflow-x: scroll;
-    -webkit-overflow-scrolling: touch;
+    padding: 4px;
+    gap: 4px;
   }
-  
-  .tools-tabs::-webkit-scrollbar {
-    height: 4px;
-  }
-  
+
   .tab-btn {
-    white-space: nowrap;
+    padding: 8px 14px;
+    font-size: 0.8rem;
   }
-  
+
+  .tab-icon {
+    font-size: 0.95rem;
+  }
+
   .tool-content-card {
-    padding: 12px;
+    padding: 14px;
+    border-radius: 14px;
   }
-  
+
+  .card-header {
+    gap: 10px;
+  }
+
+  .header-icon-box {
+    width: 38px;
+    height: 38px;
+    font-size: 1.1rem;
+  }
+
+  .tool-content-card h3 {
+    font-size: 1.05rem;
+  }
+
+  .notepad-card,
+  .timeout-card,
+  .focus-card,
+  .tasks-card,
+  .timer-card {
+    border-radius: 14px;
+  }
+
   .notes-sidebar {
     max-height: 120px;
+    padding: 8px;
   }
-  
+
   .note-item {
-    min-width: 130px;
+    min-width: 140px;
+    padding: 10px;
   }
-  
+
+  .note-item-content {
+    padding-right: 30px;
+  }
+
+  .note-item-title {
+    font-size: 0.85rem;
+  }
+
+  .note-item-preview {
+    font-size: 0.75rem;
+  }
+
+  .note-title-input {
+    font-size: 0.95rem;
+    padding: 10px 12px;
+  }
+
+  .notepad-area {
+    min-height: 250px;
+    padding: 12px;
+  }
+
+  .note-content {
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
   .apps-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    max-height: 140px;
+    gap: 8px;
   }
-  
+
   .app-chip {
-    min-height: 60px;
-    justify-content: center;
+    padding: 7px 9px;
   }
-  
+
+  .app-chip span {
+    font-size: 0.7rem;
+  }
+
+  .btn-insert-apps {
+    padding: 6px 10px;
+    font-size: 0.75rem;
+  }
+
+  .btn-save {
+    padding: 8px 14px;
+    font-size: 0.8rem;
+  }
+}
+
+/* Mobile Small (320px - 480px) */
+@media (max-width: 480px) {
+  .page-container {
+    padding: 0 10px;
+  }
+
+  .page-header {
+    margin-bottom: 14px;
+  }
+
+  .page-header h2 {
+    font-size: 1.1rem;
+  }
+
+  .subtitle {
+    font-size: 0.75rem;
+  }
+
+  .tools-tabs {
+    padding: 4px;
+    gap: 3px;
+  }
+
+  .tab-btn {
+    padding: 7px 12px;
+    font-size: 0.75rem;
+  }
+
+  .tab-icon {
+    font-size: 0.9rem;
+  }
+
+  .tool-content-card {
+    padding: 12px;
+    border-radius: 12px;
+  }
+
+  .card-header {
+    gap: 8px;
+  }
+
+  .header-icon-box {
+    width: 36px;
+    height: 36px;
+    font-size: 1rem;
+  }
+
+  .tool-content-card h3 {
+    font-size: 1rem;
+  }
+
+  .notes-sidebar {
+    max-height: 100px;
+    padding: 6px;
+  }
+
+  .note-item {
+    min-width: 120px;
+    padding: 8px;
+  }
+
+  .note-item-content {
+    padding-right: 28px;
+  }
+
+  .note-item-title {
+    font-size: 0.8rem;
+  }
+
+  .note-item-preview {
+    font-size: 0.7rem;
+    margin-top: 4px;
+  }
+
+  .note-title-input {
+    font-size: 0.9rem;
+    padding: 8px 10px;
+  }
+
   .notepad-area {
     min-height: 200px;
+    padding: 10px;
+    font-size: 0.85rem;
+  }
+
+  .note-content {
+    font-size: 0.85rem;
+    line-height: 1.4;
+  }
+
+  .apps-grid {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    max-height: 120px;
+    gap: 6px;
+  }
+
+  .app-chip {
+    padding: 6px 8px;
+  }
+
+  .app-chip span {
+    font-size: 0.65rem;
+  }
+
+  .btn-insert-apps {
+    padding: 5px 9px;
+    font-size: 0.7rem;
+  }
+
+  .btn-save {
+    padding: 7px 12px;
+    font-size: 0.75rem;
+  }
+
+  .editor-actions {
+    gap: 6px;
+  }
+}
+
+/* Extra Small Mobile (below 360px) */
+@media (max-width: 360px) {
+  .page-container {
+    padding: 0 8px;
+  }
+
+  .page-header h2 {
+    font-size: 1rem;
+  }
+
+  .subtitle {
+    display: none;
+  }
+
+  .tools-tabs {
+    padding: 3px;
+    gap: 2px;
+  }
+
+  .tab-btn {
+    padding: 6px 10px;
+    font-size: 0.7rem;
+  }
+
+  .tab-icon {
+    font-size: 0.85rem;
+  }
+
+  .tool-content-card {
+    padding: 10px;
+    border-radius: 10px;
+  }
+
+  .card-header {
+    gap: 6px;
+  }
+
+  .header-icon-box {
+    width: 32px;
+    height: 32px;
+    font-size: 0.9rem;
+  }
+
+  .tool-content-card h3 {
+    font-size: 0.95rem;
+  }
+
+  .notes-sidebar {
+    max-height: 90px;
+  }
+
+  .note-item {
+    min-width: 110px;
+    padding: 6px;
+  }
+
+  .notepad-area {
+    min-height: 180px;
+  }
+
+  .apps-grid {
+    grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+    max-height: 100px;
   }
 }
 </style>

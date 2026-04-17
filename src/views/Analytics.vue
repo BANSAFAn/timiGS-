@@ -14,7 +14,6 @@
         <div class="header-controls">
           <!-- Time Range Selector -->
           <div class="time-range-selector">
-            <button class="range-btn" :class="{ active: selectedRange === 'day' }" @click="selectedRange = 'day'">{{ $t('common.day') || 'Day' }}</button>
             <button class="range-btn" :class="{ active: selectedRange === 'week' }" @click="selectedRange = 'week'">{{ $t('common.week') || 'Week' }}</button>
             <button class="range-btn" :class="{ active: selectedRange === 'month' }" @click="selectedRange = 'month'">{{ $t('common.month') || 'Month' }}</button>
           </div>
@@ -2045,13 +2044,131 @@ watch(selectedRange, async () => {
   background: rgba(255, 255, 255, 0.02);
 }
 
+/* ===== RESPONSIVE BREAKPOINTS ===== */
+
+/* 4K Ultra Wide (2560px+) */
+@media (min-width: 2560px) {
+  .page-container {
+    max-width: 1800px;
+  }
+
+  .stats-row {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+  }
+
+  .stat-card {
+    padding: 32px;
+  }
+
+  .stat-label {
+    font-size: 1.1rem;
+  }
+
+  .stat-value {
+    font-size: 2.5rem;
+  }
+
+  .charts-grid {
+    gap: 32px;
+  }
+
+  .chart-card {
+    padding: 32px;
+  }
+
+  .card-header h3 {
+    font-size: 1.5rem;
+  }
+
+  .app-breakdown-content {
+    gap: 32px;
+  }
+
+  .app-list-item {
+    padding: 20px 24px;
+  }
+}
+
+/* Large Desktop (1920px - 2560px) */
+@media (min-width: 1920px) and (max-width: 2559px) {
+  .page-container {
+    max-width: 1600px;
+  }
+
+  .stats-row {
+    gap: 28px;
+  }
+
+  .stat-card {
+    padding: 28px;
+  }
+
+  .charts-grid {
+    gap: 28px;
+  }
+}
+
+/* Medium Desktop (1440px - 1920px) */
+@media (min-width: 1440px) and (max-width: 1919px) {
+  .page-container {
+    max-width: 1400px;
+  }
+}
+
+/* Tablet Landscape (1024px - 1440px) */
+@media (min-width: 1024px) and (max-width: 1439px) {
+  .page-container {
+    max-width: 1000px;
+  }
+
+  .stats-row {
+    gap: 20px;
+  }
+
+  .stat-card {
+    padding: 20px;
+  }
+}
+
+/* Tablet Portrait (900px - 1024px) */
+@media (max-width: 1024px) {
+  .page-container {
+    max-width: 90%;
+  }
+
+  .stats-row {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+
+  .stat-card {
+    padding: 18px;
+  }
+
+  .stat-label {
+    font-size: 0.9rem;
+  }
+
+  .stat-value {
+    font-size: 1.5rem;
+  }
+
+  .charts-grid {
+    gap: 20px;
+  }
+}
+
+/* Small Tablet (768px - 900px) */
 @media (max-width: 900px) {
   .stats-row {
     grid-template-columns: 1fr;
+    gap: 16px;
   }
 
   .charts-grid {
     grid-template-columns: 1fr;
+    gap: 20px;
   }
 
   .large-chart {
@@ -2091,31 +2208,461 @@ watch(selectedRange, async () => {
   .music-grid {
     grid-template-columns: 1fr;
   }
+
+  .time-range-selector {
+    gap: 6px;
+  }
+
+  .range-btn {
+    padding: 8px 16px;
+    font-size: 0.85rem;
+  }
 }
 
-@media (max-width: 600px) {
+/* Mobile Large (600px - 768px) */
+@media (max-width: 768px) {
   .page-header {
     flex-direction: column;
     gap: 16px;
+    align-items: flex-start;
   }
-  
+
+  .header-left h2 {
+    font-size: 1.5rem;
+  }
+
+  .subtitle {
+    font-size: 0.85rem;
+  }
+
   .header-controls {
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .time-range-selector {
+    order: 2;
     width: 100%;
     justify-content: space-between;
   }
-  
-  .view-selector,
-  .time-range-selector {
-    order: 2;
+
+  .range-btn {
+    flex: 1;
+    padding: 10px 12px;
+    font-size: 0.85rem;
   }
-  
+
   .nav-btn,
   .date-range-badge {
     order: 1;
   }
-  
-  .header-left h2 {
-    font-size: 1.5rem;
+
+  .nav-btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .date-range-badge {
+    padding: 8px 12px;
+    font-size: 0.85rem;
+  }
+
+  .stats-row {
+    gap: 12px;
+  }
+
+  .stat-card {
+    padding: 16px;
+  }
+
+  .stat-label {
+    font-size: 0.85rem;
+  }
+
+  .stat-value {
+    font-size: 1.3rem;
+  }
+
+  .chart-card {
+    padding: 16px;
+  }
+
+  .card-header h3 {
+    font-size: 1.1rem;
+  }
+
+  .modal-content {
+    width: 95%;
+    max-height: 85vh;
+  }
+}
+
+/* Mobile Medium (480px - 600px) */
+@media (max-width: 600px) {
+  .page-container {
+    max-width: 100%;
+    padding: 0 12px;
+  }
+
+  .page-header h2 {
+    font-size: 1.3rem;
+  }
+
+  .subtitle {
+    font-size: 0.8rem;
+  }
+
+  .header-controls {
+    gap: 8px;
+  }
+
+  .time-range-selector {
+    gap: 4px;
+  }
+
+  .range-btn {
+    padding: 8px 10px;
+    font-size: 0.8rem;
+  }
+
+  .nav-btn {
+    width: 32px;
+    height: 32px;
+  }
+
+  .date-range-badge {
+    padding: 6px 10px;
+    font-size: 0.8rem;
+  }
+
+  .range-icon {
+    width: 14px;
+    height: 14px;
+  }
+
+  .stats-row {
+    gap: 10px;
+  }
+
+  .stat-card {
+    padding: 14px;
+  }
+
+  .stat-label {
+    font-size: 0.8rem;
+  }
+
+  .stat-value {
+    font-size: 1.2rem;
+  }
+
+  .stat-bg-icon {
+    width: 48px;
+    height: 48px;
+  }
+
+  .chart-card {
+    padding: 14px;
+  }
+
+  .card-header h3 {
+    font-size: 1rem;
+  }
+
+  .app-breakdown-chart {
+    min-height: 200px;
+    padding: 12px;
+  }
+
+  .app-list-item {
+    padding: 10px 12px;
+  }
+
+  .app-list-icon {
+    width: 24px;
+    height: 24px;
+    font-size: 0.75rem;
+  }
+
+  .app-list-name {
+    font-size: 0.85rem;
+  }
+
+  .app-list-percent {
+    font-size: 0.8rem;
+  }
+
+  .app-list-time {
+    font-size: 0.8rem;
+  }
+
+  .website-card,
+  .music-card {
+    padding: 14px;
+  }
+
+  .website-grid,
+  .music-grid {
+    gap: 12px;
+  }
+
+  .modal-content {
+    width: 98%;
+    max-width: 98%;
+  }
+
+  .modal-header {
+    padding: 14px 16px;
+  }
+
+  .modal-body {
+    padding: 14px;
+  }
+}
+
+/* Mobile Small (320px - 480px) */
+@media (max-width: 480px) {
+  .page-container {
+    padding: 0 10px;
+  }
+
+  .page-header {
+    margin-bottom: 16px;
+  }
+
+  .page-header h2 {
+    font-size: 1.2rem;
+  }
+
+  .subtitle {
+    font-size: 0.75rem;
+  }
+
+  .header-controls {
+    gap: 6px;
+  }
+
+  .time-range-selector {
+    gap: 4px;
+  }
+
+  .range-btn {
+    padding: 6px 8px;
+    font-size: 0.75rem;
+  }
+
+  .nav-btn {
+    width: 28px;
+    height: 28px;
+  }
+
+  .nav-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .date-range-badge {
+    padding: 5px 8px;
+    font-size: 0.75rem;
+    gap: 6px;
+  }
+
+  .range-icon {
+    width: 12px;
+    height: 12px;
+  }
+
+  .stats-row {
+    gap: 8px;
+  }
+
+  .stat-card {
+    padding: 12px;
+  }
+
+  .stat-label {
+    font-size: 0.75rem;
+  }
+
+  .stat-value {
+    font-size: 1.1rem;
+  }
+
+  .stat-bg-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .chart-card {
+    padding: 12px;
+  }
+
+  .card-header h3 {
+    font-size: 0.95rem;
+  }
+
+  .app-breakdown-content {
+    gap: 12px;
+  }
+
+  .app-breakdown-chart {
+    min-height: 180px;
+    padding: 10px;
+  }
+
+  .app-list-item {
+    padding: 8px 10px;
+    gap: 8px;
+  }
+
+  .app-list-icon {
+    width: 20px;
+    height: 20px;
+    font-size: 0.7rem;
+  }
+
+  .app-list-name {
+    font-size: 0.8rem;
+  }
+
+  .app-list-percent {
+    font-size: 0.75rem;
+  }
+
+  .app-list-time {
+    font-size: 0.75rem;
+  }
+
+  .progress-bar {
+    height: 4px;
+  }
+
+  .website-grid,
+  .music-grid {
+    gap: 10px;
+  }
+
+  .website-card,
+  .music-card {
+    padding: 12px;
+  }
+
+  .website-name,
+  .song-title {
+    font-size: 0.85rem;
+  }
+
+  .modal-content {
+    width: 100%;
+    max-width: 100%;
+    border-radius: 12px;
+  }
+
+  .modal-header {
+    padding: 12px 14px;
+  }
+
+  .modal-header h3 {
+    font-size: 1rem;
+  }
+
+  .modal-body {
+    padding: 12px;
+  }
+
+  .day-session-item {
+    padding: 12px 16px;
+    gap: 12px;
+  }
+
+  .day-session-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 0.85rem;
+  }
+
+  .day-session-app {
+    font-size: 0.9rem;
+  }
+
+  .day-session-title {
+    font-size: 0.8rem;
+  }
+
+  .day-session-time {
+    font-size: 0.8rem;
+  }
+}
+
+/* Extra Small Mobile (below 320px) */
+@media (max-width: 360px) {
+  .page-container {
+    padding: 0 8px;
+  }
+
+  .page-header h2 {
+    font-size: 1.1rem;
+  }
+
+  .subtitle {
+    display: none;
+  }
+
+  .header-controls {
+    gap: 4px;
+  }
+
+  .time-range-selector {
+    gap: 3px;
+  }
+
+  .range-btn {
+    padding: 5px 6px;
+    font-size: 0.7rem;
+  }
+
+  .nav-btn {
+    width: 26px;
+    height: 26px;
+  }
+
+  .nav-btn svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  .date-range-badge {
+    padding: 4px 6px;
+    font-size: 0.7rem;
+  }
+
+  .stats-row {
+    gap: 6px;
+  }
+
+  .stat-card {
+    padding: 10px;
+  }
+
+  .stat-label {
+    font-size: 0.7rem;
+  }
+
+  .stat-value {
+    font-size: 1rem;
+  }
+
+  .chart-card {
+    padding: 10px;
+  }
+
+  .card-header h3 {
+    font-size: 0.9rem;
+  }
+
+  .app-breakdown-chart {
+    min-height: 160px;
   }
 }
 
