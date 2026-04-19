@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.0](https://github.com/BANSAFAn/timiGS-/compare/v1.3.0...v1.4.0) (2026-04-19)
+
+
+### Features
+
+* implement P2P file transfer view with support for token and IP-based connection modes ([786141f](https://github.com/BANSAFAn/timiGS-/commit/786141fca65c9724e315e64f8c9c9bb0d18e4e14))
+
 ## [1.3.0](https://github.com/BANSAFAn/timiGS-/compare/v1.2.0...v1.3.0) (2026-04-17)
 
 
