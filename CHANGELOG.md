@@ -1,5 +1,107 @@
 # Changelog
 
+## [1.5.0](https://github.com/BANSAFAn/timiGS-/compare/v1.4.0...v1.5.0) (2026-04-19)
+
+
+### Features
+
+* add auto-export backend commands and doctor mode backend ([53af06e](https://github.com/BANSAFAn/timiGS-/commit/53af06ed82e8e060f5fe5d2577cc6b998fb0b931))
+* add CustomCalendar, ModernToggle, and ConfirmDialog components ([dd5c0e7](https://github.com/BANSAFAn/timiGS-/commit/dd5c0e7d1e87904dd0cf2eb2e78caf22ee7ac99d))
+* add Doctor Mode with PC time tracking and break reminders ([a26995b](https://github.com/BANSAFAn/timiGS-/commit/a26995b56316371f3eefff4afe36ba1fe0656609))
+* Add Sync feature and remove Music app ([e59af8a](https://github.com/BANSAFAn/timiGS-/commit/e59af8ab819b509b82c19e40bfc485d33718cfbf))
+* add Team page route and app integration ([cff4d60](https://github.com/BANSAFAn/timiGS-/commit/cff4d609e8dd18e1def4a6854e4baf9c38d5972b))
+* create notif ([8c56b65](https://github.com/BANSAFAn/timiGS-/commit/8c56b65133829c2ed7d49774ea501cb0611b86e4))
+* deleting android version (100%), new ProcessExcludeModal ([9993d04](https://github.com/BANSAFAn/timiGS-/commit/9993d040ea66b230e67fc1ebffb631047ddac90b))
+* Implement a new synchronization system with device pairing and P2P, add dedicated sync, tray, and settings views, and update the website with new pages and internationalization. ([6d53b37](https://github.com/BANSAFAn/timiGS-/commit/6d53b3731bea2aec75c6efd259c6d7cf0f232b1c))
+* Implement new Tauri desktop application with various features and remove the old Android cleanup script. ([85a0c68](https://github.com/BANSAFAn/timiGS-/commit/85a0c6827876b48b9a8d1e91123d89b4fac22a4c))
+* implement P2P file transfer view with support for token and IP-based connection modes ([786141f](https://github.com/BANSAFAn/timiGS-/commit/786141fca65c9724e315e64f8c9c9bb0d18e4e14))
+* improve doctor mode with lock screen and configurable settings ([16847c7](https://github.com/BANSAFAn/timiGS-/commit/16847c780df3a0a441570e263cb9c87756fecea0))
+* improve Sync design with SVG icons and modern UI ([20570bd](https://github.com/BANSAFAn/timiGS-/commit/20570bd06481935acce10bdaa081bae5125565f5))
+* new designer tray, music +- ([0889d39](https://github.com/BANSAFAn/timiGS-/commit/0889d397586dc0935d1ae1dc70f3313f3c78623e))
+* New Installer NSIS Windows ([2c75fb7](https://github.com/BANSAFAn/timiGS-/commit/2c75fb7d7d1e05496b4b9d5c195499748cd013d2))
+* new table syns ([129bfe3](https://github.com/BANSAFAn/timiGS-/commit/129bfe3d7d048dbe89e14698d033db29e2694fc6))
+* nofitical tools + Hello Timeout Shealder ([b7e72c0](https://github.com/BANSAFAn/timiGS-/commit/b7e72c0cafe7623087d09fdd9f909cd0fd2aef21))
+* remove Cloud Sync row from comparison table ([57d008a](https://github.com/BANSAFAn/timiGS-/commit/57d008a94ad1031cb136750580a5676740ce72c5))
+* remove gradients from design (Weather, Compare, view-styles) ([88441c0](https://github.com/BANSAFAn/timiGS-/commit/88441c0071b41f272836dd0a4bae78a7f0434920))
+* team member nickname shows PC computer name ([7d44d1f](https://github.com/BANSAFAn/timiGS-/commit/7d44d1fd0b1815916a36155b586c0b2997490f99))
+* update contacts, export formats and fix analytics toggle ([c577454](https://github.com/BANSAFAn/timiGS-/commit/c57745459f69b0d40d8ed7aeb9cff1058eedb2e4))
+
+
+### Bug Fixes
+
+* Analytics build ([79adbc7](https://github.com/BANSAFAn/timiGS-/commit/79adbc77e72259d7953f2e25473dbfd981ca7ab3))
+* Auto-Export toggle layout and improve Settings, Analytics, Timeline, Tools views ([687ba8d](https://github.com/BANSAFAn/timiGS-/commit/687ba8d99203852d44d3cede640717d67384f97f))
+* delete github ([78a0b57](https://github.com/BANSAFAn/timiGS-/commit/78a0b57744632660f4d7f2fc4168c4a1e5811ed9))
+* delete syns table ([945c394](https://github.com/BANSAFAn/timiGS-/commit/945c39482e17b7742e1cf9c448d744fd65b363d6))
+* flag contry ([7566cb6](https://github.com/BANSAFAn/timiGS-/commit/7566cb664db4ea151b2338feadb3cf6393226e48))
+* light theme ! ([32de928](https://github.com/BANSAFAn/timiGS-/commit/32de92807dcbd588aff6f0796af5abd5b7925523))
+* package-lock music ([d6ad98c](https://github.com/BANSAFAn/timiGS-/commit/d6ad98c848e40ffef899ad18bad3038c6ffe9753))
+* remove Android, improve Linux tracking ([39cf1ac](https://github.com/BANSAFAn/timiGS-/commit/39cf1ac089d6d9b44485bf88c1a7033ebe77d1b3))
+* remove unused code and fix TypeScript errors ([669378d](https://github.com/BANSAFAn/timiGS-/commit/669378dbb6d30f2985c39e1174c154fc3df9abef))
+* root linux ([868f844](https://github.com/BANSAFAn/timiGS-/commit/868f844d14e3420a2e9c82c836255a5c6c353ba9))
+* simplify tray menu event handling ([2ad356f](https://github.com/BANSAFAn/timiGS-/commit/2ad356f6200ead6270d8d4e8d5dd600d771365d0))
+* tracing Linux ([cae4ae3](https://github.com/BANSAFAn/timiGS-/commit/cae4ae3825d1c3981772fda24dacc48f3278d402))
+* tray menu events and remove [skip ci] from workflow ([d1e0d7b](https://github.com/BANSAFAn/timiGS-/commit/d1e0d7bce54b89fbe4458444de00450f5ed46c15))
+* tray menu not working - store tray in app state ([b6673e6](https://github.com/BANSAFAn/timiGS-/commit/b6673e6afb60abc06d56dc66d8751d843e2b71b2))
+* vercel develop ([f60b533](https://github.com/BANSAFAn/timiGS-/commit/f60b53350b9f121f5b794d93f4369373333e7ff9))
+* views not compiler ! ([b3673c4](https://github.com/BANSAFAn/timiGS-/commit/b3673c46962646d300cc016a3310aac50ebe6971))
+
+
+### Translations
+
+* add translations for team, doctor mode, and settings ([b012fdd](https://github.com/BANSAFAn/timiGS-/commit/b012fdd0b89d805fc4a06e78e3c411bc3b030b93))
+* pt.json + pl.json ! ([7a0a5ed](https://github.com/BANSAFAn/timiGS-/commit/7a0a5ed1fa85efff6a65563151b4086c5688d40e))
+* remove Cloud Sync translation keys from all languages ([11492e9](https://github.com/BANSAFAn/timiGS-/commit/11492e959ca82b8306aa351fbfd26360900ad8b0))
+* update translation types and utils ([27d061f](https://github.com/BANSAFAn/timiGS-/commit/27d061f49c5f5f77fb26328964ce538235364434))
+
+
+### Miscellaneous
+
+* add Vercel and Astro build artifacts to .gitignore ([62a9ab6](https://github.com/BANSAFAn/timiGS-/commit/62a9ab6644e7e0313b8975f3943836eb50b5321f))
+* **deps:** bump h3 ([f286a64](https://github.com/BANSAFAn/timiGS-/commit/f286a64cdc2bd93bf4cc3fe0228cdcab772db3b7))
+* **deps:** bump rustls-webpki ([7771bf5](https://github.com/BANSAFAn/timiGS-/commit/7771bf5a3f31e65b63fa6513bc779811c1ea04cb))
+* **deps:** bump svgo ([940e506](https://github.com/BANSAFAn/timiGS-/commit/940e506451e093b4e9850fdd5743fd1ae6e8914f))
+* **deps:** bump tar ([062df5e](https://github.com/BANSAFAn/timiGS-/commit/062df5e95fad4811c6c67ceda75328235dbca184))
+* **deps:** bump tar ([f71c71b](https://github.com/BANSAFAn/timiGS-/commit/f71c71bc36af7b07c99e57ede0aae90cff5ed3ca))
+* **deps:** bump the npm_and_yarn group across 1 directory with 2 updates ([fcede0b](https://github.com/BANSAFAn/timiGS-/commit/fcede0bee896fc4b1d2985258afaba8134bcd354))
+* **deps:** bump the npm_and_yarn group across 2 directories with 2 updates ([5f6472c](https://github.com/BANSAFAn/timiGS-/commit/5f6472cca4ece86fd5542b6f4b6a19f15d831cc7))
+* generate package-lock.json for project dependencies ([73264dd](https://github.com/BANSAFAn/timiGS-/commit/73264dd6c2551d92767df021fec37df3a1b1d253))
+* initial commit (history reset) ([1c8ca65](https://github.com/BANSAFAn/timiGS-/commit/1c8ca65a71e9c6a7e03243361d16fdcccc6d61c7))
+* **main:** release 1.0.1 ([65fc0d7](https://github.com/BANSAFAn/timiGS-/commit/65fc0d72070d09dfc3ed0b687967e02c4ff249ae))
+* **main:** release 1.1.0 ([cbab607](https://github.com/BANSAFAn/timiGS-/commit/cbab607399f97a0f3ff8b739e6a376180ec16326))
+* **main:** release 1.1.1 ([2d821e4](https://github.com/BANSAFAn/timiGS-/commit/2d821e4b2f0d713bf22f1c5cca8e88c7ba280790))
+* **main:** release 1.2.0 ([f42084b](https://github.com/BANSAFAn/timiGS-/commit/f42084bb715130c5ea8a21b0e68f84245ac1721d))
+* **main:** release 1.3.0 ([7e4829f](https://github.com/BANSAFAn/timiGS-/commit/7e4829fc59c41648df8ab98a701bba19e7f03381))
+* **main:** release 1.4.0 ([0fc3d0c](https://github.com/BANSAFAn/timiGS-/commit/0fc3d0c8dbea6f43ee24549223786765a2bb0108))
+* update dependencies and add locale update script ([bb6107b](https://github.com/BANSAFAn/timiGS-/commit/bb6107be54e61378929f0c7d1c4f1cb415a68c4f))
+* various fixes and improvements ([2207525](https://github.com/BANSAFAn/timiGS-/commit/22075254b184bff5c36195ce4bee067832ddb4c9))
+
+
+### Documentation
+
+* fix README merge conflict markers in status table ([528c73c](https://github.com/BANSAFAn/timiGS-/commit/528c73c61ba46982c846dfa1cf53cb307dcd9580))
+* update platform build statuses ([3b0198f](https://github.com/BANSAFAn/timiGS-/commit/3b0198f849bb7a2d6b6bf495fa4b37c997df2adb))
+* update platform build statuses [skip ci] ([3ebdb6e](https://github.com/BANSAFAn/timiGS-/commit/3ebdb6eb8749dd21ccf3dcddd5ec15be345522a4))
+* update platform build statuses [skip ci] ([3ec4f49](https://github.com/BANSAFAn/timiGS-/commit/3ec4f491c6a43295181acb91ab791a5f5b285e03))
+* update platform build statuses [skip ci] ([2ea6b3f](https://github.com/BANSAFAn/timiGS-/commit/2ea6b3f920ae639e6efe16fc9c9a55593de391d6))
+* update platform build statuses [skip ci] ([2e4f197](https://github.com/BANSAFAn/timiGS-/commit/2e4f1971912b1d65427682cd920e37ab8384b338))
+
+
+### Code Refactoring
+
+* redesign Usage by Application block in Analytics ([29acb32](https://github.com/BANSAFAn/timiGS-/commit/29acb3204d5f7e5cbf88d5117db7eb80bd5c5a75))
+
+
+### CI/CD
+
+* alpine ([928b65d](https://github.com/BANSAFAn/timiGS-/commit/928b65d2796c2ad9443246545befb9682e82b8d0))
+* ci update ([7ba1da1](https://github.com/BANSAFAn/timiGS-/commit/7ba1da1575f809edd0f893c12dac21f5e47e6ae5))
+* fix android & linxu ([272ec03](https://github.com/BANSAFAn/timiGS-/commit/272ec038320dcae8dac2efdbbd8840077c65d7da))
+* fix build ([90072e7](https://github.com/BANSAFAn/timiGS-/commit/90072e78689d9b61739bd96c3a5897e6a7fbce91))
+* i18n tag add ([f62eb08](https://github.com/BANSAFAn/timiGS-/commit/f62eb08f7567f84777ffed8bf0537cd37210ca77))
+* remove android ([e8c3098](https://github.com/BANSAFAn/timiGS-/commit/e8c309886f8ad4867f104a4b9ff79f16d4227423))
+* ubuntu &lt;-----alpine ([c443953](https://github.com/BANSAFAn/timiGS-/commit/c4439530084140fbcc68657b2a1ea52958ff10e3))
+
 ## [1.4.0](https://github.com/BANSAFAn/timiGS-/compare/v1.3.0...v1.4.0) (2026-04-19)
 
 
