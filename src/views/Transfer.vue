@@ -504,32 +504,49 @@ function copyIp() {
 }
 
 function initPeer() {
-  peer = new Peer({
-    config: {
-      iceServers: [
-        { urls: 'stun:stun.l.google.com:19302' },
-        { urls: 'stun:stun1.l.google.com:19302' },
-        { urls: 'stun:stun2.l.google.com:19302' },
-      ],
-    },
-  });
+  try {
+    peer = new Peer({
+      config: {
+        iceServers: [
+          { urls: 'stun:stun.l.google.com:19302' },
+          { urls: 'stun:stun1.l.google.com:19302' },
+          { urls: 'stun:stun2.l.google.com:19302' },
+        ],
+      },
+    });
 
-  peer.on('open', (id) => {
-    myPeerId.value = id;
-  });
+    peer.on('open', (id) => {
+      myPeerId.value = id;
+      connectionError.value = '';
+    });
 
-  peer.on('connection', (c) => {
-    conn = c;
-    setupReceiverConnection();
-  });
+    peer.on('connection', (c) => {
+      conn = c;
+      setupReceiverConnection();
+    });
 
-  peer.on('error', (err: any) => {
-    if (err.type === 'peer-unavailable') {
-      connectionError.value = "Peer not found. Check the token.";
-    } else {
-      connectionError.value = "P2P Error: " + (err.type || err);
-    }
-  });
+    peer.on('error', (err: any) => {
+      if (err.type === 'peer-unavailable') {
+        connectionError.value = "Peer not found. Check the token.";
+      } else if (err.type === 'server-error' || err.type === 'network') {
+        connectionError.value = "Cannot reach signaling server. Check your internet connection or use IP mode instead.";
+        notifications.warning("Token mode requires internet. Try IP mode for local transfers.");
+      } else if (err.type === 'disconnected') {
+        connectionError.value = "Disconnected from server. Reconnecting...";
+        setTimeout(() => { try { peer?.reconnect(); } catch {} }, 3000);
+      } else {
+        connectionError.value = "P2P Error: " + (err.type || err);
+      }
+    });
+
+    peer.on('disconnected', () => {
+      // Auto-reconnect
+      setTimeout(() => { try { peer?.reconnect(); } catch {} }, 5000);
+    });
+  } catch (e) {
+    connectionError.value = "Failed to initialize P2P. Use IP mode instead.";
+    console.error("PeerJS init error:", e);
+  }
 }
 
 function copyToken() {

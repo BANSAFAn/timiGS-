@@ -66,7 +66,8 @@
                 @click="langOpen = !langOpen"
               >
                 <div class="selected-option">
-                  <img :src="currentLangFlagImg" :alt="currentLangName" class="flag-icon-img" />
+                  <img :src="currentLangFlagImg" :alt="currentLangName" class="flag-icon-img" @error="(e: Event) => (e.target as HTMLImageElement).style.display = 'none'" />
+                  <span class="flag-emoji-fallback">{{ currentLangFlag }}</span>
                   <span class="lang-name">{{ currentLangName }}</span>
                   <span class="chevron">▼</span>
                 </div>
@@ -77,7 +78,8 @@
                     class="option-item"
                     @click.stop="changeLanguage(lang.code)"
                   >
-                    <img :src="lang.flagImg" :alt="lang.name" class="flag-icon-img" />
+                    <img :src="lang.flagImg" :alt="lang.name" class="flag-icon-img" @error="(e: Event) => (e.target as HTMLImageElement).style.display = 'none'" />
+                    <span class="flag-emoji-fallback">{{ lang.flag }}</span>
                     {{ lang.name }}
                   </div>
                 </div>
@@ -777,6 +779,11 @@ const currentLangName = computed(
     availableLanguages.find((l) => l.code === localSettings.language)?.name ||
     "Language",
 );
+const currentLangFlag = computed(
+  () =>
+    availableLanguages.find((l) => l.code === localSettings.language)?.flag ||
+    "🌐",
+);
 
 function changeLanguage(code: string) {
   localSettings.language = code;
@@ -1414,6 +1421,23 @@ async function confirmResetData() {
   flex-shrink: 0;
   display: inline-block;
   vertical-align: middle;
+}
+
+.flag-emoji-fallback {
+  font-size: 1.25rem;
+  line-height: 1;
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+
+/* Hide emoji when img is visible (loaded successfully) */
+.flag-icon-img + .flag-emoji-fallback {
+  display: none;
+}
+
+/* When img is hidden via @error handler (display:none), emoji shows via normal flow */
+.flag-icon-img[style*="display: none"] + .flag-emoji-fallback {
+  display: inline-block;
 }
 
 [data-theme="dark"] .flag-icon-img {

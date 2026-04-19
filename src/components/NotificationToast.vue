@@ -25,6 +25,7 @@
 
 <script setup lang="ts">
 import { useNotificationStore } from '../stores/notifications';
+import { useTeamsStore } from '../stores/teams';
 import { storeToRefs } from 'pinia';
 import { onMounted } from 'vue';
 import { listen } from '@tauri-apps/api/event';
@@ -34,14 +35,26 @@ const { notifications } = storeToRefs(store);
 const { remove, add } = store;
 
 onMounted(async () => {
+  const teamsStore = useTeamsStore();
+
   // Listen for system notifications from Rust backend
   await listen('system-notification', (event: any) => {
     const { title, body } = event.payload;
+    const type = detectType(title, body);
+    
     add({
       title,
       message: body,
-      type: detectType(title, body),
+      type,
     });
+
+    // Forward notification to connected team members (e.g. Android phone)
+    if (teamsStore.isConnected) {
+        teamsStore.broadcast({
+            type: 'SYSTEM_NOTIFICATION',
+            payload: { title, body, type }
+        });
+    }
   });
 
   // Listen for task completed

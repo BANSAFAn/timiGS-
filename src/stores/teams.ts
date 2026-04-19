@@ -480,7 +480,7 @@ export const useTeamsStore = defineStore("teams", () => {
   }
 
 
-  function handleData(data: any, conn: DataConnection) {
+  async function handleData(data: any, conn: DataConnection) {
     switch (data.type) {
       case 'REQUEST_PROFILE':
         // Send my profile back
@@ -544,6 +544,17 @@ export const useTeamsStore = defineStore("teams", () => {
 
       case 'ACTIVITY_SESSION':
          handleActivitySession(data.payload);
+         break;
+
+      case 'SYSTEM_NOTIFICATION':
+         // Received a forwarded notification from PC
+         const notificationStore = (await import('./notifications')).useNotificationStore();
+         notificationStore.add({
+             title: data.payload.title,
+             message: data.payload.body,
+             type: data.payload.type || 'info',
+             duration: 10000 // Mobile notification should stay a bit longer
+         });
          break;
 
       case 'REPORT_DOWNLOADED':
@@ -1238,6 +1249,8 @@ export const useTeamsStore = defineStore("teams", () => {
     generateGroupReport,
     generateMemberReport,
     downloadReport,
-    notifyReportDownloaded
+    notifyReportDownloaded,
+    // Internal broadcast for forwarding
+    broadcast
   };
 });
