@@ -557,6 +557,20 @@ pub fn export_data_json_cmd(path: String, start_date: String, end_date: String) 
 }
 
 #[command]
+pub fn import_data_cmd(path: String) -> Result<usize, String> {
+    let lower_path = path.to_lowercase();
+    if lower_path.ends_with(".csv") {
+        crate::db::import_sessions_csv(&path).map_err(|e| e.to_string())
+    } else if lower_path.ends_with(".html") {
+        crate::db::import_sessions_html(&path).map_err(|e| e.to_string())
+    } else if lower_path.ends_with(".md") {
+        crate::db::import_sessions_markdown(&path).map_err(|e| e.to_string())
+    } else {
+        crate::db::import_sessions_json(&path).map_err(|e| e.to_string())
+    }
+}
+
+#[command]
 pub fn export_data_markdown_cmd(path: String, start_date: String, end_date: String) -> Result<(), String> {
     crate::db::export_sessions_markdown(&path, &start_date, &end_date).map_err(|e| e.to_string())
 }
