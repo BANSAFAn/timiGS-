@@ -6,29 +6,132 @@ use tauri::{command, Manager};
 #[cfg(target_os = "windows")]
 use crate::tracker;
 
-#[cfg(target_os = "android")]
-use crate::android_tracker as tracker;
+#[command]
+pub fn get_platform() -> String {
+    #[cfg(target_os = "windows")]
+    return "windows".to_string();
+    #[cfg(target_os = "macos")]
+    return "macos".to_string();
+    #[cfg(target_os = "linux")]
+    return "linux".to_string();
+    #[cfg(target_os = "ios")]
+    return "ios".to_string();
+    #[allow(unreachable_code)]
+    "unknown".to_string()
+}
 
 #[command]
-#[cfg(any(target_os = "windows", target_os = "android"))]
+pub fn get_device_stats() -> Result<serde_json::Value, String> {
+    let sessions = db::get_today_sessions()
+        .map_err(|e| e.to_string())?
+        .len() as i64;
+    
+    let total_time = db::get_today_summary()
+        .map_err(|e| e.to_string())?
+        .iter()
+        .map(|s| s.total_seconds)
+        .sum::<i64>();
+    
+    Ok(serde_json::json!({
+        "sessions": sessions,
+        "totalTime": total_time
+    }))
+}
+
+#[command]
+pub fn get_db_path() -> String {
+    db::get_db_path().to_string_lossy().to_string()
+}
+
+#[command]
+pub async fn discover_devices() -> Result<Vec<serde_json::Value>, String> {
+    // Simple network discovery - scan local subnet for TimiGS instances
+    // This is a placeholder - real implementation would use mDNS or similar
+    Ok(vec![])
+}
+
+#[command]
+pub async fn connect_to_device(ip: String, port: u16) -> Result<String, String> {
+    // Test connection to device
+    let url = format!("http://{}:{}/ping", ip, port);
+    let client = reqwest::Client::new();
+    
+    match client.get(&url).send().await {
+        Ok(resp) => {
+            if resp.status().is_success() {
+                Ok("Connected".to_string())
+            } else {
+                Err("Device not responding".to_string())
+            }
+        }
+        Err(e) => Err(format!("Connection failed: {}", e))
+    }
+}
+
+#[command]
+pub async fn get_device_info(ip: String) -> Result<serde_json::Value, String> {
+    let url = format!("http://{}:4444/info", ip);
+    let client = reqwest::Client::new();
+    
+    match client.get(&url).send().await {
+        Ok(resp) => {
+            if resp.status().is_success() {
+                let info = resp.json::<serde_json::Value>().await
+                    .map_err(|e| e.to_string())?;
+                Ok(info)
+            } else {
+                Ok(serde_json::json!({
+                    "name": ip,
+                    "type": "Unknown"
+                }))
+            }
+        }
+        Err(_) => Ok(serde_json::json!({
+            "name": ip,
+            "type": "Unknown"
+        }))
+    }
+}
+
+#[command]
+pub async fn get_remote_processes(ip: String) -> Result<Vec<serde_json::Value>, String> {
+    let url = format!("http://{}:4444/processes", ip);
+    let client = reqwest::Client::new();
+    
+    match client.get(&url).send().await {
+        Ok(resp) => {
+            if resp.status().is_success() {
+                let processes = resp.json::<Vec<serde_json::Value>>().await
+                    .map_err(|e| e.to_string())?;
+                Ok(processes)
+            } else {
+                Err("Failed to get processes".to_string())
+            }
+        }
+        Err(e) => Err(format!("Connection failed: {}", e))
+    }
+}
+
+#[command]
+#[cfg(target_os = "windows")]
 pub fn get_current_activity() -> Option<tracker::ActiveWindow> {
     tracker::get_current_active()
 }
 
 #[command]
-#[cfg(not(any(target_os = "windows", target_os = "android")))]
+#[cfg(not(target_os = "windows"))]
 pub fn get_current_activity() -> Option<()> {
     None
 }
 
 #[command]
-#[cfg(any(target_os = "windows", target_os = "android"))]
+#[cfg(target_os = "windows")]
 pub fn get_current_session() -> Option<tracker::CurrentSession> {
     tracker::get_current_session()
 }
 
 #[command]
-#[cfg(not(any(target_os = "windows", target_os = "android")))]
+#[cfg(not(target_os = "windows"))]
 pub fn get_current_session() -> Option<()> {
     None
 }
@@ -156,51 +259,39 @@ pub fn remove_excluded_process_cmd(exe_path: String) -> Result<(), String> {
 }
 
 #[command]
-#[cfg(any(target_os = "windows", target_os = "android"))]
+#[cfg(target_os = "windows")]
 pub fn start_tracking() {
     tracker::start_tracking();
 }
 
 #[command]
-#[cfg(not(any(target_os = "windows", target_os = "android")))]
+#[cfg(not(target_os = "windows"))]
 pub fn start_tracking() {
     // No-op on unsupported platforms
 }
 
 #[command]
-#[cfg(any(target_os = "windows", target_os = "android"))]
+#[cfg(target_os = "windows")]
 pub fn stop_tracking() {
     tracker::stop_tracking();
 }
 
 #[command]
-#[cfg(not(any(target_os = "windows", target_os = "android")))]
+#[cfg(not(target_os = "windows"))]
 pub fn stop_tracking() {
     // No-op on unsupported platforms
 }
 
 #[command]
-#[cfg(any(target_os = "windows", target_os = "android"))]
+#[cfg(target_os = "windows")]
 pub fn is_tracking() -> bool {
     tracker::is_tracking()
 }
 
 #[command]
-#[cfg(not(any(target_os = "windows", target_os = "android")))]
+#[cfg(not(target_os = "windows"))]
 pub fn is_tracking() -> bool {
     false
-}
-
-#[command]
-#[cfg(target_os = "android")]
-pub fn check_usage_permission() -> bool {
-    tracker::check_permission()
-}
-
-#[command]
-#[cfg(target_os = "android")]
-pub fn request_usage_permission() -> Result<(), String> {
-    tracker::request_permission()
 }
 
 #[command]
@@ -361,6 +452,7 @@ pub fn start_timeout_cmd(
 
 #[command]
 pub fn save_timeout_schedule_cmd(
+    app: tauri::AppHandle,
     interval_secs: u64,
     break_duration_secs: u64,
     password: String,
@@ -376,13 +468,15 @@ pub fn save_timeout_schedule_cmd(
         .unwrap_or_default()
         .iter()
         .filter_map(|b| {
-            let hour = b.get("hour")?.as_u64()? as u32;
-            let minute = b.get("minute")?.as_u64()? as u32;
-            let duration = b.get("duration")?.as_u64()? as u32;
-            let time_minutes = hour * 60 + minute;
+            let start_hour = b.get("startHour")?.as_u64()? as u32;
+            let start_minute = b.get("startMinute")?.as_u64()? as u32;
+            let end_hour = b.get("endHour")?.as_u64()? as u32;
+            let end_minute = b.get("endMinute")?.as_u64()? as u32;
+            let start_time_minutes = start_hour * 60 + start_minute;
+            let end_time_minutes = end_hour * 60 + end_minute;
             Some(crate::timeout::CustomBreak {
-                time_minutes,
-                duration_minutes: duration,
+                start_time_minutes,
+                end_time_minutes,
             })
         })
         .collect();
@@ -397,6 +491,7 @@ pub fn save_timeout_schedule_cmd(
         schedule_end_minute.unwrap_or(0),
         breaks,
         selected_days,
+        &app,
     )
 }
 
@@ -554,6 +649,20 @@ pub fn export_data_html_cmd(path: String, start_date: String, end_date: String) 
 #[command]
 pub fn export_data_json_cmd(path: String, start_date: String, end_date: String) -> Result<(), String> {
     crate::db::export_sessions_json(&path, &start_date, &end_date).map_err(|e| e.to_string())
+}
+
+#[command]
+pub fn import_data_cmd(path: String) -> Result<usize, String> {
+    let lower_path = path.to_lowercase();
+    if lower_path.ends_with(".csv") {
+        crate::db::import_sessions_csv(&path).map_err(|e| e.to_string())
+    } else if lower_path.ends_with(".html") {
+        crate::db::import_sessions_html(&path).map_err(|e| e.to_string())
+    } else if lower_path.ends_with(".md") {
+        crate::db::import_sessions_markdown(&path).map_err(|e| e.to_string())
+    } else {
+        crate::db::import_sessions_json(&path).map_err(|e| e.to_string())
+    }
 }
 
 #[command]

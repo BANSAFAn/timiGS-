@@ -48,7 +48,7 @@ onMounted(async () => {
       type,
     });
 
-    // Forward notification to connected team members (e.g. Android phone)
+    // Forward notification to connected team members
     if (teamsStore.isConnected) {
         teamsStore.broadcast({
             type: 'SYSTEM_NOTIFICATION',

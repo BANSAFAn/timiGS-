@@ -339,7 +339,7 @@
           </div>
 
           <div class="settings-group">
-            <div class="setting-item" style="position: relative; z-index: 10;">
+            <div class="setting-item" style="position: relative; z-index: 20;">
               <div class="setting-left">
                 <div class="setting-icon" v-html="Icons.dataExport"></div>
                 <div class="setting-content">
@@ -470,6 +470,28 @@
               </div>
             </div>
           </div>
+
+            <div class="setting-item" style="position: relative; z-index: 10;">
+              <div class="setting-left">
+                <div class="setting-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="24" height="24" fill="currentColor"><path d="M224,144v64a8,8,0,0,1-8,8H40a8,8,0,0,1-8-8V144a8,8,0,0,1,16,0v56H208V144a8,8,0,0,1,16,0Zm-87.16,33.16a8.13,8.13,0,0,0,11.32,0l40-40a8,8,0,0,0-11.32-11.32L136,166.69V32a8,8,0,0,0-16,0V166.69L79.16,125.84a8,8,0,0,0-11.32,11.32Z"></path></svg></div>
+                <div class="setting-content">
+                  <label class="setting-label">{{
+                    $te("settings.importData") ? $t("settings.importData") : "Import Data"
+                  }}</label>
+                  <p class="setting-description">
+                    {{ $te("settings.importDataDesc") ? $t("settings.importDataDesc") : "Import your tracked activity from a file" }}
+                  </p>
+                </div>
+              </div>
+              <button
+                class="btn btn-primary"
+                @click="importData"
+                :disabled="isImporting"
+              >
+                <span v-if="isImporting" class="updating-spinner"></span>
+                <span>{{ $te("settings.importFile") ? $t("settings.importFile") : "Import File" }}</span>
+              </button>
+            </div>
 
             <div class="setting-item">
               <div class="setting-left">
@@ -860,36 +882,8 @@ async function saveSettings() {
 }
 
 async function toggleTracking() {
-  // Check if on Android and handle permissions
-  if (store.isMobile) {
-    try {
-      // Check if permission is granted
-      const hasPermission = await safeInvoke("check_usage_permission");
-
-      if (!hasPermission) {
-        // Request permission
-        const confirmed = confirm(
-          "TimiGS needs 'Usage Access' permission to track app activity on Android. " +
-            "You will be redirected to Settings to grant this permission.",
-        );
-
-        if (confirmed) {
-          await safeInvoke("request_usage_permission");
-          alert(
-            "Please grant 'Usage Access' permission in Settings, then try again.",
-          );
-        }
-        return;
-      }
-    } catch (e) {
-      console.error("Permission check failed:", e);
-      alert("Failed to check permissions: " + e);
-      return;
-    }
-  }
-
   // Check if on Linux and warn about dependencies
-  if (!store.isMobile && navigator.userAgent.includes("Linux")) {
+  if (navigator.userAgent.includes("Linux")) {
     // Check if xdotool or wmctrl is available
     const { Command } = await import("@tauri-apps/plugin-shell");
     try {
@@ -1054,6 +1048,7 @@ const showResetModal = ref(false);
 const resetConfirmText = ref("");
 const isResetting = ref(false);
 const isExporting = ref(false);
+const isImporting = ref(false);
 const exportDropdownOpen = ref(false);
 const selectedExportFormat = ref<"csv" | "html" | "json" | "markdown">("csv");
 const exportRange = ref<"today" | "week" | "month" | "custom">("today");
@@ -1168,6 +1163,27 @@ async function exportData(format: "csv" | "html" | "json" | "markdown" = "csv") 
 }
 
 // Export dropdown functions
+async function importData() {
+  isImporting.value = true;
+  try {
+    const filePath = await open({
+      filters: [{ name: "Supported Formats", extensions: ["json", "csv", "html", "md"] }],
+      multiple: false,
+    });
+    if (filePath) {
+      const actualPath = Array.isArray(filePath) ? filePath[0] : filePath;
+      const count = await invoke("import_data_cmd", { path: actualPath });
+      notifications.success(`Successfully imported ${count} sessions.`);
+      // Optional: signal other components to reload data
+    }
+  } catch (e: any) {
+    console.error("Import failed:", e);
+    notifications.error("Import failed: " + e);
+  } finally {
+    isImporting.value = false;
+  }
+}
+
 function getExportIcon(format: string): string {
   switch (format) {
     case "csv":

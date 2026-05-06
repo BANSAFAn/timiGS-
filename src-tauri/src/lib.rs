@@ -167,6 +167,15 @@ pub fn run() {
             commands::shutdown_pc,
             commands::get_app_icon,
             commands::get_desktop_sources,
+            // Platform detection
+            commands::get_platform,
+            commands::get_device_stats,
+            commands::get_db_path,
+            // P2P Sync
+            commands::discover_devices,
+            commands::connect_to_device,
+            commands::get_device_info,
+            commands::get_remote_processes,
             tasks::create_task_cmd,
             tasks::get_tasks_cmd,
             tasks::update_task_status_cmd,
@@ -177,10 +186,6 @@ pub fn run() {
             commands::show_tray_window_cmd,
             commands::emit_navigate_cmd,
             commands::quit_app_cmd,
-            #[cfg(target_os = "android")]
-            commands::check_usage_permission,
-            #[cfg(target_os = "android")]
-            commands::request_usage_permission,
             commands::get_timer_status_cmd,
             // P2P Transfer
             commands::start_p2p_server,
@@ -212,6 +217,7 @@ pub fn run() {
             commands::export_data_csv_cmd,
             commands::export_data_html_cmd,
             commands::export_data_json_cmd,
+            commands::import_data_cmd,
             commands::export_data_markdown_cmd,
             commands::save_auto_export_settings_cmd,
             commands::get_auto_export_settings_cmd,

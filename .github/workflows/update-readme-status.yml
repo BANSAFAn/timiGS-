@@ -2,7 +2,7 @@
 
 on:
   workflow_run:
-    workflows: ["Release", "Flutter Android Build"]
+    workflows: ["Release"]
     types: [completed]
   workflow_dispatch:
 
@@ -54,14 +54,12 @@ jobs:
           WIN=$(get_job_status "release.yml" "Windows")
           MAC=$(get_job_status "release.yml" "macOS")
           LNX=$(get_job_status "release.yml" "Linux")
-          ANDROID=$(get_job_status "flutter-android.yml" "")
 
           echo "windows=$WIN" >> $GITHUB_OUTPUT
           echo "macos=$MAC" >> $GITHUB_OUTPUT
           echo "linux=$LNX" >> $GITHUB_OUTPUT
-          echo "android=$ANDROID" >> $GITHUB_OUTPUT
 
-          echo "::notice::Windows=$WIN macOS=$MAC Linux=$LNX Android=$ANDROID"
+          echo "::notice::Windows=$WIN macOS=$MAC Linux=$LNX"
 
       - name: Map statuses to badges
         id: badges
@@ -79,7 +77,6 @@ jobs:
           echo "windows=$(map_status '${{ steps.status.outputs.windows }}')" >> $GITHUB_OUTPUT
           echo "macos=$(map_status '${{ steps.status.outputs.macos }}')" >> $GITHUB_OUTPUT
           echo "linux=$(map_status '${{ steps.status.outputs.linux }}')" >> $GITHUB_OUTPUT
-          echo "android=$(map_status '${{ steps.status.outputs.android }}')" >> $GITHUB_OUTPUT
 
       - name: Update README
         run: |
@@ -93,7 +90,6 @@ jobs:
               "windows": "${{ steps.badges.outputs.windows }}",
               "macos": "${{ steps.badges.outputs.macos }}",
               "linux": "${{ steps.badges.outputs.linux }}",
-              "android": "${{ steps.badges.outputs.android }}",
           }
 
           # Replace between markers
@@ -104,7 +100,6 @@ jobs:
           | **Windows** | Tauri v2 + Rust + Vue 3       | {windows} |
           | **macOS**   | Tauri v2 + Rust + Vue 3       | {macos} |
           | **Linux**   | Tauri v2 + Rust + Vue 3       | {linux} |
-          | **Android** | Flutter 3.24 + Dart + Rust    | {android} |
           """.format(**statuses).strip()
 
           replacement = r"\1\n" + table + r"\n\3"

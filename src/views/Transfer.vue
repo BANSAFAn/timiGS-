@@ -124,7 +124,7 @@
             <div class="connect-section" v-if="!isConnected">
               <div class="section-card">
                 <div class="card-header">
-                  <span class="card-icon" v-html="Icons.sync"></span>
+                  <span class="card-icon" v-html="Icons.transfer"></span>
                   <h3>Connect to Receiver</h3>
                 </div>
                 <div class="input-row">

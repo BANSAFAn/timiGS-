@@ -11,6 +11,24 @@ The Docker setup uses a **multi-stage build** process:
 
 This approach ensures a small final image size and optimal performance.
 
+### Build Pipeline Architecture
+
+```mermaid
+graph LR
+    subgraph "Stage 1: Builder (Node.js)"
+        Node[npm run build] -->|Generates| Dist[/dist/ folder]
+    end
+    
+    subgraph "Stage 2: Production (NGINX Alpine)"
+        Dist -.->|Copies| WebRoot[/usr/share/nginx/html]
+        NginxConf[nginx.conf] -->|Configures| NginxServ[NGINX Server]
+        NginxServ -->|Serves| WebRoot
+    end
+    
+    style Node fill:#84cc16,stroke:#3f6212
+    style NginxServ fill:#3b82f6,stroke:#1d4ed8
+```
+
 ## Prerequisites
 
 Before you begin, make sure you have:

@@ -15,9 +15,6 @@
     "settings": "Settings",
     "settingsShort": "Settings",
     "compare": "Teams",
-    "sync": "Sync",
-    "weather": "Weather",
-    "weatherShort": "Weather",
     "transfer": "Transfer",
     "transferShort": "Send",
     "team": "Team",
@@ -241,7 +238,30 @@
     "openFolder": "Open Folder",
     "addTrack": "Add Track",
     "noMusic": "No music files found",
-    "playMusicBreak": "Play music during break"
+    "playMusicBreak": "Play music during break",
+    "scheduling": "Scheduling...",
+    "starting": "Starting...",
+    "scheduleTitle": "Schedule Mode",
+    "scheduleDesc": "Set specific times and days for Time OUT",
+    "enableSchedule": "Enable schedule mode",
+    "workingHours": "Working Hours",
+    "activeDays": "Active Days",
+    "customBreaks": "Custom Breaks",
+    "addBreak": "Add Break",
+    "noCustomBreaks": "No custom breaks. Add breaks at specific times.",
+    "scheduleHint": "Time OUT will automatically start during working hours on selected days. Custom breaks will trigger at specified times.",
+    "daySun": "Sun",
+    "dayMon": "Mon",
+    "dayTue": "Tue",
+    "dayWed": "Wed",
+    "dayThu": "Thu",
+    "dayFri": "Fri",
+    "daySat": "Sat",
+    "scheduleActive": "Schedule Active",
+    "cancelSchedule": "Cancel Schedule",
+    "clickToEdit": "(click to edit)",
+    "breakFrom": "From",
+    "breakTo": "To"
   },
   "common": {
     "loading": "Loading...",
@@ -312,70 +332,7 @@
     "notBeingTracked": "Not being tracked",
     "footerHint": "Excluded processes still appear in Timeline with a \"Not Tracked\" badge"
   },
-  "sync": {
-    "title": "Phone Synchronization",
-    "description": "Sync your activity data between desktop and mobile devices seamlessly",
-    "status": {
-      "disconnected": "Disconnected",
-      "connecting": "Connecting...",
-      "connected": "Connected",
-      "error": "Error"
-    },
-    "pairing": {
-      "title": "Device Pairing",
-      "generateCode": "Generate Pairing Code",
-      "generateCodeDesc": "Generate a code to enter on your other device",
-      "expiresIn": "Expires in",
-      "generateCodeBtn": "Generate Code",
-      "enterCode": "Enter Pairing Code",
-      "enterCodeDesc": "Enter the code shown on your other device",
-      "codePlaceholder": "XXXXXX",
-      "connectBtn": "Connect",
-      "pairedDevices": "Paired Devices",
-      "neverSynced": "Never synced",
-      "remove": "Remove",
-      "removeConfirm": "Are you sure you want to remove this device?"
-    },
-    "methods": {
-      "title": "Sync Methods",
-      "p2p": {
-        "title": "Peer-to-Peer (P2P)",
-        "description": "Direct device-to-device sync via WebRTC"
-      },
-      "api": {
-        "title": "API (Store-and-Forward)",
-        "description": "Sync via your personal API server",
-        "endpointPlaceholder": "API Endpoint (e.g., https://api.yourserver.com)",
-        "tokenPlaceholder": "API Token (optional)"
-      }
-    },
-    "queue": {
-      "title": "Pending Syncs",
-      "retries": "Retries",
-      "status": {
-        "pending": "Pending",
-        "sent": "Sent",
-        "confirmed": "Confirmed"
-      }
-    },
-    "backup": {
-      "title": "Export & Import",
-      "export": "Export Backup",
-      "import": "Import Backup",
-      "exportFailed": "Failed to export backup",
-      "importSuccess": "Backup imported successfully",
-      "importFailed": "Failed to import backup"
-    },
-    "settings": {
-      "title": "Sync Settings",
-      "enableSync": "Enable synchronization",
-      "autoSync": "Auto-sync every 5 minutes",
-      "syncOnMetered": "Sync on metered connections",
-      "clearData": "Clear Sync Data",
-      "clearDataConfirm": "This will remove all paired devices and pending syncs. Continue?"
-    },
-    "syncing": "Syncing...",
-    "syncNow": "Sync Now",
+  "transfer": {
     "syncFailed": "Sync failed. Please check your connection.",
     "time": {
       "minutesAgo": "{count}m ago",

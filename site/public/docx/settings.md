@@ -35,7 +35,7 @@ Control the core tracking functionality:
 - **Status Display** - See if tracking is currently active or paused
 
 > [!IMPORTANT]
-> On Android devices, TimiGS requires "Usage Access" permission to track app activity. You'll be prompted to grant this permission when enabling tracking for the first time.
+> TimiGS tracks active window activity automatically. You'll be prompted to grant necessary permissions when enabling tracking for the first time.
 
 ### 🚀 Autostart
 
@@ -166,15 +166,6 @@ Licensed under **TimiGS Public License**
 > The name "TimiGS" is a protected trademark. Copyright © 2026. See the LICENSE file for full terms.
 
 ## Platform-Specific Features
-
-### Android Permissions
-
-On Android, TimiGS requires special permissions:
-
-**Usage Access Permission**
-- Required for tracking app activity
-- Granted through Android Settings
-- TimiGS will guide you through the permission process
 
 ### Desktop Features
 

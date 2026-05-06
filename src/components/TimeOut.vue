@@ -1,5 +1,22 @@
 <template>
   <div class="timeout-widget">
+    <!-- Active Schedule Indicator -->
+    <div v-if="hasActiveSchedule && !status" class="active-schedule-banner">
+      <div class="banner-content">
+        <div class="banner-left" @click="editSchedule" style="cursor: pointer;">
+          <span class="banner-icon" v-html="Icons.timeoutWork"></span>
+          <div class="banner-text">
+            <h4>{{ t('timeout.scheduleActive', 'Schedule Active') }} <span class="edit-hint">{{ t('timeout.clickToEdit', '(click to edit)') }}</span></h4>
+            <p>{{ getScheduleSummary() }}</p>
+          </div>
+        </div>
+        <button @click="cancelSchedule" class="btn-cancel-schedule">
+          <span v-html="Icons.timeoutTrash"></span>
+          {{ t('timeout.cancelSchedule', 'Cancel Schedule') }}
+        </button>
+      </div>
+    </div>
+
     <!-- Setup State -->
     <div v-if="!status" class="timeout-setup">
       <!-- Work Interval Card -->
@@ -176,13 +193,174 @@
         </div>
       </div>
 
+      <!-- Schedule Card -->
+      <div class="settings-card schedule-card">
+        <div class="card-header">
+          <div class="card-icon schedule-icon" v-html="Icons.timeoutWork"></div>
+          <div class="card-title-group">
+            <h3 class="card-title">{{ t('timeout.scheduleTitle', 'Schedule Mode') }}</h3>
+            <p class="card-desc">{{ t('timeout.scheduleDesc', 'Set specific times and days for Time OUT') }}</p>
+          </div>
+        </div>
 
+        <div class="schedule-container">
+          <!-- Enable Schedule Toggle -->
+          <div class="schedule-toggle">
+            <label class="checkbox-label-modern">
+              <input type="checkbox" v-model="enableSchedule" />
+              <span class="checkbox-custom"></span>
+              <span class="checkbox-text">{{ t('timeout.enableSchedule', 'Enable schedule mode') }}</span>
+            </label>
+          </div>
+
+          <!-- Schedule Options (shown when enabled) -->
+          <div v-if="enableSchedule" class="schedule-options">
+            <!-- Time Range -->
+            <div class="time-picker">
+              <label class="sub-label">{{ t('timeout.workingHours', 'Working Hours') }}</label>
+              <div class="time-range-row">
+                <div class="time-picker-row">
+                  <select v-model.number="scheduleStartHour" class="time-select">
+                    <option v-for="h in 12" :key="h" :value="h">{{ h }}</option>
+                  </select>
+                  <span class="time-separator">:</span>
+                  <input 
+                    type="number" 
+                    v-model.number="scheduleStartMinute" 
+                    min="0" 
+                    max="59" 
+                    class="time-input-manual"
+                    placeholder="00"
+                  />
+                  <select v-model="scheduleStartPeriod" class="period-select">
+                    <option value="AM">AM</option>
+                    <option value="PM">PM</option>
+                  </select>
+                </div>
+                <span style="margin: 0 8px; color: var(--text-secondary);">—</span>
+                <div class="time-picker-row">
+                  <select v-model.number="scheduleEndHour" class="time-select">
+                    <option v-for="h in 12" :key="h" :value="h">{{ h }}</option>
+                  </select>
+                  <span class="time-separator">:</span>
+                  <input 
+                    type="number" 
+                    v-model.number="scheduleEndMinute" 
+                    min="0" 
+                    max="59" 
+                    class="time-input-manual"
+                    placeholder="00"
+                  />
+                  <select v-model="scheduleEndPeriod" class="period-select">
+                    <option value="AM">AM</option>
+                    <option value="PM">PM</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Days of Week -->
+            <div class="days-picker">
+              <label class="sub-label">{{ t('timeout.activeDays', 'Active Days') }}</label>
+              <div class="days-row">
+                <button
+                  v-for="(day, index) in ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']"
+                  :key="index"
+                  @click="toggleDay(index)"
+                  class="day-btn"
+                  :class="{ active: selectedDays.includes(index) }"
+                  type="button"
+                >
+                  {{ t(`timeout.day${day}`, day) }}
+                </button>
+              </div>
+            </div>
+
+            <!-- Custom Breaks -->
+            <div class="custom-breaks-section">
+              <div class="breaks-header">
+                <label class="sub-label">{{ t('timeout.customBreaks', 'Custom Breaks') }}</label>
+                <button @click="addBreak" class="btn-add-break" type="button">
+                  <span v-html="Icons.tasksAdd"></span>
+                  {{ t('timeout.addBreak', 'Add Break') }}
+                </button>
+              </div>
+
+              <div v-if="customBreaks.length === 0" class="no-breaks">
+                <p>{{ t('timeout.noCustomBreaks', 'No custom breaks. Add breaks at specific times.') }}</p>
+              </div>
+
+              <div v-else class="break-item" v-for="brk in customBreaks" :key="brk.id">
+                <div class="break-time-range">
+                  <div class="break-label">{{ t('timeout.breakFrom', 'From') }}</div>
+                  <div class="break-time-inputs">
+                    <select v-model.number="brk.startHour" class="time-select-small">
+                      <option v-for="h in 12" :key="h" :value="h">{{ h }}</option>
+                    </select>
+                    <span class="time-separator">:</span>
+                    <input 
+                      type="number" 
+                      v-model.number="brk.startMinute" 
+                      min="0" 
+                      max="59" 
+                      class="time-input-small"
+                      placeholder="00"
+                    />
+                    <select v-model="brk.startPeriod" class="period-select-small">
+                      <option value="AM">AM</option>
+                      <option value="PM">PM</option>
+                    </select>
+                  </div>
+                  
+                  <div class="break-label">{{ t('timeout.breakTo', 'To') }}</div>
+                  <div class="break-time-inputs">
+                    <select v-model.number="brk.endHour" class="time-select-small">
+                      <option v-for="h in 12" :key="h" :value="h">{{ h }}</option>
+                    </select>
+                    <span class="time-separator">:</span>
+                    <input 
+                      type="number" 
+                      v-model.number="brk.endMinute" 
+                      min="0" 
+                      max="59" 
+                      class="time-input-small"
+                      placeholder="00"
+                    />
+                    <select v-model="brk.endPeriod" class="period-select-small">
+                      <option value="AM">AM</option>
+                      <option value="PM">PM</option>
+                    </select>
+                  </div>
+                </div>
+                <button @click="removeBreak(brk.id)" class="btn-remove-break" type="button">
+                  <span v-html="Icons.timeoutTrash"></span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Info Box -->
+            <div class="schedule-info-box">
+              <span class="info-icon">ℹ️</span>
+              <p class="schedule-hint">
+                {{ t('timeout.scheduleHint', 'Time OUT will automatically start during working hours on selected days. Custom breaks will trigger at specified times.') }}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <!-- Start Button -->
-      <button @click="startTimeout" class="btn-start-modern" :disabled="!canStart">
-        <span class="btn-icon" v-html="Icons.timeoutBreak"></span>
-        <span>{{ enableSchedule ? t('timeout.schedule', 'Schedule Time OUT') : t('timeout.start', 'Activate Time OUT') }}</span>
+      <button @click="startTimeout" class="btn-start-modern" :disabled="!canStart || isSaving">
+        <span v-if="isSaving" class="btn-spinner"></span>
+        <span v-else class="btn-icon" v-html="Icons.timeoutBreak"></span>
+        <span>{{ getSaveButtonText() }}</span>
       </button>
+
+      <!-- Status Message -->
+      <div v-if="statusMessage" class="status-message" :class="statusMessageType">
+        <span class="status-icon" v-html="getStatusIcon()"></span>
+        <span>{{ statusMessage }}</span>
+      </div>
     </div>
 
     <!-- Active State -->
@@ -347,14 +525,34 @@ const scheduleEndPeriod = ref<"AM" | "PM">("PM");
 // Custom breaks
 interface CustomBreak {
   id: number;
-  hour: number;
-  minute: number;
-  period: "AM" | "PM";
-  duration: number;
+  startHour: number;
+  startMinute: number;
+  startPeriod: "AM" | "PM";
+  endHour: number;
+  endMinute: number;
+  endPeriod: "AM" | "PM";
 }
 const customBreaks = ref<CustomBreak[]>([]);
 // Days
 const selectedDays = ref<number[]>([]); // 0 = Sunday, 1 = Monday, etc.
+
+// Status feedback
+const isSaving = ref(false);
+const statusMessage = ref("");
+const statusMessageType = ref<"success" | "error" | "info">("info");
+let statusTimeout: number | null = null;
+
+// Check if schedule is active
+const hasActiveSchedule = computed(() => {
+  const savedSchedule = localStorage.getItem("timigs-timeout-schedule");
+  if (!savedSchedule) return false;
+  try {
+    const parsed = JSON.parse(savedSchedule);
+    return parsed.enabled === true;
+  } catch {
+    return false;
+  }
+});
 
 // Music Controls
 const isPlaying = ref(false);
@@ -450,9 +648,152 @@ const canStart = computed(
     password.value.length >= 1,
 );
 
-// function toggleDay...
-// function addBreak...
-// function removeBreak...
+// Helper functions for UI feedback
+function showStatusMessage(message: string, type: "success" | "error" | "info", duration = 5000) {
+  if (statusTimeout) {
+    clearTimeout(statusTimeout);
+  }
+  statusMessage.value = message;
+  statusMessageType.value = type;
+  statusTimeout = window.setTimeout(() => {
+    statusMessage.value = "";
+  }, duration);
+}
+
+function getSaveButtonText() {
+  if (isSaving.value) {
+    return enableSchedule.value ? t('timeout.scheduling', 'Scheduling...') : t('timeout.starting', 'Starting...');
+  }
+  return enableSchedule.value ? t('timeout.schedule', 'Schedule Time OUT') : t('timeout.start', 'Activate Time OUT');
+}
+
+function getStatusIcon() {
+  if (statusMessageType.value === "success") {
+    return '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>';
+  } else if (statusMessageType.value === "error") {
+    return '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>';
+  }
+  return '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>';
+}
+
+function getScheduleSummary() {
+  const savedSchedule = localStorage.getItem("timigs-timeout-schedule");
+  if (!savedSchedule) return "";
+  
+  try {
+    const parsed = JSON.parse(savedSchedule);
+    const days = parsed.days || [];
+    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const selectedDayNames = days.map((d: number) => dayNames[d]).join(', ');
+    
+    const startTime = `${parsed.startHour}:${String(parsed.startMinute).padStart(2, '0')} ${parsed.startPeriod}`;
+    const endTime = `${parsed.endHour}:${String(parsed.endMinute).padStart(2, '0')} ${parsed.endPeriod}`;
+    
+    const breaksCount = parsed.customBreaks?.length || 0;
+    let breaksText = '';
+    if (breaksCount > 0) {
+      const breaksList = parsed.customBreaks.map((b: any) => {
+        const bStart = `${b.startHour}:${String(b.startMinute).padStart(2, '0')} ${b.startPeriod}`;
+        const bEnd = `${b.endHour}:${String(b.endMinute).padStart(2, '0')} ${b.endPeriod}`;
+        return `${bStart}-${bEnd}`;
+      }).join(', ');
+      breaksText = ` • Breaks: ${breaksList}`;
+    }
+    
+    return `${selectedDayNames || 'No days selected'} • ${startTime} - ${endTime}${breaksText}`;
+  } catch {
+    return "Schedule configured";
+  }
+}
+
+async function cancelSchedule() {
+  try {
+    // Remove from localStorage
+    localStorage.removeItem("timigs-timeout-schedule");
+    
+    // Reset UI state
+    enableSchedule.value = false;
+    selectedDays.value = [];
+    customBreaks.value = [];
+    
+    showStatusMessage(
+      "✓ Schedule cancelled successfully. Changes will take effect on next app restart.",
+      "success",
+      5000
+    );
+  } catch (e: any) {
+    showStatusMessage(
+      `✗ Failed to cancel schedule: ${e.toString()}`,
+      "error",
+      5000
+    );
+  }
+}
+
+function editSchedule() {
+  // Load the schedule into the form for editing
+  const savedSchedule = localStorage.getItem("timigs-timeout-schedule");
+  if (!savedSchedule) return;
+  
+  try {
+    const parsed = JSON.parse(savedSchedule);
+    enableSchedule.value = true;
+    scheduleStartHour.value = parsed.startHour || 9;
+    scheduleStartMinute.value = parsed.startMinute || 0;
+    scheduleStartPeriod.value = parsed.startPeriod || "AM";
+    scheduleEndHour.value = parsed.endHour || 5;
+    scheduleEndMinute.value = parsed.endMinute || 0;
+    scheduleEndPeriod.value = parsed.endPeriod || "PM";
+    customBreaks.value = parsed.customBreaks || [];
+    selectedDays.value = parsed.days || [];
+    
+    // Scroll to schedule section
+    setTimeout(() => {
+      const scheduleCard = document.querySelector('.schedule-card');
+      if (scheduleCard) {
+        scheduleCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 100);
+    
+    showStatusMessage(
+      "✎️ Schedule loaded for editing. Make your changes and click 'Schedule Time OUT' to save.",
+      "info",
+      5000
+    );
+  } catch (e) {
+    console.error("Failed to load schedule for editing:", e);
+  }
+}
+
+// Schedule management functions
+function toggleDay(day: number) {
+  const index = selectedDays.value.indexOf(day);
+  if (index > -1) {
+    selectedDays.value.splice(index, 1);
+  } else {
+    selectedDays.value.push(day);
+  }
+}
+
+function addBreak() {
+  const newBreak: CustomBreak = {
+    id: Date.now(),
+    startHour: 2,
+    startMinute: 0,
+    startPeriod: "PM",
+    endHour: 2,
+    endMinute: 30,
+    endPeriod: "PM",
+  };
+  customBreaks.value.push(newBreak);
+}
+
+function removeBreak(id: number) {
+  const index = customBreaks.value.findIndex(b => b.id === id);
+  if (index > -1) {
+    customBreaks.value.splice(index, 1);
+  }
+}
 
 function convertTo24Hour(hour: number, period: string): number {
   if (period === "PM" && hour !== 12) {
@@ -468,7 +809,7 @@ function getScheduleConfig(): {
   startMinute: number; 
   endHour: number; 
   endMinute: number; 
-  breaks: Array<{ hour: number; minute: number; duration: number }>;
+  breaks: Array<{ startHour: number; startMinute: number; endHour: number; endMinute: number }>;
 } | null {
   if (!enableSchedule.value) return null;
   
@@ -478,9 +819,10 @@ function getScheduleConfig(): {
     endHour: convertTo24Hour(scheduleEndHour.value, scheduleEndPeriod.value),
     endMinute: scheduleEndMinute.value,
     breaks: customBreaks.value.map(b => ({
-      hour: convertTo24Hour(b.hour, b.period),
-      minute: b.minute,
-      duration: b.duration,
+      startHour: convertTo24Hour(b.startHour, b.startPeriod),
+      startMinute: b.startMinute,
+      endHour: convertTo24Hour(b.endHour, b.endPeriod),
+      endMinute: b.endMinute,
     })),
   };
 }
@@ -579,7 +921,11 @@ async function manageAudio(breakActive: boolean) {
 }
 
 async function startTimeout() {
-  if (!canStart.value) return;
+  if (!canStart.value || isSaving.value) return;
+  
+  isSaving.value = true;
+  statusMessage.value = "";
+  
   try {
     const scheduleConfig = getScheduleConfig();
 
@@ -611,7 +957,16 @@ async function startTimeout() {
       }));
 
       password.value = "";
-      alert("Schedule saved! Time OUT will start automatically at the specified times on selected days.");
+      
+      // Show success message
+      const daysText = selectedDays.value.length > 0 
+        ? ` on ${selectedDays.value.length} selected day(s)` 
+        : "";
+      showStatusMessage(
+        `✓ Schedule saved! Time OUT will start automatically${daysText} during working hours.`,
+        "success",
+        8000
+      );
     } else {
       // No schedule - start immediately
       await invoke("start_timeout_cmd", {
@@ -630,9 +985,22 @@ async function startTimeout() {
       localStorage.removeItem("timigs-timeout-schedule");
       password.value = "";
       await loadStatus();
+      
+      // Show success message
+      showStatusMessage(
+        "✓ Time OUT activated! Work session started.",
+        "success",
+        5000
+      );
     }
   } catch (e: any) {
-    alert(e);
+    showStatusMessage(
+      `✗ Error: ${e.toString()}`,
+      "error",
+      8000
+    );
+  } finally {
+    isSaving.value = false;
   }
 }
 
@@ -647,8 +1015,18 @@ async function stopTimeout() {
       clearInterval(pollInterval);
       pollInterval = null;
     }
+    showStatusMessage(
+      "✓ Time OUT cancelled successfully.",
+      "success",
+      3000
+    );
   } catch (e: any) {
     cancelError.value = e;
+    showStatusMessage(
+      `✗ Failed to cancel: ${e.toString()}`,
+      "error",
+      5000
+    );
   }
 }
 
@@ -663,6 +1041,11 @@ async function stopTimeoutOverlay() {
       clearInterval(pollInterval);
       pollInterval = null;
     }
+    showStatusMessage(
+      "✓ Time OUT cancelled successfully.",
+      "success",
+      3000
+    );
   } catch (e: any) {
     overlayCancelError.value = e;
   }
@@ -753,6 +1136,101 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   gap: 18px;
+}
+
+/* Active Schedule Banner */
+.active-schedule-banner {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(59, 130, 246, 0.15) 100%);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  border-radius: 16px;
+  padding: 18px;
+  margin-bottom: 12px;
+  animation: slideIn 0.3s ease;
+}
+
+.banner-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.banner-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex: 1;
+}
+
+.banner-icon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(139, 92, 246, 0.2);
+  border-radius: 12px;
+  color: #8b5cf6;
+  flex-shrink: 0;
+}
+
+.banner-icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.banner-text h4 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.banner-text h4 .edit-hint {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--text-muted);
+  opacity: 0.7;
+  margin-left: 8px;
+}
+
+.banner-left:hover .edit-hint {
+  opacity: 1;
+  color: #8b5cf6;
+}
+
+.banner-text p {
+  margin: 4px 0 0 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.btn-cancel-schedule {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.btn-cancel-schedule:hover {
+  background: rgba(239, 68, 68, 0.25);
+  border-color: rgba(239, 68, 68, 0.5);
+  transform: translateY(-1px);
+}
+
+.btn-cancel-schedule svg {
+  width: 18px;
+  height: 18px;
 }
 
 .setup-section {
@@ -873,6 +1351,10 @@ onUnmounted(() => {
   border-left: 3px solid #f59e0b;
 }
 
+.schedule-card {
+  border-left: 3px solid #a855f7;
+}
+
 
 
 .card-header {
@@ -916,6 +1398,11 @@ onUnmounted(() => {
 .password-icon {
   background: rgba(245, 158, 11, 0.15);
   color: #f59e0b;
+}
+
+.schedule-icon {
+  background: rgba(168, 85, 247, 0.15);
+  color: #a855f7;
 }
 
 
@@ -1251,6 +1738,467 @@ onUnmounted(() => {
 .btn-start-modern .btn-icon {
   width: 22px;
   height: 22px;
+}
+
+.btn-start-modern .btn-spinner {
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Status Message */
+.status-message {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.status-message.success {
+  background: rgba(34, 197, 94, 0.15);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  color: #22c55e;
+}
+
+.status-message.error {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+}
+
+.status-message.info {
+  background: rgba(59, 130, 246, 0.15);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  color: #3b82f6;
+}
+
+.status-message .status-icon {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.status-message .status-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Schedule Styles */
+.schedule-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.schedule-toggle {
+  padding-bottom: 8px;
+}
+
+.schedule-options {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.time-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sub-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.time-picker-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.time-range-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.time-range-row .time-picker {
+  flex: 1;
+  min-width: 200px;
+}
+
+.time-select, .period-select {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.time-select:focus, .period-select:focus {
+  outline: none;
+  border-color: #a855f7;
+  box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.15);
+}
+
+.time-select {
+  width: 70px;
+  text-align: center;
+}
+
+.time-input-manual {
+  width: 70px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  padding: 10px;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.time-input-manual:focus {
+  outline: none;
+  border-color: #a855f7;
+  box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.15);
+}
+
+.time-input-manual::-webkit-inner-spin-button,
+.time-input-manual::-webkit-outer-spin-button {
+  opacity: 1;
+}
+
+.period-select {
+  width: 80px;
+  text-align: center;
+}
+
+.time-separator {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.days-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.days-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.day-btn {
+  flex: 1;
+  min-width: 50px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-muted);
+  padding: 10px 8px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.day-btn:hover {
+  background: rgba(168, 85, 247, 0.1);
+  border-color: rgba(168, 85, 247, 0.3);
+}
+
+.day-btn.active {
+  background: rgba(168, 85, 247, 0.2);
+  border-color: #a855f7;
+  color: #a855f7;
+}
+
+.schedule-info-box {
+  background: rgba(168, 85, 247, 0.08);
+  border: 1px solid rgba(168, 85, 247, 0.2);
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.schedule-hint {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.info-icon {
+  font-size: 1rem;
+  flex-shrink: 0;
+  opacity: 0.7;
+  display: inline-block;
+  margin-top: 2px;
+}
+
+.breaks-count-row {
+  display: flex;
+  gap: 12px;
+}
+
+.input-with-label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.breaks-input {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+}
+
+.breaks-input:focus {
+  outline: none;
+  border-color: #a855f7;
+  box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.15);
+}
+
+/* Custom Breaks Section */
+.custom-breaks-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.breaks-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.btn-add-break {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(168, 85, 247, 0.15);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  color: #a855f7;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-add-break:hover {
+  background: rgba(168, 85, 247, 0.25);
+}
+
+.btn-add-break :deep(svg) {
+  width: 16px;
+  height: 16px;
+}
+
+.no-breaks {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px dashed rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 20px;
+  text-align: center;
+}
+
+.no-breaks p {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.break-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  padding: 12px;
+  transition: all 0.2s ease;
+}
+
+.break-item:hover {
+  border-color: rgba(168, 85, 247, 0.3);
+}
+
+.break-time-range {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  flex-wrap: wrap;
+}
+
+.break-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  min-width: 40px;
+}
+
+.break-time-inputs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.time-select-small {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.time-select-small:focus {
+  outline: none;
+  border-color: #a855f7;
+  box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.15);
+}
+
+.time-input-small {
+  width: 50px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.time-input-small:focus {
+  outline: none;
+  border-color: #a855f7;
+  box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.15);
+}
+
+.time-input-small::-webkit-inner-spin-button,
+.time-input-small::-webkit-outer-spin-button {
+  opacity: 1;
+}
+
+.period-select-small {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.period-select-small:focus {
+  outline: none;
+  border-color: #a855f7;
+  box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.15);
+}
+
+.break-duration-input {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.duration-input {
+  width: 70px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.duration-input:focus {
+  outline: none;
+  border-color: #a855f7;
+  box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.15);
+}
+
+.duration-label {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.btn-remove-break {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.btn-remove-break:hover {
+  background: rgba(239, 68, 68, 0.2);
+}
+
+.btn-remove-break :deep(svg) {
+  width: 18px;
+  height: 18px;
 }
 
 

@@ -1368,6 +1368,208 @@ pub fn export_sessions_json(path: &str, start_date: &str, end_date: &str) -> Res
     Ok(())
 }
 
+pub fn import_sessions_json(path: &str) -> Result<usize> {
+    let content = std::fs::read_to_string(path)
+        .map_err(|e| rusqlite::Error::ToSqlConversionFailure(Box::new(e)))?;
+
+    let sessions: Vec<serde_json::Value> = serde_json::from_str(&content)
+        .map_err(|e| rusqlite::Error::ToSqlConversionFailure(Box::new(e)))?;
+
+    let guard = DB.lock();
+    let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
+
+    let mut count = 0;
+    for session in sessions {
+        let app_name = session["app_name"].as_str().unwrap_or("Unknown");
+        let window_title = session["window_title"].as_str().unwrap_or("");
+        let exe_path = session["exe_path"].as_str().unwrap_or("");
+        let start_time = session["start_time"].as_str().unwrap_or("");
+        let end_time = session["end_time"].as_str(); // Option<&str>
+        let duration = session["duration_seconds"].as_i64().unwrap_or(0);
+
+        let exists: i64 = conn.query_row(
+            "SELECT count(*) FROM activity_sessions WHERE start_time = ?1 AND exe_path = ?2",
+            params![start_time, exe_path],
+            |row| row.get(0),
+        ).unwrap_or(0);
+
+        if exists == 0 {
+            conn.execute(
+                "INSERT INTO activity_sessions (app_name, window_title, exe_path, start_time, end_time, duration_seconds)
+                 VALUES (?1, ?2, ?3, ?4, ?5, ?6)",
+                params![
+                    app_name,
+                    window_title,
+                    exe_path,
+                    start_time,
+                    end_time,
+                    duration,
+                ],
+            )?;
+            count += 1;
+        }
+    }
+
+    Ok(count)
+}
+
+pub fn import_sessions_csv(path: &str) -> Result<usize> {
+    let mut reader = csv::ReaderBuilder::new()
+        .has_headers(true)
+        .from_path(path)
+        .map_err(|e| rusqlite::Error::ToSqlConversionFailure(Box::new(e)))?;
+
+    let guard = DB.lock();
+    let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
+
+    let mut count = 0;
+    for result in reader.records() {
+        if let Ok(record) = result {
+            if record.len() < 6 {
+                continue;
+            }
+
+            let app_name = &record[0];
+            let window_title = &record[1];
+            let exe_path = &record[2];
+            let start_time = &record[3];
+            let end_time_str = &record[4];
+            let duration: i64 = record[5].parse().unwrap_or(0);
+
+            let end_time = if end_time_str.trim().is_empty() {
+                None
+            } else {
+                Some(end_time_str)
+            };
+
+            let exists: i64 = conn.query_row(
+                "SELECT count(*) FROM activity_sessions WHERE start_time = ?1 AND exe_path = ?2",
+                params![start_time, exe_path],
+                |row| row.get(0),
+            ).unwrap_or(0);
+
+            if exists == 0 {
+                conn.execute(
+                    "INSERT INTO activity_sessions (app_name, window_title, exe_path, start_time, end_time, duration_seconds)
+                     VALUES (?1, ?2, ?3, ?4, ?5, ?6)",
+                    params![
+                        app_name,
+                        window_title,
+                        exe_path,
+                        start_time,
+                        end_time,
+                        duration,
+                    ],
+                )?;
+                count += 1;
+            }
+        }
+    }
+
+    Ok(count)
+}
+
+pub fn import_sessions_markdown(path: &str) -> Result<usize> {
+    let content = std::fs::read_to_string(path)
+        .map_err(|e| rusqlite::Error::ToSqlConversionFailure(Box::new(e)))?;
+
+    let guard = DB.lock();
+    let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
+
+    let mut count = 0;
+    
+    for line in content.lines() {
+        let line = line.trim();
+        if line.starts_with('|') && !line.contains("---|") && !line.contains("App Name | Window Title") {
+            let parts: Vec<&str> = line.split('|').map(|s| s.trim()).collect();
+            if parts.len() >= 6 {
+                let app_name = parts[1].replace("\\|", "|");
+                let window_title = parts[2].replace("\\|", "|");
+                let start_time = parts[3];
+                let end_time_str = parts[4];
+                let duration: i64 = parts[5].parse().unwrap_or(0);
+                
+                let end_time = if end_time_str.is_empty() { None } else { Some(end_time_str) };
+                let exe_path = "imported_from_markdown";
+
+                let exists: i64 = conn.query_row(
+                    "SELECT count(*) FROM activity_sessions WHERE start_time = ?1 AND exe_path = ?2",
+                    params![start_time, exe_path],
+                    |row| row.get(0),
+                ).unwrap_or(0);
+
+                if exists == 0 {
+                    conn.execute(
+                        "INSERT INTO activity_sessions (app_name, window_title, exe_path, start_time, end_time, duration_seconds)
+                         VALUES (?1, ?2, ?3, ?4, ?5, ?6)",
+                        params![app_name, window_title, exe_path, start_time, end_time, duration],
+                    )?;
+                    count += 1;
+                }
+            }
+        }
+    }
+    
+    Ok(count)
+}
+
+pub fn import_sessions_html(path: &str) -> Result<usize> {
+    let content = std::fs::read_to_string(path)
+        .map_err(|e| rusqlite::Error::ToSqlConversionFailure(Box::new(e)))?;
+        
+    let guard = DB.lock();
+    let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
+
+    let mut count = 0;
+    
+    for tr_block in content.split("<tr>").skip(2) {
+        let td_parts: Vec<&str> = tr_block.split("</td>").collect();
+        if td_parts.len() >= 5 {
+            let app_name = td_parts[0].split("<strong>").nth(1).unwrap_or("").split("</strong>").next().unwrap_or("").trim()
+                .replace("&amp;", "&").replace("&lt;", "<").replace("&gt;", ">").replace("&quot;", "\"");
+            
+            let window_title = td_parts[1].split("<td>").nth(1).unwrap_or("").trim()
+                .replace("&amp;", "&").replace("&lt;", "<").replace("&gt;", ">").replace("&quot;", "\"");
+            
+            let start_time = td_parts[2].split("\">").nth(1).unwrap_or("").trim()
+                .replace("&amp;", "&").replace("&lt;", "<").replace("&gt;", ">").replace("&quot;", "\"");
+            
+            let end_time_str = td_parts[3].split("\">").nth(1).unwrap_or("").trim()
+                .replace("&amp;", "&").replace("&lt;", "<").replace("&gt;", ">").replace("&quot;", "\"");
+            
+            let end_time = if end_time_str == "Now" || end_time_str.is_empty() { None } else { Some(end_time_str.as_str()) };
+            
+            let duration_str = td_parts[4].split("\">").nth(1).unwrap_or("").trim();
+            let mut duration: i64 = 0;
+            for part in duration_str.split_whitespace() {
+                 let num = part.trim_end_matches(&['h', 'm', 's'][..]).parse::<i64>().unwrap_or(0);
+                 if part.ends_with('h') { duration += num * 3600; }
+                 else if part.ends_with('m') { duration += num * 60; }
+                 else if part.ends_with('s') { duration += num; }
+            }
+            
+            let exe_path = "imported_from_html";
+
+            let exists: i64 = conn.query_row(
+                "SELECT count(*) FROM activity_sessions WHERE start_time = ?1 AND exe_path = ?2",
+                params![start_time, exe_path],
+                |row| row.get(0),
+            ).unwrap_or(0);
+
+            if exists == 0 && !app_name.is_empty() {
+                conn.execute(
+                    "INSERT INTO activity_sessions (app_name, window_title, exe_path, start_time, end_time, duration_seconds)
+                     VALUES (?1, ?2, ?3, ?4, ?5, ?6)",
+                    params![app_name, window_title, exe_path, start_time, end_time, duration],
+                )?;
+                count += 1;
+            }
+        }
+    }
+    
+    Ok(count)
+}
+
 pub fn export_sessions_markdown(path: &str, start_date: &str, end_date: &str) -> Result<()> {
     let guard = DB.lock();
     let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;

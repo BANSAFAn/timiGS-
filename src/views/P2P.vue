@@ -22,7 +22,7 @@
           <div>
             <h3 class="font-bold">Ready to Receive!</h3>
             <div class="text-sm">
-              <p>1. Open TimiGS on Android.</p>
+              <p>1. Open TimiGS on another device.</p>
               <p>2. Go to Tools -> P2P File Transfer.</p>
               <p>3. Enter your PC's local IP address (e.g. 192.168.x.x).</p>
               <p>4. Click "Send Database".</p>

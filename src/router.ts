@@ -3,7 +3,6 @@ import Dashboard from "./views/Dashboard.vue";
 import Timeline from "./views/Timeline.vue";
 import Analytics from "./views/Analytics.vue";
 import Settings from "./views/Settings.vue";
-import Weather from "./views/Weather.vue";
 import Tools from "./views/Tools.vue";
 import Transfer from "./views/Transfer.vue";
 import Team from "./views/Team.vue";
@@ -24,11 +23,6 @@ const routes = [
     path: "/analytics",
     name: "Analytics",
     component: Analytics,
-  },
-  {
-    path: "/weather",
-    name: "Weather",
-    component: Weather,
   },
   {
     path: "/settings",

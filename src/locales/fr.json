@@ -10,7 +10,6 @@
     "tools": "Outils",
     "settings": "Paramètres",
     "compare": "Équipes",
-    "sync": "Synchronisation",
     "weather": "Météo",
     "transfer": "Transfert"
   },
@@ -96,7 +95,6 @@
     "about": "À propos",
     "version": "Version",
     "saved": "Paramètres enregistrés !",
-    "dataSync": "Synchronisation des données",
     "localStorage": "Stockage local",
     "localStorageDesc": "Exporter ou importer vos données localement",
     "import": "Importer",
@@ -206,7 +204,30 @@
     "nextBreak": "Prochaine pause dans",
     "working": "En cours de travail",
     "strictMode": "Mode Strict",
-    "strictHint": "Le mode strict bloque : fermer l'application, changer de fenêtre, arrêt/redémarrage. Vous NE POUVEZ PAS quitter sans mot de passe !"
+    "strictHint": "Le mode strict bloque : fermer l'application, changer de fenêtre, arrêt/redémarrage. Vous NE POUVEZ PAS quitter sans mot de passe !",
+    "scheduling": "Planification...",
+    "starting": "Démarrage...",
+    "scheduleTitle": "Mode Planifié",
+    "scheduleDesc": "Définir des horaires et jours spécifiques pour Time OUT",
+    "enableSchedule": "Activer le mode planifié",
+    "workingHours": "Heures de Travail",
+    "activeDays": "Jours Actifs",
+    "customBreaks": "Pauses Personnalisées",
+    "addBreak": "Ajouter une Pause",
+    "noCustomBreaks": "Aucune pause personnalisée. Ajoutez des pauses à des heures spécifiques.",
+    "scheduleHint": "Time OUT démarrera automatiquement pendant les heures de travail les jours sélectionnés. Les pauses personnalisées se déclencheront aux heures spécifiées.",
+    "daySun": "Dim",
+    "dayMon": "Lun",
+    "dayTue": "Mar",
+    "dayWed": "Mer",
+    "dayThu": "Jeu",
+    "dayFri": "Ven",
+    "daySat": "Sam",
+    "scheduleActive": "Planification Active",
+    "cancelSchedule": "Annuler la Planification",
+    "clickToEdit": "(cliquer pour modifier)",
+    "breakFrom": "De",
+    "breakTo": "À"
   },
   "common": {
     "loading": "Chargement...",
@@ -226,76 +247,5 @@
     "done": "Terminé",
     "on": "ACTIVÉ",
     "off": "DÉSACTIVÉ"
-  },
-  "sync": {
-    "title": "Synchronisation téléphone",
-    "description": "Synchronisez vos données d'activité entre ordinateur et appareils mobiles",
-    "status": {
-      "disconnected": "Déconnecté",
-      "connecting": "Connexion...",
-      "connected": "Connecté",
-      "error": "Erreur"
-    },
-    "pairing": {
-      "title": "Appairage d'appareil",
-      "generateCode": "Générer un code d'appairage",
-      "generateCodeDesc": "Générez un code à entrer sur votre autre appareil",
-      "expiresIn": "Expire dans",
-      "generateCodeBtn": "Générer le code",
-      "enterCode": "Entrer le code d'appairage",
-      "enterCodeDesc": "Entrez le code affiché sur votre autre appareil",
-      "codePlaceholder": "XXXXXX",
-      "connectBtn": "Connecter",
-      "pairedDevices": "Appareils appairés",
-      "neverSynced": "Jamais synchronisé",
-      "remove": "Supprimer",
-      "removeConfirm": "Êtes-vous sûr de vouloir supprimer cet appareil ?"
-    },
-    "methods": {
-      "title": "Méthodes de synchronisation",
-      "p2p": {
-        "title": "Peer-to-Peer (P2P)",
-        "description": "Synchronisation directe appareil à appareil via WebRTC"
-      },
-      "api": {
-        "title": "API (Store-and-Forward)",
-        "description": "Synchronisation via votre serveur API personnel",
-        "endpointPlaceholder": "Point de terminaison API (ex : https://api.votreserveur.com)",
-        "tokenPlaceholder": "Token API (optionnel)"
-      }
-    },
-    "queue": {
-      "title": "Synchronisations en attente",
-      "retries": "Tentatives",
-      "status": {
-        "pending": "En attente",
-        "sent": "Envoyé",
-        "confirmed": "Confirmé"
-      }
-    },
-    "backup": {
-      "title": "Export et Import",
-      "export": "Exporter la sauvegarde",
-      "import": "Importer la sauvegarde",
-      "exportFailed": "Échec de l'exportation",
-      "importSuccess": "Sauvegarde importée avec succès",
-      "importFailed": "Échec de l'importation"
-    },
-    "settings": {
-      "title": "Paramètres de synchronisation",
-      "enableSync": "Activer la synchronisation",
-      "autoSync": "Synchronisation automatique toutes les 5 minutes",
-      "syncOnMetered": "Synchroniser via les connexions mobiles",
-      "clearData": "Effacer les données de synchronisation",
-      "clearDataConfirm": "Cela supprimera tous les appareils appairés et les synchronisations en attente. Continuer ?"
-    },
-    "syncing": "Synchronisation...",
-    "syncNow": "Synchroniser maintenant",
-    "syncFailed": "Échec de la synchronisation. Vérifiez votre connexion.",
-    "time": {
-      "minutesAgo": "il y a {count}min",
-      "hoursAgo": "il y a {count}h",
-      "daysAgo": "il y a {count}j"
-    }
   }
 }

@@ -21,6 +21,7 @@
     "framer-motion": "^12.38.0",
     "highlight.js": "^11.11.1",
     "marked": "^17.0.1",
+    "mermaid": "^11.14.0",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
     "react-markdown": "9.0.1",

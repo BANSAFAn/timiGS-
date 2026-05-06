@@ -150,7 +150,7 @@
       "yes": "Oui",
       "no": "Non",
       "partial": "Partiel",
-      "unavailableunavailableunavailableunavailableunavailableunavailableunavailableunavailable": "Non disponibleNon disponibleNon disponibleNon disponibleNon disponibleNon disponibleNon disponibleNon disponible"
+      "unavailable": "Non disponible"
     }
   },
   "platforms": {

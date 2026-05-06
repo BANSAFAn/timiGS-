@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useMemo } from "react";
 import { marked } from "marked";
 import hljs from "highlight.js";
 import 'highlight.js/styles/atom-one-dark.css';
-import { BookOpen, DownloadSimple, Sparkle, CloudSun, Gear, GithubLogo, Cube as DockerLogo, FileText } from "@phosphor-icons/react";
+import { BookOpen, DownloadSimple, Sparkle, CloudSun, Gear, GithubLogo, Cube as DockerLogo, FileText, ClockCounterClockwise, UsersThree, Browser, X } from "@phosphor-icons/react";
 
 interface DocSection {
   id: string;
@@ -23,7 +23,10 @@ const sectionIcons: Record<string, React.ReactNode> = {
   weather: <CloudSun weight="duotone" />,
   settings: <Gear weight="duotone" />,
   "github-api": <GithubLogo weight="duotone" />,
-  docker: <DockerLogo weight="duotone" />
+  docker: <DockerLogo weight="duotone" />,
+  tracking: <ClockCounterClockwise weight="duotone" />,
+  team: <UsersThree weight="duotone" />,
+  tabs: <Browser weight="duotone" />
 };
 
 const sectionDescriptions: Record<string, string> = {
@@ -34,6 +37,9 @@ const sectionDescriptions: Record<string, string> = {
   settings: "Customize your experience",
   "github-api": "Coding activity tracker",
   docker: "Deploy with Docker",
+  tracking: "How tracking works",
+  team: "P2P social team tracking",
+  tabs: "Overview of all tabs",
 };
 
 export default function DocsViewer({ lang = "en" }: { lang?: string }) {
@@ -46,6 +52,8 @@ export default function DocsViewer({ lang = "en" }: { lang?: string }) {
   const [toc, setToc] = useState<TocItem[]>([]);
   const [activeHeading, setActiveHeading] = useState<string>("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [previewContent, setPreviewContent] = useState<string | null>(null);
+  const [previewType, setPreviewType] = useState<"mermaid" | "table" | null>(null);
   const docsCache = useRef<Record<string, { html: string, toc: TocItem[] }>>({});
   const contentRef = useRef<HTMLDivElement>(null);
   const mainRef = useRef<HTMLElement>(null);
@@ -152,10 +160,67 @@ export default function DocsViewer({ lang = "en" }: { lang?: string }) {
   // Syntax highlighting effect
   useEffect(() => {
     if (!loading && contentRef.current) {
+      let hasMermaid = false;
       contentRef.current.querySelectorAll('pre code').forEach((block) => {
-        hljs.highlightElement(block as HTMLElement);
+        if (block.classList.contains('language-mermaid')) {
+          const parent = block.parentElement;
+          if (parent) {
+            const div = document.createElement('div');
+            div.className = 'mermaid';
+            div.textContent = block.textContent || "";
+            parent.replaceWith(div);
+            hasMermaid = true;
+          }
+        } else {
+          hljs.highlightElement(block as HTMLElement);
+        }
       });
+      
+      if (hasMermaid) {
+        import('mermaid').then((m) => {
+          m.default.initialize({ startOnLoad: false, theme: 'dark' });
+          m.default.run({ querySelector: '.mermaid' }).catch(e => console.error(e));
+        });
+      }
     }
+  }, [content, loading]);
+
+  // Attach Preview Listeners to Mermaid and Tables
+  useEffect(() => {
+    if (loading || !contentRef.current) return;
+    
+    // Attach to Tables
+    contentRef.current.querySelectorAll('.docs-table-wrapper').forEach(table => {
+       table.classList.add('previewable-node');
+       const listener = () => {
+           setPreviewContent(table.innerHTML);
+           setPreviewType("table");
+       };
+       table.addEventListener('click', listener);
+       (table as any)._previewListener = listener;
+    });
+
+    // Attach to Mermaid
+    contentRef.current.querySelectorAll('.mermaid').forEach(mer => {
+       mer.classList.add('previewable-node');
+       const listener = () => {
+           setPreviewContent(mer.innerHTML);
+           setPreviewType("mermaid");
+       };
+       mer.addEventListener('click', listener);
+       (mer as any)._previewListener = listener;
+    });
+    
+    return () => {
+       if (contentRef.current) {
+          contentRef.current.querySelectorAll('.docs-table-wrapper').forEach(t => {
+             if ((t as any)._previewListener) t.removeEventListener('click', (t as any)._previewListener);
+          });
+          contentRef.current.querySelectorAll('.mermaid').forEach(m => {
+             if ((m as any)._previewListener) m.removeEventListener('click', (m as any)._previewListener);
+          });
+       }
+    };
   }, [content, loading]);
 
   // Reading progress & active heading tracking
@@ -231,6 +296,17 @@ export default function DocsViewer({ lang = "en" }: { lang?: string }) {
           <span className="docs-mobile-current">{sectionIcons[currentSection.id]} {currentSection.title}</span>
         )}
       </div>
+
+      {/* Fullscreen Preview Modal */}
+      {previewContent && (
+        <div className="docs-preview-modal" onClick={() => setPreviewContent(null)}>
+          <div className="docs-preview-backdrop" />
+          <button className="docs-preview-close" onClick={() => setPreviewContent(null)}>
+            <X size={24} weight="bold" />
+          </button>
+          <div className={`docs-preview-content preview-type-${previewType}`} onClick={(e) => e.stopPropagation()} dangerouslySetInnerHTML={{ __html: previewContent }} />
+        </div>
+      )}
 
       <div className="docs-layout">
         {/* Sidebar */}
@@ -681,6 +757,59 @@ export default function DocsViewer({ lang = "en" }: { lang?: string }) {
           0%, 100% { box-shadow: 0 0 0 0 rgba(16,185,129,0.4); }
           50% { box-shadow: 0 0 0 4px rgba(16,185,129,0); }
         }
+
+        /* ── Extensions CSS ── */
+        .previewable-node {
+           cursor: zoom-in;
+           position: relative;
+           transition: transform 0.2s, box-shadow 0.2s;
+           border-radius: 8px;
+        }
+        .previewable-node:hover {
+           box-shadow: 0 0 20px rgba(6, 245, 214, 0.15);
+           background: rgba(255,255,255,0.02);
+        }
+        .previewable-node::after {
+           content: '🔍 Click to Preview';
+           position: absolute;
+           top: 10px;
+           right: 10px;
+           background: rgba(10,10,15,0.8);
+           color: #06f5d6;
+           padding: 6px 10px;
+           border-radius: 6px;
+           font-size: 11px;
+           font-weight: 600;
+           backdrop-filter: blur(4px);
+           opacity: 0;
+           transition: opacity 0.2s;
+           pointer-events: none;
+        }
+        .previewable-node:hover::after { opacity: 1; }
+
+        .docs-preview-modal {
+           position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+           z-index: 9999; display: flex; align-items: center; justify-content: center;
+        }
+        .docs-preview-backdrop {
+           position: absolute; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
+        }
+        .docs-preview-close {
+           position: absolute; top: 30px; right: 30px; background: rgba(255,255,255,0.1);
+           border: none; color: #fff; width: 48px; height: 48px; border-radius: 50%;
+           display: flex; align-items: center; justify-content: center; cursor: pointer;
+           z-index: 10; transition: background 0.2s;
+        }
+        .docs-preview-close:hover { background: rgba(255,255,255,0.2); }
+        
+        .docs-preview-content {
+           position: relative; z-index: 5; background: #111118;
+           border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 40px;
+           max-width: 90vw; max-height: 90vh; overflow: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+        }
+        .preview-type-mermaid svg { min-width: 50vw; height: auto; max-height: 80vh; }
+        .preview-type-table table { margin: 0; font-size: 16px; }
+        .preview-type-mermaid { display: flex; align-items: center; justify-content: center; }
 
         /* ── Main Content ── */
         .docs-main {
