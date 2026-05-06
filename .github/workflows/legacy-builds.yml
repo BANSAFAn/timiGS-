@@ -1,0 +1,204 @@
+name: Legacy Builds
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to build'
+        required: true
+        default: '1.3.0'
+
+jobs:
+  build-win32:
+    name: Build Windows 32-bit (Win7+)
+    runs-on: windows-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: i686-pc-windows-msvc
+
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: './src-tauri -> target'
+
+      - name: Build frontend
+        run: npm run build
+
+      - name: Build Win32 version
+        run: |
+          # Backup original config
+          Copy-Item src-tauri\tauri.conf.json src-tauri\tauri.conf.json.backup
+          
+          # Use legacy config
+          Copy-Item legacy-builds\win32\tauri.conf.json src-tauri\tauri.conf.json
+          
+          # Build for 32-bit
+          cd src-tauri
+          cargo tauri build --target i686-pc-windows-msvc
+          
+          # Restore original config
+          cd ..
+          Copy-Item src-tauri\tauri.conf.json.backup src-tauri\tauri.conf.json
+          Remove-Item src-tauri\tauri.conf.json.backup
+
+      - name: Upload Win32 artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: timigs-win32
+          path: |
+            src-tauri/target/i686-pc-windows-msvc/release/bundle/nsis/*.exe
+            src-tauri/target/i686-pc-windows-msvc/release/bundle/msi/*.msi
+
+      - name: Upload to release
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            src-tauri/target/i686-pc-windows-msvc/release/bundle/nsis/*.exe
+            src-tauri/target/i686-pc-windows-msvc/release/bundle/msi/*.msi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-winxp:
+    name: Build Windows XP/2000 (Legacy)
+    runs-on: windows-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: i686-pc-windows-msvc
+
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: './src-tauri -> target'
+
+      - name: Build frontend
+        run: npm run build
+
+      - name: Build WinXP version
+        run: |
+          # Backup original files
+          Copy-Item src-tauri\tauri.conf.json src-tauri\tauri.conf.json.backup
+          Copy-Item src-tauri\Cargo.toml src-tauri\Cargo.toml.backup
+          
+          # Use legacy config
+          Copy-Item legacy-builds\winxp\tauri.conf.json src-tauri\tauri.conf.json
+          Copy-Item legacy-builds\winxp\Cargo.toml src-tauri\Cargo.toml
+          
+          # Set XP compatibility flags
+          $env:RUSTFLAGS = "-C target-feature=+crt-static"
+          
+          # Build for 32-bit XP
+          cd src-tauri
+          cargo tauri build --target i686-pc-windows-msvc
+          
+          # Restore original files
+          cd ..
+          Copy-Item src-tauri\tauri.conf.json.backup src-tauri\tauri.conf.json
+          Copy-Item src-tauri\Cargo.toml.backup src-tauri\Cargo.toml
+          Remove-Item src-tauri\tauri.conf.json.backup
+          Remove-Item src-tauri\Cargo.toml.backup
+
+      - name: Upload WinXP artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: timigs-winxp
+          path: |
+            src-tauri/target/i686-pc-windows-msvc/release/bundle/nsis/*.exe
+
+      - name: Upload to release
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            src-tauri/target/i686-pc-windows-msvc/release/bundle/nsis/*.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  create-legacy-manifest:
+    name: Create Legacy Builds Manifest
+    runs-on: ubuntu-latest
+    needs: [build-win32, build-winxp]
+    if: github.event_name == 'release'
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create manifest
+        run: |
+          cat > legacy-manifest.json << EOF
+          {
+            "version": "${{ github.event.release.tag_name }}",
+            "builds": {
+              "win32": {
+                "name": "Windows 32-bit (Win7+)",
+                "platforms": ["Windows 7", "Windows 8", "Windows 8.1", "Windows 10 (32-bit)"],
+                "architecture": "i686",
+                "features": {
+                  "activity_tracking": true,
+                  "auto_updates": true,
+                  "discord_presence": true,
+                  "p2p_sync": true,
+                  "music_player": true
+                }
+              },
+              "winxp": {
+                "name": "Windows XP/2000 (Legacy)",
+                "platforms": ["Windows XP SP3", "Windows 2000 SP4"],
+                "architecture": "i686",
+                "features": {
+                  "activity_tracking": true,
+                  "auto_updates": false,
+                  "discord_presence": false,
+                  "p2p_sync": false,
+                  "music_player": false
+                },
+                "notes": [
+                  "Limited functionality",
+                  "Requires .NET Framework 2.0+",
+                  "May require Visual C++ Redistributable (x86)"
+                ]
+              }
+            },
+            "release_date": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          }
+          EOF
+
+      - name: Upload manifest to release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: legacy-manifest.json
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

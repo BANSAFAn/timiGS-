@@ -109,8 +109,8 @@ static SCHEDULE_PASSWORD_HASH: Lazy<Mutex<String>> = Lazy::new(|| Mutex::new(Str
 
 #[derive(Debug, Clone)]
 pub struct CustomBreak {
-    pub time_minutes: u32,    // Minutes from midnight (e.g., 11:00 AM = 660)
-    pub duration_minutes: u32,
+    pub start_time_minutes: u32,  // Start time in minutes from midnight (e.g., 2:30 PM = 870)
+    pub end_time_minutes: u32,    // End time in minutes from midnight (e.g., 3:00 PM = 900)
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -196,13 +196,15 @@ pub fn start_timeout(
         let parsed_breaks: Vec<CustomBreak> = breaks
             .iter()
             .filter_map(|b| {
-                let hour = b.get("hour")?.as_u64()? as u32;
-                let minute = b.get("minute")?.as_u64()? as u32;
-                let duration = b.get("duration")?.as_u64()? as u32;
-                let time_minutes = hour * 60 + minute;
+                let start_hour = b.get("startHour")?.as_u64()? as u32;
+                let start_minute = b.get("startMinute")?.as_u64()? as u32;
+                let end_hour = b.get("endHour")?.as_u64()? as u32;
+                let end_minute = b.get("endMinute")?.as_u64()? as u32;
+                let start_time_minutes = start_hour * 60 + start_minute;
+                let end_time_minutes = end_hour * 60 + end_minute;
                 Some(CustomBreak {
-                    time_minutes,
-                    duration_minutes: duration,
+                    start_time_minutes,
+                    end_time_minutes,
                 })
             })
             .collect();
@@ -300,20 +302,35 @@ pub fn start_timeout(
                     if is_selected_day {
                         // Check if we should start a break now
                         for break_item in custom_breaks.iter() {
-                            // Check if current time matches break time (within the same minute)
-                            if current_time_minutes == break_item.time_minutes as u64
+                            // Check if current time is at the start of the break time range
+                            if current_time_minutes == break_item.start_time_minutes as u64
                                 && current_minute != last_checked_minute
                             {
                                 last_checked_minute = current_minute;
 
                                 // Only auto-start if not already in a break
                                 if !BREAK_ACTIVE.load(Ordering::SeqCst) {
+                                    // Calculate break duration from time range
+                                    let break_duration_minutes = if break_item.end_time_minutes > break_item.start_time_minutes {
+                                        break_item.end_time_minutes - break_item.start_time_minutes
+                                    } else {
+                                        // Handle case where break crosses midnight
+                                        (24 * 60 - break_item.start_time_minutes) + break_item.end_time_minutes
+                                    };
+                                    
+                                    let break_duration_secs = (break_duration_minutes as u64) * 60;
+                                    
+                                    // Update break duration for this scheduled break
+                                    SCHEDULE_BREAK_DURATION_SECS.store(break_duration_secs, Ordering::SeqCst);
+                                    
                                     let session = TIMEOUT_STATE.lock();
                                     if let Some(s) = session.as_ref() {
                                         next_break_sched.store(s.interval_secs, Ordering::SeqCst);
                                     }
                                     drop(session);
 
+                                    println!("Scheduled break triggered at {}:{:02} for {} minutes", 
+                                        current_hour, current_minute, break_duration_minutes);
                                     let _ = app_handle_schedule.emit("timeout-schedule-triggered", ());
                                 }
                                 break;
@@ -375,7 +392,7 @@ pub fn get_timeout_status() -> Option<TimeoutStatus> {
     })
 }
 
-/// Save timeout schedule settings
+/// Save timeout schedule settings and start monitoring
 pub fn save_timeout_schedule(
     interval_secs: u64,
     break_duration_secs: u64,
@@ -386,6 +403,7 @@ pub fn save_timeout_schedule(
     schedule_end_minute: u64,
     custom_breaks: Vec<CustomBreak>,
     selected_days: Vec<u32>,
+    app_handle: &tauri::AppHandle,
 ) -> Result<(), String> {
     let breaks_count = custom_breaks.len();
     
@@ -402,7 +420,113 @@ pub fn save_timeout_schedule(
     SCHEDULE_ENABLED.store(true, Ordering::SeqCst);
     
     println!("Timeout schedule saved with {} breaks", breaks_count);
+    
+    // Start schedule monitoring if not already running
+    if !TIMEOUT_RUNNING.load(Ordering::SeqCst) {
+        TIMEOUT_RUNNING.store(true, Ordering::SeqCst);
+        start_schedule_monitoring(app_handle.clone());
+    }
+    
     Ok(())
+}
+
+/// Start schedule monitoring thread
+fn start_schedule_monitoring(app_handle: tauri::AppHandle) {
+    thread::spawn(move || {
+        let mut last_checked_minute = 999;
+
+        while TIMEOUT_RUNNING.load(Ordering::SeqCst) {
+            if SCHEDULE_ENABLED.load(Ordering::SeqCst) {
+                let now = Local::now();
+                let current_hour = now.hour() as u64;
+                let current_minute = now.minute() as u64;
+                let current_day = now.weekday().num_days_from_sunday();
+                let current_time_minutes = current_hour * 60 + current_minute;
+
+                let days = SCHEDULE_DAYS.lock();
+                let custom_breaks = CUSTOM_BREAKS.lock();
+
+                // Check if current day is in selected days
+                let is_selected_day = days.contains(&current_day);
+
+                if is_selected_day {
+                    // Check if we should start a break now
+                    for break_item in custom_breaks.iter() {
+                        // Check if current time is at the start of the break time range
+                        if current_time_minutes == break_item.start_time_minutes as u64
+                            && current_minute != last_checked_minute
+                        {
+                            last_checked_minute = current_minute;
+
+                            // Only auto-start if not already in a break
+                            if !BREAK_ACTIVE.load(Ordering::SeqCst) {
+                                // Calculate break duration from time range
+                                let break_duration_minutes = if break_item.end_time_minutes > break_item.start_time_minutes {
+                                    break_item.end_time_minutes - break_item.start_time_minutes
+                                } else {
+                                    // Handle case where break crosses midnight
+                                    (24 * 60 - break_item.start_time_minutes) + break_item.end_time_minutes
+                                };
+                                
+                                let break_duration_secs = (break_duration_minutes as u64) * 60;
+                                
+                                // Create a timeout session for this scheduled break
+                                let interval_secs = SCHEDULE_INTERVAL_SECS.load(Ordering::SeqCst);
+                                let password_hash = SCHEDULE_PASSWORD_HASH.lock().clone();
+                                let next_break = Arc::new(AtomicU64::new(0));
+                                let break_countdown = Arc::new(AtomicU64::new(break_duration_secs));
+                                
+                                let session = TimeoutSession {
+                                    interval_secs,
+                                    break_duration_secs,
+                                    password_hash,
+                                    next_break_countdown: next_break.clone(),
+                                    break_countdown: break_countdown.clone(),
+                                };
+                                
+                                *TIMEOUT_STATE.lock() = Some(session);
+                                BREAK_ACTIVE.store(true, Ordering::SeqCst);
+                                
+                                println!("Scheduled break triggered at {}:{:02} for {} minutes", 
+                                    current_hour, current_minute, break_duration_minutes);
+                                
+                                // Set window to break mode
+                                set_break_window_state(&app_handle, true);
+                                
+                                let _ = app_handle.emit("timeout-break-start", ());
+                                let _ = app_handle.emit("timeout-schedule-triggered", ());
+                                
+                                // Start break countdown thread
+                                let app_clone = app_handle.clone();
+                                let break_countdown_clone = break_countdown.clone();
+                                thread::spawn(move || {
+                                    while BREAK_ACTIVE.load(Ordering::SeqCst) && TIMEOUT_RUNNING.load(Ordering::SeqCst) {
+                                        let left = break_countdown_clone.load(Ordering::SeqCst);
+                                        if left == 0 {
+                                            BREAK_ACTIVE.store(false, Ordering::SeqCst);
+                                            set_break_window_state(&app_clone, false);
+                                            let _ = app_clone.emit("timeout-break-end", ());
+                                            break;
+                                        }
+                                        break_countdown_clone.store(left.saturating_sub(1), Ordering::SeqCst);
+                                        thread::sleep(Duration::from_secs(1));
+                                    }
+                                });
+                            }
+                            break;
+                        }
+                    }
+                }
+                
+                if current_minute != last_checked_minute && current_minute == 0 {
+                    // Reset at the start of each hour to allow re-triggering
+                    last_checked_minute = 999;
+                }
+            }
+            
+            thread::sleep(Duration::from_secs(10));
+        }
+    });
 }
 
 /// Set or restore the TimiGS window for break mode.

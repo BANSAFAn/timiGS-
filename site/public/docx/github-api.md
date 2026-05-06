@@ -10,6 +10,24 @@ The GitHub integration offers:
 - **Recent Activity Feed** - See your latest GitHub actions
 - **Coding Insights** - Correlate coding activity with overall productivity
 
+### API Integration Architecture
+
+```mermaid
+graph TD
+    UI[TimiGS UI\nGitHub.vue] -->|Inputs Personal Access Token| LocalStore[(Browser LocalStorage)]
+    LocalStore -.-> UI
+    
+    UI -->|REST Request with Auth Header| GitAPI{api.github.com}
+    
+    GitAPI -->|Returns JSON| UI
+    
+    UI -->|Renders| Repos[Repository List]
+    UI -->|Renders| Feed[Recent Activity Feed]
+    
+    style LocalStore fill:#f9e2af,stroke:#24273a
+    style GitAPI fill:#89b4fa,stroke:#24273a
+```
+
 ## Getting Started
 
 ### Prerequisites

@@ -90,7 +90,6 @@ const mainNavItems: NavItem[] = [
 
 // Secondary navigation items (less used)
 const secondaryNavItems: NavItem[] = [
-  { path: "/weather", label: "nav.weather", labelShort: "nav.weatherShort", icon: Icons.weather },
   { path: "/team", label: "nav.team", labelShort: "nav.teamShort", icon: Icons.team },
   { path: "/tools", label: "nav.tools", labelShort: "nav.toolsShort", icon: Icons.tools },
   { path: "/transfer", label: "nav.transfer", labelShort: "nav.transferShort", icon: Icons.transfer },
@@ -102,7 +101,6 @@ const mobileNavItems: NavItem[] = [
   { path: "/", label: "nav.dashboard", labelShort: "nav.dashboardShort", icon: Icons.dashboard },
   { path: "/timeline", label: "nav.timeline", labelShort: "nav.timelineShort", icon: Icons.timeline },
   { path: "/analytics", label: "nav.analytics", labelShort: "nav.analyticsShort", icon: Icons.analytics },
-  { path: "/team", label: "nav.team", labelShort: "nav.teamShort", icon: Icons.team },
   { path: "/tools", label: "nav.tools", labelShort: "nav.toolsShort", icon: Icons.tools },
   { path: "/settings", label: "nav.settings", labelShort: "nav.settingsShort", icon: Icons.settings },
 ];

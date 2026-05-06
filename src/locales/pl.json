@@ -10,7 +10,6 @@
     "tools": "Narzędzia",
     "settings": "Ustawienia",
     "compare": "Zespoły",
-    "sync": "Synchronizacja",
     "weather": "Pogoda",
     "transfer": "Transfer"
   },
@@ -97,7 +96,6 @@
     "about": "O programie",
     "version": "Wersja",
     "saved": "Ustawienia zapisane!",
-    "dataSync": "Synchronizacja Danych",
     "localStorage": "Lokalna Pamięć",
     "localStorageDesc": "Eksportuj lub importuj swoje dane lokalnie",
     "import": "Importuj",
@@ -215,7 +213,30 @@
     "breakTitle": "Czas na relaks!",
     "breakMessage": "Zrób przerwę, napij się herbaty, rozciągnij się!",
     "nextBreak": "Następna przerwa za",
-    "working": "Praca"
+    "working": "Praca",
+    "scheduling": "Planowanie...",
+    "starting": "Uruchamianie...",
+    "scheduleTitle": "Tryb Harmonogramu",
+    "scheduleDesc": "Ustaw konkretne godziny i dni dla Time OUT",
+    "enableSchedule": "Włącz tryb harmonogramu",
+    "workingHours": "Godziny Pracy",
+    "activeDays": "Aktywne Dni",
+    "customBreaks": "Niestandardowe Przerwy",
+    "addBreak": "Dodaj Przerwę",
+    "noCustomBreaks": "Brak niestandardowych przerw. Dodaj przerwy o określonych godzinach.",
+    "scheduleHint": "Time OUT uruchomi się automatycznie w godzinach pracy w wybranych dniach. Niestandardowe przerwy zostaną uruchomione o określonych godzinach.",
+    "daySun": "Nd",
+    "dayMon": "Pn",
+    "dayTue": "Wt",
+    "dayWed": "Śr",
+    "dayThu": "Czw",
+    "dayFri": "Pt",
+    "daySat": "Sb",
+    "scheduleActive": "Harmonogram Aktywny",
+    "cancelSchedule": "Anuluj Harmonogram",
+    "clickToEdit": "(kliknij, aby edytować)",
+    "breakFrom": "Od",
+    "breakTo": "Do"
   },
   "common": {
     "loading": "Ładowanie...",
@@ -246,76 +267,5 @@
     "allTracked": "Wszystkie procesy są śledzone",
     "notBeingTracked": "Nie jest śledzone",
     "footerHint": "Wykluczone procesy nadal pojawiają się na Osi Czasu z odznaką \"Nie Śledzone\""
-  },
-  "sync": {
-    "title": "Synchronizacja z Telefonem",
-    "description": "Synchronizuj dane aktywności między komputerem a urządzeniami mobilnymi",
-    "status": {
-      "disconnected": "Rozłączono",
-      "connecting": "Łączenie...",
-      "connected": "Połączono",
-      "error": "Błąd"
-    },
-    "pairing": {
-      "title": "Parowanie Urządzenia",
-      "generateCode": "Wygeneruj Kod Parowania",
-      "generateCodeDesc": "Wygeneruj kod do wpisania na innym urządzeniu",
-      "expiresIn": "Wygasa za",
-      "generateCodeBtn": "Wygeneruj Kod",
-      "enterCode": "Wprowadź Kod Parowania",
-      "enterCodeDesc": "Wpisz kod wyświetlany na innym urządzeniu",
-      "codePlaceholder": "XXXXXX",
-      "connectBtn": "Połącz",
-      "pairedDevices": "Sparowane Urządzenia",
-      "neverSynced": "Nigdy nie synchronizowano",
-      "remove": "Usuń",
-      "removeConfirm": "Czy na pewno chcesz usunąć to urządzenie?"
-    },
-    "methods": {
-      "title": "Metody Synchronizacji",
-      "p2p": {
-        "title": "Peer-to-Peer (P2P)",
-        "description": "Bezpośrednia synchronizacja między urządzeniami przez WebRTC"
-      },
-      "api": {
-        "title": "API (Przechowuj i Przekaż)",
-        "description": "Synchronizacja przez Twój osobisty serwer API",
-        "endpointPlaceholder": "Punkt Końcowy API (np. https://api.twojserwer.com)",
-        "tokenPlaceholder": "Token API (opcjonalnie)"
-      }
-    },
-    "queue": {
-      "title": "Oczekujące Synchronizacje",
-      "retries": "Ponowne Próby",
-      "status": {
-        "pending": "Oczekujące",
-        "sent": "Wysłane",
-        "confirmed": "Potwierdzone"
-      }
-    },
-    "backup": {
-      "title": "Eksportuj i Importuj",
-      "export": "Eksportuj Kopię Zapasową",
-      "import": "Importuj Kopię Zapasową",
-      "exportFailed": "Nie udało się wyeksportować kopii zapasowej",
-      "importSuccess": "Kopia zapasowa zaimportowana pomyślnie",
-      "importFailed": "Nie udało się zaimportować kopii zapasowej"
-    },
-    "settings": {
-      "title": "Ustawienia Synchronizacji",
-      "enableSync": "Włącz synchronizację",
-      "autoSync": "Automatyczna synchronizacja co 5 minut",
-      "syncOnMetered": "Synchronizuj na połączeniach taryfowych",
-      "clearData": "Wyczyść Dane Synchronizacji",
-      "clearDataConfirm": "To usunie wszystkie sparowane urządzenia i oczekujące synchronizacje. Kontynuować?"
-    },
-    "syncing": "Synchronizowanie...",
-    "syncNow": "Synchronizuj Teraz",
-    "syncFailed": "Synchronizacja nieudana. Sprawdź połączenie.",
-    "time": {
-      "minutesAgo": "{count}m temu",
-      "hoursAgo": "{count}h temu",
-      "daysAgo": "{count}d temu"
-    }
   }
 }

@@ -150,7 +150,7 @@
       "yes": "是",
       "no": "否",
       "partial": "部分",
-      "unavailableunavailableunavailableunavailableunavailableunavailableunavailableunavailable": "不可用不可用不可用不可用不可用不可用不可用不可用"
+      "unavailable": "不可用"
     }
   },
   "platforms": {

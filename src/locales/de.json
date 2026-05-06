@@ -10,7 +10,6 @@
     "tools": "Werkzeuge",
     "settings": "Einstellungen",
     "compare": "Teams",
-    "sync": "Synchronisierung",
     "weather": "Wetter",
     "transfer": "Übertragen"
   },
@@ -98,7 +97,6 @@
     "about": "Über",
     "version": "Version",
     "saved": "Einstellungen gespeichert!",
-    "dataSync": "Datensynchronisierung",
     "localStorage": "Lokaler Speicher",
     "localStorageDesc": "Exportieren oder importieren Sie Ihre Daten lokal",
     "import": "Importieren",
@@ -208,7 +206,30 @@
     "nextBreak": "Nächste Pause in",
     "working": "Arbeiten",
     "strictMode": "Strenger Modus",
-    "strictHint": "Strenger Modus blockiert: App schließen, Fenster wechseln, Herunterfahren/Neustart. Sie können OHNE Passwort NICHT vorzeitig beenden!"
+    "strictHint": "Strenger Modus blockiert: App schließen, Fenster wechseln, Herunterfahren/Neustart. Sie können OHNE Passwort NICHT vorzeitig beenden!",
+    "scheduling": "Planen...",
+    "starting": "Starten...",
+    "scheduleTitle": "Zeitplan-Modus",
+    "scheduleDesc": "Bestimmte Zeiten und Tage für Time OUT festlegen",
+    "enableSchedule": "Zeitplan-Modus aktivieren",
+    "workingHours": "Arbeitszeiten",
+    "activeDays": "Aktive Tage",
+    "customBreaks": "Benutzerdefinierte Pausen",
+    "addBreak": "Pause hinzufügen",
+    "noCustomBreaks": "Keine benutzerdefinierten Pausen. Fügen Sie Pausen zu bestimmten Zeiten hinzu.",
+    "scheduleHint": "Time OUT startet automatisch während der Arbeitszeiten an ausgewählten Tagen. Benutzerdefinierte Pausen werden zu festgelegten Zeiten ausgelöst.",
+    "daySun": "So",
+    "dayMon": "Mo",
+    "dayTue": "Di",
+    "dayWed": "Mi",
+    "dayThu": "Do",
+    "dayFri": "Fr",
+    "daySat": "Sa",
+    "scheduleActive": "Zeitplan aktiv",
+    "cancelSchedule": "Zeitplan abbrechen",
+    "clickToEdit": "(zum Bearbeiten klicken)",
+    "breakFrom": "Von",
+    "breakTo": "Bis"
   },
   "common": {
     "loading": "Wird geladen...",
@@ -228,76 +249,5 @@
     "done": "Fertig",
     "on": "AN",
     "off": "AUS"
-  },
-  "sync": {
-    "title": "Telefon-Synchronisierung",
-    "description": "Synchronisieren Sie Ihre Aktivitätsdaten nahtlos zwischen Desktop und mobilen Geräten",
-    "status": {
-      "disconnected": "Getrennt",
-      "connecting": "Verbinden...",
-      "connected": "Verbunden",
-      "error": "Fehler"
-    },
-    "pairing": {
-      "title": "Gerätekopplung",
-      "generateCode": "Kopplungscode generieren",
-      "generateCodeDesc": "Generieren Sie einen Code zur Eingabe auf dem anderen Gerät",
-      "expiresIn": "Läuft ab in",
-      "generateCodeBtn": "Code generieren",
-      "enterCode": "Kopplungscode eingeben",
-      "enterCodeDesc": "Geben Sie den auf Ihrem anderen Gerät angezeigten Code ein",
-      "codePlaceholder": "XXXXXX",
-      "connectBtn": "Verbinden",
-      "pairedDevices": "Gekoppelte Geräte",
-      "neverSynced": "Nie synchronisiert",
-      "remove": "Entfernen",
-      "removeConfirm": "Möchten Sie dieses Gerät wirklich entfernen?"
-    },
-    "methods": {
-      "title": "Sync-Methoden",
-      "p2p": {
-        "title": "Peer-to-Peer (P2P)",
-        "description": "Direkte Gerät-zu-Gerät-Synchronisierung über WebRTC"
-      },
-      "api": {
-        "title": "API (Store-and-Forward)",
-        "description": "Synchronisierung über Ihren persönlichen API-Server",
-        "endpointPlaceholder": "API-Endpunkt (z.B. https://api.ihrserver.com)",
-        "tokenPlaceholder": "API-Token (optional)"
-      }
-    },
-    "queue": {
-      "title": "Ausstehende Synchronisierungen",
-      "retries": "Versuche",
-      "status": {
-        "pending": "Ausstehend",
-        "sent": "Gesendet",
-        "confirmed": "Bestätigt"
-      }
-    },
-    "backup": {
-      "title": "Export & Import",
-      "export": "Backup exportieren",
-      "import": "Backup importieren",
-      "exportFailed": "Backup-Export fehlgeschlagen",
-      "importSuccess": "Backup erfolgreich importiert",
-      "importFailed": "Backup-Import fehlgeschlagen"
-    },
-    "settings": {
-      "title": "Sync-Einstellungen",
-      "enableSync": "Synchronisierung aktivieren",
-      "autoSync": "Automatisch alle 5 Minuten synchronisieren",
-      "syncOnMetered": "Über mobile Datenverbindungen synchronisieren",
-      "clearData": "Sync-Daten löschen",
-      "clearDataConfirm": "Dadurch werden alle gekoppelten Geräte und ausstehenden Synchronisierungen entfernt. Fortfahren?"
-    },
-    "syncing": "Synchronisieren...",
-    "syncNow": "Jetzt synchronisieren",
-    "syncFailed": "Synchronisierung fehlgeschlagen. Bitte überprüfen Sie Ihre Verbindung.",
-    "time": {
-      "minutesAgo": "vor {count}Min",
-      "hoursAgo": "vor {count}Std",
-      "daysAgo": "vor {count}T"
-    }
   }
 }

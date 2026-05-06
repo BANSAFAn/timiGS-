@@ -4,8 +4,23 @@ use std::net::UdpSocket;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::thread;
 use tiny_http::{Header, Response, Server, StatusCode};
+use serde::{Deserialize, Serialize};
 
 static SERVER_RUNNING: AtomicBool = AtomicBool::new(false);
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ProcessInfo {
+    pub name: String,
+    pub duration: i64,
+    pub timestamp: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct DeviceInfo {
+    pub name: String,
+    pub platform: String,
+    pub processes: Vec<ProcessInfo>,
+}
 
 /// Get the local LAN IP address by connecting a UDP socket to an external address.
 pub fn get_local_ip() -> Result<String, String> {
@@ -86,6 +101,52 @@ pub fn start_server() -> Result<String, String> {
                             .with_header(cors),
                     );
                 }
+                ("GET", "/info") => {
+                    // Device information endpoint
+                    let device_name = std::env::var("COMPUTERNAME")
+                        .or_else(|_| std::env::var("HOSTNAME"))
+                        .or_else(|_| std::env::var("USER"))
+                        .or_else(|_| std::env::var("USERNAME"))
+                        .unwrap_or_else(|_| "Unknown".to_string());
+                    
+                    let device_type = if cfg!(target_os = "android") {
+                        "Android"
+                    } else if cfg!(target_os = "windows") {
+                        "Windows"
+                    } else if cfg!(target_os = "macos") {
+                        "macOS"
+                    } else if cfg!(target_os = "linux") {
+                        "Linux"
+                    } else {
+                        "Unknown"
+                    };
+                    
+                    let info = format!(
+                        "{{\"name\":\"{}\",\"type\":\"{}\",\"app\":\"TimiGS\"}}",
+                        device_name, device_type
+                    );
+                    
+                    let _ = request.respond(
+                        Response::from_string(info).with_header(cors),
+                    );
+                }
+                ("GET", "/processes") => {
+                    // Get current processes/activities
+                    match get_current_processes() {
+                        Ok(processes_json) => {
+                            let _ = request.respond(
+                                Response::from_string(processes_json).with_header(cors),
+                            );
+                        }
+                        Err(e) => {
+                            let _ = request.respond(
+                                Response::from_string(format!("{{\"error\":\"{}\"}}", e))
+                                    .with_status_code(StatusCode(500))
+                                    .with_header(cors),
+                            );
+                        }
+                    }
+                }
                 _ => {
                     let _ = request.respond(
                         Response::from_string("Not Found")
@@ -138,4 +199,22 @@ pub fn send_file_to_ip(target_ip: &str, file_path: &str) -> Result<String, Strin
     } else {
         Err(format!("Transfer failed: HTTP {}", resp.status()))
     }
+}
+
+/// Get current processes from database
+fn get_current_processes() -> Result<String, String> {
+    let today_summary = crate::db::get_today_summary()
+        .map_err(|e| format!("Failed to get today summary: {}", e))?;
+    
+    let processes: Vec<ProcessInfo> = today_summary
+        .iter()
+        .map(|s| ProcessInfo {
+            name: s.app_name.clone(),
+            duration: s.total_seconds,
+            timestamp: chrono::Utc::now().timestamp(),
+        })
+        .collect();
+    
+    serde_json::to_string(&processes)
+        .map_err(|e| format!("Failed to serialize processes: {}", e))
 }

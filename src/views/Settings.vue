@@ -882,36 +882,8 @@ async function saveSettings() {
 }
 
 async function toggleTracking() {
-  // Check if on Android and handle permissions
-  if (store.isMobile) {
-    try {
-      // Check if permission is granted
-      const hasPermission = await safeInvoke("check_usage_permission");
-
-      if (!hasPermission) {
-        // Request permission
-        const confirmed = confirm(
-          "TimiGS needs 'Usage Access' permission to track app activity on Android. " +
-            "You will be redirected to Settings to grant this permission.",
-        );
-
-        if (confirmed) {
-          await safeInvoke("request_usage_permission");
-          alert(
-            "Please grant 'Usage Access' permission in Settings, then try again.",
-          );
-        }
-        return;
-      }
-    } catch (e) {
-      console.error("Permission check failed:", e);
-      alert("Failed to check permissions: " + e);
-      return;
-    }
-  }
-
   // Check if on Linux and warn about dependencies
-  if (!store.isMobile && navigator.userAgent.includes("Linux")) {
+  if (navigator.userAgent.includes("Linux")) {
     // Check if xdotool or wmctrl is available
     const { Command } = await import("@tauri-apps/plugin-shell");
     try {

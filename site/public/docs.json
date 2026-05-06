@@ -33,5 +33,20 @@
     "id": "docker",
     "title": "Docker Deployment",
     "file": "docker.md"
+  },
+  {
+    "id": "tracking",
+    "title": "Activity Tracking",
+    "file": "tracking.md"
+  },
+  {
+    "id": "team",
+    "title": "Team Collaboration",
+    "file": "team.md"
+  },
+  {
+    "id": "tabs",
+    "title": "Application Tabs",
+    "file": "tabs.md"
   }
 ]
