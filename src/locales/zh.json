@@ -227,7 +227,9 @@
     "cancelSchedule": "取消计划",
     "clickToEdit": "(点击编辑)",
     "breakFrom": "从",
-    "breakTo": "到"
+    "breakTo": "到",
+    "simpleBreaks": "简单休息",
+    "scheduleMode": "计划模式"
   },
   "common": {
     "loading": "加载中...",

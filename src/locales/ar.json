@@ -228,7 +228,9 @@
     "cancelSchedule": "إلغاء الجدولة",
     "clickToEdit": "(انقر للتعديل)",
     "breakFrom": "من",
-    "breakTo": "إلى"
+    "breakTo": "إلى",
+    "simpleBreaks": "فترات راحة بسيطة",
+    "scheduleMode": "وضع الجدول الزمني"
   },
   "common": {
     "loading": "جار التحميل...",

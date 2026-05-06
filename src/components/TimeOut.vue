@@ -19,6 +19,28 @@
 
     <!-- Setup State -->
     <div v-if="!status" class="timeout-setup">
+      <!-- Tab Navigation -->
+      <div class="mode-tabs">
+        <button 
+          class="mode-tab" 
+          :class="{ active: activeTab === 'simple' }"
+          @click="activeTab = 'simple'"
+        >
+          <span v-html="Icons.timeoutBreak"></span>
+          <span>{{ t('timeout.simpleBreaks', 'Simple Breaks') }}</span>
+        </button>
+        <button 
+          class="mode-tab" 
+          :class="{ active: activeTab === 'schedule' }"
+          @click="activeTab = 'schedule'"
+        >
+          <span v-html="Icons.timeoutWork"></span>
+          <span>{{ t('timeout.scheduleMode', 'Schedule Mode') }}</span>
+        </button>
+      </div>
+
+      <!-- Simple Breaks Tab -->
+      <div v-show="activeTab === 'simple'" class="tab-content">
       <!-- Work Interval Card -->
       <div class="settings-card work-card">
         <div class="card-header">
@@ -192,7 +214,10 @@
           />
         </div>
       </div>
+      </div>
 
+      <!-- Schedule Mode Tab -->
+      <div v-show="activeTab === 'schedule'" class="tab-content">
       <!-- Schedule Card -->
       <div class="settings-card schedule-card">
         <div class="card-header">
@@ -347,6 +372,26 @@
             </div>
           </div>
         </div>
+      </div>
+
+      <!-- Password Card for Schedule Mode -->
+      <div class="settings-card password-card">
+        <div class="card-header">
+          <div class="card-icon password-icon" v-html="Icons.timeoutLock"></div>
+          <div class="card-title-group">
+            <h3 class="card-title">{{ t('timeout.password', 'Lock Password') }}</h3>
+            <p class="card-desc">{{ t('timeout.passwordDesc', 'Required to cancel early') }}</p>
+          </div>
+        </div>
+        <div class="password-input-wrapper">
+          <input
+            type="password"
+            v-model="password"
+            class="password-input-modern"
+            :placeholder="t('timeout.passwordPlaceholder', 'Enter password...')"
+          />
+        </div>
+      </div>
       </div>
 
       <!-- Start Button -->
@@ -541,6 +586,9 @@ const isSaving = ref(false);
 const statusMessage = ref("");
 const statusMessageType = ref<"success" | "error" | "info">("info");
 let statusTimeout: number | null = null;
+
+// Active tab for mode selection
+const activeTab = ref<"simple" | "schedule">("simple");
 
 // Check if schedule is active
 const hasActiveSchedule = computed(() => {
@@ -869,8 +917,7 @@ async function loadStatus() {
 
 async function manageAudio(breakActive: boolean) {
   if (breakActive && !audio.value && playMusicDuringBreak.value) {
-    // If a custom track is selected, play it, else play builtin
-    let src = "/music/123.mp3";
+    // If a custom track is selected, play it
     const selected = musicFiles.value.find(f => f.filename === selectedMusic.value);
 
     if (selected) {
@@ -887,32 +934,16 @@ async function manageAudio(breakActive: boolean) {
         isPlaying.value = true;
         return;
       } catch (e) {
-        console.error("Failed to play audio via blob:", e);
-        // Fallback: try direct path
-        try {
-          audio.value = new Audio(selected.path);
-          audio.value.loop = true;
-          audio.value.volume = volume.value;
-          await audio.value.play();
-          isPlaying.value = true;
-          return;
-        } catch (e2) {
-          console.error("Fallback also failed:", e2);
-          isPlaying.value = false;
-          return;
-        }
+        console.error("Failed to play selected audio:", e);
+        isPlaying.value = false;
+        return;
       }
-    }
-
-    audio.value = new Audio(src);
-    audio.value.loop = true;
-    audio.value.volume = volume.value;
-    audio.value.play().then(() => {
-      isPlaying.value = true;
-    }).catch(e => {
-      console.error("Failed to auto-play audio", e);
+    } else {
+      // No music selected, don't play anything
+      console.log("No music file selected");
       isPlaying.value = false;
-    });
+      return;
+    }
   } else if (!breakActive && audio.value) {
     audio.value.pause();
     audio.value = null;
@@ -1136,6 +1167,69 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   gap: 18px;
+}
+
+/* Mode Tabs */
+.mode-tabs {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  background: var(--bg-secondary);
+  padding: 6px;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+}
+
+.mode-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mode-tab:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.mode-tab.active {
+  background: var(--bg-primary);
+  color: var(--accent-color);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.mode-tab svg {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}
+
+.tab-content {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Active Schedule Banner */

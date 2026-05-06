@@ -223,7 +223,9 @@
     "cancelSchedule": "Cancelar Programación",
     "clickToEdit": "(clic para editar)",
     "breakFrom": "Desde",
-    "breakTo": "Hasta"
+    "breakTo": "Hasta",
+    "simpleBreaks": "Descansos Simples",
+    "scheduleMode": "Modo Programado"
   },
   "common": {
     "loading": "Cargando...",

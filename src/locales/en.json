@@ -261,7 +261,9 @@
     "cancelSchedule": "Cancel Schedule",
     "clickToEdit": "(click to edit)",
     "breakFrom": "From",
-    "breakTo": "To"
+    "breakTo": "To",
+    "simpleBreaks": "Simple Breaks",
+    "scheduleMode": "Schedule Mode"
   },
   "common": {
     "loading": "Loading...",

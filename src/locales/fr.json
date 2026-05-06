@@ -227,7 +227,9 @@
     "cancelSchedule": "Annuler la Planification",
     "clickToEdit": "(cliquer pour modifier)",
     "breakFrom": "De",
-    "breakTo": "À"
+    "breakTo": "À",
+    "simpleBreaks": "Pauses Simples",
+    "scheduleMode": "Mode Planifié"
   },
   "common": {
     "loading": "Chargement...",

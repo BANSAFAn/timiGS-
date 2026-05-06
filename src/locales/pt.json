@@ -236,7 +236,9 @@
     "cancelSchedule": "Cancelar Agendamento",
     "clickToEdit": "(clique para editar)",
     "breakFrom": "De",
-    "breakTo": "Até"
+    "breakTo": "Até",
+    "simpleBreaks": "Pausas Simples",
+    "scheduleMode": "Modo Agendado"
   },
   "common": {
     "loading": "Carregando...",

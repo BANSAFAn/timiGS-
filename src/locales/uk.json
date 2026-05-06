@@ -257,7 +257,9 @@
     "cancelSchedule": "Скасувати Розклад",
     "clickToEdit": "(клацніть для редагування)",
     "breakFrom": "Від",
-    "breakTo": "До"
+    "breakTo": "До",
+    "simpleBreaks": "Прості Перерви",
+    "scheduleMode": "Режим Розкладу"
   },
   "common": {
     "loading": "Завантаження...",

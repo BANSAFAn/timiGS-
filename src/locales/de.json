@@ -229,7 +229,9 @@
     "cancelSchedule": "Zeitplan abbrechen",
     "clickToEdit": "(zum Bearbeiten klicken)",
     "breakFrom": "Von",
-    "breakTo": "Bis"
+    "breakTo": "Bis",
+    "simpleBreaks": "Einfache Pausen",
+    "scheduleMode": "Zeitplan-Modus"
   },
   "common": {
     "loading": "Wird geladen...",

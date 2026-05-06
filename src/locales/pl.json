@@ -236,7 +236,9 @@
     "cancelSchedule": "Anuluj Harmonogram",
     "clickToEdit": "(kliknij, aby edytować)",
     "breakFrom": "Od",
-    "breakTo": "Do"
+    "breakTo": "Do",
+    "simpleBreaks": "Proste Przerwy",
+    "scheduleMode": "Tryb Harmonogramu"
   },
   "common": {
     "loading": "Ładowanie...",
