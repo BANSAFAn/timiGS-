@@ -14,7 +14,7 @@ tauri-build = { version = "2.1", features = [] }
 dotenv = "0.15"
 
 [dependencies]
-tauri = { version = "2.1", features = [] }
+tauri = { version = "2.11", features = [] }
 tauri-plugin-opener = "2.1"
 tauri-plugin-shell = "2.1"
 tauri-plugin-process = "2.1"
