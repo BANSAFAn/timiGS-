@@ -20,6 +20,10 @@ use windows::Win32::UI::WindowsAndMessaging::{
 };
 
 #[cfg(target_os = "windows")]
+static MUTED_PIDS: Lazy<Mutex<Vec<u32>>> = Lazy::new(|| Mutex::new(vec![]));
+
+
+#[cfg(target_os = "windows")]
 static mut KBD_HOOK: HHOOK = HHOOK(std::ptr::null_mut());
 
 #[cfg(target_os = "windows")]
@@ -224,6 +228,7 @@ pub fn start_timeout(
     thread::spawn(move || {
         let mut was_on_break = false;
         let mut five_min_notified = false;
+        let mut loop_counter: u64 = 0;
 
         while TIMEOUT_RUNNING.load(Ordering::SeqCst) {
             if BREAK_ACTIVE.load(Ordering::SeqCst) {
@@ -248,6 +253,12 @@ pub fn start_timeout(
                     // Block other windows: minimize them and bring TimiGS back
                     #[cfg(target_os = "windows")]
                     enforce_break_focus();
+
+                    // More aggressively minimize all non-TimiGS windows every 2 seconds
+                    #[cfg(target_os = "windows")]
+                    if loop_counter % 2 == 0 {
+                        enforce_all_windows_minimized();
+                    }
                 }
             } else {
                 // Working period
@@ -272,6 +283,7 @@ pub fn start_timeout(
             }
 
             thread::sleep(Duration::from_secs(1));
+            loop_counter = loop_counter.wrapping_add(1);
         }
 
         // If stopped while on break, restore window
@@ -542,15 +554,27 @@ fn set_break_window_state(app_handle: &tauri::AppHandle, entering_break: bool) {
             // Disable close/minimize buttons during break
             let _ = window.set_closable(false);
             let _ = window.set_minimizable(false);
+
+            #[cfg(target_os = "windows")]
+            {
+                mute_other_apps();
+                enforce_all_windows_minimized();
+            }
         } else {
             let _ = window.set_fullscreen(false);
             let _ = window.set_always_on_top(false);
             let _ = window.set_closable(true);
             let _ = window.set_minimizable(true);
             let _ = window.set_decorations(true);
+
+            #[cfg(target_os = "windows")]
+            {
+                restore_other_apps_audio();
+            }
         }
     }
 }
+
 
 /// During break: if any non-TimiGS window is in foreground, minimize it
 /// and bring the TimiGS window back to foreground.
@@ -620,6 +644,252 @@ fn enforce_break_focus() {
                 let _ = SetForegroundWindow(timigs_hwnd);
             }
         }
+    }
+}
+
+/// Mute all audio sessions that don't belong to the timigs process.
+/// Stores the muted process IDs in MUTED_PIDS for later restoration.
+#[cfg(target_os = "windows")]
+fn mute_other_apps() {
+    use windows::core::Interface;
+    use windows::Win32::Media::Audio::{
+        eConsole, eRender, IAudioSessionControl2, IAudioSessionEnumerator,
+        IAudioSessionManager2, IMMDeviceEnumerator, ISimpleAudioVolume, MMDeviceEnumerator,
+    };
+    use windows::Win32::System::Com::{
+        CoCreateInstance, CoInitializeEx, CLSCTX_ALL, COINIT_MULTITHREADED,
+    };
+    use windows::Win32::System::Threading::GetCurrentProcessId;
+
+    unsafe {
+        // Initialize COM for this thread (ignore error if already initialized)
+        let _ = CoInitializeEx(None, COINIT_MULTITHREADED);
+
+        let enumerator: IMMDeviceEnumerator =
+            match CoCreateInstance(&MMDeviceEnumerator, None, CLSCTX_ALL) {
+                Ok(e) => e,
+                Err(e) => {
+                    println!("mute_other_apps: CoCreateInstance failed: {:?}", e);
+                    return;
+                }
+            };
+
+        let device = match enumerator.GetDefaultAudioEndpoint(eRender, eConsole) {
+            Ok(d) => d,
+            Err(e) => {
+                println!("mute_other_apps: GetDefaultAudioEndpoint failed: {:?}", e);
+                return;
+            }
+        };
+
+        let session_manager: IAudioSessionManager2 =
+            match device.Activate(CLSCTX_ALL, None) {
+                Ok(sm) => sm,
+                Err(e) => {
+                    println!("mute_other_apps: Activate IAudioSessionManager2 failed: {:?}", e);
+                    return;
+                }
+            };
+
+        let session_enumerator: IAudioSessionEnumerator =
+            match session_manager.GetSessionEnumerator() {
+                Ok(se) => se,
+                Err(e) => {
+                    println!("mute_other_apps: GetSessionEnumerator failed: {:?}", e);
+                    return;
+                }
+            };
+
+        let count = match session_enumerator.GetCount() {
+            Ok(c) => c,
+            Err(_) => return,
+        };
+
+        let our_pid = GetCurrentProcessId();
+        let mut newly_muted: Vec<u32> = Vec::new();
+
+        for i in 0..count {
+            let session_control = match session_enumerator.GetSession(i) {
+                Ok(sc) => sc,
+                Err(_) => continue,
+            };
+
+            let session_control2: IAudioSessionControl2 =
+                match session_control.cast::<IAudioSessionControl2>() {
+                    Ok(sc2) => sc2,
+                    Err(_) => continue,
+                };
+
+            let pid = match session_control2.GetProcessId() {
+                Ok(p) => p,
+                Err(_) => continue,
+            };
+
+            // Skip our own process and system sounds (PID 0)
+            if pid == our_pid || pid == 0 {
+                continue;
+            }
+
+            // Get ISimpleAudioVolume for per-session muting
+            let simple_volume: ISimpleAudioVolume =
+                match session_control.cast::<ISimpleAudioVolume>() {
+                    Ok(sv) => sv,
+                    Err(_) => continue,
+                };
+
+            if simple_volume
+                .SetMute(true, std::ptr::null())
+                .is_ok()
+            {
+                newly_muted.push(pid);
+                println!("mute_other_apps: Muted PID {}", pid);
+            }
+        }
+
+        let mut muted = MUTED_PIDS.lock();
+        muted.extend(newly_muted);
+        muted.dedup();
+    }
+}
+
+/// Restore audio for all sessions previously muted by mute_other_apps().
+#[cfg(target_os = "windows")]
+fn restore_other_apps_audio() {
+    use windows::core::Interface;
+    use windows::Win32::Media::Audio::{
+        eConsole, eRender, IAudioSessionControl2, IAudioSessionEnumerator,
+        IAudioSessionManager2, IMMDeviceEnumerator, ISimpleAudioVolume, MMDeviceEnumerator,
+    };
+    use windows::Win32::System::Com::{
+        CoCreateInstance, CoInitializeEx, CLSCTX_ALL, COINIT_MULTITHREADED,
+    };
+
+    let pids_to_restore: Vec<u32> = {
+        let muted = MUTED_PIDS.lock();
+        muted.clone()
+    };
+
+    if pids_to_restore.is_empty() {
+        return;
+    }
+
+    unsafe {
+        let _ = CoInitializeEx(None, COINIT_MULTITHREADED);
+
+        let enumerator: IMMDeviceEnumerator =
+            match CoCreateInstance(&MMDeviceEnumerator, None, CLSCTX_ALL) {
+                Ok(e) => e,
+                Err(e) => {
+                    println!("restore_other_apps_audio: CoCreateInstance failed: {:?}", e);
+                    return;
+                }
+            };
+
+        let device = match enumerator.GetDefaultAudioEndpoint(eRender, eConsole) {
+            Ok(d) => d,
+            Err(e) => {
+                println!("restore_other_apps_audio: GetDefaultAudioEndpoint failed: {:?}", e);
+                return;
+            }
+        };
+
+        let session_manager: IAudioSessionManager2 =
+            match device.Activate(CLSCTX_ALL, None) {
+                Ok(sm) => sm,
+                Err(e) => {
+                    println!("restore_other_apps_audio: Activate IAudioSessionManager2 failed: {:?}", e);
+                    return;
+                }
+            };
+
+        let session_enumerator: IAudioSessionEnumerator =
+            match session_manager.GetSessionEnumerator() {
+                Ok(se) => se,
+                Err(e) => {
+                    println!("restore_other_apps_audio: GetSessionEnumerator failed: {:?}", e);
+                    return;
+                }
+            };
+
+        let count = match session_enumerator.GetCount() {
+            Ok(c) => c,
+            Err(_) => return,
+        };
+
+        for i in 0..count {
+            let session_control = match session_enumerator.GetSession(i) {
+                Ok(sc) => sc,
+                Err(_) => continue,
+            };
+
+            let session_control2: IAudioSessionControl2 =
+                match session_control.cast::<IAudioSessionControl2>() {
+                    Ok(sc2) => sc2,
+                    Err(_) => continue,
+                };
+
+            let pid = match session_control2.GetProcessId() {
+                Ok(p) => p,
+                Err(_) => continue,
+            };
+
+            if !pids_to_restore.contains(&pid) {
+                continue;
+            }
+
+            let simple_volume: ISimpleAudioVolume =
+                match session_control.cast::<ISimpleAudioVolume>() {
+                    Ok(sv) => sv,
+                    Err(_) => continue,
+                };
+
+            // Unmute and restore full volume
+            let _ = simple_volume.SetMute(false, std::ptr::null());
+            let _ = simple_volume.SetMasterVolume(1.0, std::ptr::null());
+            println!("restore_other_apps_audio: Unmuted PID {}", pid);
+        }
+    }
+
+    // Clear the muted list
+    MUTED_PIDS.lock().clear();
+}
+
+/// Enumerate all visible windows and minimize any that don't belong to timigs or explorer.
+#[cfg(target_os = "windows")]
+fn enforce_all_windows_minimized() {
+    use windows::Win32::Foundation::{BOOL, HWND, LPARAM};
+    use windows::Win32::UI::WindowsAndMessaging::{
+        EnumWindows, GetWindowThreadProcessId, IsIconic, IsWindowVisible, ShowWindow, SW_MINIMIZE,
+    };
+
+    unsafe {
+        unsafe extern "system" fn enum_all_callback(hwnd: HWND, _lparam: LPARAM) -> BOOL {
+            if !IsWindowVisible(hwnd).as_bool() {
+                return BOOL(1); // skip hidden windows
+            }
+            if IsIconic(hwnd).as_bool() {
+                return BOOL(1); // already minimized
+            }
+
+            let mut pid: u32 = 0;
+            GetWindowThreadProcessId(hwnd, Some(&mut pid));
+            if pid == 0 {
+                return BOOL(1);
+            }
+
+            let exe = get_process_exe(pid);
+            let exe_lower = exe.to_lowercase();
+
+            // Allow TimiGS and Explorer windows
+            if exe_lower.contains("timigs") || exe_lower.contains("explorer.exe") {
+                return BOOL(1);
+            }
+
+            let _ = ShowWindow(hwnd, SW_MINIMIZE);
+            BOOL(1)
+        }
+
+        let _ = EnumWindows(Some(enum_all_callback), LPARAM(0));
     }
 }
 

@@ -221,6 +221,26 @@ pub fn save_settings(app: tauri::AppHandle, settings: db::Settings) -> Result<()
         use tauri_plugin_autostart::ManagerExt;
         if settings.autostart {
             let _ = app.autolaunch().enable();
+            
+            // On Windows, ensure registry entry includes --minimized flag
+            #[cfg(target_os = "windows")]
+            {
+                use std::process::Command;
+                if let Ok(exe_path) = std::env::current_exe() {
+                    let exe_str = exe_path.to_string_lossy();
+                    // Update registry entry with --minimized flag
+                    let _ = Command::new("reg")
+                        .args(&[
+                            "add",
+                            "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run",
+                            "/v", "TimiGS",
+                            "/t", "REG_SZ",
+                            "/d", &format!("\"{}\" --minimized", exe_str),
+                            "/f"
+                        ])
+                        .output();
+                }
+            }
         } else {
             let _ = app.autolaunch().disable();
         }

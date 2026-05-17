@@ -38,14 +38,24 @@ use windows::Win32::UI::WindowsAndMessaging::{MessageBoxW, MB_ICONERROR, MB_OK};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    // Check if launched with --minimized (autostart scenario)
+    let is_autostart = std::env::args().any(|arg| arg == "--minimized" || arg == "-m");
+    
+    // If autostarting, add a small delay to let system initialize
+    if is_autostart {
+        eprintln!("TimiGS: Detected autostart mode, waiting for system to initialize...");
+        std::thread::sleep(std::time::Duration::from_secs(2));
+    }
+    
     // Initialize database
     if let Err(e) = db::init_database() {
         eprintln!("Failed to initialize database: {}", e);
         #[cfg(target_os = "windows")]
         unsafe {
             let msg = format!(
-                "Failed to initialize database: {}\n\nPlease check permissions.",
-                e
+                "Failed to initialize database: {}\n\nPlease check permissions.\n\nDatabase path: {:?}",
+                e,
+                db::get_db_path()
             );
             let wide_msg: Vec<u16> = msg.encode_utf16().chain(std::iter::once(0)).collect();
             let title: Vec<u16> = "TimiGS Error"
@@ -82,6 +92,33 @@ pub fn run() {
     let builder = builder.setup(|app| {
         #[cfg(target_os = "ios")]
         let _ = app;
+
+        // Handle CLI arguments (desktop only)
+        #[cfg(desktop)]
+        {
+            use tauri_plugin_cli::CliExt;
+            use tauri::Manager;
+            
+            if let Ok(matches) = app.cli().matches() {
+                if matches.args.get("minimized").is_some() {
+                    let app_handle = app.handle().clone();
+                    if let Some(window) = app_handle.get_webview_window("main") {
+                        let _ = window.hide();
+                        println!("TimiGS: Starting in autostart mode (minimized to tray)");
+                        
+                        let handle_clone = app_handle.clone();
+                        std::thread::spawn(move || {
+                            std::thread::sleep(std::time::Duration::from_secs(1));
+                            let _ = notifications::send_notification(
+                                &handle_clone,
+                                "TimiGS Started",
+                                "Activity tracking is now running in the background"
+                            );
+                        });
+                    }
+                }
+            }
+        }
 
         // Start tracking on app launch (only on supported platforms)
         #[cfg(target_os = "windows")]

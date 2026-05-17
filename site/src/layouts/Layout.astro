@@ -22,7 +22,7 @@ const dir = currentLang === Language.AR ? 'rtl' : 'ltr';
 	<head>
         <SEOHead title={title} />
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
-        <meta name="theme-color" content="#060609" />
+        <meta name="theme-color" content="#0ea5e9" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -30,176 +30,120 @@ const dir = currentLang === Language.AR ? 'rtl' : 'ltr';
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
         <style is:global>
             /* ═══════════════════════════════════════════ */
-            /*  CYBER DARK DESIGN SYSTEM — TimiGS         */
+            /*  MODERN DESIGN SYSTEM — TimiGS             */
             /* ═══════════════════════════════════════════ */
             
             :root {
-                --cyber-bg: #060609;
-                --cyber-surface: #0a0a12;
-                --cyber-elevated: #0f0f1a;
-                --cyber-panel: #111126;
-                --cyber-cyan: #06f5d6;
-                --cyber-purple: #a855f7;
-                --cyber-blue: #3b82f6;
-                --cyber-pink: #ec4899;
-                --cyber-green: #10b981;
-                --cyber-amber: #f59e0b;
-                --cyber-red: #ef4444;
-                --cyber-border: rgba(6,245,214,0.12);
-                --cyber-border-hover: rgba(6,245,214,0.3);
-                --text-primary: #e8e8f0;
-                --text-muted: rgba(232,232,240,0.4);
+                --bg-primary: #ffffff;
+                --bg-secondary: #f8fafc;
+                --bg-tertiary: #f1f5f9;
+                --surface: #ffffff;
+                --border: #e2e8f0;
+                --border-light: #f1f5f9;
+                --brand-primary: #0ea5e9;
+                --brand-secondary: #8b5cf6;
+                --text-primary: #0f172a;
+                --text-secondary: #475569;
+                --text-tertiary: #94a3b8;
+                --accent-purple: #8b5cf6;
+                --accent-pink: #ec4899;
+                --accent-orange: #f97316;
+                --accent-green: #10b981;
                 --sidebar-width: 300px;
-                --header-height: 56px;
+                --header-height: 64px;
+            }
+            
+            @media (prefers-color-scheme: dark) {
+                :root {
+                    --bg-primary: #0f172a;
+                    --bg-secondary: #1e293b;
+                    --bg-tertiary: #334155;
+                    --surface: #1e293b;
+                    --border: #334155;
+                    --border-light: #1e293b;
+                    --text-primary: #f8fafc;
+                    --text-secondary: #cbd5e1;
+                    --text-tertiary: #64748b;
+                }
             }
 
             body {
-                background: var(--cyber-bg);
+                background: var(--bg-primary);
                 color: var(--text-primary);
                 font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
                 -webkit-font-smoothing: antialiased;
                 -moz-osx-font-smoothing: grayscale;
                 overflow-x: hidden;
                 -webkit-tap-highlight-color: transparent;
+                transition: background-color 0.3s ease, color 0.3s ease;
             }
 
             * { box-sizing: border-box; }
 
             ::selection {
-                background: rgba(6,245,214,0.2);
-                color: #fff;
+                background: rgba(14, 165, 233, 0.2);
+                color: var(--text-primary);
             }
 
-            /* ── Premium Scrollbar ── */
-            ::-webkit-scrollbar { width: 5px; height: 5px; }
-            ::-webkit-scrollbar-track { background: transparent; }
+            /* ── Scrollbar ── */
+            ::-webkit-scrollbar { width: 8px; height: 8px; }
+            ::-webkit-scrollbar-track { background: var(--bg-secondary); }
             ::-webkit-scrollbar-thumb {
-                background: rgba(6,245,214,0.15);
-                border-radius: 10px;
+                background: var(--border);
+                border-radius: 4px;
             }
             ::-webkit-scrollbar-thumb:hover {
-                background: rgba(6,245,214,0.3);
+                background: var(--text-tertiary);
             }
 
             /* ── Typography ── */
             h1, h2, h3, h4, h5, h6 {
                 font-family: 'Inter', sans-serif;
                 font-weight: 700;
-                letter-spacing: -0.02em;
-                color: #fff;
+                letter-spacing: -0.025em;
+                color: var(--text-primary);
             }
 
-            /* ── Cyber Utilities ── */
-            .cyber-border {
-                border: 1px solid var(--cyber-border);
-                transition: border-color 0.4s ease;
-            }
-            .cyber-border:hover {
-                border-color: var(--cyber-border-hover);
-            }
-
-            .cyber-card {
-                background: rgba(10,10,18,0.6);
-                border: 1px solid rgba(6,245,214,0.08);
-                backdrop-filter: blur(12px);
+            /* ── Card Components ── */
+            .card {
+                background: var(--surface);
+                border: 1px solid var(--border);
                 border-radius: 16px;
-                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                transition: all 0.3s ease;
                 position: relative;
                 overflow: hidden;
             }
-            .cyber-card::before {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                height: 1px;
-                background: linear-gradient(90deg, transparent, rgba(6,245,214,0.3), transparent);
-                opacity: 0;
-                transition: opacity 0.4s ease;
-            }
-            .cyber-card:hover {
-                border-color: rgba(6,245,214,0.2);
-                box-shadow: 0 0 30px rgba(6,245,214,0.05), inset 0 1px 0 rgba(6,245,214,0.1);
+            .card:hover {
+                border-color: var(--brand-primary);
+                box-shadow: 0 4px 25px -5px rgba(14, 165, 233, 0.1);
                 transform: translateY(-2px);
             }
-            .cyber-card:hover::before {
-                opacity: 1;
-            }
 
-            .neon-text {
-                color: var(--cyber-cyan);
-                text-shadow: 0 0 10px rgba(6,245,214,0.4), 0 0 30px rgba(6,245,214,0.15);
-            }
-
-            .neon-glow {
-                box-shadow: 0 0 15px rgba(6,245,214,0.15), 0 0 30px rgba(6,245,214,0.05);
-            }
-
-            .glass-panel {
-                background: rgba(10,10,18,0.8);
+            .glass-card {
+                background: rgba(255, 255, 255, 0.8);
                 backdrop-filter: blur(20px);
-                border: 1px solid rgba(6,245,214,0.08);
+                border: 1px solid var(--border-light);
+                border-radius: 20px;
+            }
+            
+            @media (prefers-color-scheme: dark) {
+                .glass-card {
+                    background: rgba(30, 41, 59, 0.8);
+                }
             }
 
-            /* ── Corner Brackets ── */
-            .corner-brackets {
-                position: relative;
-            }
-            .corner-brackets::before,
-            .corner-brackets::after {
-                content: '';
-                position: absolute;
-                width: 12px;
-                height: 12px;
-                transition: all 0.3s ease;
-            }
-            .corner-brackets::before {
-                top: -1px;
-                left: -1px;
-                border-top: 2px solid var(--cyber-cyan);
-                border-left: 2px solid var(--cyber-cyan);
-                opacity: 0;
-            }
-            .corner-brackets::after {
-                bottom: -1px;
-                right: -1px;
-                border-bottom: 2px solid var(--cyber-cyan);
-                border-right: 2px solid var(--cyber-cyan);
-                opacity: 0;
-            }
-            .corner-brackets:hover::before,
-            .corner-brackets:hover::after {
-                opacity: 1;
-            }
-
-            /* ── Scan Line Effect ── */
-            .scan-line::after {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                height: 2px;
-                background: linear-gradient(90deg, transparent, var(--cyber-cyan), transparent);
-                opacity: 0.4;
-                animation: scan-move 3s linear infinite;
-                pointer-events: none;
-            }
-            @keyframes scan-move {
-                0% { top: 0; }
-                100% { top: 100%; }
-            }
-
-            /* ── HUD Label ── */
-            .hud-label {
-                font-family: 'JetBrains Mono', monospace;
-                font-size: 10px;
+            /* ── Badge Component ── */
+            .badge {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+                padding: 0.5rem 1rem;
+                border-radius: 9999px;
+                font-size: 0.875rem;
                 font-weight: 600;
-                letter-spacing: 2px;
-                text-transform: uppercase;
-                color: var(--cyber-cyan);
-                opacity: 0.6;
+                background: var(--bg-secondary);
+                color: var(--text-secondary);
+                border: 1px solid var(--border);
             }
 
             /* ── Page Transition ── */
@@ -219,71 +163,9 @@ const dir = currentLang === Language.AR ? 'rtl' : 'ltr';
                 }
             }
 
-            /* ── Loading Screen ── */
-            .loading-screen {
-                position: fixed;
-                inset: 0;
-                z-index: 9999;
-                background: var(--cyber-bg);
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                transition: opacity 0.5s ease, visibility 0.5s ease;
-            }
-            .loading-screen.hidden {
-                opacity: 0;
-                visibility: hidden;
-                pointer-events: none;
-            }
-            .loader-ring {
-                width: 60px;
-                height: 60px;
-                border: 2px solid rgba(6,245,214,0.1);
-                border-top-color: var(--cyber-cyan);
-                border-radius: 50%;
-                animation: loader-spin 1s linear infinite;
-            }
-            .loader-ring-outer {
-                width: 80px;
-                height: 80px;
-                border: 1px solid rgba(168,85,247,0.15);
-                border-bottom-color: var(--cyber-purple);
-                border-radius: 50%;
-                animation: loader-spin 1.5s linear infinite reverse;
-                position: absolute;
-            }
-            @keyframes loader-spin {
-                to { transform: rotate(360deg); }
-            }
-            .loader-text {
-                font-family: 'JetBrains Mono', monospace;
-                font-size: 11px;
-                letter-spacing: 3px;
-                text-transform: uppercase;
-                color: var(--cyber-cyan);
-                margin-top: 28px;
-                opacity: 0.7;
-                animation: loader-text-pulse 1.5s ease-in-out infinite;
-            }
-            @keyframes loader-text-pulse {
-                0%, 100% { opacity: 0.4; }
-                50% { opacity: 0.9; }
-            }
-
-            /* ── Animated Gradient Text ── */
+            /* ── Gradient Text ── */
             .gradient-text {
-                background: linear-gradient(135deg, var(--cyber-cyan), var(--cyber-purple), var(--cyber-cyan));
-                background-size: 200% auto;
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
-                background-clip: text;
-                animation: gradient-flow 4s ease-in-out infinite;
-            }
-            @keyframes gradient-flow {
-                0% { background-position: 0% 50%; }
-                50% { background-position: 100% 50%; }
-                100% { background-position: 0% 50%; }
+                color: var(--brand-primary);
             }
 
             /* ── Fade in up animation ── */
@@ -292,59 +174,49 @@ const dir = currentLang === Language.AR ? 'rtl' : 'ltr';
                 opacity: 0;
             }
 
-            /* ── Button Cyber Style ── */
-            .cyber-btn-primary {
+            /* ── Button Styles ── */
+            .btn-primary {
                 position: relative;
                 display: inline-flex;
                 align-items: center;
-                gap: 10px;
-                padding: 14px 28px;
-                background: linear-gradient(135deg, rgba(6,245,214,0.15), rgba(168,85,247,0.15));
-                border: 1px solid rgba(6,245,214,0.3);
+                gap: 0.5rem;
+                padding: 0.875rem 1.75rem;
+                background: var(--brand-primary);
+                border: none;
                 border-radius: 12px;
                 color: #fff;
                 font-weight: 600;
-                font-size: 14px;
+                font-size: 15px;
                 cursor: pointer;
                 transition: all 0.3s ease;
-                overflow: hidden;
+                box-shadow: 0 4px 15px -3px rgba(14, 165, 233, 0.3);
             }
-            .cyber-btn-primary::before {
-                content: '';
-                position: absolute;
-                inset: 0;
-                background: linear-gradient(135deg, rgba(6,245,214,0.1), rgba(168,85,247,0.1));
-                opacity: 0;
-                transition: opacity 0.3s;
+            .btn-primary:hover {
+                box-shadow: 0 8px 25px -5px rgba(14, 165, 233, 0.4);
+                transform: translateY(-2px);
             }
-            .cyber-btn-primary:hover {
-                border-color: rgba(6,245,214,0.5);
-                box-shadow: 0 0 25px rgba(6,245,214,0.15), 0 0 50px rgba(6,245,214,0.05);
-                transform: translateY(-1px);
-            }
-            .cyber-btn-primary:hover::before {
-                opacity: 1;
+            .btn-primary:active {
+                transform: translateY(0);
             }
 
-            .cyber-btn-ghost {
+            .btn-secondary {
                 display: inline-flex;
                 align-items: center;
-                gap: 10px;
-                padding: 14px 28px;
-                background: rgba(255,255,255,0.03);
-                border: 1px solid rgba(255,255,255,0.08);
+                gap: 0.5rem;
+                padding: 0.875rem 1.75rem;
+                background: var(--surface);
+                border: 1px solid var(--border);
                 border-radius: 12px;
-                color: rgba(255,255,255,0.8);
+                color: var(--text-primary);
                 font-weight: 600;
-                font-size: 14px;
+                font-size: 15px;
                 cursor: pointer;
                 transition: all 0.3s ease;
             }
-            .cyber-btn-ghost:hover {
-                background: rgba(255,255,255,0.06);
-                border-color: rgba(6,245,214,0.2);
-                color: #fff;
-                box-shadow: 0 0 20px rgba(6,245,214,0.05);
+            .btn-secondary:hover {
+                background: var(--bg-secondary);
+                border-color: var(--brand-primary);
+                color: var(--brand-primary);
             }
 
             /* ── Mobile Performance ── */
@@ -374,29 +246,13 @@ const dir = currentLang === Language.AR ? 'rtl' : 'ltr';
 	</head>
 	<body class="min-h-screen flex flex-col relative">
 
-        <!-- Loading Screen -->
-        <div id="loading-screen" class="loading-screen">
-            <div class="relative flex items-center justify-center">
-                <div class="loader-ring-outer"></div>
-                <div class="loader-ring"></div>
-            </div>
-            <div class="loader-text">Initializing</div>
-            <!-- Decorative corner lines -->
-            <div style="position:absolute;top:20%;left:15%;width:40px;height:1px;background:linear-gradient(90deg,var(--cyber-cyan),transparent);opacity:0.2;"></div>
-            <div style="position:absolute;bottom:25%;right:15%;width:40px;height:1px;background:linear-gradient(90deg,transparent,var(--cyber-purple));opacity:0.2;"></div>
-        </div>
-
         <!-- Cyber Background -->
         <div class="fixed inset-0 -z-10 pointer-events-none overflow-hidden" aria-hidden="true">
-            <!-- Animated grid -->
-            <div class="absolute inset-0 opacity-[0.03] hidden sm:block" 
-                 style="background-image: linear-gradient(rgba(6,245,214,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(6,245,214,0.3) 1px, transparent 1px); background-size: 60px 60px; animation: grid-scroll 25s linear infinite;">
-            </div>
-            <!-- Ambient glows -->
-            <div class="hidden md:block absolute top-[-15%] left-[20%] w-[500px] h-[500px] rounded-full blur-[200px] opacity-[0.07]" style="background: var(--cyber-cyan);"></div>
-            <div class="hidden md:block absolute bottom-[-10%] right-[10%] w-[400px] h-[400px] rounded-full blur-[180px] opacity-[0.05]" style="background: var(--cyber-purple);"></div>
-            <!-- Subtle noise texture -->
-            <div class="absolute inset-0 opacity-[0.015]" style="background-image: url('data:image/svg+xml,%3Csvg viewBox=%220 0 256 256%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22n%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.9%22 numOctaves=%224%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23n)%22/%3E%3C/svg%3E');"></div>
+            <!-- Subtle gradient orbs -->
+            <div class="hidden md:block absolute top-0 right-0 w-[600px] h-[600px] rounded-full blur-[120px] opacity-20 bg-blue-500"></div>
+            <div class="hidden md:block absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full blur-[120px] opacity-15 bg-purple-500"></div>
+            <!-- Grid pattern -->
+            <div class="absolute inset-0 opacity-[0.02]" style="background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px); background-size: 50px 50px;"></div>
         </div>
 
 		<Sidebar client:load lang={currentLang} t={t} pathname={pathname} />
@@ -409,15 +265,5 @@ const dir = currentLang === Language.AR ? 'rtl' : 'ltr';
 
             <Footer client:visible t={t} />
         </div>
-
-        <!-- Loading screen dismiss -->
-        <script is:inline>
-            window.addEventListener('load', function() {
-                setTimeout(function() {
-                    var ls = document.getElementById('loading-screen');
-                    if (ls) ls.classList.add('hidden');
-                }, 600);
-            });
-        </script>
 	</body>
 </html>

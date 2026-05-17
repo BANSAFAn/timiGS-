@@ -86,10 +86,30 @@ impl Default for Settings {
 }
 
 pub fn get_db_path() -> PathBuf {
-    let app_data = dirs::data_dir().unwrap_or_else(|| PathBuf::from("."));
+    // Try multiple fallback locations for robustness
+    let app_data = dirs::data_dir()
+        .or_else(|| dirs::data_local_dir())
+        .or_else(|| {
+            // Fallback to executable directory if user dirs not available
+            std::env::current_exe()
+                .ok()
+                .and_then(|p| p.parent().map(|p| p.to_path_buf()))
+        })
+        .unwrap_or_else(|| PathBuf::from("."));
+    
     let db_dir = app_data.join("TimiGS");
-    std::fs::create_dir_all(&db_dir).ok();
-    db_dir.join("activity.db")
+    
+    // Ensure directory exists with proper error handling
+    if let Err(e) = std::fs::create_dir_all(&db_dir) {
+        eprintln!("Failed to create database directory {:?}: {}", db_dir, e);
+        eprintln!("Falling back to current directory for database");
+        // Fallback to current directory
+        return PathBuf::from("activity.db");
+    }
+    
+    let db_path = db_dir.join("activity.db");
+    eprintln!("Database path: {:?}", db_path);
+    db_path
 }
 
 pub fn init_database() -> Result<()> {

@@ -79,61 +79,53 @@ const Navbar: React.FC<NavbarProps> = ({ lang, t, pathname }) => {
   return (
     <>
     <nav
-      className={`fixed w-full z-50 top-0 start-0 transition-all duration-500 ${
+      className={`fixed w-full z-50 top-0 start-0 transition-all duration-300 ${
         scrolled || isMenuOpen
-          ? 'bg-apple-gray-950/95 backdrop-blur-xl border-b border-white/10 shadow-lg shadow-black/20'
-          : 'bg-apple-gray-950/30 md:bg-transparent border-b border-transparent py-2'
+          ? 'bg-surface/95 backdrop-blur-xl border-b border-border shadow-md'
+          : 'bg-transparent border-b border-transparent'
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-wrap items-center justify-between py-3 sm:py-4">
+        <div className="flex flex-wrap items-center justify-between py-4">
 
           {/* Logo */}
           <a href={`/${lang}/`} className="flex items-center space-x-3 rtl:space-x-reverse group z-50">
-            <div className="relative flex items-center justify-center p-2 rounded-2xl transition-all duration-500 overflow-hidden bg-gradient-to-br from-apple-blue/20 to-purple-500/20 border border-white/10 group-hover:border-white/20 group-hover:shadow-lg group-hover:shadow-apple-blue/20">
-              <div className="absolute inset-0 bg-gradient-to-tr from-apple-blue to-purple-500 opacity-0 group-hover:opacity-30 transition-opacity duration-500 blur-md"></div>
-              <Clock className="w-6 h-6 text-white group-hover:scale-110 group-hover:rotate-12 transition-all duration-500 relative z-10" />
+            <div className="relative flex items-center justify-center p-2 rounded-xl transition-all duration-300 overflow-hidden bg-gradient-to-br from-brand-500/20 to-brand-secondary/20 border border-brand-500/20 group-hover:border-brand-500/40 group-hover:shadow-glow">
+              <Clock className="w-6 h-6 text-brand-500 group-hover:scale-110 transition-all duration-300 relative z-10" />
             </div>
-            <span className="text-xl font-display font-bold text-white tracking-tight group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-apple-blue/80 transition-all duration-500">TimiGS</span>
+            <span className="text-xl font-display font-bold tracking-tight group-hover:text-brand-500 transition-colors">TimiGS</span>
           </a>
 
           {/* Desktop Nav */}
           <div className="hidden md:flex items-center gap-2">
-            <div className="flex p-1.5 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-xl mr-4 shadow-inner shadow-black/20 gap-1 relative">
+            <div className="flex p-1 bg-bg-secondary rounded-xl border border-border mr-4 gap-1">
                 {navLinks.map((link) => (
                     <a
                     key={link.path}
                     href={getLinkHref(link.path)}
-                    className={`relative px-5 py-2.5 rounded-xl text-sm font-medium transition-colors duration-300 group z-10 ${
+                    className={`relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                         isActive(link.path)
-                        ? 'text-white'
-                        : 'text-apple-gray-400 hover:text-white hover:bg-white/5'
+                        ? 'text-text-primary bg-surface shadow-sm'
+                        : 'text-text-secondary hover:text-text-primary hover:bg-surface/50'
                     }`}
                     >
-                    {isActive(link.path) && (
-                        <motion.div
-                            layoutId="navbar-indicator"
-                            className="absolute inset-0 bg-gradient-to-r from-apple-blue/20 to-purple-500/20 rounded-xl shadow-[0_0_15px_rgba(56,189,248,0.15)] border border-white/10"
-                            transition={{ type: "spring", bounce: 0.15, duration: 0.5 }}
-                        />
-                    )}
                     <span className="relative z-10">{link.label}</span>
                     </a>
                 ))}
             </div>
 
-            <div className="flex items-center gap-3 pl-4 border-l border-white/10">
-                {/* GitHub Stars - Enhanced */}
+            <div className="flex items-center gap-3 pl-4 border-l border-border">
+                {/* GitHub Stars */}
                 <a
                 href="https://github.com/BANSAFAn/timiGS-"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group flex items-center gap-2 text-apple-gray-400 hover:text-white transition-all duration-300"
+                className="group flex items-center gap-2 text-text-secondary hover:text-text-primary transition-all duration-300"
                 title="GitHub Stars"
                 >
-                <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10 hover:bg-gradient-to-r hover:from-apple-blue/20 hover:to-purple-500/20 hover:border-apple-blue/30 hover:shadow-lg hover:shadow-apple-blue/10 transition-all duration-300">
-                    <Star className="w-4 h-4 fill-current group-hover:scale-110 group-hover:rotate-12 transition-all duration-300" />
-                    <span className="text-sm font-medium font-mono">
+                <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-bg-secondary border border-border hover:border-brand-500 hover:shadow-sm transition-all duration-300">
+                    <Star className="w-4 h-4 fill-current group-hover:scale-110 transition-transform" />
+                    <span className="text-sm font-medium">
                         {stars !== null ? (
                             stars >= 1000 ? `${(stars / 1000).toFixed(1)}k` : stars
                         ) : '...'}
@@ -141,12 +133,12 @@ const Navbar: React.FC<NavbarProps> = ({ lang, t, pathname }) => {
                 </div>
                 </a>
 
-                {/* Discord Link - Enhanced */}
+                {/* Discord Link */}
                 <a
                   href="https://discord.gg/78V2c4bdpj"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group p-2.5 rounded-xl text-apple-gray-400 hover:text-[#5865F2] hover:bg-[#5865F2]/10 hover:border-[#5865F2]/30 border border-transparent transition-all duration-300 flex items-center justify-center hover:shadow-lg hover:shadow-[#5865F2]/20 hover:scale-105"
+                  className="group p-2 rounded-lg text-text-secondary hover:text-[#5865F2] hover:bg-[#5865F2]/10 hover:border-[#5865F2]/30 border border-transparent transition-all duration-300 flex items-center justify-center"
                   title="Join Discord Server"
                 >
                   <svg className="w-5 h-5 fill-current group-hover:scale-110 transition-transform duration-300" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -154,13 +146,13 @@ const Navbar: React.FC<NavbarProps> = ({ lang, t, pathname }) => {
                   </svg>
                 </a>
 
-                {/* Language Selector - Enhanced */}
+                {/* Language Selector */}
                 <div className="relative group">
-                    <button className="p-2.5 rounded-xl text-apple-gray-400 hover:text-white hover:bg-white/10 hover:border-white/20 border border-transparent transition-all duration-300 hover:shadow-lg">
-                        <Globe className="w-5 h-5 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300" />
+                    <button className="p-2 rounded-lg text-text-secondary hover:text-text-primary hover:bg-bg-secondary hover:border-border border border-transparent transition-all duration-300">
+                        <Globe className="w-5 h-5 group-hover:scale-110 transition-transform duration-300" />
                     </button>
-                    <div className="absolute right-0 mt-2 w-56 py-3 bg-apple-gray-900/98 backdrop-blur-2xl border border-white/15 rounded-2xl shadow-2xl shadow-black/50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform origin-top-right scale-95 group-hover:scale-100 max-h-80 overflow-y-auto">
-                        <div className="px-4 py-2 text-xs font-semibold text-apple-gray-400 uppercase tracking-wider mb-2 flex items-center gap-2">
+                    <div className="absolute right-0 mt-2 w-56 py-2 bg-surface backdrop-blur-xl border border-border rounded-xl shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform origin-top-right scale-95 group-hover:scale-100 max-h-80 overflow-y-auto">
+                        <div className="px-4 py-2 text-xs font-semibold text-text-tertiary uppercase tracking-wider mb-1 flex items-center gap-2">
                             <Globe className="w-3.5 h-3.5" />
                             Select Language
                         </div>
@@ -168,13 +160,13 @@ const Navbar: React.FC<NavbarProps> = ({ lang, t, pathname }) => {
                         <button
                             key={l.code}
                             onClick={() => switchLanguage(l.code)}
-                            className={`block w-full text-left px-4 py-3 text-sm transition-all duration-200 flex items-center gap-3 group/item ${
+                            className={`block w-full text-left px-4 py-2.5 text-sm transition-all duration-200 flex items-center gap-3 ${
                             lang === l.code
-                                ? 'text-apple-blue font-medium bg-gradient-to-r from-apple-blue/15 to-purple-500/15 border-l-3 border-apple-blue'
-                                : 'text-apple-gray-300 hover:text-white hover:bg-white/5 border-l-3 border-transparent'
+                                ? 'text-brand-500 font-medium bg-brand-500/10 border-l-2 border-brand-500'
+                                : 'text-text-secondary hover:text-text-primary hover:bg-bg-secondary border-l-2 border-transparent'
                             }`}
                         >
-                            <span className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${lang === l.code ? 'bg-apple-blue shadow-lg shadow-apple-blue/50' : 'bg-transparent group-hover/item:bg-white/30'}`}></span>
+                            <span className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${lang === l.code ? 'bg-brand-500' : 'bg-transparent'}`}></span>
                             {l.label}
                         </button>
                         ))}
@@ -183,9 +175,9 @@ const Navbar: React.FC<NavbarProps> = ({ lang, t, pathname }) => {
 
                 <a
                     href={getLinkHref('/download')}
-                    className="ml-2 group flex items-center gap-2.5 px-5 py-2.5 rounded-xl bg-gradient-to-r from-apple-blue to-purple-600 hover:from-apple-blue hover:to-purple-700 text-white text-sm font-semibold transition-all duration-300 shadow-lg shadow-apple-blue/30 hover:shadow-xl hover:shadow-apple-blue/40 hover:scale-105 active:scale-95 hover:border-white/20 border border-transparent"
+                    className="ml-2 btn-primary"
                 >
-                    <Download className="w-4 h-4 group-hover:rotate-12 group-hover:scale-110 transition-all duration-300" />
+                    <Download className="w-4 h-4" />
                     <span>Get App</span>
                 </a>
             </div>
@@ -195,7 +187,7 @@ const Navbar: React.FC<NavbarProps> = ({ lang, t, pathname }) => {
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             type="button"
-            className="inline-flex items-center justify-center p-2.5 rounded-xl text-white md:hidden hover:bg-white/10 hover:scale-105 transition-all duration-300 z-50 relative touch-manipulation border border-transparent hover:border-white/10"
+            className="inline-flex items-center justify-center p-2 rounded-lg text-text-primary md:hidden hover:bg-bg-secondary transition-all duration-300 z-50 relative touch-manipulation border border-border"
             aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
           >
             <span className="sr-only">Open main menu</span>
@@ -205,26 +197,26 @@ const Navbar: React.FC<NavbarProps> = ({ lang, t, pathname }) => {
       </div>
     </nav>
 
-    {/* Mobile Overlay Menu - Enhanced */}
-    <div className={`fixed inset-0 z-40 md:hidden transition-all duration-500 ${
+    {/* Mobile Overlay Menu */}
+    <div className={`fixed inset-0 z-40 md:hidden transition-all duration-300 ${
         isMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
     }`} role="dialog" aria-modal="true">
-        <div className="absolute inset-0 bg-apple-gray-950/98 backdrop-blur-xl" onClick={() => setIsMenuOpen(false)}></div>
-        <div className={`relative h-full flex flex-col justify-start pt-24 pb-8 px-6 transition-all duration-500 ${
+        <div className="absolute inset-0 bg-bg-primary/98 backdrop-blur-xl" onClick={() => setIsMenuOpen(false)}></div>
+        <div className={`relative h-full flex flex-col justify-start pt-24 pb-8 px-6 transition-all duration-300 ${
             isMenuOpen ? 'translate-y-0' : '-translate-y-8'
         }`}>
             {/* Navigation Links */}
             <nav className="flex-1 overflow-y-auto">
-                <ul className="flex flex-col space-y-3">
+                <ul className="flex flex-col space-y-2">
                     {navLinks.map((link, index) => (
                     <li key={link.path}>
                         <a
                         href={getLinkHref(link.path)}
                         onClick={() => setIsMenuOpen(false)}
-                        className={`block text-xl font-display font-medium tracking-tight py-4 px-5 rounded-2xl transition-all duration-300 border ${
+                        className={`block text-lg font-medium py-3 px-4 rounded-xl transition-all duration-300 border ${
                             isActive(link.path)
-                                ? 'text-apple-blue bg-gradient-to-r from-apple-blue/15 to-purple-500/15 border-white/10'
-                                : 'text-white hover:bg-white/5 border-transparent hover:border-white/5'
+                                ? 'text-brand-500 bg-brand-500/10 border-brand-500/20'
+                                : 'text-text-primary hover:bg-bg-secondary border-transparent hover:border-border'
                         }`}
                         >
                         {link.label}
@@ -235,10 +227,10 @@ const Navbar: React.FC<NavbarProps> = ({ lang, t, pathname }) => {
             </nav>
 
             {/* Action Buttons */}
-            <div className="mt-auto pt-6 border-t border-white/10 space-y-3">
+            <div className="mt-auto pt-6 border-t border-border space-y-3">
                 <a
                     href={getLinkHref('/download')}
-                    className="flex justify-center items-center gap-3 px-6 py-4 rounded-2xl bg-gradient-to-r from-apple-blue to-purple-600 text-white font-semibold active:scale-95 transition-all duration-300 shadow-lg shadow-apple-blue/30"
+                    className="btn-primary w-full justify-center"
                     onClick={() => setIsMenuOpen(false)}
                 >
                     <Download className="w-5 h-5" />
@@ -250,7 +242,7 @@ const Navbar: React.FC<NavbarProps> = ({ lang, t, pathname }) => {
                     <label htmlFor="mobile-lang-select" className="sr-only">Select Language</label>
                     <select
                         id="mobile-lang-select"
-                        className="w-full px-6 py-4 rounded-2xl bg-white/5 text-white font-semibold appearance-none outline-none focus:ring-2 focus:ring-apple-blue/50 active:bg-white/10 transition-all border border-white/10"
+                        className="w-full px-4 py-3 rounded-xl bg-bg-secondary text-text-primary font-medium appearance-none outline-none focus:ring-2 focus:ring-brand-500/50 transition-all border border-border"
                         onChange={(e) => {
                             switchLanguage(e.target.value as Language);
                             setIsMenuOpen(false);
@@ -258,10 +250,10 @@ const Navbar: React.FC<NavbarProps> = ({ lang, t, pathname }) => {
                         value={lang}
                     >
                         {languages.map(l => (
-                            <option key={l.code} value={l.code} className="bg-apple-gray-900 text-white">{l.label}</option>
+                            <option key={l.code} value={l.code} className="bg-surface text-text-primary">{l.label}</option>
                         ))}
                     </select>
-                    <Globe className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/50 pointer-events-none" />
+                    <Globe className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-text-tertiary pointer-events-none" />
                 </div>
 
                 {/* GitHub Stars (Mobile) */}
@@ -269,7 +261,7 @@ const Navbar: React.FC<NavbarProps> = ({ lang, t, pathname }) => {
                     href="https://github.com/BANSAFAn/timiGS-"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex justify-center items-center gap-2 px-6 py-4 rounded-2xl bg-white/5 text-white font-medium border border-white/10 active:bg-white/10 transition-all"
+                    className="flex justify-center items-center gap-2 px-4 py-3 rounded-xl bg-bg-secondary text-text-primary font-medium border border-border hover:border-brand-500 transition-all"
                     onClick={() => setIsMenuOpen(false)}
                 >
                     <Star className="w-4 h-4 fill-current" />
