@@ -24,9 +24,9 @@ Track your app usage, visualize productivity, manage tasks, and stay focused —
 <!-- STATUS_TABLE_START -->
 | Platform    | Technology                    | Status        |
 | ----------- | ----------------------------- | ------------- |
-| **Windows** | Tauri v2 + Rust + Vue 3       | ❔ Unknown |
-| **macOS**   | Tauri v2 + Rust + Vue 3       | ❔ Unknown |
-| **Linux**   | Tauri v2 + Rust + Vue 3       | ❔ Unknown |
+| **Windows** | Tauri v2 + Rust + Vue 3       | ✅ Passing |
+| **macOS**   | Tauri v2 + Rust + Vue 3       | ✅ Passing |
+| **Linux**   | Tauri v2 + Rust + Vue 3       | ✅ Passing |
 <!-- STATUS_TABLE_END -->
 
 ---
