@@ -52,9 +52,15 @@ pub async fn discover_devices() -> Result<Vec<serde_json::Value>, String> {
 
 #[command]
 pub async fn connect_to_device(ip: String, port: u16) -> Result<String, String> {
-    // Test connection to device
+    if !validate_local_ip(&ip) {
+        return Err("Invalid or non-local IP address".to_string());
+    }
+    
     let url = format!("http://{}:{}/ping", ip, port);
-    let client = reqwest::Client::new();
+    let client = reqwest::Client::builder()
+        .timeout(std::time::Duration::from_secs(5))
+        .build()
+        .map_err(|e| e.to_string())?;
     
     match client.get(&url).send().await {
         Ok(resp) => {
@@ -68,10 +74,34 @@ pub async fn connect_to_device(ip: String, port: u16) -> Result<String, String> 
     }
 }
 
+fn validate_local_ip(ip: &str) -> bool {
+    if let Ok(addr) = ip.parse::<std::net::IpAddr>() {
+        match addr {
+            std::net::IpAddr::V4(ipv4) => {
+                let octets = ipv4.octets();
+                (octets[0] == 192 && octets[1] == 168) ||
+                (octets[0] == 10) ||
+                (octets[0] == 172 && octets[1] >= 16 && octets[1] <= 31) ||
+                (octets[0] == 127)
+            }
+            _ => false,
+        }
+    } else {
+        false
+    }
+}
+
 #[command]
 pub async fn get_device_info(ip: String) -> Result<serde_json::Value, String> {
+    if !validate_local_ip(&ip) {
+        return Err("Invalid or non-local IP address".to_string());
+    }
+    
     let url = format!("http://{}:4444/info", ip);
-    let client = reqwest::Client::new();
+    let client = reqwest::Client::builder()
+        .timeout(std::time::Duration::from_secs(5))
+        .build()
+        .map_err(|e| e.to_string())?;
     
     match client.get(&url).send().await {
         Ok(resp) => {
@@ -95,8 +125,15 @@ pub async fn get_device_info(ip: String) -> Result<serde_json::Value, String> {
 
 #[command]
 pub async fn get_remote_processes(ip: String) -> Result<Vec<serde_json::Value>, String> {
+    if !validate_local_ip(&ip) {
+        return Err("Invalid or non-local IP address".to_string());
+    }
+    
     let url = format!("http://{}:4444/processes", ip);
-    let client = reqwest::Client::new();
+    let client = reqwest::Client::builder()
+        .timeout(std::time::Duration::from_secs(5))
+        .build()
+        .map_err(|e| e.to_string())?;
     
     match client.get(&url).send().await {
         Ok(resp) => {
@@ -365,6 +402,10 @@ pub fn get_local_ip() -> Result<String, String> {
 
 #[command]
 pub async fn send_p2p_file(target_ip: String, file_path: String) -> Result<String, String> {
+    if !validate_local_ip(&target_ip) {
+        return Err("Invalid or non-local IP address".to_string());
+    }
+    
     tokio::task::spawn_blocking(move || crate::p2p::send_file_to_ip(&target_ip, &file_path))
         .await
         .map_err(|e| e.to_string())?
@@ -712,6 +753,50 @@ pub fn get_auto_export_settings_cmd() -> Result<serde_json::Value, String> {
         "folder": settings.auto_export_folder,
         "last_export_time": settings.last_export_time
     }))
+}
+
+// ── Coding Tracker ────────────────────────────────────────────────────────────
+
+#[command]
+pub fn get_today_coding_sessions() -> Vec<crate::db::CodingSession> {
+    crate::db::get_today_coding_sessions().unwrap_or_default()
+}
+
+#[command]
+pub fn get_coding_sessions_range_cmd(from: String, to: String) -> Vec<crate::db::CodingSession> {
+    crate::db::get_coding_sessions_range(&from, &to).unwrap_or_default()
+}
+
+#[command]
+pub fn get_coding_stats_today() -> Vec<crate::db::CodingStats> {
+    crate::db::get_coding_stats_today().unwrap_or_default()
+}
+
+#[command]
+pub fn get_coding_project_stats_today() -> Vec<crate::db::CodingProjectStats> {
+    crate::db::get_coding_project_stats_today().unwrap_or_default()
+}
+
+#[command]
+pub fn get_total_coding_time_today() -> i64 {
+    crate::db::get_total_coding_time_today().unwrap_or(0)
+}
+
+#[command]
+pub fn get_total_ai_coding_time_today() -> i64 {
+    crate::db::get_total_ai_coding_time_today().unwrap_or(0)
+}
+
+#[cfg(any(target_os = "windows", target_os = "linux"))]
+#[command]
+pub fn get_current_coding_session() -> Option<crate::tracker::CurrentCodingSession> {
+    crate::tracker::get_current_coding_session()
+}
+
+#[cfg(not(any(target_os = "windows", target_os = "linux")))]
+#[command]
+pub fn get_current_coding_session() -> Option<serde_json::Value> {
+    None
 }
 
 // ── Music ──

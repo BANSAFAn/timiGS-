@@ -38,15 +38,6 @@ use windows::Win32::UI::WindowsAndMessaging::{MessageBoxW, MB_ICONERROR, MB_OK};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    // Check if launched with --minimized (autostart scenario)
-    let is_autostart = std::env::args().any(|arg| arg == "--minimized" || arg == "-m");
-    
-    // If autostarting, add a small delay to let system initialize
-    if is_autostart {
-        eprintln!("TimiGS: Detected autostart mode, waiting for system to initialize...");
-        std::thread::sleep(std::time::Duration::from_secs(2));
-    }
-    
     // Initialize database
     if let Err(e) = db::init_database() {
         eprintln!("Failed to initialize database: {}", e);
@@ -99,23 +90,27 @@ pub fn run() {
             use tauri_plugin_cli::CliExt;
             use tauri::Manager;
             
+            let is_autostart = std::env::args().any(|arg| arg == "--minimized" || arg == "-m");
+            
             if let Ok(matches) = app.cli().matches() {
-                if matches.args.get("minimized").is_some() {
+                if matches.args.get("minimized").is_some() || is_autostart {
                     let app_handle = app.handle().clone();
-                    if let Some(window) = app_handle.get_webview_window("main") {
-                        let _ = window.hide();
-                        println!("TimiGS: Starting in autostart mode (minimized to tray)");
+                    
+                    std::thread::spawn(move || {
+                        std::thread::sleep(std::time::Duration::from_millis(800));
                         
-                        let handle_clone = app_handle.clone();
-                        std::thread::spawn(move || {
-                            std::thread::sleep(std::time::Duration::from_secs(1));
+                        if let Some(window) = app_handle.get_webview_window("main") {
+                            let _ = window.hide();
+                            println!("TimiGS: Starting in autostart mode (minimized to tray)");
+                            
+                            std::thread::sleep(std::time::Duration::from_millis(500));
                             let _ = notifications::send_notification(
-                                &handle_clone,
+                                &app_handle,
                                 "TimiGS Started",
                                 "Activity tracking is now running in the background"
                             );
-                        });
-                    }
+                        }
+                    });
                 }
             }
         }
@@ -273,6 +268,14 @@ pub fn run() {
             commands::toggle_music_loop_cmd,
             // Notifications
             notifications::send_notification_cmd,
+            // Coding Tracker
+            commands::get_today_coding_sessions,
+            commands::get_coding_sessions_range_cmd,
+            commands::get_coding_stats_today,
+            commands::get_coding_project_stats_today,
+            commands::get_total_coding_time_today,
+            commands::get_total_ai_coding_time_today,
+            commands::get_current_coding_session,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

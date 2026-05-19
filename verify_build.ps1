@@ -1,6 +1,18 @@
 # Build Verification Script
 $ErrorActionPreference = "Stop"
 
+Write-Host "0. Verifying Frontend Build..." -ForegroundColor Cyan
+if (!(Test-Path "dist\index.html")) {
+    Write-Host "ERROR: Frontend not built! dist/index.html not found" -ForegroundColor Red
+    Write-Host "Building frontend now..." -ForegroundColor Yellow
+    npm run build
+    if (!(Test-Path "dist\index.html")) {
+        Write-Host "ERROR: Frontend build failed!" -ForegroundColor Red
+        exit 1
+    }
+}
+Write-Host "SUCCESS: Frontend build verified" -ForegroundColor Green
+
 Write-Host "1. Installing Frontend Dependencies..." -ForegroundColor Cyan
 npm install
 

@@ -5,7 +5,7 @@ use std::sync::atomic::{AtomicU64, Ordering};
 use tauri::{
     image::Image,
     menu::{Menu, MenuItemBuilder, PredefinedMenuItem},
-    tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
+    tray::{MouseButton, TrayIconBuilder, TrayIconEvent},
     Manager,
 };
 
@@ -41,33 +41,14 @@ pub fn setup(app: &tauri::App) -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-/// Handle tray icon click events (left-click toggles popup window)
-fn handle_tray_icon_event(tray: &tauri::tray::TrayIcon, event: TrayIconEvent) {
+/// Handle tray icon click events (disabled left-click, only right-click menu works)
+fn handle_tray_icon_event(_tray: &tauri::tray::TrayIcon, event: TrayIconEvent) {
     if let TrayIconEvent::Click {
         button: MouseButton::Left,
-        button_state: MouseButtonState::Up,
-        position,
         ..
     } = event
     {
-        println!("[Tray] Left-click at ({}, {})", position.x, position.y);
-
-        TRAY_LAST_SHOWN.store(now_millis(), Ordering::SeqCst);
-
-        let app = tray.app_handle();
-        if let Some(win) = app.get_webview_window("tray") {
-            if win.is_visible().unwrap_or(false) {
-                let _ = win.hide();
-            } else {
-                // Position popup above the tray icon, centered horizontally
-                let x = (position.x as i32).saturating_sub(150);
-                let y = (position.y as i32).saturating_sub(240);
-                let _ =
-                    win.set_position(tauri::Position::Physical(tauri::PhysicalPosition { x, y }));
-                let _ = win.show();
-                let _ = win.set_focus();
-            }
-        }
+        return;
     }
 }
 
