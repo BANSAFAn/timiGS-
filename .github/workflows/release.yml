@@ -18,6 +18,7 @@ jobs:
     outputs:
       release_created: ${{ steps.release.outputs.release_created }}
       tag_name: ${{ steps.release.outputs.tag_name }}
+      body: ${{ steps.release.outputs.body }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -29,10 +30,13 @@ jobs:
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
 
-  # Build desktop apps for Windows, Linux, macOS
+  # Build desktop apps
   build-desktop:
     name: 🖥️ Desktop (${{ matrix.name }})
     needs: release-please
+    if: |
+      needs.release-please.outputs.release_created == 'true' ||
+      github.event_name == 'workflow_dispatch'
     permissions:
       contents: write
     strategy:
@@ -91,21 +95,36 @@ jobs:
         if: matrix.platform == 'windows-latest'
         run: node scripts/generate-installer-assets.js
 
-      - name: Build Tauri app
+      - name: Build Tauri app (release)
+        if: needs.release-please.outputs.release_created == 'true'
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
-          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
           GITHUB_CLIENT_ID: ${{ secrets.GH_OAUTH_CLIENT_ID }}
           GITHUB_CLIENT_SECRET: ${{ secrets.GH_OAUTH_CLIENT_SECRET }}
           DISCORD_CLIENT_ID: ${{ secrets.DISCORD_CLIENT_ID }}
         with:
-          tagName: ${{ needs.release-please.outputs.tag_name || 'dev' }}
-          releaseName: "TimiGS ${{ needs.release-please.outputs.tag_name || 'Development Build' }}"
-          releaseBody: "See the assets to download this version and install."
-          releaseDraft: ${{ !needs.release-please.outputs.release_created }}
-          prerelease: ${{ !needs.release-please.outputs.release_created }}
+          tagName: ${{ needs.release-please.outputs.tag_name }}
+          releaseName: "TimiGS ${{ needs.release-please.outputs.tag_name }}"
+          releaseBody: ${{ needs.release-please.outputs.body }}
+          releaseDraft: false
+          prerelease: false
+          args: ${{ matrix.args }}
+
+      - name: Build Tauri app (dev / manual dispatch)
+        if: needs.release-please.outputs.release_created != 'true'
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_CLIENT_ID: ${{ secrets.GH_OAUTH_CLIENT_ID }}
+          GITHUB_CLIENT_SECRET: ${{ secrets.GH_OAUTH_CLIENT_SECRET }}
+          DISCORD_CLIENT_ID: ${{ secrets.DISCORD_CLIENT_ID }}
+        with:
+          tagName: dev-${{ github.sha }}
+          releaseName: "TimiGS Development Build (${{ github.sha }})"
+          releaseBody: "Development build — not a stable release."
+          releaseDraft: true
+          prerelease: true
           args: ${{ matrix.args }}
 
       - name: Upload Artifacts

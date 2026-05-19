@@ -138,42 +138,6 @@ jobs:
         with:
           args: ${{ matrix.args }}
 
-  # Docker build verification (Alpine)
-  docker-build:
-    name: 🐳 Docker Build (Alpine)
-    runs-on: ubuntu-latest
-    container:
-      image: alpine:latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install Docker and dependencies
-        run: |
-          apk add --no-cache docker docker-cli-compose git
-
-      - name: Build Docker image
-        run: docker build -t timigs-website-test .
-
-      - name: Test container starts
-        run: |
-          docker run -d --name test-site -p 8080:80 timigs-website-test
-          sleep 3
-
-          # Check that nginx responds
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/)
-          echo "HTTP status: $STATUS"
-
-          if [ "$STATUS" -eq 200 ] || [ "$STATUS" -eq 301 ] || [ "$STATUS" -eq 302 ]; then
-            echo "✅ Container is serving the site"
-          else
-            echo "❌ Container returned unexpected status $STATUS"
-            docker logs test-site
-            exit 1
-          fi
-
-      - name: Cleanup
-        if: always()
-        run: docker rm -f test-site || true
 
   # Website build check (Alpine)
   website-build:

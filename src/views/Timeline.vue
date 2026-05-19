@@ -109,6 +109,52 @@
       </div>
     </div>
 
+    <!-- Coding Sessions Section -->
+    <div class="coding-timeline-section" v-if="codingSessions.length > 0">
+      <div class="coding-timeline-header">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2">
+          <polyline points="16 18 22 12 16 6"/>
+          <polyline points="8 6 2 12 8 18"/>
+        </svg>
+        <span>{{ $t('coding.title') || 'Coding' }}</span>
+        <span class="coding-timeline-total">{{ formatDuration(codingTotalTime) }}</span>
+      </div>
+      <div class="coding-sessions-list">
+        <div v-for="session in codingSessions" :key="session.id" class="coding-session-item">
+          <div class="cs-time">
+            {{ formatTime(session.start_time) }} - {{ session.end_time ? formatTime(session.end_time) : 'Now' }}
+          </div>
+          <div class="cs-content">
+            <div class="cs-editor-badge" :class="getEditorBadgeClass(session.editor_name)">
+              {{ session.editor_name }}
+            </div>
+            <div class="cs-info">
+              <div class="cs-file" v-if="session.file_path">
+                <span class="cs-lang-dot" :style="{ background: getLangColor(session.language) }"></span>
+                <span class="cs-filename">{{ session.file_path }}</span>
+                <span class="cs-lang" v-if="session.language">{{ session.language }}</span>
+              </div>
+              <div class="cs-project" v-if="session.project_dir">
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 256 256" fill="currentColor" style="display:inline;vertical-align:middle;margin-right:3px;">
+                  <path d="M216,72H131.31L104,44.69A15.86,15.86,0,0,0,92.69,40H40A16,16,0,0,0,24,56V200.62A15.4,15.4,0,0,0,39.38,216H216.89A15.13,15.13,0,0,0,232,200.89V88A16,16,0,0,0,216,72ZM40,56H92.69l16,16H40ZM216,200H40V88H216Z"/>
+                </svg>
+                {{ session.project_dir }}
+              </div>
+            </div>
+            <div class="cs-right">
+              <span class="cs-duration">{{ formatDuration(session.duration_seconds) }}</span>
+              <span class="cs-ai" v-if="session.is_ai_assisted">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 256 256" fill="currentColor">
+                  <path d="M200,112a8,8,0,0,1-8,8H152a8,8,0,0,1,0-16h40A8,8,0,0,1,200,112Zm-8,24H152a8,8,0,0,0,0,16h40a8,8,0,0,0,0-16Zm-32,32H152a8,8,0,0,0,0,16h8a8,8,0,0,0,0-16ZM96,208H72a8,8,0,0,1-8-8V160a8,8,0,0,1,16,0v32H96a8,8,0,0,1,0,16Zm0-96H80V80a8,8,0,0,0-16,0v40a8,8,0,0,0,8,8H96a8,8,0,0,0,0-16ZM232,56V200a16,16,0,0,1-16,16H40a16,16,0,0,1-16-16V56A16,16,0,0,1,40,40H216A16,16,0,0,1,232,56Zm-16,0H40V200H216V56Z"/>
+                </svg>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Browser Stats Modal -->
     <div v-if="showBrowserModal" class="modal-overlay" @click.self="showBrowserModal = false">
       <div class="modal-content">
@@ -137,7 +183,7 @@
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { invoke } from '@tauri-apps/api/core';
-import { useActivityStore, type ActivitySession } from '../stores/activity';
+import { useActivityStore, type ActivitySession, type CodingSession } from '../stores/activity';
 import CustomCalendar from '../components/CustomCalendar.vue';
 
 const { t } = useI18n();
@@ -146,6 +192,11 @@ const store = useActivityStore();
 const selectedDate = ref(new Date());
 const showCalendar = ref(false);
 const sessions = ref<ActivitySession[]>([]);
+const codingSessions = ref<CodingSession[]>([]);
+
+const codingTotalTime = computed(() =>
+  codingSessions.value.reduce((acc, s) => acc + s.duration_seconds, 0)
+);
 const searchQuery = ref('');
 const appIcons = ref<Record<string, string>>({});
 const expandedGroups = ref<Set<string>>(new Set());
@@ -359,6 +410,32 @@ function formatDuration(seconds: number): string {
   return `${mins}m`;
 }
 
+function getEditorBadgeClass(editor: string): string {
+  const e = editor.toLowerCase();
+  if (e.includes('cursor') || e.includes('windsurf')) return 'editor-ai';
+  if (e.includes('code') || e.includes('vs code')) return 'editor-vscode';
+  if (e.includes('zed')) return 'editor-zed';
+  if (e.includes('neovim') || e.includes('vim')) return 'editor-vim';
+  if (e.includes('intellij') || e.includes('webstorm') || e.includes('pycharm') ||
+      e.includes('clion') || e.includes('goland') || e.includes('phpstorm')) return 'editor-jetbrains';
+  return 'editor-default';
+}
+
+const LANG_COLORS: Record<string, string> = {
+  'Rust': '#CE422B', 'TypeScript': '#3178C6', 'JavaScript': '#F7DF1E',
+  'Python': '#3776AB', 'Go': '#00ADD8', 'Ruby': '#CC342D', 'Java': '#ED8B00',
+  'Kotlin': '#7F52FF', 'Swift': '#FA7343', 'C': '#A8B9CC', 'C++': '#00599C',
+  'C#': '#239120', 'PHP': '#777BB4', 'HTML': '#E34C26', 'CSS': '#1572B6',
+  'Vue': '#42B883', 'Svelte': '#FF3E00', 'Markdown': '#083FA1', 'JSON': '#555',
+  'YAML': '#CB171E', 'TOML': '#9C4121', 'Shell': '#4EAA25', 'PowerShell': '#012456',
+  'SQL': '#336791', 'Lua': '#000080', 'Dart': '#0175C2', 'Zig': '#F7A41D',
+};
+
+function getLangColor(lang: string | null): string {
+  if (!lang) return '#888';
+  return LANG_COLORS[lang] || '#888';
+}
+
 function goToPreviousDay() {
   const newDate = new Date(selectedDate.value);
   newDate.setDate(newDate.getDate() - 1);
@@ -376,6 +453,15 @@ function goToNextDay() {
 async function fetchSessions() {
   const dateStr = formatDateForInput(selectedDate.value);
   sessions.value = await store.getActivityRange(dateStr, dateStr);
+  // Load coding sessions for the selected date
+  try {
+    codingSessions.value = await invoke<CodingSession[]>('get_coding_sessions_range_cmd', {
+      from: dateStr,
+      to: dateStr
+    });
+  } catch {
+    codingSessions.value = [];
+  }
 }
 
 async function loadIcons(sessionList: ActivitySession[]) {
@@ -402,6 +488,7 @@ onMounted(async () => {
   if (isToday.value) {
     await store.fetchTodayData();
     sessions.value = store.todaySessions;
+    codingSessions.value = store.todayCodingSessions;
   } else {
     await fetchSessions();
   }
@@ -1574,6 +1661,180 @@ onMounted(async () => {
 
   .window-title {
     font-size: 0.7rem;
+  }
+}
+
+/* ── Coding Timeline Section ───────────────────────────────────────────────── */
+.coding-timeline-section {
+  margin-top: 28px;
+  background: var(--bg-card, rgba(255,255,255,0.04));
+  border: 1px solid rgba(99,102,241,0.2);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.coding-timeline-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 18px;
+  background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(139,92,246,0.08));
+  border-bottom: 1px solid rgba(99,102,241,0.15);
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.coding-timeline-header svg {
+  color: #a5b4fc;
+  flex-shrink: 0;
+}
+
+.coding-timeline-total {
+  margin-left: auto;
+  font-size: 0.78rem;
+  color: #a5b4fc;
+  background: rgba(99,102,241,0.15);
+  padding: 3px 10px;
+  border-radius: 20px;
+  border: 1px solid rgba(99,102,241,0.25);
+}
+
+.coding-sessions-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.coding-session-item {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  gap: 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  transition: background 0.15s;
+}
+
+.coding-session-item:last-child {
+  border-bottom: none;
+}
+
+.coding-session-item:hover {
+  background: rgba(99,102,241,0.05);
+}
+
+.cs-time {
+  padding: 10px 14px;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-family: monospace;
+  display: flex;
+  align-items: center;
+  border-right: 1px solid rgba(255,255,255,0.05);
+  white-space: nowrap;
+}
+
+.cs-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  flex-wrap: wrap;
+}
+
+.cs-editor-badge {
+  padding: 2px 8px;
+  border-radius: 5px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.cs-editor-badge.editor-vscode  { background: rgba(0,122,204,0.18); color: #60a5fa; border: 1px solid rgba(0,122,204,0.28); }
+.cs-editor-badge.editor-zed     { background: rgba(83,191,162,0.18); color: #53BFA2; border: 1px solid rgba(83,191,162,0.28); }
+.cs-editor-badge.editor-vim     { background: rgba(24,157,94,0.18); color: #34d399; border: 1px solid rgba(24,157,94,0.28); }
+.cs-editor-badge.editor-jetbrains { background: rgba(255,49,140,0.12); color: #f472b6; border: 1px solid rgba(255,49,140,0.22); }
+.cs-editor-badge.editor-ai      { background: rgba(16,185,129,0.18); color: #10b981; border: 1px solid rgba(16,185,129,0.3); }
+.cs-editor-badge.editor-default { background: rgba(148,163,184,0.12); color: #94a3b8; border: 1px solid rgba(148,163,184,0.2); }
+
+.cs-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cs-file {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.cs-lang-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.cs-filename {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cs-lang {
+  font-size: 0.65rem;
+  padding: 1px 5px;
+  background: rgba(148,163,184,0.1);
+  border-radius: 3px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.cs-project {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cs-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.cs-duration {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-family: monospace;
+}
+
+.cs-ai {
+  font-size: 0.85rem;
+}
+
+@media (max-width: 600px) {
+  .coding-session-item {
+    grid-template-columns: 1fr;
+  }
+
+  .cs-time {
+    border-right: none;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    padding: 8px 14px 4px;
+  }
+
+  .cs-content {
+    padding: 6px 14px 10px;
   }
 }
 </style>

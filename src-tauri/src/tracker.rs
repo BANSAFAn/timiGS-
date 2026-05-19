@@ -21,6 +21,7 @@ static RUNNING: AtomicBool = AtomicBool::new(false);
 static APP_HANDLE: once_cell::sync::OnceCell<tauri::AppHandle> = once_cell::sync::OnceCell::new();
 static CURRENT_SESSION: Lazy<Mutex<Option<CurrentSession>>> = Lazy::new(|| Mutex::new(None));
 static CURRENT_MUSIC_SESSION: Lazy<Mutex<Option<CurrentMusicSession>>> = Lazy::new(|| Mutex::new(None));
+static CURRENT_CODING_SESSION: Lazy<Mutex<Option<CurrentCodingSession>>> = Lazy::new(|| Mutex::new(None));
 
 // List of music streaming applications
 const MUSIC_APPS: &[&str] = &[
@@ -70,6 +71,19 @@ pub struct CurrentMusicSession {
     pub id: i64,
     pub app_name: String,
     pub window_title: Option<String>,
+    pub exe_path: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CurrentCodingSession {
+    pub id: i64,
+    pub app_name: String,
+    pub editor_name: String,
+    pub file_path: Option<String>,
+    pub language: Option<String>,
+    pub project_dir: Option<String>,
+    pub is_ai_assisted: bool,
+    pub window_title: String,
     pub exe_path: String,
 }
 
@@ -283,6 +297,10 @@ pub fn get_current_session() -> Option<CurrentSession> {
     CURRENT_SESSION.lock().clone()
 }
 
+pub fn get_current_coding_session() -> Option<CurrentCodingSession> {
+    CURRENT_CODING_SESSION.lock().clone()
+}
+
 pub fn start_tracking_with_app_handle(app_handle: tauri::AppHandle) {
     if RUNNING.load(Ordering::SeqCst) {
         return;
@@ -295,6 +313,7 @@ pub fn start_tracking_with_app_handle(app_handle: tauri::AppHandle) {
         let mut last_app = String::new();
         let mut last_title = String::new();
         let mut last_music_app = String::new();
+        let mut last_coding_key = String::new();
         let mut ticker = 0;
 
         while RUNNING.load(Ordering::SeqCst) {
@@ -338,6 +357,12 @@ pub fn start_tracking_with_app_handle(app_handle: tauri::AppHandle) {
 
                             last_music_app = active.exe_path;
                         }
+
+                        // End coding session if music is active
+                        if let Some(session) = CURRENT_CODING_SESSION.lock().take() {
+                            let _ = db::end_coding_session(session.id);
+                        }
+                        last_coding_key.clear();
                     } else {
                         last_music_app = String::new();
 
@@ -368,8 +393,54 @@ pub fn start_tracking_with_app_handle(app_handle: tauri::AppHandle) {
                                 }
                             }
 
-                            last_app = active.exe_path;
-                            last_title = active.window_title;
+                            last_app = active.exe_path.clone();
+                            last_title = active.window_title.clone();
+                        }
+
+                        // Handle coding session (independent of regular session)
+                        if let Some(editor_name) = detect_code_editor(&active.app_name, &active.exe_path) {
+                            let coding_key = format!("{}|{}", active.exe_path, active.window_title);
+                            if coding_key != last_coding_key {
+                                // End previous coding session
+                                if let Some(session) = CURRENT_CODING_SESSION.lock().take() {
+                                    let _ = db::end_coding_session(session.id);
+                                }
+
+                                let (file_path, language, project_dir) =
+                                    parse_coding_info(&active.window_title, &editor_name);
+                                let ai = is_ai_assisted(&active.app_name, &active.window_title, &editor_name);
+
+                                if let Ok(id) = db::start_coding_session(
+                                    &active.app_name,
+                                    &editor_name,
+                                    file_path.as_deref(),
+                                    language.as_deref(),
+                                    project_dir.as_deref(),
+                                    ai,
+                                    &active.window_title,
+                                    &active.exe_path,
+                                ) {
+                                    *CURRENT_CODING_SESSION.lock() = Some(CurrentCodingSession {
+                                        id,
+                                        app_name: active.app_name.clone(),
+                                        editor_name,
+                                        file_path,
+                                        language,
+                                        project_dir,
+                                        is_ai_assisted: ai,
+                                        window_title: active.window_title.clone(),
+                                        exe_path: active.exe_path.clone(),
+                                    });
+                                }
+
+                                last_coding_key = coding_key;
+                            }
+                        } else {
+                            // Not a code editor - end any active coding session
+                            if let Some(session) = CURRENT_CODING_SESSION.lock().take() {
+                                let _ = db::end_coding_session(session.id);
+                            }
+                            last_coding_key.clear();
                         }
                     }
                 }
@@ -399,6 +470,9 @@ pub fn start_tracking_with_app_handle(app_handle: tauri::AppHandle) {
         if let Some(session) = CURRENT_MUSIC_SESSION.lock().take() {
             let _ = db::end_music_session(session.id);
         }
+        if let Some(session) = CURRENT_CODING_SESSION.lock().take() {
+            let _ = db::end_coding_session(session.id);
+        }
     });
 }
 
@@ -413,6 +487,7 @@ pub fn start_tracking() {
         let mut last_app = String::new();
         let mut last_title = String::new();
         let mut last_music_app = String::new();
+        let mut last_coding_key = String::new();
         let mut ticker = 0;
 
         while RUNNING.load(Ordering::SeqCst) {
@@ -456,6 +531,12 @@ pub fn start_tracking() {
 
                             last_music_app = active.exe_path;
                         }
+
+                        // End coding session if music is active
+                        if let Some(session) = CURRENT_CODING_SESSION.lock().take() {
+                            let _ = db::end_coding_session(session.id);
+                        }
+                        last_coding_key.clear();
                     } else {
                         // End music session if we were in one
                         if let Some(session) = CURRENT_MUSIC_SESSION.lock().take() {
@@ -490,8 +571,54 @@ pub fn start_tracking() {
                                 }
                             }
 
-                            last_app = active.exe_path;
-                            last_title = active.window_title;
+                            last_app = active.exe_path.clone();
+                            last_title = active.window_title.clone();
+                        }
+
+                        // Handle coding session (independent of regular session)
+                        if let Some(editor_name) = detect_code_editor(&active.app_name, &active.exe_path) {
+                            let coding_key = format!("{}|{}", active.exe_path, active.window_title);
+                            if coding_key != last_coding_key {
+                                // End previous coding session
+                                if let Some(session) = CURRENT_CODING_SESSION.lock().take() {
+                                    let _ = db::end_coding_session(session.id);
+                                }
+
+                                let (file_path, language, project_dir) =
+                                    parse_coding_info(&active.window_title, &editor_name);
+                                let ai = is_ai_assisted(&active.app_name, &active.window_title, &editor_name);
+
+                                if let Ok(id) = db::start_coding_session(
+                                    &active.app_name,
+                                    &editor_name,
+                                    file_path.as_deref(),
+                                    language.as_deref(),
+                                    project_dir.as_deref(),
+                                    ai,
+                                    &active.window_title,
+                                    &active.exe_path,
+                                ) {
+                                    *CURRENT_CODING_SESSION.lock() = Some(CurrentCodingSession {
+                                        id,
+                                        app_name: active.app_name.clone(),
+                                        editor_name,
+                                        file_path,
+                                        language,
+                                        project_dir,
+                                        is_ai_assisted: ai,
+                                        window_title: active.window_title.clone(),
+                                        exe_path: active.exe_path.clone(),
+                                    });
+                                }
+
+                                last_coding_key = coding_key;
+                            }
+                        } else {
+                            // Not a code editor - end any active coding session
+                            if let Some(session) = CURRENT_CODING_SESSION.lock().take() {
+                                let _ = db::end_coding_session(session.id);
+                            }
+                            last_coding_key.clear();
                         }
                     }
                 }
@@ -520,6 +647,9 @@ pub fn start_tracking() {
         }
         if let Some(session) = CURRENT_MUSIC_SESSION.lock().take() {
             let _ = db::end_music_session(session.id);
+        }
+        if let Some(session) = CURRENT_CODING_SESSION.lock().take() {
+            let _ = db::end_coding_session(session.id);
         }
     });
 }
@@ -562,4 +692,287 @@ fn is_youtube_music_title(window_title: &str) -> bool {
     title_lower.contains("youtube music") || 
     (title_lower.contains("youtube.com") && title_lower.contains("music")) ||
     (title_lower.ends_with("| youtube music") || title_lower.contains("| youtube music"))
+}
+
+// ── Code Editor Detection ──
+
+/// Known code editors mapped to their canonical names.
+/// (pattern, canonical name) - pattern is matched case-insensitively
+/// against app_name (stem) and exe_path.
+const CODE_EDITORS: &[(&str, &str)] = &[
+    ("nvim",          "Neovim"),
+    ("neovim",        "Neovim"),
+    ("code",          "VS Code"),
+    ("vscode",        "VS Code"),
+    ("cursor",        "Cursor"),
+    ("windsurf",      "Windsurf"),
+    ("zed",           "Zed"),
+    ("intellij",      "IntelliJ IDEA"),
+    ("webstorm",      "WebStorm"),
+    ("pycharm",       "PyCharm"),
+    ("phpstorm",      "PhpStorm"),
+    ("clion",         "CLion"),
+    ("goland",        "GoLand"),
+    ("rider",         "Rider"),
+    ("rubymine",      "RubyMine"),
+    ("datagrip",      "DataGrip"),
+    ("fleet",         "Fleet"),
+    ("rustrover",     "RustRover"),
+    ("appcode",       "AppCode"),
+    ("androidstudio", "Android Studio"),
+    ("studio",        "Android Studio"),
+    ("xcode",         "Xcode"),
+    ("visual studio", "Visual Studio"),
+    ("devenv",        "Visual Studio"),
+    ("sublime_text",  "Sublime Text"),
+    ("sublime",       "Sublime Text"),
+    ("atom",          "Atom"),
+    ("emacs",         "Emacs"),
+    ("vim",           "Vim"),
+    ("helix",         "Helix"),
+    ("lapce",         "Lapce"),
+    ("lite-xl",       "Lite XL"),
+    ("notepad++",     "Notepad++"),
+    ("npp",           "Notepad++"),
+    ("kate",          "Kate"),
+    ("kiro",          "Kiro"),
+    ("qoder",         "Qoder"),
+    ("robloxstudio",  "Roblox Studio"),
+    ("roblox studio", "Roblox Studio"),
+    ("antigravity",   "Antigravity"),
+];
+
+/// Detect if app is a code editor. Returns `Some(editor_name)` if detected.
+fn detect_code_editor(app_name: &str, exe_path: &str) -> Option<String> {
+    let app_lower = app_name.to_lowercase();
+    let exe_lower = exe_path.to_lowercase();
+
+    eprintln!("[CODING] Checking app: '{}', exe: '{}'", app_name, exe_path);
+
+    for &(pattern, canonical) in CODE_EDITORS {
+        if app_lower.contains(pattern) || exe_lower.contains(pattern) {
+            eprintln!("[CODING] ✓ Detected editor: {} (pattern: {})", canonical, pattern);
+            // Exclude "vim" from matching "neovim" (neovim is already listed first)
+            // But guard against "nvim" accidentally matching some unrelated app that
+            // merely contains those letters by requiring it to be a word-ish match.
+            // The patterns are specific enough that a simple contains() is fine here.
+            return Some(canonical.to_string());
+        }
+    }
+    None
+}
+
+/// Detect the programming language from a file extension.
+fn detect_language(file_path: &str) -> Option<String> {
+    // Strip query params or trailing garbage after the last dot
+    let path = std::path::Path::new(file_path);
+    let ext = path.extension()?.to_str()?.to_lowercase();
+
+    let lang = match ext.as_str() {
+        "rs"                         => "Rust",
+        "ts" | "tsx"                 => "TypeScript",
+        "js" | "jsx" | "mjs" | "cjs" => "JavaScript",
+        "py" | "pyw"                 => "Python",
+        "go"                         => "Go",
+        "rb"                         => "Ruby",
+        "java"                       => "Java",
+        "kt" | "kts"                 => "Kotlin",
+        "swift"                      => "Swift",
+        "c"                          => "C",
+        "cpp" | "cc" | "cxx" | "c++" => "C++",
+        "cs"                         => "C#",
+        "php"                        => "PHP",
+        "html" | "htm"               => "HTML",
+        "css" | "scss" | "sass"      => "CSS",
+        "vue"                        => "Vue",
+        "svelte"                     => "Svelte",
+        "md" | "mdx"                 => "Markdown",
+        "json" | "jsonc"             => "JSON",
+        "yaml" | "yml"               => "YAML",
+        "toml"                       => "TOML",
+        "sh" | "bash" | "zsh"        => "Shell",
+        "ps1" | "psm1"               => "PowerShell",
+        "sql"                        => "SQL",
+        "lua"                        => "Lua",
+        "dart"                       => "Dart",
+        "ex" | "exs"                 => "Elixir",
+        "hs"                         => "Haskell",
+        "clj" | "cljs"               => "Clojure",
+        "r"                          => "R",
+        "xml"                        => "XML",
+        "tf" | "hcl"                 => "HCL",
+        "zig"                        => "Zig",
+        _                            => "Unknown",
+    };
+    Some(lang.to_string())
+}
+
+/// Parse file path, language, and project directory from a window title.
+/// Returns `(file_path, language, project_dir)`.
+fn parse_coding_info(
+    window_title: &str,
+    editor_name: &str,
+) -> (Option<String>, Option<String>, Option<String>) {
+    eprintln!("[CODING] Parsing title: '{}' for editor: '{}'", window_title, editor_name);
+
+    // --- VS Code: "filename - folder - Visual Studio Code" ---
+    if editor_name == "VS Code" || editor_name == "Cursor" || editor_name == "Windsurf" {
+        // Typical format: "<file> - <project> - Visual Studio Code"
+        // Or: "<file> • <project> - Visual Studio Code"
+        // Or: "Welcome - Visual Studio Code" (no project)
+        let clean = window_title
+            .trim_end_matches(" - Visual Studio Code")
+            .trim_end_matches(" - Cursor")
+            .trim_end_matches(" - Windsurf");
+        let clean = clean
+            .trim_end_matches(" - Visual Studio Code")
+            .trim();
+        // Split on " - " to get parts
+        let parts: Vec<&str> = clean.split(" - ").collect();
+        if parts.len() >= 2 {
+            let file = parts[0].trim().trim_start_matches('•').trim().to_string();
+            let project = parts[1].trim().to_string();
+            let lang = detect_language(&file);
+            return (Some(file), lang, Some(project));
+        } else if !clean.is_empty() {
+            let file = clean.trim().to_string();
+            let lang = detect_language(&file);
+            return (Some(file), lang, None);
+        }
+    }
+
+    // --- Zed: "filename — Zed" (em dash) ---
+    if editor_name == "Zed" {
+        if let Some(pos) = window_title.find(" — ") {
+            let file = window_title[..pos].trim().to_string();
+            let lang = detect_language(&file);
+            let result = (Some(file), lang, None);
+            eprintln!("[CODING] Result (Zed em-dash): file={:?}, lang={:?}, project={:?}", result.0, result.1, result.2);
+            return result;
+        }
+        // Also try plain " - Zed"
+        if let Some(stripped) = window_title.strip_suffix(" - Zed") {
+            let file = stripped.trim().to_string();
+            let lang = detect_language(&file);
+            let result = (Some(file), lang, None);
+            eprintln!("[CODING] Result (Zed hyphen): file={:?}, lang={:?}, project={:?}", result.0, result.1, result.2);
+            return result;
+        }
+    }
+
+    // --- JetBrains IDEs: "ProjectName – filename.ext – EditorName" (en dash) ---
+    // Pattern: "<project> – <file> – <IDE>"
+    if matches!(
+        editor_name,
+        "IntelliJ IDEA" | "WebStorm" | "PyCharm" | "PhpStorm" | "CLion"
+            | "GoLand" | "Rider" | "RubyMine" | "DataGrip" | "Fleet"
+            | "Android Studio"
+    ) {
+        // En dash separator
+        let parts: Vec<&str> = window_title.split(" – ").collect();
+        if parts.len() >= 3 {
+            let project = parts[0].trim().to_string();
+            let file = parts[1].trim().to_string();
+            let lang = detect_language(&file);
+            return (Some(file), lang, Some(project));
+        } else if parts.len() == 2 {
+            let file = parts[0].trim().to_string();
+            let lang = detect_language(&file);
+            return (Some(file), lang, None);
+        }
+    }
+
+    // --- Neovim / Vim / Helix / Lapce / Lite XL: title often IS the file path ---
+    if matches!(editor_name, "Neovim" | "Vim" | "Helix" | "Lapce" | "Lite XL") {
+        // Try to extract the last path-like segment
+        let title = window_title.trim();
+        // Strip editor prefix like "NVim" at start
+        let candidate = title
+            .trim_start_matches("NVim")
+            .trim_start_matches("nvim")
+            .trim_start_matches(" - ")
+            .trim();
+        if !candidate.is_empty() {
+            // If it looks like a file (has an extension or path sep)
+            if candidate.contains('.') || candidate.contains('/') || candidate.contains('\\') {
+                let path = std::path::Path::new(candidate);
+                let file = path
+                    .file_name()
+                    .and_then(|f| f.to_str())
+                    .unwrap_or(candidate)
+                    .to_string();
+                let project = path
+                    .parent()
+                    .and_then(|p| p.file_name())
+                    .and_then(|f| f.to_str())
+                    .map(|s| s.to_string());
+                let lang = detect_language(&file);
+                return (Some(file), lang, project);
+            }
+        }
+        return (Some(title.to_string()), None, None);
+    }
+
+    // --- Sublime Text: "filename - Sublime Text" ---
+    if editor_name == "Sublime Text" {
+        let clean = window_title
+            .trim_end_matches(" - Sublime Text")
+            .trim();
+        if !clean.is_empty() {
+            let parts: Vec<&str> = clean.split(" - ").collect();
+            let file = parts[0].trim().to_string();
+            let lang = detect_language(&file);
+            let project = parts.get(1).map(|s| s.trim().to_string());
+            return (Some(file), lang, project);
+        }
+    }
+
+    // --- Generic fallback: look for common " - EditorName" suffix ---
+    // Try to strip any trailing " - Something" that looks like the editor name
+    for suffix in [
+        " - Notepad++", " - Atom", " - Emacs", " - Xcode",
+    ] {
+        if let Some(stripped) = window_title.strip_suffix(suffix) {
+            let file = stripped.trim().to_string();
+            let lang = detect_language(&file);
+            return (Some(file), lang, None);
+        }
+    }
+
+    // Last resort: return the full window title as "file_path"
+    if !window_title.is_empty() {
+        let result = (Some(window_title.to_string()), None, None);
+        eprintln!("[CODING] Result (fallback): file={:?}, lang={:?}, project={:?}", result.0, result.1, result.2);
+        return result;
+    }
+
+    eprintln!("[CODING] Result: No file detected");
+    (None, None, None)
+}
+
+/// AI tools to detect (in editor name or window title).
+const AI_TOOLS: &[&str] = &[
+    "cursor",
+    "windsurf",
+    "github copilot",
+    "copilot",
+    "codeium",
+    "tabnine",
+    "claude",
+    "chatgpt",
+    "gemini",
+    "supermaven",
+];
+
+/// Returns true if this session involves AI assistance.
+fn is_ai_assisted(app_name: &str, window_title: &str, editor_name: &str) -> bool {
+    let app_lower = app_name.to_lowercase();
+    let title_lower = window_title.to_lowercase();
+    let editor_lower = editor_name.to_lowercase();
+
+    AI_TOOLS.iter().any(|&tool| {
+        app_lower.contains(tool)
+            || title_lower.contains(tool)
+            || editor_lower.contains(tool)
+    })
 }

@@ -55,6 +55,39 @@ pub struct MusicAppUsage {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CodingSession {
+    pub id: i64,
+    pub app_name: String,
+    pub editor_name: String,
+    pub file_path: Option<String>,
+    pub language: Option<String>,
+    pub project_dir: Option<String>,
+    pub is_ai_assisted: bool,
+    pub window_title: String,
+    pub exe_path: String,
+    pub start_time: String,
+    pub end_time: Option<String>,
+    pub duration_seconds: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CodingStats {
+    pub language: String,
+    pub total_seconds: i64,
+    pub ai_seconds: i64,
+    pub manual_seconds: i64,
+    pub session_count: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CodingProjectStats {
+    pub project_dir: String,
+    pub total_seconds: i64,
+    pub ai_seconds: i64,
+    pub session_count: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Settings {
     pub language: String,
     pub theme: String,
@@ -239,6 +272,43 @@ pub fn init_database() -> Result<()> {
 // НІ ну реально їбашити базу для музики)
     conn.execute(
         "CREATE INDEX IF NOT EXISTS idx_music_start_time ON music_sessions(start_time)",
+        [],
+    )?;
+
+    // Coding sessions - track developer activity
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS coding_sessions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            app_name TEXT NOT NULL,
+            editor_name TEXT NOT NULL,
+            file_path TEXT,
+            language TEXT,
+            project_dir TEXT,
+            is_ai_assisted INTEGER NOT NULL DEFAULT 0,
+            window_title TEXT NOT NULL,
+            exe_path TEXT NOT NULL,
+            start_time TEXT NOT NULL,
+            end_time TEXT,
+            duration_seconds INTEGER DEFAULT 0
+        )",
+        [],
+    )?;
+
+    // Safe migrations for coding_sessions (ignored if column already exists)
+    let _ = conn.execute("ALTER TABLE coding_sessions ADD COLUMN app_name TEXT NOT NULL DEFAULT ''", []);
+    let _ = conn.execute("ALTER TABLE coding_sessions ADD COLUMN editor_name TEXT NOT NULL DEFAULT ''", []);
+    let _ = conn.execute("ALTER TABLE coding_sessions ADD COLUMN file_path TEXT", []);
+    let _ = conn.execute("ALTER TABLE coding_sessions ADD COLUMN language TEXT", []);
+    let _ = conn.execute("ALTER TABLE coding_sessions ADD COLUMN project_dir TEXT", []);
+    let _ = conn.execute("ALTER TABLE coding_sessions ADD COLUMN is_ai_assisted INTEGER NOT NULL DEFAULT 0", []);
+    let _ = conn.execute("ALTER TABLE coding_sessions ADD COLUMN window_title TEXT NOT NULL DEFAULT ''", []);
+    let _ = conn.execute("ALTER TABLE coding_sessions ADD COLUMN exe_path TEXT NOT NULL DEFAULT ''", []);
+    let _ = conn.execute("ALTER TABLE coding_sessions ADD COLUMN start_time TEXT NOT NULL DEFAULT ''", []);
+    let _ = conn.execute("ALTER TABLE coding_sessions ADD COLUMN end_time TEXT", []);
+    let _ = conn.execute("ALTER TABLE coding_sessions ADD COLUMN duration_seconds INTEGER DEFAULT 0", []);
+
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_coding_start_time ON coding_sessions(start_time)",
         [],
     )?;
 
@@ -1875,6 +1945,234 @@ pub fn get_total_music_time_today() -> Result<i64> {
 
     let total: Option<i64> = conn.query_row(
         "SELECT SUM(duration_seconds) FROM music_sessions WHERE date(start_time) = date(?1)",
+        [today.to_string()],
+        |row| row.get(0),
+    ).ok();
+
+    Ok(total.unwrap_or(0))
+}
+
+// ── Coding Session Functions ──
+
+pub fn start_coding_session(
+    app_name: &str,
+    editor_name: &str,
+    file_path: Option<&str>,
+    language: Option<&str>,
+    project_dir: Option<&str>,
+    is_ai_assisted: bool,
+    window_title: &str,
+    exe_path: &str,
+) -> Result<i64> {
+    let guard = DB.lock();
+    let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
+
+    let now = Local::now();
+    let ai_flag: i64 = if is_ai_assisted { 1 } else { 0 };
+    conn.execute(
+        "INSERT INTO coding_sessions \
+         (app_name, editor_name, file_path, language, project_dir, is_ai_assisted, window_title, exe_path, start_time) \
+         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)",
+        params![
+            app_name,
+            editor_name,
+            file_path,
+            language,
+            project_dir,
+            ai_flag,
+            window_title,
+            exe_path,
+            now.to_rfc3339()
+        ],
+    )?;
+
+    Ok(conn.last_insert_rowid())
+}
+
+pub fn end_coding_session(id: i64) -> Result<()> {
+    let guard = DB.lock();
+    let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
+
+    let now = Local::now();
+
+    let start_time: String = conn.query_row(
+        "SELECT start_time FROM coding_sessions WHERE id = ?1",
+        [id],
+        |row| row.get(0),
+    )?;
+
+    if let Ok(start) = DateTime::parse_from_rfc3339(&start_time) {
+        let duration = (now - start.with_timezone(&Local)).num_seconds();
+        conn.execute(
+            "UPDATE coding_sessions SET end_time = ?1, duration_seconds = ?2 WHERE id = ?3",
+            params![now.to_rfc3339(), duration, id],
+        )?;
+    }
+
+    Ok(())
+}
+
+pub fn get_today_coding_sessions() -> Result<Vec<CodingSession>> {
+    let guard = DB.lock();
+    let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
+
+    let today = Local::now().date_naive();
+    let start_of_day = today.and_hms_opt(0, 0, 0).unwrap();
+
+    let mut stmt = conn.prepare(
+        "SELECT id, app_name, editor_name, file_path, language, project_dir, \
+                is_ai_assisted, window_title, exe_path, start_time, end_time, duration_seconds \
+         FROM coding_sessions \
+         WHERE date(start_time) = date(?1) \
+         ORDER BY start_time DESC",
+    )?;
+
+    let sessions = stmt
+        .query_map([start_of_day.to_string()], |row| {
+            Ok(CodingSession {
+                id: row.get(0)?,
+                app_name: row.get(1)?,
+                editor_name: row.get(2)?,
+                file_path: row.get(3)?,
+                language: row.get(4)?,
+                project_dir: row.get(5)?,
+                is_ai_assisted: row.get::<_, i64>(6)? != 0,
+                window_title: row.get(7)?,
+                exe_path: row.get(8)?,
+                start_time: row.get(9)?,
+                end_time: row.get(10)?,
+                duration_seconds: row.get(11)?,
+            })
+        })?
+        .collect::<Result<Vec<_>>>()?;
+
+    Ok(sessions)
+}
+
+pub fn get_coding_sessions_range(from: &str, to: &str) -> Result<Vec<CodingSession>> {
+    let guard = DB.lock();
+    let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
+
+    let mut stmt = conn.prepare(
+        "SELECT id, app_name, editor_name, file_path, language, project_dir, \
+                is_ai_assisted, window_title, exe_path, start_time, end_time, duration_seconds \
+         FROM coding_sessions \
+         WHERE date(start_time) >= date(?1) AND date(start_time) <= date(?2) \
+         ORDER BY start_time DESC",
+    )?;
+
+    let sessions = stmt
+        .query_map(params![from, to], |row| {
+            Ok(CodingSession {
+                id: row.get(0)?,
+                app_name: row.get(1)?,
+                editor_name: row.get(2)?,
+                file_path: row.get(3)?,
+                language: row.get(4)?,
+                project_dir: row.get(5)?,
+                is_ai_assisted: row.get::<_, i64>(6)? != 0,
+                window_title: row.get(7)?,
+                exe_path: row.get(8)?,
+                start_time: row.get(9)?,
+                end_time: row.get(10)?,
+                duration_seconds: row.get(11)?,
+            })
+        })?
+        .collect::<Result<Vec<_>>>()?;
+
+    Ok(sessions)
+}
+
+pub fn get_coding_stats_today() -> Result<Vec<CodingStats>> {
+    let guard = DB.lock();
+    let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
+
+    let today = Local::now().date_naive();
+
+    let mut stmt = conn.prepare(
+        "SELECT \
+             COALESCE(language, 'Unknown') as lang, \
+             SUM(duration_seconds) as total, \
+             SUM(CASE WHEN is_ai_assisted = 1 THEN duration_seconds ELSE 0 END) as ai_secs, \
+             SUM(CASE WHEN is_ai_assisted = 0 THEN duration_seconds ELSE 0 END) as manual_secs, \
+             COUNT(*) as cnt \
+         FROM coding_sessions \
+         WHERE date(start_time) = date(?1) \
+         GROUP BY lang \
+         ORDER BY total DESC",
+    )?;
+
+    let stats = stmt
+        .query_map([today.to_string()], |row| {
+            Ok(CodingStats {
+                language: row.get(0)?,
+                total_seconds: row.get(1)?,
+                ai_seconds: row.get(2)?,
+                manual_seconds: row.get(3)?,
+                session_count: row.get(4)?,
+            })
+        })?
+        .collect::<Result<Vec<_>>>()?;
+
+    Ok(stats)
+}
+
+pub fn get_coding_project_stats_today() -> Result<Vec<CodingProjectStats>> {
+    let guard = DB.lock();
+    let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
+
+    let today = Local::now().date_naive();
+
+    let mut stmt = conn.prepare(
+        "SELECT \
+             COALESCE(project_dir, 'Unknown') as proj, \
+             SUM(duration_seconds) as total, \
+             SUM(CASE WHEN is_ai_assisted = 1 THEN duration_seconds ELSE 0 END) as ai_secs, \
+             COUNT(*) as cnt \
+         FROM coding_sessions \
+         WHERE date(start_time) = date(?1) \
+         GROUP BY proj \
+         ORDER BY total DESC",
+    )?;
+
+    let stats = stmt
+        .query_map([today.to_string()], |row| {
+            Ok(CodingProjectStats {
+                project_dir: row.get(0)?,
+                total_seconds: row.get(1)?,
+                ai_seconds: row.get(2)?,
+                session_count: row.get(3)?,
+            })
+        })?
+        .collect::<Result<Vec<_>>>()?;
+
+    Ok(stats)
+}
+
+pub fn get_total_coding_time_today() -> Result<i64> {
+    let guard = DB.lock();
+    let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
+
+    let today = Local::now().date_naive();
+
+    let total: Option<i64> = conn.query_row(
+        "SELECT SUM(duration_seconds) FROM coding_sessions WHERE date(start_time) = date(?1)",
+        [today.to_string()],
+        |row| row.get(0),
+    ).ok();
+
+    Ok(total.unwrap_or(0))
+}
+
+pub fn get_total_ai_coding_time_today() -> Result<i64> {
+    let guard = DB.lock();
+    let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
+
+    let today = Local::now().date_naive();
+
+    let total: Option<i64> = conn.query_row(
+        "SELECT SUM(duration_seconds) FROM coding_sessions \
+         WHERE date(start_time) = date(?1) AND is_ai_assisted = 1",
         [today.to_string()],
         |row| row.get(0),
     ).ok();

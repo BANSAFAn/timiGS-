@@ -242,5 +242,9 @@
     "seconds": "Segundos",
     "generating": "Generando...",
     "connecting": "Conectando..."
+  },
+  "calendar": {
+    "clear": "Limpiar",
+    "today": "Hoy"
   }
 }

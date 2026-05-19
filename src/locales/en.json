@@ -341,5 +341,22 @@
       "hoursAgo": "{count}h ago",
       "daysAgo": "{count}d ago"
     }
+  },
+  "coding": {
+    "title": "Coding",
+    "now_coding": "Now Coding",
+    "ai_assisted": "AI Assisted",
+    "manual": "Manual",
+    "ai": "AI",
+    "languages": "Languages",
+    "projects": "Projects",
+    "sessions": "sessions",
+    "total_time": "Total Coding",
+    "ai_time": "AI Coding",
+    "manual_time": "Manual Coding"
+  },
+  "calendar": {
+    "clear": "Clear",
+    "today": "Today"
   }
 }

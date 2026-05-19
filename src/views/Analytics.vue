@@ -242,6 +242,10 @@
           <h3>No Data Available Yet</h3>
           <p>Start using your applications to see analytics here.</p>
         </div>
+
+        <!-- Coding Tracker Section -->
+        <CodingTracker class="animate-enter" style="animation-delay: 0.3s" />
+
       </div>
     </div>
 
@@ -390,6 +394,7 @@ import { Line, Pie } from 'vue-chartjs';
 import { useI18n } from 'vue-i18n';
 import { Icons } from '../components/icons/IconMap';
 import { invoke } from '@tauri-apps/api/core';
+import CodingTracker from '../components/CodingTracker.vue';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, PointElement, LineElement, Tooltip, Legend, Filler);
 

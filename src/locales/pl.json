@@ -268,6 +268,10 @@
     "noProcesses": "Nie znaleziono procesów",
     "allTracked": "Wszystkie procesy są śledzone",
     "notBeingTracked": "Nie jest śledzone",
-    "footerHint": "Wykluczone procesy nadal pojawiają się na Osi Czasu z odznaką \"Nie Śledzone\""
+    "footerHint": "Wykluczone procesy nadal pojawiają się na Osi Czasu z odznaką \"Nie śLedzone\""
+  },
+  "calendar": {
+    "clear": "Wyczyść",
+    "today": "Dziś"
   }
 }

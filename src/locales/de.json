@@ -251,5 +251,9 @@
     "done": "Fertig",
     "on": "AN",
     "off": "AUS"
+  },
+  "calendar": {
+    "clear": "Zurücksetzen",
+    "today": "Heute"
   }
 }

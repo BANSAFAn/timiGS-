@@ -54,6 +54,48 @@ export interface MusicSession {
   duration_seconds: number;
 }
 
+export interface CodingSession {
+  id: number;
+  app_name: string;
+  editor_name: string;
+  file_path: string | null;
+  language: string | null;
+  project_dir: string | null;
+  is_ai_assisted: boolean;
+  window_title: string;
+  exe_path: string;
+  start_time: string;
+  end_time: string | null;
+  duration_seconds: number;
+}
+
+export interface CodingStats {
+  language: string;
+  total_seconds: number;
+  ai_seconds: number;
+  manual_seconds: number;
+  session_count: number;
+}
+
+export interface CodingProjectStats {
+  project_dir: string;
+  total_seconds: number;
+  ai_seconds: number;
+  session_count: number;
+}
+
+export interface CurrentCodingSession {
+  id: number;
+  app_name: string;
+  editor_name: string;
+  file_path: string | null;
+  language: string | null;
+  project_dir: string | null;
+  is_ai_assisted: boolean;
+  window_title: string;
+  exe_path: string;
+}
+
 export interface Settings {
   language: string;
   theme: string;
@@ -103,6 +145,13 @@ export const useActivityStore = defineStore('activity', {
     musicSummary: [] as MusicAppUsage[],
     totalMusicTime: 0,
     currentMusicSession: null as MusicSession | null,
+    // Coding tracker
+    todayCodingSessions: [] as CodingSession[],
+    codingStats: [] as CodingStats[],
+    codingProjectStats: [] as CodingProjectStats[],
+    totalCodingTime: 0,
+    totalAiCodingTime: 0,
+    currentCodingSession: null as CurrentCodingSession | null,
     settings: {
       language: 'en',
       theme: 'dark',
@@ -226,6 +275,26 @@ export const useActivityStore = defineStore('activity', {
         .map(([name, seconds]) => ({ name, seconds }))
         .filter(cat => cat.seconds > 0)
         .sort((a, b) => b.seconds - a.seconds);
+    },
+
+    topCodingLanguages: (state) => {
+      return [...state.codingStats].sort((a, b) => b.total_seconds - a.total_seconds).slice(0, 8);
+    },
+
+    manualCodingTime: (state) => {
+      return Math.max(0, state.totalCodingTime - state.totalAiCodingTime);
+    },
+
+    aiCodingPercent: (state) => {
+      if (state.totalCodingTime === 0) return 0;
+      return Math.round((state.totalAiCodingTime / state.totalCodingTime) * 100);
+    },
+
+    topCodingProjects: (state) => {
+      return [...state.codingProjectStats]
+        .filter(p => p.project_dir && p.project_dir !== 'Unknown')
+        .sort((a, b) => b.total_seconds - a.total_seconds)
+        .slice(0, 6);
     }
   },
 
@@ -234,6 +303,7 @@ export const useActivityStore = defineStore('activity', {
       try {
         this.currentActivity = await invoke<ActiveWindow | null>('get_current_activity');
         this.currentSession = await invoke<CurrentSession | null>('get_current_session');
+        this.currentCodingSession = await invoke<CurrentCodingSession | null>('get_current_coding_session');
       } catch (error) {
         console.error('Failed to fetch current activity:', error);
       }
@@ -247,11 +317,24 @@ export const useActivityStore = defineStore('activity', {
         this.musicSummary = await invoke<MusicAppUsage[]>('get_music_today_summary');
         this.totalMusicTime = await invoke<number>('get_total_music_time_today');
         this.currentMusicSession = await invoke<MusicSession | null>('get_current_music_session');
+        await this.fetchCodingData();
         await this.fetchAppCategories();
       } catch (error) {
         console.error('Failed to fetch today data:', error);
       } finally {
         this.isLoading = false;
+      }
+    },
+
+    async fetchCodingData() {
+      try {
+        this.todayCodingSessions = await invoke<CodingSession[]>('get_today_coding_sessions');
+        this.codingStats = await invoke<CodingStats[]>('get_coding_stats_today');
+        this.codingProjectStats = await invoke<CodingProjectStats[]>('get_coding_project_stats_today');
+        this.totalCodingTime = await invoke<number>('get_total_coding_time_today');
+        this.totalAiCodingTime = await invoke<number>('get_total_ai_coding_time_today');
+      } catch (error) {
+        console.error('Failed to fetch coding data:', error);
       }
     },
 

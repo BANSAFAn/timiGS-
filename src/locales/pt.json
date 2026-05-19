@@ -269,5 +269,9 @@
     "allTracked": "Todos os processos estão sendo rastreados",
     "notBeingTracked": "Não está sendo rastreado",
     "footerHint": "Processos excluídos ainda aparecem na Linha do Tempo com um selo \"Não Rastreado\""
+  },
+  "calendar": {
+    "clear": "Limpar",
+    "today": "Hoje"
   }
 }

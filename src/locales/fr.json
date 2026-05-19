@@ -249,5 +249,9 @@
     "done": "Terminé",
     "on": "ACTIVÉ",
     "off": "DÉSACTIVÉ"
+  },
+  "calendar": {
+    "clear": "Effacer",
+    "today": "Aujourd'hui"
   }
 }
