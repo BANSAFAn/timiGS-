@@ -733,11 +733,8 @@ fn detect_code_editor(app_name: &str, exe_path: &str) -> Option<String> {
     let app_lower = app_name.to_lowercase();
     let exe_lower = exe_path.to_lowercase();
 
-    eprintln!("[CODING] Checking app: '{}', exe: '{}'", app_name, exe_path);
-
     for &(pattern, canonical) in CODE_EDITORS {
         if app_lower.contains(pattern) || exe_lower.contains(pattern) {
-            eprintln!("[CODING] ✓ Detected editor: {} (pattern: {})", canonical, pattern);
             // Exclude "vim" from matching "neovim" (neovim is already listed first)
             // But guard against "nvim" accidentally matching some unrelated app that
             // merely contains those letters by requiring it to be a word-ish match.
@@ -799,7 +796,6 @@ fn parse_coding_info(
     window_title: &str,
     editor_name: &str,
 ) -> (Option<String>, Option<String>, Option<String>) {
-    eprintln!("[CODING] Parsing title: '{}' for editor: '{}'", window_title, editor_name);
 
     // --- VS Code: "filename - folder - Visual Studio Code" ---
     if editor_name == "VS Code" || editor_name == "Cursor" || editor_name == "Windsurf" {
@@ -832,17 +828,13 @@ fn parse_coding_info(
         if let Some(pos) = window_title.find(" — ") {
             let file = window_title[..pos].trim().to_string();
             let lang = detect_language(&file);
-            let result = (Some(file), lang, None);
-            eprintln!("[CODING] Result (Zed em-dash): file={:?}, lang={:?}, project={:?}", result.0, result.1, result.2);
-            return result;
+            return (Some(file), lang, None);
         }
         // Also try plain " - Zed"
         if let Some(stripped) = window_title.strip_suffix(" - Zed") {
             let file = stripped.trim().to_string();
             let lang = detect_language(&file);
-            let result = (Some(file), lang, None);
-            eprintln!("[CODING] Result (Zed hyphen): file={:?}, lang={:?}, project={:?}", result.0, result.1, result.2);
-            return result;
+            return (Some(file), lang, None);
         }
     }
 
@@ -927,12 +919,9 @@ fn parse_coding_info(
 
     // Last resort: return the full window title as "file_path"
     if !window_title.is_empty() {
-        let result = (Some(window_title.to_string()), None, None);
-        eprintln!("[CODING] Result (fallback): file={:?}, lang={:?}, project={:?}", result.0, result.1, result.2);
-        return result;
+        return (Some(window_title.to_string()), None, None);
     }
 
-    eprintln!("[CODING] Result: No file detected");
     (None, None, None)
 }
 
