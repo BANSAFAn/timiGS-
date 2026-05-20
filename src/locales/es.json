@@ -60,7 +60,20 @@
     "topWebsites": "Sitios web principales"
   },
   "common": {
-    "today": "Hoy"
+    "loading": "Cargando...",
+    "error": "Ocurrió un error",
+    "retry": "Reintentar",
+    "save": "Guardar",
+    "saved": "Guardado",
+    "saving": "Guardando...",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "close": "Cerrar",
+    "hours": "Horas",
+    "minutes": "Minutos",
+    "seconds": "Segundos",
+    "generating": "Generando...",
+    "connecting": "Conectando..."
   },
   "settings": {
     "title": "Ajustes",
@@ -71,8 +84,6 @@
     "themeLight": "Claro",
     "autostart": "Iniciar con Windows",
     "minimizeToTray": "Minimizar a la bandeja del sistema",
-    "discordRpc": "Discord Rich Presence",
-    "discordRpcDesc": "Mostrar actividad en el perfil de Discord",
     "tracking": "Seguimiento",
     "startTracking": "Iniciar seguimiento",
     "stopTracking": "Detener seguimiento",
@@ -226,22 +237,6 @@
     "breakTo": "Hasta",
     "simpleBreaks": "Descansos Simples",
     "scheduleMode": "Modo Programado"
-  },
-  "common": {
-    "loading": "Cargando...",
-    "error": "Ocurrió un error",
-    "retry": "Reintentar",
-    "save": "Guardar",
-    "saved": "Guardado",
-    "saving": "Guardando...",
-    "cancel": "Cancelar",
-    "confirm": "Confirmar",
-    "close": "Cerrar",
-    "hours": "Horas",
-    "minutes": "Minutos",
-    "seconds": "Segundos",
-    "generating": "Generando...",
-    "connecting": "Conectando..."
   },
   "calendar": {
     "clear": "Limpiar",

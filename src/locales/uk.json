@@ -89,8 +89,6 @@
     "themeLight": "Світла",
     "autostart": "Запускати з Windows",
     "minimizeToTray": "Згортати в системний трей",
-    "discordRpc": "Discord Rich Presence",
-    "discordRpcDesc": "Показувати активність у профілі Discord",
     "tracking": "Відстеження",
     "startTracking": "Почати відстеження",
     "stopTracking": "Зупинити відстеження",

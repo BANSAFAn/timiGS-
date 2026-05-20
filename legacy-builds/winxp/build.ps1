@@ -99,6 +99,6 @@ Get-ChildItem "src-tauri\target\$target\release\bundle" -Recurse -Include "*.exe
 
 Write-Host "`n⚠️  IMPORTANT NOTES FOR WINDOWS XP:" -ForegroundColor Yellow
 Write-Host "  - Test on actual XP hardware or VM before distribution" -ForegroundColor Gray
-Write-Host "  - Some features are disabled (auto-update, Discord, P2P sync)" -ForegroundColor Gray
+Write-Host "  - Some features are disabled (auto-update, P2P sync)" -ForegroundColor Gray
 Write-Host "  - Requires .NET Framework 2.0 or higher on target system" -ForegroundColor Gray
 Write-Host "  - May require Visual C++ 2015-2022 Redistributable (x86)" -ForegroundColor Gray

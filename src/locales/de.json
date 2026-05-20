@@ -62,7 +62,23 @@
     "topWebsites": "Top-Websites"
   },
   "common": {
-    "today": "Heute"
+    "loading": "Wird geladen...",
+    "error": "Ein Fehler ist aufgetreten",
+    "retry": "Wiederholen",
+    "save": "Speichern",
+    "saved": "Gespeichert",
+    "saving": "Speichern...",
+    "cancel": "Abbrechen",
+    "confirm": "Bestätigen",
+    "close": "Schließen",
+    "hours": "Stunden",
+    "minutes": "Minuten",
+    "seconds": "Sekunden",
+    "generating": "Wird generiert...",
+    "connecting": "Verbinden...",
+    "done": "Fertig",
+    "on": "AN",
+    "off": "AUS"
   },
   "settings": {
     "title": "Einstellungen",
@@ -73,8 +89,6 @@
     "themeLight": "Hell",
     "autostart": "Mit Windows starten",
     "minimizeToTray": "In System-Tray minimieren",
-    "discordRpc": "Discord Rich Presence",
-    "discordRpcDesc": "Aktivität im Discord-Profil anzeigen",
     "tracking": "Verfolgung",
     "startTracking": "Verfolgung starten",
     "stopTracking": "Verfolgung stoppen",
@@ -232,25 +246,6 @@
     "breakTo": "Bis",
     "simpleBreaks": "Einfache Pausen",
     "scheduleMode": "Zeitplan-Modus"
-  },
-  "common": {
-    "loading": "Wird geladen...",
-    "error": "Ein Fehler ist aufgetreten",
-    "retry": "Wiederholen",
-    "save": "Speichern",
-    "saved": "Gespeichert",
-    "saving": "Speichern...",
-    "cancel": "Abbrechen",
-    "confirm": "Bestätigen",
-    "close": "Schließen",
-    "hours": "Stunden",
-    "minutes": "Minuten",
-    "seconds": "Sekunden",
-    "generating": "Wird generiert...",
-    "connecting": "Verbinden...",
-    "done": "Fertig",
-    "on": "AN",
-    "off": "AUS"
   },
   "calendar": {
     "clear": "Zurücksetzen",

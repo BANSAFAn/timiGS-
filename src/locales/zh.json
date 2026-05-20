@@ -60,7 +60,23 @@
     "topWebsites": "热门网站"
   },
   "common": {
-    "today": "今天"
+    "loading": "加载中...",
+    "error": "发生错误",
+    "retry": "重试",
+    "save": "保存",
+    "saved": "已保存",
+    "saving": "保存中...",
+    "cancel": "取消",
+    "confirm": "确认",
+    "close": "关闭",
+    "hours": "小时",
+    "minutes": "分钟",
+    "seconds": "秒",
+    "generating": "生成中...",
+    "connecting": "连接中...",
+    "done": "完成",
+    "on": "开启",
+    "off": "关闭"
   },
   "settings": {
     "title": "设置",
@@ -71,8 +87,6 @@
     "themeLight": "浅色",
     "autostart": "随 Windows 启动",
     "minimizeToTray": "最小化到系统托盘",
-    "discordRpc": "Discord Rich Presence",
-    "discordRpcDesc": "在 Discord 个人资料中显示活动",
     "tracking": "追踪",
     "startTracking": "开始追踪",
     "stopTracking": "停止追踪",
@@ -230,25 +244,6 @@
     "breakTo": "到",
     "simpleBreaks": "简单休息",
     "scheduleMode": "计划模式"
-  },
-  "common": {
-    "loading": "加载中...",
-    "error": "发生错误",
-    "retry": "重试",
-    "save": "保存",
-    "saved": "已保存",
-    "saving": "保存中...",
-    "cancel": "取消",
-    "confirm": "确认",
-    "close": "关闭",
-    "hours": "小时",
-    "minutes": "分钟",
-    "seconds": "秒",
-    "generating": "生成中...",
-    "connecting": "连接中...",
-    "done": "完成",
-    "on": "开启",
-    "off": "关闭"
   },
   "calendar": {
     "clear": "清除",

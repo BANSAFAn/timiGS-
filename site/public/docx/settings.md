@@ -52,19 +52,6 @@ When enabled, closing the main window minimizes TimiGS to the system tray instea
 > [!NOTE]
 > You can restore the window by clicking the TimiGS icon in the system tray.
 
-### 🎮 Discord Rich Presence
-
-**Show activity on Discord profile**
-
-Enable Discord integration to display your current activity on your Discord profile:
-- Shows the app you're currently using
-- Displays elapsed time
-- Updates in real-time
-- Respects Discord's privacy settings
-
-> [!CAUTION]
-> Make sure Discord is running for Rich Presence to work. The integration connects automatically when both applications are active.
-
 ## Cloud & Data
 
 ### 🔄 Auto Sync
@@ -173,7 +160,6 @@ Desktop versions (Windows, macOS, Linux) include:
 - System tray integration
 - Autostart functionality
 - Native window management
-- Full Discord Rich Presence support
 
 ## Data Privacy
 
@@ -210,10 +196,3 @@ If auto-sync fails:
 3. Ensure you have storage space available
 4. Try manually exporting to test the connection
 
-### Discord Rich Presence Not Showing
-
-If Discord integration isn't working:
-1. Make sure Discord is running
-2. Check that Discord Rich Presence is enabled in Discord settings
-3. Restart both TimiGS and Discord
-4. Verify the setting is enabled in TimiGS Settings

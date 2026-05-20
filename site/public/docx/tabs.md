@@ -77,6 +77,6 @@ Handles multi-device data environments.
 Manages overall core application behavior natively.
 
 - **Appearance & Aesthetics**: Quickly toggle Dark/Light Color Profiles and Interface Translators (i18n).
-- **System Properties**: Configure PC Autostart routines, toggle Discord RPC (Rich Presence integration) to broadcast active status to Discord, and manage System Tray behaviors.
+- **System Properties**: Configure PC Autostart routines, and manage System Tray behaviors.
 - **Data Extractor Layer**: An independent database export utility that dumps active database histories to extensive flexible parsing formats (`.csv`, `.json`, `.html`, `.md`). Also supports full database imports from legacy setups. Includes the Data Destructor to purge the local SQLite files entirely.
 - **Doctor Mode**: A wellness AI that enforces physical health markers—triggering OS-level alerts instructing you to take eye rests (20-20-20 rule) or stand up when critically extended, uninterrupted sessions are encountered.

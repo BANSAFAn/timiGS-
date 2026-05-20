@@ -101,7 +101,6 @@ export interface Settings {
   theme: string;
   autostart: boolean;
   minimize_to_tray: boolean;
-  discord_rpc: boolean;
 }
 
 export function detectCategory(appName: string, exePath: string = ''): string {
@@ -156,8 +155,7 @@ export const useActivityStore = defineStore('activity', {
       language: 'en',
       theme: 'dark',
       autostart: true,
-      minimize_to_tray: true,
-      discord_rpc: true
+      minimize_to_tray: true
     } as Settings,
     appCategories: {} as Record<string, string>,
     isTracking: false,

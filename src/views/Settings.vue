@@ -190,26 +190,7 @@
               />
             </div>
 
-            <div class="setting-item">
-              <div class="setting-left">
-                <div class="setting-icon" v-html="Icons.discord"></div>
-                <div class="setting-content">
-                  <label class="setting-label">{{
-                    $t("settings.discordRpc") || "Discord Rich Presence"
-                  }}</label>
-                  <p class="setting-description">
-                    {{
-                      $t("settings.discordRpcDesc") ||
-                      "Show activity on Discord profile"
-                    }}
-                  </p>
-                </div>
-              </div>
-              <ModernToggle 
-                v-model="localSettings.discord_rpc" 
-                @update:modelValue="toggleDiscord"
-              />
-            </div>
+
           </div>
         </div>
 
@@ -828,7 +809,6 @@ const localSettings = reactive({
   theme: "dark",
   autostart: true,
   minimize_to_tray: true,
-  discord_rpc: true,
 });
 
 // Helper for safe invokes
@@ -926,10 +906,7 @@ function toggleMinimize() {
   saveSettings();
 }
 
-function toggleDiscord() {
-  localSettings.discord_rpc = !localSettings.discord_rpc;
-  saveSettings();
-}
+
 
 // Update modal state
 const isUpdating = ref(false);

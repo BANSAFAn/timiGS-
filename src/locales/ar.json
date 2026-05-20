@@ -60,7 +60,23 @@
     "topWebsites": "أفضل المواقع"
   },
   "common": {
-    "today": "اليوم"
+    "loading": "جار التحميل...",
+    "error": "حدث خطأ",
+    "retry": "إعادة المحاولة",
+    "save": "حفظ",
+    "saved": "تم الحفظ",
+    "saving": "جاري الحفظ...",
+    "cancel": "إلغاء",
+    "confirm": "تأكيد",
+    "close": "إغلاق",
+    "hours": "ساعات",
+    "minutes": "دقائق",
+    "seconds": "ثواني",
+    "generating": "جاري الإنشاء...",
+    "connecting": "جاري الاتصال...",
+    "done": "تم",
+    "on": "تشغيل",
+    "off": "إيقاف"
   },
   "settings": {
     "title": "الإعدادات",
@@ -71,8 +87,6 @@
     "themeLight": "فاتح",
     "autostart": "ابدأ مع Windows",
     "minimizeToTray": "تصغير إلى علبة النظام",
-    "discordRpc": "Discord Rich Presence",
-    "discordRpcDesc": "عرض النشاط في ملف Discord الشخصي",
     "tracking": "التتبع",
     "startTracking": "بدء التتبع",
     "stopTracking": "إيقاف التتبع",
@@ -95,7 +109,6 @@
     "about": "حول",
     "version": "الإصدار",
     "saved": "تم حفظ الإعدادات!",
-
     "localStorage": "التخزين المحلي",
     "localStorageDesc": "تصدير أو استيراد بياناتك محلياً",
     "import": "استيراد",
@@ -231,25 +244,6 @@
     "breakTo": "إلى",
     "simpleBreaks": "فترات راحة بسيطة",
     "scheduleMode": "وضع الجدول الزمني"
-  },
-  "common": {
-    "loading": "جار التحميل...",
-    "error": "حدث خطأ",
-    "retry": "إعادة المحاولة",
-    "save": "حفظ",
-    "saved": "تم الحفظ",
-    "saving": "جاري الحفظ...",
-    "cancel": "إلغاء",
-    "confirm": "تأكيد",
-    "close": "إغلاق",
-    "hours": "ساعات",
-    "minutes": "دقائق",
-    "seconds": "ثواني",
-    "generating": "جاري الإنشاء...",
-    "connecting": "جاري الاتصال...",
-    "done": "تم",
-    "on": "تشغيل",
-    "off": "إيقاف"
   },
   "calendar": {
     "clear": "مسح",

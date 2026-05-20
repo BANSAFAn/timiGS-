@@ -1,8 +1,6 @@
 //! Cross-platform activity tracker module
 
 use crate::db;
-#[cfg(desktop)]
-use crate::discord;
 use once_cell::sync::Lazy;
 use parking_lot::Mutex;
 use serde::{Deserialize, Serialize};
@@ -384,13 +382,7 @@ pub fn start_tracking_with_app_handle(app_handle: tauri::AppHandle) {
                                     exe_path: active.exe_path.clone(),
                                 });
 
-                                // Update Discord-presence
-                                #[cfg(desktop)]
-                                if db::get_settings().discord_rpc {
-                                    discord::update_presence(&active.app_name, &active.window_title);
-                                } else {
-                                    discord::clear_presence();
-                                }
+
                             }
 
                             last_app = active.exe_path.clone();
@@ -562,13 +554,7 @@ pub fn start_tracking() {
                                     exe_path: active.exe_path.clone(),
                                 });
 
-                                // Update Discord Presence
-                                #[cfg(desktop)]
-                                if db::get_settings().discord_rpc {
-                                    discord::update_presence(&active.app_name, &active.window_title);
-                                } else {
-                                    discord::clear_presence();
-                                }
+
                             }
 
                             last_app = active.exe_path.clone();

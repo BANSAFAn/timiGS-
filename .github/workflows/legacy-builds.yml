@@ -169,7 +169,7 @@ jobs:
                 "features": {
                   "activity_tracking": true,
                   "auto_updates": true,
-                  "discord_presence": true,
+                  "discord_presence": false,
                   "p2p_sync": true,
                   "music_player": true
                 }

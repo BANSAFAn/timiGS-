@@ -74,7 +74,21 @@
     "categorizeApps": "Categorizar Apps"
   },
   "common": {
-    "today": "Hoje"
+    "loading": "Carregando...",
+    "error": "Ocorreu um erro",
+    "retry": "Tentar Novamente",
+    "save": "Salvar",
+    "saved": "Salvo",
+    "saving": "Salvando...",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "close": "Fechar",
+    "hours": "Horas",
+    "minutes": "Minutos",
+    "seconds": "Segundos",
+    "generating": "Gerando...",
+    "connecting": "Conectando...",
+    "done": "Concluído"
   },
   "settings": {
     "title": "Configurações",
@@ -85,8 +99,6 @@
     "themeLight": "Claro",
     "autostart": "Início automático",
     "minimizeToTray": "Minimizar para bandeja do sistema",
-    "discordRpc": "Discord Rich Presence",
-    "discordRpcDesc": "Mostrar atividade no perfil do Discord",
     "tracking": "Rastreamento",
     "startTracking": "Iniciar Rastreamento",
     "stopTracking": "Parar Rastreamento",
@@ -239,23 +251,6 @@
     "breakTo": "Até",
     "simpleBreaks": "Pausas Simples",
     "scheduleMode": "Modo Agendado"
-  },
-  "common": {
-    "loading": "Carregando...",
-    "error": "Ocorreu um erro",
-    "retry": "Tentar Novamente",
-    "save": "Salvar",
-    "saved": "Salvo",
-    "saving": "Salvando...",
-    "cancel": "Cancelar",
-    "confirm": "Confirmar",
-    "close": "Fechar",
-    "hours": "Horas",
-    "minutes": "Minutos",
-    "seconds": "Segundos",
-    "generating": "Gerando...",
-    "connecting": "Conectando...",
-    "done": "Concluído"
   },
   "excludeProcesses": {
     "title": "Gerenciar Rastreamento de Processos",

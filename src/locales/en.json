@@ -20,7 +20,6 @@
     "team": "Team",
     "teamShort": "Team"
   },
-
   "dashboard": {
     "title": "Dashboard",
     "activeNow": "Active Now",
@@ -90,8 +89,6 @@
     "themeLight": "Light",
     "autostart": "Auto-start",
     "minimizeToTray": "Minimize to system tray",
-    "discordRpc": "Discord Rich Presence",
-    "discordRpcDesc": "Show activity on Discord profile",
     "tracking": "Tracking",
     "startTracking": "Start Tracking",
     "stopTracking": "Stop Tracking",

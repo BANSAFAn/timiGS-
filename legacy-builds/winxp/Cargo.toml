@@ -54,6 +54,5 @@ windows = { version = "0.58", features = [
 # Примечание: Следующие функции ОТКЛЮЧЕНЫ для XP версии:
 # - tauri-plugin-autostart (не поддерживается)
 # - tauri-plugin-updater (не поддерживается)
-# - discord-rich-presence (требует современные API)
 # - rodio (аудио может не работать)
 # - P2P синхронизация (требует современные сетевые API)

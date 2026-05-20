@@ -93,7 +93,6 @@ pub struct Settings {
     pub theme: String,
     pub autostart: bool,
     pub minimize_to_tray: bool,
-    pub discord_rpc: bool,
     pub auto_export_enabled: bool,
     pub auto_export_interval_hours: i64,
     pub auto_export_folder: String,
@@ -108,7 +107,6 @@ impl Default for Settings {
             theme: "dark".to_string(),
             autostart: true,
             minimize_to_tray: true,
-            discord_rpc: true,
             auto_export_enabled: false,
             auto_export_interval_hours: 24,
             auto_export_folder: String::new(),
@@ -574,13 +572,7 @@ pub fn get_settings() -> Settings {
             settings.minimize_to_tray = minimize == "true";
         }
 
-        if let Ok(discord) = conn.query_row(
-            "SELECT value FROM settings WHERE key = 'discord_rpc'",
-            [],
-            |row| row.get::<_, String>(0),
-        ) {
-            settings.discord_rpc = discord == "true";
-        }
+
 
         if let Ok(auto_export_enabled) = conn.query_row(
             "SELECT value FROM settings WHERE key = 'auto_export_enabled'",
@@ -652,14 +644,7 @@ pub fn save_settings(settings: &Settings) -> Result<()> {
             "false"
         }],
     )?;
-    conn.execute(
-        "INSERT OR REPLACE INTO settings (key, value) VALUES ('discord_rpc', ?1)",
-        [if settings.discord_rpc {
-            "true"
-        } else {
-            "false"
-        }],
-    )?;
+
     conn.execute(
         "INSERT OR REPLACE INTO settings (key, value) VALUES ('auto_export_enabled', ?1)",
         [if settings.auto_export_enabled {

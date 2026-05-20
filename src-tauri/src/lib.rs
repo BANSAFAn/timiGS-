@@ -6,8 +6,6 @@ mod commands;
 mod db;
 mod music;
 
-#[cfg(desktop)]
-mod discord;
 mod drive;
 mod icons;
 

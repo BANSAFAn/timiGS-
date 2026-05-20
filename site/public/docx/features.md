@@ -30,9 +30,3 @@ If absolute redundancy is critical for your data retention, TimiGS offers local 
 - Extrapolate your databases to generic CSV or human-readable HTML/Markdown formats.
 - Enable the **Auto-Export Module** to silently push formatted backups at scheduled intervals (Every Startup, Every Hour, Daily, etc.).
 
-## 🎮 Discord Rich Presence Engine
-Showcase your focus to the world automatically.
-
-- The backend Rust engine natively communicates with the local Discord Desktop Client pipeline.
-- Whenever you are utilizing a `Work`-categorized application or actively engaged in a Focus loop, TimiGS intercepts the Discord Rich Presence API to display "In Deep Work" directly on your Discord profile, complete with exact elapsed session timers. 
-- *This deters notifications and pings from friends during critical moments.*

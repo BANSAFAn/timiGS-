@@ -60,7 +60,23 @@
     "topWebsites": "Meilleurs sites Web"
   },
   "common": {
-    "today": "Aujourd'hui"
+    "loading": "Chargement...",
+    "error": "Une erreur s'est produite",
+    "retry": "Réessayer",
+    "save": "Enregistrer",
+    "saved": "Enregistré",
+    "saving": "Enregistrement...",
+    "cancel": "Annuler",
+    "confirm": "Confirmer",
+    "close": "Fermer",
+    "hours": "Heures",
+    "minutes": "Minutes",
+    "seconds": "Secondes",
+    "generating": "Génération...",
+    "connecting": "Connexion...",
+    "done": "Terminé",
+    "on": "ACTIVÉ",
+    "off": "DÉSACTIVÉ"
   },
   "settings": {
     "title": "Paramètres",
@@ -71,8 +87,6 @@
     "themeLight": "Clair",
     "autostart": "Démarrer avec Windows",
     "minimizeToTray": "Réduire dans la barre d'état système",
-    "discordRpc": "Discord Rich Presence",
-    "discordRpcDesc": "Afficher l'activité sur le profil Discord",
     "tracking": "Suivi",
     "startTracking": "Commencer le suivi",
     "stopTracking": "Arrêter le suivi",
@@ -230,25 +244,6 @@
     "breakTo": "À",
     "simpleBreaks": "Pauses Simples",
     "scheduleMode": "Mode Planifié"
-  },
-  "common": {
-    "loading": "Chargement...",
-    "error": "Une erreur s'est produite",
-    "retry": "Réessayer",
-    "save": "Enregistrer",
-    "saved": "Enregistré",
-    "saving": "Enregistrement...",
-    "cancel": "Annuler",
-    "confirm": "Confirmer",
-    "close": "Fermer",
-    "hours": "Heures",
-    "minutes": "Minutes",
-    "seconds": "Secondes",
-    "generating": "Génération...",
-    "connecting": "Connexion...",
-    "done": "Terminé",
-    "on": "ACTIVÉ",
-    "off": "DÉSACTIVÉ"
   },
   "calendar": {
     "clear": "Effacer",

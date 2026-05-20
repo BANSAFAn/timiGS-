@@ -74,7 +74,21 @@
     "categorizeApps": "Kategoryzuj Aplikacje"
   },
   "common": {
-    "today": "Dzisiaj"
+    "loading": "Ładowanie...",
+    "error": "Wystąpił błąd",
+    "retry": "Spróbuj Ponownie",
+    "save": "Zapisz",
+    "saved": "Zapisano",
+    "saving": "Zapisywanie...",
+    "cancel": "Anuluj",
+    "confirm": "Potwierdź",
+    "close": "Zamknij",
+    "hours": "Godzin",
+    "minutes": "Minut",
+    "seconds": "Sekund",
+    "generating": "Generowanie...",
+    "connecting": "Łączenie...",
+    "done": "Gotowe"
   },
   "settings": {
     "title": "Ustawienia",
@@ -85,8 +99,6 @@
     "themeLight": "Jasny",
     "autostart": "Autostart",
     "minimizeToTray": "Minimalizuj do zasobnika systemowego",
-    "discordRpc": "Discord Rich Presence",
-    "discordRpcDesc": "Pokaż aktywność na profilu Discord",
     "tracking": "Śledzenie",
     "startTracking": "Rozpocznij Śledzenie",
     "stopTracking": "Zatrzymaj Śledzenie",
@@ -239,23 +251,6 @@
     "breakTo": "Do",
     "simpleBreaks": "Proste Przerwy",
     "scheduleMode": "Tryb Harmonogramu"
-  },
-  "common": {
-    "loading": "Ładowanie...",
-    "error": "Wystąpił błąd",
-    "retry": "Spróbuj Ponownie",
-    "save": "Zapisz",
-    "saved": "Zapisano",
-    "saving": "Zapisywanie...",
-    "cancel": "Anuluj",
-    "confirm": "Potwierdź",
-    "close": "Zamknij",
-    "hours": "Godzin",
-    "minutes": "Minut",
-    "seconds": "Sekund",
-    "generating": "Generowanie...",
-    "connecting": "Łączenie...",
-    "done": "Gotowe"
   },
   "excludeProcesses": {
     "title": "Zarządzaj Śledzeniem Procesów",
