@@ -35,8 +35,8 @@ jobs:
     name: 🖥️ Desktop (${{ matrix.name }})
     needs: release-please
     if: |
-      needs.release-please.outputs.release_created == 'true' ||
-      github.event_name == 'workflow_dispatch'
+      always() &&
+      (needs.release-please.result == 'success' || needs.release-please.result == 'skipped')
     permissions:
       contents: write
     strategy:
