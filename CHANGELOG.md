@@ -84,6 +84,7 @@
 ### Documentation
 
 * fix README merge conflict markers in status table ([528c73c](https://github.com/BANSAFAn/timiGS-/commit/528c73c61ba46982c846dfa1cf53cb307dcd9580))
+* update platform build statuses ([06afbe4](https://github.com/BANSAFAn/timiGS-/commit/06afbe4922d18fd02ecc2f9d737d29f6d6164986))
 * update platform build statuses ([3b0198f](https://github.com/BANSAFAn/timiGS-/commit/3b0198f849bb7a2d6b6bf495fa4b37c997df2adb))
 * update platform build statuses [skip ci] ([3ebdb6e](https://github.com/BANSAFAn/timiGS-/commit/3ebdb6eb8749dd21ccf3dcddd5ec15be345522a4))
 * update platform build statuses [skip ci] ([3ec4f49](https://github.com/BANSAFAn/timiGS-/commit/3ec4f491c6a43295181acb91ab791a5f5b285e03))
