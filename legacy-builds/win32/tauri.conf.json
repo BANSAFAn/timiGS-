@@ -55,7 +55,7 @@
       "icons/icon.ico"
     ],
     "windows": {
-      "signCommand": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -ExecutionPolicy Bypass -File windows\\sign.ps1 \"%1\"",
+      "signCommand": "node windows\\sign.cjs \"%1\"",
       "nsis": {
         "installMode": "currentUser",
         "displayLanguageSelector": true,

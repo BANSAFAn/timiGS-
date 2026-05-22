@@ -10,7 +10,6 @@ permissions:
   pull-requests: write
 
 jobs:
-  # Create release PR via release-please
   release-please:
     name: 📦 Release Please
     if: github.ref == 'refs/heads/main'
@@ -29,8 +28,6 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
-
-  # Build desktop apps
   build-desktop:
     name: 🖥️ Desktop (${{ matrix.name }})
     needs: release-please
@@ -109,10 +106,10 @@ jobs:
         if: matrix.platform == 'windows-latest'
         shell: pwsh
         env:
-          TIMIGS_SECRET: ${{ secrets.TimigsSecret }}
+          TIMIGS_SECRET: ${{ secrets.TIMIGSSECRET }}
         run: |
           if ([string]::IsNullOrEmpty($env:TIMIGS_SECRET)) {
-              Write-Host "TimigsSecret secret is empty or not set. Skipping certificate preparation."
+              Write-Host "TIMIGSSECRET secret is empty or not set. Skipping certificate preparation."
               exit 0
           }
           $certDir = Join-Path $env:RUNNER_TEMP "certs"
@@ -176,8 +173,8 @@ jobs:
           }
           if (Test-Path $pfxPath) {
               Write-Host "Certificate prepared successfully at $pfxPath"
-              echo "TAURI_WINDOWS_PFX=$pfxPath" >> $env:GITHUB_ENV
-              echo "TAURI_WINDOWS_PFX_PASSWORD=$pfxPassword" >> $env:GITHUB_ENV
+              Add-Content -Path $env:GITHUB_ENV -Value "TAURI_WINDOWS_PFX=$pfxPath" -Encoding utf8
+              Add-Content -Path $env:GITHUB_ENV -Value "TAURI_WINDOWS_PFX_PASSWORD=$pfxPassword" -Encoding utf8
           } else {
               Write-Error "Failed to generate $pfxPath"
               exit 1
