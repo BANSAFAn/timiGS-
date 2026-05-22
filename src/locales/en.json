@@ -10,6 +10,8 @@
     "timelineShort": "History",
     "analytics": "Analytics",
     "analyticsShort": "Stats",
+    "coding": "Coding",
+    "codingShort": "Coding",
     "tools": "Tools",
     "toolsShort": "Tools",
     "settings": "Settings",
@@ -78,7 +80,8 @@
     "categoryPrograms": "Programs",
     "categoryWork": "Work",
     "categoryRest": "Rest",
-    "categorizeApps": "Categorize Apps"
+    "categorizeApps": "Categorize Apps",
+    "programsOpened": "Programs Opened"
   },
   "settings": {
     "title": "Settings",
@@ -299,6 +302,10 @@
     "groupCode": "Group Code",
     "copied": "Copied!",
     "downloadAll": "Download All",
+    "export": "Export",
+    "exportJSON": "Export JSON",
+    "exportHTML": "Export HTML",
+    "exportCSV": "Export CSV",
     "leave": "Leave",
     "members": "Members",
     "connected": "Connected",
@@ -316,7 +323,22 @@
     "activeMembers": "Active Members",
     "online": "Online",
     "todayHistory": "Today's History",
-    "noHistory": "No activity recorded yet"
+    "noHistory": "No activity recorded yet",
+    "uploadReport": "Upload Report",
+    "downloadReport": "Download Report",
+    "onBreak": "On Break",
+    "focusing": "Focusing",
+    "tasksTitle": "Tasks Checklist",
+    "taskPlaceholder": "Add a new task...",
+    "addTask": "Add Task",
+    "rename": "Rename",
+    "kick": "Kick member",
+    "settings": "Settings",
+    "privacySettings": "Privacy Settings",
+    "shareMusicTitle": "Share Music",
+    "shareMusicDesc": "Show currently playing music during Focus Mode",
+    "disconnectedOnRestartTitle": "Disconnected",
+    "disconnectedOnRestartMessage": "You have been disconnected from the group because the application was restarted. Please ask for the code again or try to join the room again."
   },
   "excludeProcesses": {
     "title": "Manage Process Tracking",
@@ -350,7 +372,14 @@
     "sessions": "sessions",
     "total_time": "Total Coding",
     "ai_time": "AI Coding",
-    "manual_time": "Manual Coding"
+    "manual_time": "Manual Coding",
+    "files_worked": "Files Worked On",
+    "most_active_lang": "Most Active Language",
+    "show_files": "Show File Breakdown",
+    "hide_files": "Hide File Breakdown",
+    "timeline_view": "Timeline View",
+    "grouped_view": "Files Summary",
+    "timeline_title": "Sessions & File Activity"
   },
   "calendar": {
     "clear": "Clear",

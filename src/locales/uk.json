@@ -10,6 +10,8 @@
     "timelineShort": "Історія",
     "analytics": "Аналітика",
     "analyticsShort": "Аналітика",
+    "coding": "Кодінг",
+    "codingShort": "Кодінг",
     "tools": "Інструменти",
     "toolsShort": "Інструменти",
     "settings": "Налаштування",
@@ -18,7 +20,9 @@
     "weather": "Погода",
     "weatherShort": "Погода",
     "transfer": "Передача",
-    "transferShort": "Передача"
+    "transferShort": "Передача",
+    "team": "Команда",
+    "teamShort": "Команда"
   },
   "dashboard": {
     "title": "Головна",
@@ -78,7 +82,8 @@
     "categoryPrograms": "Програми",
     "categoryWork": "Робота",
     "categoryRest": "Відпочинок",
-    "categorizeApps": "Розподілити програми"
+    "categorizeApps": "Розподілити програми",
+    "programsOpened": "Відкрито програм"
   },
   "settings": {
     "title": "Налаштування",
@@ -143,7 +148,10 @@
     "timeLimitDesc": "Скільки часу перед сповіщенням про перерву",
     "resetSession": "Скинути активну сесію",
     "doctorModeAlertMessage": "Ви тривалий час працюєте за ПК. Зробіть перерву, погуляйте або дайте очам відпочити хоча б 1 годину!",
-    "doctorModeRepeatMessage": "Ви все ще ігноруєте перерву. Дайте очам відпочити!"
+    "doctorModeRepeatMessage": "Ви все ще ігноруєте перерву. Дайте очам відпочити!",
+    "custom": "Свій період",
+    "startDate": "Початкова дата",
+    "endDate": "Кінцева дата"
   },
   "tools": {
     "timer": "Таймер вимкнення",
@@ -296,6 +304,10 @@
     "groupCode": "Код групи",
     "copied": "Скопійовано!",
     "downloadAll": "Завантажити все",
+    "export": "Експорт",
+    "exportJSON": "Експорт в JSON",
+    "exportHTML": "Експорт в HTML",
+    "exportCSV": "Експорт в CSV",
     "leave": "Вийти",
     "members": "Учасники",
     "connected": "Підключено",
@@ -313,7 +325,22 @@
     "activeMembers": "Активні учасники",
     "online": "В мережі",
     "todayHistory": "Історія за сьогодні",
-    "noHistory": "Записів про активність ще немає"
+    "noHistory": "Записів про активність ще немає",
+    "uploadReport": "Завантажити звіт",
+    "downloadReport": "Завантажити звіт",
+    "onBreak": "Перерва",
+    "focusing": "Фокус",
+    "tasksTitle": "Список завдань",
+    "taskPlaceholder": "Додати нове завдання...",
+    "addTask": "Додати",
+    "rename": "Перейменувати",
+    "kick": "Вигнати",
+    "settings": "Налаштування",
+    "privacySettings": "Налаштування приватності",
+    "shareMusicTitle": "Ділитися музикою",
+    "shareMusicDesc": "Показувати назву поточної пісні в режимі Фокусу",
+    "disconnectedOnRestartTitle": "Відключено",
+    "disconnectedOnRestartMessage": "Вас було від'єднано від команди через перезапуск програми. Будь ласка, попросіть код знову або спробуйте знову увійти в кімнату."
   },
   "excludeProcesses": {
     "title": "Керування відстеженням процесів",
@@ -339,7 +366,14 @@
     "sessions": "сесій",
     "total_time": "Всього кодинг",
     "ai_time": "AI кодинг",
-    "manual_time": "Ручний кодинг"
+    "manual_time": "Ручний кодинг",
+    "files_worked": "Файли в роботі",
+    "most_active_lang": "Найактивніша мова",
+    "show_files": "Показати деталі файлів",
+    "hide_files": "Приховати деталі файлів",
+    "timeline_view": "Хронологія",
+    "grouped_view": "Підсумок файлів",
+    "timeline_title": "Сесії та активність у файлах"
   },
   "calendar": {
     "clear": "Очистити",

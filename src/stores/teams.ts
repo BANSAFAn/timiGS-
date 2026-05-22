@@ -3,27 +3,34 @@ import { ref, reactive, computed } from "vue";
 import Peer, { type DataConnection, type MediaConnection } from "peerjs";
 import { invoke } from "@tauri-apps/api/core";
 import { save } from "@tauri-apps/plugin-dialog";
-import { writeTextFile } from "@tauri-apps/plugin-fs";
+import { writeTextFile, readTextFile, remove } from "@tauri-apps/plugin-fs";
+import { useActivityStore, detectCategory } from "./activity";
 
 export interface TeamMember {
-  id: string; // Peer ID
+  id: string;
   name: string;
-  email: string; // Optional, can be empty
+  email: string;
   isLeader: boolean;
   status: 'online' | 'offline' | 'busy' | 'voice';
   isScreenSharing?: boolean;
   currentApp?: string;
   progress?: {
     appName: string;
-    current: number; // seconds
-    target: number; // seconds
+    current: number;
+    target: number;
     percentage: number;
   };
-  // Team page specific fields
-  joinedAt: number; // timestamp when joined
-  totalOnlineSeconds: number; // cumulative online time
-  activityHistory: ActivityEntry[]; // history of app usage
-  lastSeen: number; // last activity timestamp
+  joinedAt: number;
+  totalOnlineSeconds: number;
+  activityHistory: ActivityEntry[];
+  lastSeen: number;
+  tasks?: string[];
+  inTimeout?: boolean;
+  focusModeActive?: boolean;
+  focusTargetApp?: string;
+  currentMusicTitle?: string;
+  currentMusicArtist?: string;
+  musicSharingEnabled?: boolean;
 }
 
 export interface ActivityEntry {
@@ -74,6 +81,9 @@ export interface TeamMemberReport {
   totalOnlineSeconds: number;
   activityHistory: ActivityEntry[];
   stats: MemberStats;
+  tasks?: string[];
+  inTimeout?: boolean;
+  focusModeActive?: boolean;
 }
 
 export interface ChatMessage {
@@ -92,20 +102,24 @@ export interface TeamGoal {
 }
 
 export const useTeamsStore = defineStore("teams", () => {
-  // Identity
+
   const myProfile = reactive({
     name: "", // Will be set by ensureProfile() to PC computer name
     email: localStorage.getItem("timigs_team_email") || "",
     id: "", // Assigned by PeerJS
+    focusTargetApp: "",
+    currentMusicTitle: "",
+    currentMusicArtist: "",
+    musicSharingEnabled: localStorage.getItem("timigs_team_share_music") !== "false",
   });
 
-  // State
+
   const peer = ref<Peer | null>(null);
   const connections = ref<DataConnection[]>([]); // For Leader: all members. For Member: just Leader.
   const isLeader = ref(false);
   const currentTeamId = ref<string>(""); // Leader's Peer ID
 
-  // Group code system (for Team page)
+
   const groupName = ref<string>("");
   const groupCode = ref<string>(""); // 6-char short code for joining
   const groupLeaderPeerId = ref<string>(""); // The peer ID of the group leader
@@ -113,30 +127,32 @@ export const useTeamsStore = defineStore("teams", () => {
   const members = ref<TeamMember[]>([]);
   const messages = ref<ChatMessage[]>([]);
   const activeGoal = ref<TeamGoal | null>(null);
-  
-  // Voice State
+
+
   const localStream = ref<MediaStream | null>(null);
   const voiceConnections = ref<MediaConnection[]>([]);
   const voiceActive = ref(false);
   const remoteStreams = ref<Map<string, MediaStream>>(new Map());
-  
-  // Voice Controls
+
+
   const isMuted = ref(false);
   const isCameraOn = ref(false);
   const isScreenSharing = ref(false);
-  
-  // Device Management
+
+
   const audioInputDevices = ref<MediaDeviceInfo[]>([]);
   const audioOutputDevices = ref<MediaDeviceInfo[]>([]);
   const videoInputDevices = ref<MediaDeviceInfo[]>([]);
   const selectedAudioInput = ref<string>("");
   const selectedAudioOutput = ref<string>("");
+  const lastActivityApp = ref("");
+  const activityPollInterval = ref<number | null>(null);
+  const unlistenTick = ref<(() => void) | null>(null);
 
-  // Computed
   const isConnected = computed(() => !!peer.value && !peer.value.disconnected);
-  // const amILeader = computed(() => isLeader.value);
-  
-  // Actions
+  const isInGroup = computed(() => !!groupCode.value);
+
+
   function saveProfile(name: string, email: string) {
     myProfile.name = name;
     myProfile.email = email;
@@ -167,18 +183,18 @@ export const useTeamsStore = defineStore("teams", () => {
         return;
       }
 
-      // Create Peer with random ID
+
       const newPeer = new Peer();
 
       newPeer.on('open', (id) => {
         myProfile.id = id;
         peer.value = newPeer;
         console.log("My Peer ID:", id);
-        
-        // Setup listener for incoming connections (Host logic mostly)
+
+
         newPeer.on('connection', handleIncomingConnection);
-        
-        // Setup listener for incoming voice calls
+
+
         newPeer.on('call', handleIncomingCall);
 
         resolve(id);
@@ -195,15 +211,15 @@ export const useTeamsStore = defineStore("teams", () => {
     conn.on('open', () => {
       console.log("New connection from:", conn.peer);
       connections.value.push(conn);
-      
-      // Request their info
+
+
       conn.send({ type: 'REQUEST_PROFILE' });
-      
+
       if (isLeader.value) {
         broadcastState();
       }
     });
-    
+
     conn.on('data', (data: any) => handleData(data, conn));
 
     conn.on('close', () => {
@@ -213,21 +229,21 @@ export const useTeamsStore = defineStore("teams", () => {
     });
   }
 
-  // --- Voice/Video Logic ---
+
   async function joinVoice(video = false) {
     if (voiceActive.value) return;
     try {
-        const stream = await navigator.mediaDevices.getUserMedia({ 
-            audio: true, 
-            video: video ? { width: 1280, height: 720 } : false 
+        const stream = await navigator.mediaDevices.getUserMedia({
+            audio: true,
+            video: video ? { width: 1280, height: 720 } : false
         });
         localStream.value = stream;
         voiceActive.value = true;
-        
-        // Update status
+
+
         updateMyStatus('voice');
 
-        // Call everyone
+
         if (isLeader.value) {
             connections.value.forEach(conn => callPeer(conn.peer, stream));
         } else {
@@ -243,34 +259,34 @@ export const useTeamsStore = defineStore("teams", () => {
           await joinVoice(true);
           return;
       }
-      
+
       const videoTrack = localStream.value.getVideoTracks()[0];
       if (videoTrack) {
-          // Toggle existing
+
           videoTrack.enabled = !videoTrack.enabled;
-          // If we stopped it, maybe we want to actually stop the track to turn off light?
-          // videoTrack.stop(); // But then we need to re-request. `enabled = false` is mute.
-          // To truly "Turn On" if we started with audio-only:
+
+
+
       } else {
-          // We started with audio-only, now want video
+
           try {
               const videoStream = await navigator.mediaDevices.getUserMedia({ video: true });
               const newTrack = videoStream.getVideoTracks()[0];
               localStream.value.addTrack(newTrack);
-              
-              // Replace track in active calls
+
+
               voiceConnections.value.forEach(call => {
                   const sender = call.peerConnection.getSenders().find(s => s.track?.kind === 'video');
                   if (sender) sender.replaceTrack(newTrack);
                   else call.peerConnection.addTrack(newTrack, localStream.value!);
               });
-          } catch(e) { 
+          } catch(e) {
               console.error("Cam Error", e);
           }
       }
   }
 
-  // --- Screen Share ---
+
   const desktopSources = ref<{ id: string, name: string, thumbnail: string }[]>([]);
 
   async function fetchDesktopSources() {
@@ -285,38 +301,35 @@ export const useTeamsStore = defineStore("teams", () => {
 
   async function shareScreen(sourceId?: string) {
       if (!localStream.value) await joinVoice(false);
-      
+
       try {
           let screenStream: MediaStream;
-          
+
           if (sourceId) {
-             // Custom source selected
-             // Note: In WebView2/Tauri, the ID format from EnumWindows (HWND) typically needs to be passed 
-             // in a specific way or we might need to use getDisplayMedia which ignores sourceId usually.
-             // Try standard legacy constraint for specific window:
+
+
+
+
              screenStream = await navigator.mediaDevices.getUserMedia({
                  audio: false,
                  video: {
-                     // @ts-ignore
                      mandatory: {
                          chromeMediaSource: 'desktop',
                          chromeMediaSourceId: sourceId
                      }
-                 }
+                 } as any
              });
           } else {
-             // Fallback to system picker
-             // @ts-ignore
-             screenStream = await navigator.mediaDevices.getDisplayMedia({ 
-                 video: true, 
-                 audio: false 
+             screenStream = await navigator.mediaDevices.getDisplayMedia({
+                 video: true,
+                 audio: false
              });
           }
-          
+
           const screenTrack = screenStream.getVideoTracks()[0];
-          
+
           screenTrack.onended = () => {
-              stopScreenShare(); 
+              stopScreenShare();
           };
 
           const videoTrack = localStream.value!.getVideoTracks()[0];
@@ -325,21 +338,21 @@ export const useTeamsStore = defineStore("teams", () => {
               localStream.value!.removeTrack(videoTrack);
           }
           localStream.value!.addTrack(screenTrack);
-          
+
           voiceConnections.value.forEach(call => {
                const sender = call.peerConnection.getSenders().find(s => s.track?.kind === 'video');
                if (sender) sender.replaceTrack(screenTrack);
                else call.peerConnection.addTrack(screenTrack, localStream.value!);
           });
-          
+
           isScreenSharing.value = true;
           updateMyStatus('voice', true);
-          
+
       } catch (e) {
           console.error("Screen Share Error", e);
       }
   }
-  
+
   function stopScreenShare() {
        if (localStream.value) {
           const videoTrack = localStream.value.getVideoTracks()[0];
@@ -350,8 +363,8 @@ export const useTeamsStore = defineStore("teams", () => {
        }
        isScreenSharing.value = false;
        updateMyStatus('voice', false);
-       
-       // Optional: Try to restore camera here if needed
+
+
   }
 
   function toggleMute() {
@@ -369,8 +382,7 @@ export const useTeamsStore = defineStore("teams", () => {
           audioInputDevices.value = devices.filter(d => d.kind === 'audioinput');
           audioOutputDevices.value = devices.filter(d => d.kind === 'audiooutput');
           videoInputDevices.value = devices.filter(d => d.kind === 'videoinput');
-          
-          // Set defaults if not set
+
           if (!selectedAudioInput.value && audioInputDevices.value.length) {
               selectedAudioInput.value = audioInputDevices.value[0].deviceId;
           }
@@ -385,21 +397,20 @@ export const useTeamsStore = defineStore("teams", () => {
   async function switchAudioInput(deviceId: string) {
       selectedAudioInput.value = deviceId;
       if (!localStream.value || !voiceActive.value) return;
-      
+
       try {
           const newStream = await navigator.mediaDevices.getUserMedia({
               audio: { deviceId: { exact: deviceId } }
           });
           const newTrack = newStream.getAudioTracks()[0];
           const oldTrack = localStream.value.getAudioTracks()[0];
-          
+
           if (oldTrack) {
               oldTrack.stop();
               localStream.value.removeTrack(oldTrack);
           }
           localStream.value.addTrack(newTrack);
-          
-          // Update in active calls
+
           voiceConnections.value.forEach(call => {
               const sender = call.peerConnection.getSenders().find(s => s.track?.kind === 'audio');
               if (sender) sender.replaceTrack(newTrack);
@@ -423,7 +434,7 @@ export const useTeamsStore = defineStore("teams", () => {
       isScreenSharing.value = false;
       updateMyStatus('online', false);
   }
-  
+
   function callPeer(peerId: string, stream: MediaStream) {
      if (!peer.value) return;
      const call = peer.value.call(peerId, stream);
@@ -435,7 +446,7 @@ export const useTeamsStore = defineStore("teams", () => {
           call.answer(localStream.value);
           setupCallEvents(call);
       } else {
-          // Auto-join voice audio-only
+
           navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
               localStream.value = stream;
               voiceActive.value = true;
@@ -459,7 +470,7 @@ export const useTeamsStore = defineStore("teams", () => {
       call.on('error', (e) => console.error("Call error", e));
       voiceConnections.value.push(call);
   }
-  
+
   function updateMyStatus(status: 'online' | 'voice', sharing?: boolean) {
       const self = members.value.find(m => m.id === myProfile.id);
       if (self) {
@@ -468,13 +479,13 @@ export const useTeamsStore = defineStore("teams", () => {
               self.isScreenSharing = sharing;
           }
       }
-      
-      const payload = { 
-          id: myProfile.id, 
-          status, 
-          isScreenSharing: typeof sharing === 'boolean' ? sharing : self?.isScreenSharing 
+
+      const payload = {
+          id: myProfile.id,
+          status,
+          isScreenSharing: typeof sharing === 'boolean' ? sharing : self?.isScreenSharing
       };
-      
+
       if (isLeader.value) broadcast({ type: 'STATUS_UPDATE', payload });
       else connections.value.forEach(c => c.send({ type: 'STATUS_UPDATE', payload }));
   }
@@ -483,51 +494,52 @@ export const useTeamsStore = defineStore("teams", () => {
   async function handleData(data: any, conn: DataConnection) {
     switch (data.type) {
       case 'REQUEST_PROFILE':
-        // Send my profile back
-        conn.send({ 
-          type: 'PROFILE_RESPONSE', 
-          payload: { name: myProfile.name, email: myProfile.email, isLeader: isLeader.value } 
+        conn.send({
+          type: 'PROFILE_RESPONSE',
+          payload: { name: myProfile.name, email: myProfile.email, isLeader: isLeader.value }
         });
         break;
 
       case 'PROFILE_RESPONSE':
-        // A new member sent their details
         handleProfileResponse(data.payload, conn);
         break;
 
       case 'SYNC_STATE':
-        // Received full state update (usually from Leader)
         if (!isLeader.value) {
           members.value = data.payload.members;
           activeGoal.value = data.payload.goal;
+          saveGroupState();
         }
         break;
-        
+
       case 'STATUS_UPDATE':
-         // Update member status
          const m = members.value.find(mem => mem.id === data.payload.id);
          if (m) {
              m.status = data.payload.status;
              if (data.payload.isScreenSharing !== undefined) {
                  m.isScreenSharing = data.payload.isScreenSharing;
              }
+             if (data.payload.name !== undefined) {
+                 m.name = data.payload.name;
+             }
+             saveGroupState();
          }
          if (isLeader.value) broadcast(data, conn.peer);
          break;
 
       case 'CHAT_MESSAGE':
         messages.value.push(data.payload);
+        saveGroupState();
         if (isLeader.value) {
-          // Re-broadcast to everyone else
            broadcast({ type: 'CHAT_MESSAGE', payload: data.payload }, conn.peer);
         }
         break;
-        
+
       case 'PROGRESS_UPDATE':
-        // Member sending progress to Leader
         if (isLeader.value) {
           updateMemberProgress(conn.peer, data.payload);
-          broadcastState(); // Reflect change to everyone
+          broadcastState();
+          saveGroupState();
         }
         break;
 
@@ -535,6 +547,7 @@ export const useTeamsStore = defineStore("teams", () => {
          if (isLeader.value) {
             updateMemberActivity(conn.peer, data.payload.appName);
             broadcastState();
+            saveGroupState();
          }
          break;
 
@@ -547,23 +560,34 @@ export const useTeamsStore = defineStore("teams", () => {
          break;
 
       case 'SYSTEM_NOTIFICATION':
-         // Received a forwarded notification from PC
          const notificationStore = (await import('./notifications')).useNotificationStore();
          notificationStore.add({
              title: data.payload.title,
              message: data.payload.body,
              type: data.payload.type || 'info',
-             duration: 10000 // Mobile notification should stay a bit longer
+             duration: 10000
          });
          break;
 
       case 'REPORT_DOWNLOADED':
-         // Notify the target member (shown via UI notification)
          break;
 
       case 'KICK':
-         // I was kicked
-         leaveTeam();
+         leaveGroup();
+         break;
+
+      case 'RENAME_COMMAND':
+         myProfile.name = data.payload.newName;
+         localStorage.setItem("timigs_team_name", data.payload.newName);
+         const selfMember = members.value.find(mem => mem.id === myProfile.id);
+         if (selfMember) {
+           selfMember.name = data.payload.newName;
+         }
+         connections.value.forEach(c => c.send({
+           type: 'STATUS_UPDATE',
+           payload: { id: myProfile.id, name: data.payload.newName }
+         }));
+         saveGroupState();
          break;
     }
   }
@@ -581,17 +605,36 @@ export const useTeamsStore = defineStore("teams", () => {
         lastSeen: Date.now()
      };
 
-     // Update or Add
-     const index = members.value.findIndex(m => m.id === conn.peer);
+
+     let index = members.value.findIndex(m => m.id === conn.peer);
+     if (index === -1 && payload.name) {
+       index = members.value.findIndex(m => m.name === payload.name);
+     }
+
      if (index !== -1) {
-       members.value[index] = { ...members.value[index], ...newMember };
+       const oldId = members.value[index].id;
+       members.value[index] = { 
+         ...members.value[index], 
+         id: conn.peer, // Update to the new Peer ID!
+         name: payload.name || members.value[index].name,
+         email: payload.email || members.value[index].email,
+         status: 'online',
+         lastSeen: Date.now()
+       };
+
+       if (oldId !== conn.peer) {
+         messages.value.forEach(msg => {
+           if (msg.senderId === oldId) msg.senderId = conn.peer;
+         });
+       }
      } else {
        members.value.push(newMember);
      }
 
      if (isLeader.value) {
-       broadcastState(); // Tell everyone about the new guy
+       broadcastState();
      }
+     saveGroupState();
   }
 
   function updateMemberProgress(peerId: string, progress: any) {
@@ -601,13 +644,13 @@ export const useTeamsStore = defineStore("teams", () => {
     }
   }
 
-  // --- Leader Actions ---
+
 
   async function createTeam() {
     await initializePeer();
     isLeader.value = true;
     currentTeamId.value = myProfile.id;
-    // Add myself
+
     members.value = [{
       id: myProfile.id,
       name: myProfile.name,
@@ -622,35 +665,36 @@ export const useTeamsStore = defineStore("teams", () => {
   }
 
   function setGoal(appName: string, targetSeconds: number) {
-    activeGoal.value = { 
-        appName, 
-        targetSeconds, 
+    activeGoal.value = {
+        appName,
+        targetSeconds,
         description: `Work on ${appName} for ${Math.floor(targetSeconds/60)}m`,
         status: 'active'
     };
     broadcastState();
+    saveGroupState();
   }
-  
+
   function updateGoalStatus(status: 'completed' | 'failed' | 'cancelled') {
       if (activeGoal.value) {
           activeGoal.value.status = status;
           broadcastState();
+          saveGroupState();
       }
   }
 
   function kickMember(memberId: string) {
       if (!isLeader.value) return;
-      
-      // Notify them
+
       const conn = connections.value.find(c => c.peer === memberId);
       if (conn) {
           conn.send({ type: 'KICK' });
           conn.close();
       }
-      
-      // Remove local
+
       members.value = members.value.filter(m => m.id !== memberId);
       broadcastState();
+      saveGroupState();
   }
 
   function broadcastState() {
@@ -671,14 +715,14 @@ export const useTeamsStore = defineStore("teams", () => {
     });
   }
 
-  // --- Member Actions ---
+
 
   async function joinTeam(leaderId: string) {
     await initializePeer();
     isLeader.value = false;
     currentTeamId.value = leaderId;
     members.value = []; // Clear current
-    
+
     const conn = peer.value!.connect(leaderId);
     conn.on('open', () => {
       console.log("Connected to Leader");
@@ -708,18 +752,18 @@ export const useTeamsStore = defineStore("teams", () => {
       timestamp: Date.now()
     };
     messages.value.push(msg); // Add locally
-    
+
     if (isLeader.value) {
       broadcast({ type: 'CHAT_MESSAGE', payload: msg });
     } else {
-      // Send to leader, who broadcasts
+
       connections.value.forEach(c => c.send({ type: 'CHAT_MESSAGE', payload: msg }));
     }
   }
 
   function sendProgress(current: number, appName: string) {
     if (!activeGoal.value) return;
-    
+
     const percentage = Math.min(100, Math.round((current / activeGoal.value.targetSeconds) * 100));
     const payload = {
        appName,
@@ -727,8 +771,8 @@ export const useTeamsStore = defineStore("teams", () => {
        target: activeGoal.value.targetSeconds,
        percentage
     };
-    
-    // Update local self
+
+
     const self = members.value.find(m => m.id === myProfile.id);
     if (self) self.progress = payload;
 
@@ -743,7 +787,7 @@ export const useTeamsStore = defineStore("teams", () => {
       if (!isLeader.value) {
           connections.value.forEach(c => c.send({ type: 'ACTIVITY_UPDATE', payload: { appName } }));
       }
-      // Update local
+
       updateMemberActivity(myProfile.id, appName);
       if (isLeader.value) broadcastState();
   }
@@ -753,11 +797,11 @@ export const useTeamsStore = defineStore("teams", () => {
       if (m) m.currentApp = appName;
   }
 
-  // =============================================
-  // GROUP CODE SYSTEM (Team Page)
-  // =============================================
 
-  // In-memory registry: groupCode -> leaderPeerId (for demo; in production use a signaling server)
+
+
+
+
   const groupRegistry = new Map<string, string>();
 
   function generateGroupCode(): string {
@@ -778,7 +822,6 @@ export const useTeamsStore = defineStore("teams", () => {
     return `${adj} ${noun}`;
   }
 
-  // Create a new group (leader)
   async function createGroup(name?: string): Promise<{ groupCode: string; groupName: string }> {
     await initializePeer();
     isLeader.value = true;
@@ -791,10 +834,8 @@ export const useTeamsStore = defineStore("teams", () => {
     groupCode.value = code;
     groupName.value = gName;
 
-    // Register the code -> peer mapping
     groupRegistry.set(code, myProfile.id);
 
-    // Add myself as first member
     members.value = [{
       id: myProfile.id,
       name: myProfile.name || 'Anonymous',
@@ -807,17 +848,16 @@ export const useTeamsStore = defineStore("teams", () => {
       lastSeen: Date.now()
     }];
 
-    // Save to localStorage
-    saveGroupState();
+    await saveGroupState();
+    await startActivityPolling();
 
     return { groupCode: code, groupName: gName };
   }
 
-  // Join a group by code (member)
   async function joinGroupByCode(code: string): Promise<boolean> {
     const leaderPeerId = groupRegistry.get(code.toUpperCase());
     if (!leaderPeerId) {
-      return false; // Group not found
+      return false;
     }
 
     await initializePeer();
@@ -834,12 +874,24 @@ export const useTeamsStore = defineStore("teams", () => {
     conn.on('data', (d: any) => handleData(d, conn));
     conn.on('close', leaveGroup);
 
-    saveGroupState();
+    await saveGroupState();
+    await startActivityPolling();
     return true;
   }
 
-  // Leave the current group
+  async function getTempStateFilePath() {
+    try {
+      const { tempDir, join } = await import("@tauri-apps/api/path");
+      const tmp = await tempDir();
+      return await join(tmp, 'timigs_team_state.json');
+    } catch (err) {
+      console.error("Failed to get temp path:", err);
+      return null;
+    }
+  }
+
   function leaveGroup() {
+    stopActivityPolling();
     leaveVoice();
     connections.value.forEach(c => c.close());
     connections.value = [];
@@ -852,60 +904,150 @@ export const useTeamsStore = defineStore("teams", () => {
     activeGoal.value = null;
     messages.value = [];
     localStorage.removeItem('timigs_group_state');
+    localStorage.removeItem('timigs_team_full_data');
 
-    // If leader, unregister the code
+    getTempStateFilePath().then(path => {
+      if (path) {
+        remove(path).catch(() => {});
+      }
+    });
+
     if (groupRegistry.has(groupCode.value)) {
       groupRegistry.delete(groupCode.value);
     }
   }
 
-  // Save group state to localStorage
-  function saveGroupState() {
+  async function saveGroupState() {
     const state = {
       groupCode: groupCode.value,
       groupName: groupName.value,
       isLeader: isLeader.value,
       groupLeaderPeerId: groupLeaderPeerId.value,
-      profileName: myProfile.name
+      profileName: myProfile.name,
+      myPeerId: myProfile.id
     };
     localStorage.setItem('timigs_group_state', JSON.stringify(state));
+
+    const fullData = {
+      members: members.value,
+      messages: messages.value,
+      activeGoal: activeGoal.value
+    };
+    localStorage.setItem('timigs_team_full_data', JSON.stringify(fullData));
+
+    try {
+      const path = await getTempStateFilePath();
+      if (path) {
+        await writeTextFile(path, JSON.stringify(fullData, null, 2));
+      }
+    } catch (err) {
+      console.error("Failed to save team state to temp file:", err);
+    }
   }
 
-  // Restore group state from localStorage
   async function restoreGroupState(): Promise<boolean> {
+    const isFresh = !sessionStorage.getItem('timigs_session_active');
+    sessionStorage.setItem('timigs_session_active', 'true');
     const saved = localStorage.getItem('timigs_group_state');
     if (!saved) return false;
+    if (isFresh) {
+      localStorage.setItem('timigs_disconnected_on_restart', 'true');
+      leaveGroup();
+      return false;
+    }
 
     try {
       const state = JSON.parse(saved);
       if (!state.groupCode || !state.groupLeaderPeerId) return false;
 
-      // Profile name is already set by ensureProfile() (uses PC name)
+      groupCode.value = state.groupCode;
+      groupName.value = state.groupName || 'Team Group';
+      isLeader.value = state.isLeader;
+      groupLeaderPeerId.value = state.groupLeaderPeerId;
+
+      let restoredData: any = null;
+      try {
+        const path = await getTempStateFilePath();
+        if (path) {
+          const fileContent = await readTextFile(path);
+          if (fileContent) {
+            restoredData = JSON.parse(fileContent);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to restore team state from temp file:", err);
+      }
+
+      if (!restoredData) {
+        const fullSaved = localStorage.getItem('timigs_team_full_data');
+        if (fullSaved) {
+          restoredData = JSON.parse(fullSaved);
+        }
+      }
+
+      if (restoredData) {
+        members.value = restoredData.members || [];
+        messages.value = restoredData.messages || [];
+        activeGoal.value = restoredData.activeGoal || null;
+      }
+
+      const oldMyPeerId = state.myPeerId;
 
       if (state.isLeader) {
-        // Re-create as leader
-        await createGroup(state.groupName);
-        // Re-register the code
+        await initializePeer();
         groupRegistry.set(groupCode.value, myProfile.id);
+
+        if (oldMyPeerId && oldMyPeerId !== myProfile.id) {
+          const selfIndex = members.value.findIndex(m => m.id === oldMyPeerId);
+          if (selfIndex !== -1) {
+            members.value[selfIndex].id = myProfile.id;
+          }
+          messages.value.forEach(msg => {
+            if (msg.senderId === oldMyPeerId) msg.senderId = myProfile.id;
+          });
+        } else {
+          const selfIndex = members.value.findIndex(m => m.isLeader === true || m.name === myProfile.name);
+          if (selfIndex !== -1) {
+            members.value[selfIndex].id = myProfile.id;
+          }
+        }
+
+        updateMyStatus('online');
       } else {
-        // Re-join as member
-        groupCode.value = state.groupCode;
-        groupName.value = state.groupName || 'Team Group';
+        await initializePeer();
+
+        if (oldMyPeerId && oldMyPeerId !== myProfile.id) {
+          const selfIndex = members.value.findIndex(m => m.id === oldMyPeerId);
+          if (selfIndex !== -1) {
+            members.value[selfIndex].id = myProfile.id;
+          }
+          messages.value.forEach(msg => {
+            if (msg.senderId === oldMyPeerId) msg.senderId = myProfile.id;
+          });
+        }
+
         await joinGroupByCode(state.groupCode);
       }
 
+      await startActivityPolling();
       return true;
-    } catch {
+    } catch (e) {
+      console.error(e);
       return false;
     }
   }
 
-  // =============================================
-  // ACTIVITY SHARING
-  // =============================================
-
-  // Send current activity to all members
-  function broadcastActivity(activity: { appName: string; windowTitle: string; category: string }) {
+  function broadcastActivity(activity: { 
+    appName: string; 
+    windowTitle: string; 
+    category: string; 
+    inTimeout?: boolean; 
+    focusModeActive?: boolean;
+    focusTargetApp?: string;
+    currentMusicTitle?: string;
+    currentMusicArtist?: string;
+    musicSharingEnabled?: boolean;
+  }) {
     const payload = {
       type: 'ACTIVITY_BROADCAST',
       payload: {
@@ -913,16 +1055,27 @@ export const useTeamsStore = defineStore("teams", () => {
         appName: activity.appName || 'Unknown',
         windowTitle: activity.windowTitle || '',
         category: activity.category || 'Uncategorized',
-        timestamp: Date.now()
+        timestamp: Date.now(),
+        inTimeout: activity.inTimeout || false,
+        focusModeActive: activity.focusModeActive || false,
+        focusTargetApp: activity.focusTargetApp || '',
+        currentMusicTitle: activity.currentMusicTitle || '',
+        currentMusicArtist: activity.currentMusicArtist || '',
+        musicSharingEnabled: activity.musicSharingEnabled !== false,
       }
     };
 
-    // Update local
     updateMemberActivity(myProfile.id, activity.appName);
     const self = members.value.find(m => m.id === myProfile.id);
     if (self) {
       self.lastSeen = Date.now();
       self.currentApp = activity.appName;
+      self.inTimeout = activity.inTimeout || false;
+      self.focusModeActive = activity.focusModeActive || false;
+      self.focusTargetApp = activity.focusTargetApp || '';
+      self.currentMusicTitle = activity.currentMusicTitle || '';
+      self.currentMusicArtist = activity.currentMusicArtist || '';
+      self.musicSharingEnabled = activity.musicSharingEnabled !== false;
     }
 
     if (isLeader.value) {
@@ -930,16 +1083,21 @@ export const useTeamsStore = defineStore("teams", () => {
     } else {
       connections.value.forEach(c => c.send(payload));
     }
+    saveGroupState();
   }
 
-  // Handle incoming activity broadcast
   function handleActivityBroadcast(payload: any) {
     const m = members.value.find(x => x.id === payload.memberId);
     if (m) {
       m.currentApp = payload.appName;
       m.lastSeen = payload.timestamp;
+      m.inTimeout = payload.inTimeout || false;
+      m.focusModeActive = payload.focusModeActive || false;
+      m.focusTargetApp = payload.focusTargetApp || '';
+      m.currentMusicTitle = payload.currentMusicTitle || '';
+      m.currentMusicArtist = payload.currentMusicArtist || '';
+      m.musicSharingEnabled = payload.musicSharingEnabled !== false;
 
-      // Add to activity history
       const entry: ActivityEntry = {
         id: `${payload.memberId}-${payload.timestamp}`,
         appName: payload.appName,
@@ -951,19 +1109,18 @@ export const useTeamsStore = defineStore("teams", () => {
       };
       m.activityHistory.push(entry);
 
-      // Limit history size
       if (m.activityHistory.length > 200) {
         m.activityHistory = m.activityHistory.slice(-200);
       }
+      saveGroupState();
     }
 
-    // Leader re-broadcasts to other members
     if (isLeader.value) {
       broadcast({ type: 'ACTIVITY_BROADCAST', payload });
     }
   }
 
-  // Send activity session with duration
+
   function broadcastActivitySession(entry: ActivityEntry) {
     const payload = {
       type: 'ACTIVITY_SESSION',
@@ -984,9 +1141,10 @@ export const useTeamsStore = defineStore("teams", () => {
     } else {
       connections.value.forEach(c => c.send(payload));
     }
+    saveGroupState();
   }
 
-  // Handle incoming activity session
+
   function handleActivitySession(payload: any) {
     const m = members.value.find(x => x.id === payload.memberId);
     if (m) {
@@ -996,6 +1154,7 @@ export const useTeamsStore = defineStore("teams", () => {
       if (m.activityHistory.length > 200) {
         m.activityHistory = m.activityHistory.slice(-200);
       }
+      saveGroupState();
     }
 
     if (isLeader.value) {
@@ -1003,18 +1162,18 @@ export const useTeamsStore = defineStore("teams", () => {
     }
   }
 
-  // =============================================
-  // STATISTICS
-  // =============================================
 
-  // Get statistics for a specific member
+
+
+
+
   function getMemberStats(memberId: string): MemberStats | null {
     const member = members.value.find(m => m.id === memberId);
     if (!member) return null;
 
     const activeDuration = Date.now() - member.joinedAt;
 
-    // Calculate top apps
+
     const appMap = new Map<string, number>();
     const categoryMap = new Map<string, number>();
 
@@ -1060,7 +1219,7 @@ export const useTeamsStore = defineStore("teams", () => {
     };
   }
 
-  // Get ranking of members by online time
+
   function getOnlineTimeRanking(): { memberId: string; memberName: string; totalOnlineSeconds: number; rank: number }[] {
     return members.value
       .map(m => ({
@@ -1072,13 +1231,13 @@ export const useTeamsStore = defineStore("teams", () => {
       .map((entry, index) => ({ ...entry, rank: index + 1 }));
   }
 
-  // Get total team stats
+
   function getTeamStats() {
     const totalMembers = members.value.length;
     const onlineMembers = members.value.filter(m => m.status === 'online' || m.status === 'voice').length;
     const totalOnlineSeconds = members.value.reduce((sum, m) => sum + m.totalOnlineSeconds, 0);
 
-    // Aggregate top apps across all members
+
     const appMap = new Map<string, number>();
     members.value.forEach(member => {
       member.activityHistory.forEach(entry => {
@@ -1097,11 +1256,11 @@ export const useTeamsStore = defineStore("teams", () => {
     };
   }
 
-  // =============================================
-  // REPORT GENERATION & DOWNLOAD
-  // =============================================
 
-  // Generate report for entire group
+
+
+
+
   function generateGroupReport(): TeamReport {
     const memberReports: TeamMemberReport[] = members.value.map(member => ({
       memberId: member.id,
@@ -1109,7 +1268,10 @@ export const useTeamsStore = defineStore("teams", () => {
       isLeader: member.isLeader,
       totalOnlineSeconds: member.totalOnlineSeconds,
       activityHistory: member.activityHistory,
-      stats: getMemberStats(member.id)!
+      stats: getMemberStats(member.id)!,
+      tasks: member.tasks || [],
+      inTimeout: !!member.inTimeout,
+      focusModeActive: !!member.focusModeActive
     }));
 
     return {
@@ -1122,7 +1284,6 @@ export const useTeamsStore = defineStore("teams", () => {
     };
   }
 
-  // Generate report for a specific member
   function generateMemberReport(memberId: string): TeamMemberReport | null {
     const member = members.value.find(m => m.id === memberId);
     if (!member) return null;
@@ -1133,16 +1294,19 @@ export const useTeamsStore = defineStore("teams", () => {
       isLeader: member.isLeader,
       totalOnlineSeconds: member.totalOnlineSeconds,
       activityHistory: member.activityHistory,
-      stats: getMemberStats(member.id)!
+      stats: getMemberStats(member.id)!,
+      tasks: member.tasks || [],
+      inTimeout: !!member.inTimeout,
+      focusModeActive: !!member.focusModeActive
     };
   }
 
-  // Download report as JSON file
+
   async function downloadReport(report: TeamReport | TeamMemberReport, filename?: string) {
     try {
       const defaultName = 'memberId' in report ? `${report.memberName}_Report` : `${report.groupName}_Report`;
       const finalName = filename || `${defaultName}_${new Date().toISOString().split('T')[0]}.json`;
-      
+
       const savePath = await save({
         defaultPath: finalName,
         filters: [{ name: 'JSON Document', extensions: ['json'] }]
@@ -1153,7 +1317,7 @@ export const useTeamsStore = defineStore("teams", () => {
       }
     } catch (e) {
       console.error("Failed to download report via Tauri:", e);
-      // Fallback to web approach
+
       const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -1165,7 +1329,7 @@ export const useTeamsStore = defineStore("teams", () => {
     }
   }
 
-  // Notify a member that their report was downloaded
+
   function notifyReportDownloaded(targetMemberId: string) {
     const payload = {
       type: 'REPORT_DOWNLOADED',
@@ -1184,7 +1348,246 @@ export const useTeamsStore = defineStore("teams", () => {
     }
   }
 
-  // =============================================
+  function loadReportData(report: TeamReport) {
+    groupName.value = report.groupName;
+    groupCode.value = report.groupCode;
+    groupLeaderPeerId.value = report.leaderId;
+    members.value = report.members.map(m => ({
+      id: m.memberId,
+      name: m.memberName,
+      email: "",
+      isLeader: m.isLeader,
+      status: 'offline',
+      joinedAt: report.createdAt || Date.now(),
+      totalOnlineSeconds: m.totalOnlineSeconds,
+      activityHistory: m.activityHistory || [],
+      lastSeen: report.generatedAt || Date.now(),
+      tasks: m.tasks || [],
+      inTimeout: m.inTimeout || false,
+      focusModeActive: m.focusModeActive || false
+    }));
+    saveGroupState();
+  }
+
+  function renameMember(memberId: string, newName: string) {
+    if (memberId === myProfile.id) {
+      myProfile.name = newName;
+      localStorage.setItem("timigs_team_name", newName);
+      const selfMember = members.value.find(m => m.id === myProfile.id);
+      if (selfMember) {
+        selfMember.name = newName;
+      }
+      if (isLeader.value) {
+        broadcastState();
+      } else {
+        connections.value.forEach(c => c.send({
+          type: 'STATUS_UPDATE',
+          payload: { id: myProfile.id, name: newName }
+        }));
+      }
+    } else if (isLeader.value) {
+      const member = members.value.find(m => m.id === memberId);
+      if (member) {
+        member.name = newName;
+        const conn = connections.value.find(c => c.peer === memberId);
+        if (conn) {
+          conn.send({ type: 'RENAME_COMMAND', payload: { newName } });
+        }
+        broadcastState();
+      }
+    }
+    saveGroupState();
+  }
+
+  function addMemberTask(memberId: string, taskText: string) {
+    if (!taskText.trim()) return;
+    const member = members.value.find(m => m.id === memberId);
+    if (member) {
+      if (!member.tasks) member.tasks = [];
+      member.tasks.push(taskText.trim());
+      if (isLeader.value) {
+        broadcastState();
+      } else {
+        connections.value.forEach(c => c.send({
+          type: 'SYNC_STATE',
+          payload: { members: members.value, goal: activeGoal.value }
+        }));
+      }
+    }
+    saveGroupState();
+  }
+
+  function removeMemberTask(memberId: string, index: number) {
+    const member = members.value.find(m => m.id === memberId);
+    if (member && member.tasks && member.tasks[index] !== undefined) {
+      member.tasks.splice(index, 1);
+      if (isLeader.value) {
+        broadcastState();
+      } else {
+        connections.value.forEach(c => c.send({
+          type: 'SYNC_STATE',
+          payload: { members: members.value, goal: activeGoal.value }
+        }));
+      }
+    }
+    saveGroupState();
+  }
+
+  async function pollCurrentActivity() {
+    let isFocusActive = false;
+    let isBreakActive = false;
+    let focusTargetApp = '';
+    let currentMusicTitle = '';
+    let currentMusicArtist = '';
+
+    try {
+      const focusStatus = await invoke<any>('get_focus_status_cmd');
+      isFocusActive = !!(focusStatus && focusStatus.active);
+      if (isFocusActive && focusStatus) {
+        focusTargetApp = focusStatus.app_name || '';
+      }
+    } catch (e) {
+      console.error('Failed to get focus status in teams store', e);
+    }
+    try {
+      const timeoutStatus = await invoke<any>('get_timeout_status_cmd');
+      isBreakActive = !!(timeoutStatus && timeoutStatus.active && timeoutStatus.break_active);
+    } catch (e) {
+      console.error('Failed to get timeout status in teams store', e);
+    }
+
+    if (myProfile.musicSharingEnabled) {
+      try {
+        const mediaInfo = await invoke<any>('get_current_media_info');
+        if (mediaInfo) {
+          currentMusicTitle = mediaInfo.title || '';
+          currentMusicArtist = mediaInfo.artist || '';
+        }
+      } catch (e) {
+        console.error('Failed to get active media playback info in teams store', e);
+      }
+    }
+
+    const self = members.value.find(m => m.id === myProfile.id);
+    let statusChanged = false;
+    if (self) {
+      if (
+        self.focusModeActive !== isFocusActive || 
+        self.inTimeout !== isBreakActive ||
+        self.focusTargetApp !== focusTargetApp ||
+        self.currentMusicTitle !== currentMusicTitle ||
+        self.currentMusicArtist !== currentMusicArtist ||
+        self.musicSharingEnabled !== myProfile.musicSharingEnabled
+      ) {
+        self.focusModeActive = isFocusActive;
+        self.inTimeout = isBreakActive;
+        self.focusTargetApp = focusTargetApp;
+        self.currentMusicTitle = currentMusicTitle;
+        self.currentMusicArtist = currentMusicArtist;
+        self.musicSharingEnabled = myProfile.musicSharingEnabled;
+        statusChanged = true;
+      }
+    }
+
+    const activityStore = useActivityStore();
+    const current = activityStore.currentActivity;
+    if (!current) {
+      if (statusChanged && self) {
+        broadcastActivity({ 
+          appName: self.currentApp || 'Unknown', 
+          windowTitle: '', 
+          category: 'Uncategorized', 
+          inTimeout: isBreakActive, 
+          focusModeActive: isFocusActive,
+          focusTargetApp,
+          currentMusicTitle,
+          currentMusicArtist,
+          musicSharingEnabled: myProfile.musicSharingEnabled
+        });
+      }
+      return;
+    }
+
+    const appName = current.app_name || 'Unknown';
+
+    if (appName !== lastActivityApp.value || statusChanged) {
+      if (appName !== lastActivityApp.value && lastActivityApp.value) {
+        if (self) {
+          let lastEntry = null;
+          for (let i = self.activityHistory.length - 1; i >= 0; i--) {
+            if (self.activityHistory[i].appName === lastActivityApp.value && self.activityHistory[i].durationSeconds === 0) {
+              lastEntry = self.activityHistory[i];
+              break;
+            }
+          }
+          if (lastEntry) {
+            lastEntry.endTime = Date.now();
+            lastEntry.durationSeconds = Math.floor((lastEntry.endTime - lastEntry.startTime) / 1000);
+            self.totalOnlineSeconds += lastEntry.durationSeconds;
+            broadcastActivitySession(lastEntry);
+          }
+        }
+      }
+
+      const category = detectCategory(appName, current.exe_path || '');
+
+      if (appName !== lastActivityApp.value) {
+        const entry = {
+          id: `${myProfile.id}-${Date.now()}`,
+          appName,
+          windowTitle: current.window_title || '',
+          category,
+          startTime: Date.now(),
+          endTime: Date.now(),
+          durationSeconds: 0
+        };
+
+        if (self) {
+          self.activityHistory.push(entry);
+          self.currentApp = appName;
+        }
+        lastActivityApp.value = appName;
+      }
+
+      broadcastActivity({ 
+        appName, 
+        windowTitle: current.window_title || '', 
+        category, 
+        inTimeout: isBreakActive, 
+        focusModeActive: isFocusActive,
+        focusTargetApp,
+        currentMusicTitle,
+        currentMusicArtist,
+        musicSharingEnabled: myProfile.musicSharingEnabled
+      });
+    }
+  }
+
+  async function startActivityPolling() {
+    pollCurrentActivity();
+    if (!activityPollInterval.value) {
+      activityPollInterval.value = window.setInterval(pollCurrentActivity, 10000);
+    }
+    if (!unlistenTick.value) {
+      const { listen } = await import("@tauri-apps/api/event");
+      unlistenTick.value = await listen("activity-tracker-tick", () => {
+        if (isInGroup.value) {
+          pollCurrentActivity();
+        }
+      });
+    }
+  }
+
+  function stopActivityPolling() {
+    if (activityPollInterval.value) {
+      clearInterval(activityPollInterval.value);
+      activityPollInterval.value = null;
+    }
+    if (unlistenTick.value) {
+      unlistenTick.value();
+      unlistenTick.value = null;
+    }
+  }
 
   return {
     myProfile,
@@ -1197,7 +1600,6 @@ export const useTeamsStore = defineStore("teams", () => {
     voiceActive,
     remoteStreams,
     localStream,
-    // Voice Controls
     isMuted,
     isCameraOn,
     isScreenSharing,
@@ -1206,11 +1608,9 @@ export const useTeamsStore = defineStore("teams", () => {
     videoInputDevices,
     selectedAudioInput,
     selectedAudioOutput,
-    // Group code system (Team page)
     groupName,
     groupCode,
     groupLeaderPeerId,
-    // Actions
     saveProfile,
     ensureProfile,
     createTeam,
@@ -1231,26 +1631,30 @@ export const useTeamsStore = defineStore("teams", () => {
     switchAudioInput,
     fetchDesktopSources,
     desktopSources,
-    // Team page group code functions
     createGroup,
     joinGroupByCode,
     leaveGroup,
     restoreGroupState,
     saveGroupState,
     generateGroupCode,
-    // Activity sharing
     broadcastActivity,
     broadcastActivitySession,
-    // Statistics
     getMemberStats,
     getOnlineTimeRanking,
     getTeamStats,
-    // Reports
     generateGroupReport,
     generateMemberReport,
     downloadReport,
     notifyReportDownloaded,
-    // Internal broadcast for forwarding
-    broadcast
+    broadcast,
+    loadReportData,
+    renameMember,
+    addMemberTask,
+    removeMemberTask,
+    isInGroup,
+    startActivityPolling,
+    stopActivityPolling,
+    pollCurrentActivity
   };
 });
+
