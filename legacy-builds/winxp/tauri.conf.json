@@ -54,7 +54,6 @@
       "icons/icon.ico"
     ],
     "windows": {
-      "signCommand": "node windows\\sign.cjs \"%1\"",
       "nsis": {
         "installMode": "currentUser",
         "displayLanguageSelector": true,
