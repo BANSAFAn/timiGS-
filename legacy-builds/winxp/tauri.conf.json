@@ -54,7 +54,7 @@
       "icons/icon.ico"
     ],
     "windows": {
-      "signCommand": "powershell -ExecutionPolicy Bypass -File windows/sign.ps1 \"%1\"",
+      "signCommand": "powershell.exe -ExecutionPolicy Bypass -File windows\\sign.ps1 \"%1\"",
       "nsis": {
         "installMode": "currentUser",
         "displayLanguageSelector": true,
