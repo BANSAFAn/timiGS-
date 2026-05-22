@@ -62,7 +62,7 @@ jobs:
       - name: Install dependencies (Alpine)
         if: matrix.container == 'alpine:latest'
         run: |
-          apk add --no-cache nodejs npm curl rust cargo git make musl-dev openssl-dev clang llvm webkit2gtk-4.1-dev gtk+3.0-dev libayatana-appindicator-dev librsvg-dev patchelf alsa-lib-dev
+          apk add --no-cache nodejs npm curl rust cargo git make musl-dev openssl-dev clang llvm webkit2gtk-4.1-dev gtk+3.0-dev libayatana-appindicator-dev librsvg-dev patchelf alsa-lib-dev xdg-utils
 
       - name: Setup Node.js
         if: matrix.container != 'alpine:latest'
@@ -120,16 +120,47 @@ jobs:
           $pfxPath = Join-Path $certDir "cert.pfx"
           $pfxPassword = "timigs123"
           if ($env:TIMIGS_SECRET.StartsWith("-----BEGIN")) {
-              [System.IO.File]::WriteAllText($pemPath, $env:TIMIGS_SECRET)
               if ($env:TIMIGS_SECRET -match "PRIVATE KEY") {
+                  [System.IO.File]::WriteAllText($pemPath, $env:TIMIGS_SECRET)
                   Write-Host "PEM contains private key. Exporting to PFX using openssl..."
                   openssl pkcs12 -export -out $pfxPath -in $pemPath -passout "pass:$pfxPassword" -legacy
                   if ($LASTEXITCODE -ne 0 -or -not (Test-Path $pfxPath)) {
                       openssl pkcs12 -export -out $pfxPath -in $pemPath -passout "pass:$pfxPassword"
                   }
               } else {
-                  Write-Error "PEM certificate does not contain a PRIVATE KEY. Cannot create PFX."
-                  exit 1
+                  Write-Host "PEM does not contain 'PRIVATE KEY'. Checking if it is a wrapped PFX..."
+                  $lines = $env:TIMIGS_SECRET -split "`n"
+                  $base64Body = ""
+                  foreach ($line in $lines) {
+                      $trimmed = $line.Trim()
+                      if (-not $trimmed.StartsWith("-----")) {
+                          $base64Body += $trimmed
+                      }
+                  }
+                  try {
+                      $bytes = [System.Convert]::FromBase64String($base64Body)
+                      [System.IO.File]::WriteAllBytes($pfxPath, $bytes)
+                      $certs = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2Collection
+                      $pfxValid = $false
+                      try {
+                          $certs.Import($pfxPath, "", [System.Security.Cryptography.X509Certificates.X509KeyStorageFlags]::DefaultKeySet)
+                          $pfxPassword = ""
+                          $pfxValid = $true
+                      } catch {
+                          try {
+                              $certs.Import($pfxPath, "timigs123", [System.Security.Cryptography.X509Certificates.X509KeyStorageFlags]::DefaultKeySet)
+                              $pfxPassword = "timigs123"
+                              $pfxValid = $true
+                          } catch {}
+                      }
+                      if (-not $pfxValid) {
+                          throw "Not a valid PFX file"
+                      }
+                      Write-Host "Verified: Wrapped PFX file successfully decoded!"
+                  } catch {
+                      Write-Error "PEM certificate does not contain a PRIVATE KEY, and is not a valid PFX file: $_"
+                      exit 1
+                  }
               }
           } else {
               Write-Host "Decoding base64 encoded PFX..."
