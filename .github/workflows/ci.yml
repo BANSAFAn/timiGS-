@@ -84,7 +84,7 @@ jobs:
             name: macOS
           - platform: ubuntu-latest
             container: alpine:latest
-            args: ""
+            args: "--bundles deb,rpm"
             name: Linux (Alpine)
           - platform: windows-latest
             args: ""
