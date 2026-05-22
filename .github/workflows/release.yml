@@ -62,7 +62,8 @@ jobs:
       - name: Install dependencies (Alpine)
         if: matrix.container == 'alpine:latest'
         run: |
-          apk add --no-cache nodejs npm curl rust cargo git make musl-dev openssl-dev clang llvm webkit2gtk-4.1-dev gtk+3.0-dev libayatana-appindicator-dev librsvg-dev patchelf alsa-lib-dev xdg-utils
+          apk add --no-cache nodejs npm curl rust cargo git make musl-dev openssl-dev clang llvm webkit2gtk-4.1-dev gtk+3.0-dev libayatana-appindicator-dev librsvg-dev patchelf alsa-lib-dev xdg-utils gcompat libc6-compat
+
 
       - name: Setup Node.js
         if: matrix.container != 'alpine:latest'
@@ -190,6 +191,7 @@ jobs:
           GITHUB_CLIENT_ID: ${{ secrets.GH_OAUTH_CLIENT_ID }}
           GITHUB_CLIENT_SECRET: ${{ secrets.GH_OAUTH_CLIENT_SECRET }}
           RUSTFLAGS: ${{ matrix.container == 'alpine:latest' && '-C target-feature=-crt-static' || '' }}
+          APPIMAGE_EXTRACT_AND_RUN: 1
         with:
           tagName: ${{ needs.release-please.outputs.tag_name }}
           releaseName: "TimiGS ${{ needs.release-please.outputs.tag_name }}"
@@ -206,6 +208,7 @@ jobs:
           GITHUB_CLIENT_ID: ${{ secrets.GH_OAUTH_CLIENT_ID }}
           GITHUB_CLIENT_SECRET: ${{ secrets.GH_OAUTH_CLIENT_SECRET }}
           RUSTFLAGS: ${{ matrix.container == 'alpine:latest' && '-C target-feature=-crt-static' || '' }}
+          APPIMAGE_EXTRACT_AND_RUN: 1
         with:
           tagName: dev-${{ github.sha }}
           releaseName: "TimiGS Development Build (${{ github.sha }})"
