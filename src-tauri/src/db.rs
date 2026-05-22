@@ -1239,6 +1239,7 @@ pub fn reset_all_data() -> Result<()> {
     conn.execute("DELETE FROM project_tasks", [])?;
     conn.execute("DELETE FROM cloud_accounts", [])?;
     conn.execute("DELETE FROM settings", [])?;
+    conn.execute("DELETE FROM coding_sessions", [])?;
 
     Ok(())
 }
