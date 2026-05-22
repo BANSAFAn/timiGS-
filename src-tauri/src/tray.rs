@@ -41,14 +41,40 @@ pub fn setup(app: &tauri::App) -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-/// Handle tray icon click events (disabled left-click, only right-click menu works)
-fn handle_tray_icon_event(_tray: &tauri::tray::TrayIcon, event: TrayIconEvent) {
+fn handle_tray_icon_event(tray: &tauri::tray::TrayIcon, event: TrayIconEvent) {
     if let TrayIconEvent::Click {
         button: MouseButton::Left,
+        rect,
         ..
     } = event
     {
-        return;
+        let app = tray.app_handle();
+        if let Some(window) = app.get_webview_window("tray") {
+            if window.is_visible().unwrap_or(false) {
+                let _ = window.hide();
+            } else {
+                let w_width = 240.0;
+                let w_height = 220.0;
+                let (rect_x, rect_y) = match rect.position {
+                    tauri::Position::Physical(p) => (p.x as f64, p.y as f64),
+                    tauri::Position::Logical(l) => (l.x, l.y),
+                };
+                let rect_w = match rect.size {
+                    tauri::Size::Physical(s) => s.width as f64,
+                    tauri::Size::Logical(l) => l.width,
+                };
+                let mut x = rect_x + (rect_w / 2.0) - (w_width / 2.0);
+                let mut y = rect_y - w_height;
+                if x < 0.0 { x = 10.0; }
+                if y < 0.0 { y = 10.0; }
+                let _ = window.set_position(tauri::Position::Physical(tauri::PhysicalPosition {
+                    x: x as i32,
+                    y: y as i32,
+                }));
+                let _ = window.show();
+                let _ = window.set_focus();
+            }
+        }
     }
 }
 

@@ -799,4 +799,86 @@ pub fn get_current_coding_session() -> Option<serde_json::Value> {
     None
 }
 
+#[command]
+pub async fn get_website_favicon(domain: String) -> Option<String> {
+    let cache_dir = dirs::data_dir()
+        .or_else(|| dirs::data_local_dir())?
+        .join("TimiGS")
+        .join("favicons");
+
+    if !cache_dir.exists() {
+        let _ = std::fs::create_dir_all(&cache_dir);
+    }
+
+    let clean_domain = domain
+        .replace("https://", "")
+        .replace("http://", "")
+        .replace("www.", "")
+        .trim_matches('/')
+        .to_lowercase();
+
+    let cache_file = cache_dir.join(format!("{}.png", clean_domain));
+
+    if cache_file.exists() {
+        if let Ok(bytes) = std::fs::read(&cache_file) {
+            use base64::{engine::general_purpose, Engine as _};
+            return Some(format!("data:image/png;base64,{}", general_purpose::STANDARD.encode(bytes)));
+        }
+    }
+
+    let url = format!("https://www.google.com/s2/favicons?domain={}&sz=64", clean_domain);
+    let client = reqwest::Client::builder()
+        .timeout(std::time::Duration::from_secs(5))
+        .build()
+        .ok()?;
+
+    match client.get(&url).send().await {
+        Ok(resp) => {
+            if resp.status().is_success() {
+                if let Ok(bytes) = resp.bytes().await {
+                    let _ = std::fs::write(&cache_file, &bytes);
+                    use base64::{engine::general_purpose, Engine as _};
+                    return Some(format!("data:image/png;base64,{}", general_purpose::STANDARD.encode(bytes)));
+                }
+            }
+        }
+        Err(e) => {
+            eprintln!("Failed to fetch favicon for {}: {}", clean_domain, e);
+        }
+    }
+
+    None
+}
+
 // ── Music ──
+
+#[derive(serde::Serialize, Clone, Debug)]
+pub struct MediaInfo {
+    pub title: String,
+    pub artist: String,
+}
+
+#[command]
+pub async fn get_current_media_info() -> Option<MediaInfo> {
+    #[cfg(target_os = "windows")]
+    {
+        let result: Result<Option<MediaInfo>, windows::core::Error> = (|| {
+            let manager = windows::Media::Control::GlobalSystemMediaTransportControlsSessionManager::RequestAsync()?.get()?;
+            let session = manager.GetCurrentSession()?;
+            let properties = session.TryGetMediaPropertiesAsync()?.get()?;
+            let title = properties.Title()?.to_string();
+            let artist = properties.Artist()?.to_string();
+            if title.is_empty() && artist.is_empty() {
+                Ok(None)
+            } else {
+                Ok(Some(MediaInfo { title, artist }))
+            }
+        })();
+        
+        result.ok().flatten()
+    }
+    #[cfg(not(target_os = "windows"))]
+    {
+        None
+    }
+}

@@ -89,26 +89,28 @@ pub fn run() {
             use tauri::Manager;
             
             let is_autostart = std::env::args().any(|arg| arg == "--minimized" || arg == "-m");
+            let mut start_minimized = is_autostart;
             
             if let Ok(matches) = app.cli().matches() {
-                if matches.args.get("minimized").is_some() || is_autostart {
-                    let app_handle = app.handle().clone();
-                    
-                    std::thread::spawn(move || {
-                        std::thread::sleep(std::time::Duration::from_millis(800));
-                        
-                        if let Some(window) = app_handle.get_webview_window("main") {
-                            let _ = window.hide();
-                            println!("TimiGS: Starting in autostart mode (minimized to tray)");
-                            
-                            std::thread::sleep(std::time::Duration::from_millis(500));
-                            let _ = notifications::send_notification(
-                                &app_handle,
-                                "TimiGS Started",
-                                "Activity tracking is now running in the background"
-                            );
-                        }
-                    });
+                if matches.args.get("minimized").is_some() {
+                    start_minimized = true;
+                }
+            }
+            
+            if start_minimized {
+                println!("TimiGS: Starting in autostart mode (minimized to tray)");
+                let app_handle = app.handle().clone();
+                std::thread::spawn(move || {
+                    std::thread::sleep(std::time::Duration::from_millis(500));
+                    let _ = notifications::send_notification(
+                        &app_handle,
+                        "TimiGS Started",
+                        "Activity tracking is now running in the background"
+                    );
+                });
+            } else {
+                if let Some(window) = app.get_webview_window("main") {
+                    let _ = window.show();
                 }
             }
         }
@@ -196,6 +198,7 @@ pub fn run() {
             commands::shutdown_pc,
             commands::shutdown_pc,
             commands::get_app_icon,
+            commands::get_website_favicon,
             commands::get_desktop_sources,
             // Platform detection
             commands::get_platform,
@@ -274,6 +277,7 @@ pub fn run() {
             commands::get_total_coding_time_today,
             commands::get_total_ai_coding_time_today,
             commands::get_current_coding_session,
+            commands::get_current_media_info,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

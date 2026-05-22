@@ -389,11 +389,19 @@ pub fn start_tracking_with_app_handle(app_handle: tauri::AppHandle) {
                             last_title = active.window_title.clone();
                         }
 
-                        // Handle coding session (independent of regular session)
-                        if let Some(editor_name) = detect_code_editor(&active.app_name, &active.exe_path) {
+                        // Ну нахуя ви тут дивитися ?
+                        let is_browser_ai = is_browser_ai_site(&active.app_name, &active.window_title);
+                        let editor_opt = detect_code_editor(&active.app_name, &active.exe_path);
+
+                        if editor_opt.is_some() || is_browser_ai {
+                            let editor_name = if is_browser_ai {
+                                "AI Web Assistant".to_string()
+                            } else {
+                                editor_opt.unwrap()
+                            };
                             let coding_key = format!("{}|{}", active.exe_path, active.window_title);
                             if coding_key != last_coding_key {
-                                // End previous coding session
+
                                 if let Some(session) = CURRENT_CODING_SESSION.lock().take() {
                                     let _ = db::end_coding_session(session.id);
                                 }
@@ -445,6 +453,12 @@ pub fn start_tracking_with_app_handle(app_handle: tauri::AppHandle) {
             thread::sleep(Duration::from_secs(1));
 
             ticker += 1;
+            if ticker % 3 == 0 {
+                if let Some(app_handle) = APP_HANDLE.get() {
+                    use tauri::Emitter;
+                    let _ = app_handle.emit("activity-tracker-tick", ());
+                }
+            }
             if ticker >= 60 {
                 ticker = 0;
                 if let Some(session) = CURRENT_SESSION.lock().as_ref() {
@@ -488,18 +502,18 @@ pub fn start_tracking() {
                 if let Some(active) = get_foreground_window_info() {
                     // Check if this is YouTube Music in browser
                     let is_yt_music = is_youtube_music_title(&active.window_title);
-                    
+
                     // Check if this is a music app (including YouTube Music in browser)
                     let is_music = is_music_app(&active.app_name, &active.exe_path) || is_yt_music;
-                    
+
                     if is_music {
-                        // For YouTube Music in browser, use "YouTube Music" as app name
+
                         let app_name = if is_yt_music {
                             "YouTube Music".to_string()
                         } else {
                             active.app_name.clone()
                         };
-                        
+
                         // Handle music session
                         if active.exe_path != last_music_app {
                             // End previous music session
@@ -553,8 +567,6 @@ pub fn start_tracking() {
                                     window_title: active.window_title.clone(),
                                     exe_path: active.exe_path.clone(),
                                 });
-
-
                             }
 
                             last_app = active.exe_path.clone();
@@ -562,7 +574,16 @@ pub fn start_tracking() {
                         }
 
                         // Handle coding session (independent of regular session)
-                        if let Some(editor_name) = detect_code_editor(&active.app_name, &active.exe_path) {
+                        let is_browser_ai = is_browser_ai_site(&active.app_name, &active.window_title);
+                        let editor_opt = detect_code_editor(&active.app_name, &active.exe_path);
+
+                        if editor_opt.is_some() || is_browser_ai {
+                            let editor_name = if is_browser_ai {
+                                "AI Web Assistant".to_string()
+                            } else {
+                                editor_opt.unwrap()
+                            };
+                            // Ось тут нахуй лізете, тут нічого цікавого немає чи рукожоп тут !
                             let coding_key = format!("{}|{}", active.exe_path, active.window_title);
                             if coding_key != last_coding_key {
                                 // End previous coding session
@@ -617,6 +638,12 @@ pub fn start_tracking() {
             thread::sleep(Duration::from_secs(1));
 
             ticker += 1;
+            if ticker % 3 == 0 {
+                if let Some(app_handle) = APP_HANDLE.get() {
+                    use tauri::Emitter;
+                    let _ = app_handle.emit("activity-tracker-tick", ());
+                }
+            }
             if ticker >= 60 {
                 ticker = 0;
                 if let Some(session) = CURRENT_SESSION.lock().as_ref() {
@@ -662,7 +689,7 @@ fn is_music_app(app_name: &str, exe_path: &str) -> bool {
 
     // Check for YouTube Music in browser tabs (Vivaldi, Chrome, etc.)
     // Window title patterns: "Song Name - Artist | YouTube Music" or "YouTube Music"
-    if app_lower.contains("vivaldi") || app_lower.contains("chrome") || 
+    if app_lower.contains("vivaldi") || app_lower.contains("chrome") ||
        app_lower.contains("msedge") || app_lower.contains("firefox") ||
        app_lower.contains("brave") {
         // Will check window title in the main tracking loop
@@ -675,7 +702,7 @@ fn is_music_app(app_name: &str, exe_path: &str) -> bool {
 /// Check if a browser window title indicates YouTube Music
 fn is_youtube_music_title(window_title: &str) -> bool {
     let title_lower = window_title.to_lowercase();
-    title_lower.contains("youtube music") || 
+    title_lower.contains("youtube music") ||
     (title_lower.contains("youtube.com") && title_lower.contains("music")) ||
     (title_lower.ends_with("| youtube music") || title_lower.contains("| youtube music"))
 }
@@ -745,63 +772,230 @@ fn detect_code_editor(app_name: &str, exe_path: &str) -> Option<String> {
     None
 }
 
-/// Detect the programming language from a file extension.
-fn detect_language(file_path: &str) -> Option<String> {
-    // Strip query params or trailing garbage after the last dot
-    let path = std::path::Path::new(file_path);
-    let ext = path.extension()?.to_str()?.to_lowercase();
+const KNOWN_EXTENSIONS: &[(&str, &str)] = &[
+    ("rs", "Rust"),
+    ("ts", "TypeScript"),
+    ("tsx", "TypeScript"),
+    ("js", "JavaScript"),
+    ("jsx", "JavaScript"),
+    ("mjs", "JavaScript"),
+    ("cjs", "JavaScript"),
+    ("py", "Python"),
+    ("pyw", "Python"),
+    ("go", "Go"),
+    ("rb", "Ruby"),
+    ("java", "Java"),
+    ("kt", "Kotlin"),
+    ("kts", "Kotlin"),
+    ("swift", "Swift"),
+    ("c", "C"),
+    ("cpp", "C++"),
+    ("cc", "C++"),
+    ("cxx", "C++"),
+    ("c++", "C++"),
+    ("cs", "C#"),
+    ("php", "PHP"),
+    ("html", "HTML"),
+    ("htm", "HTML"),
+    ("css", "CSS"),
+    ("scss", "CSS"),
+    ("sass", "CSS"),
+    ("vue", "Vue"),
+    ("svelte", "Svelte"),
+    ("md", "Markdown"),
+    ("mdx", "Markdown"),
+    ("json", "JSON"),
+    ("jsonc", "JSON"),
+    ("yaml", "YAML"),
+    ("yml", "YAML"),
+    ("toml", "TOML"),
+    ("sh", "Shell"),
+    ("bash", "Shell"),
+    ("zsh", "Shell"),
+    ("ps1", "PowerShell"),
+    ("psm1", "PowerShell"),
+    ("sql", "SQL"),
+    ("lua", "Lua"),
+    ("dart", "Dart"),
+    ("ex", "Elixir"),
+    ("exs", "Elixir"),
+    ("hs", "Haskell"),
+    ("clj", "Clojure"),
+    ("cljs", "Clojure"),
+    ("r", "R"),
+    ("xml", "XML"),
+    ("tf", "HCL"),
+    ("hcl", "HCL"),
+    ("zig", "Zig"),
+];
 
-    let lang = match ext.as_str() {
-        "rs"                         => "Rust",
-        "ts" | "tsx"                 => "TypeScript",
-        "js" | "jsx" | "mjs" | "cjs" => "JavaScript",
-        "py" | "pyw"                 => "Python",
-        "go"                         => "Go",
-        "rb"                         => "Ruby",
-        "java"                       => "Java",
-        "kt" | "kts"                 => "Kotlin",
-        "swift"                      => "Swift",
-        "c"                          => "C",
-        "cpp" | "cc" | "cxx" | "c++" => "C++",
-        "cs"                         => "C#",
-        "php"                        => "PHP",
-        "html" | "htm"               => "HTML",
-        "css" | "scss" | "sass"      => "CSS",
-        "vue"                        => "Vue",
-        "svelte"                     => "Svelte",
-        "md" | "mdx"                 => "Markdown",
-        "json" | "jsonc"             => "JSON",
-        "yaml" | "yml"               => "YAML",
-        "toml"                       => "TOML",
-        "sh" | "bash" | "zsh"        => "Shell",
-        "ps1" | "psm1"               => "PowerShell",
-        "sql"                        => "SQL",
-        "lua"                        => "Lua",
-        "dart"                       => "Dart",
-        "ex" | "exs"                 => "Elixir",
-        "hs"                         => "Haskell",
-        "clj" | "cljs"               => "Clojure",
-        "r"                          => "R",
-        "xml"                        => "XML",
-        "tf" | "hcl"                 => "HCL",
-        "zig"                        => "Zig",
-        _                            => "Unknown",
-    };
-    Some(lang.to_string())
+fn extract_file_and_lang(window_title: &str) -> (Option<String>, Option<String>) {
+    let title_lower = window_title.to_lowercase();
+    for &(ext, lang) in KNOWN_EXTENSIONS {
+        let ext_pattern = format!(".{}", ext);
+        if let Some(idx) = title_lower.find(&ext_pattern) {
+            let next_char = title_lower.chars().nth(idx + ext_pattern.len());
+            let is_boundary = match next_char {
+                None => true,
+                Some(c) => c.is_whitespace() || c == '-' || c == '—' || c == '–' || c == '|' || c == '>' || c == '<' || c == '•',
+            };
+            if is_boundary {
+                let mut start_idx = 0;
+                let substring_before = &window_title[..idx + ext_pattern.len()];
+                if let Some(sep_idx) = substring_before.rfind(" – ") {
+                    start_idx = sep_idx + 3;
+                } else if let Some(sep_idx) = substring_before.rfind(" - ") {
+                    start_idx = sep_idx + 3;
+                } else if let Some(sep_idx) = substring_before.rfind(" • ") {
+                    start_idx = sep_idx + 3;
+                } else if let Some(sep_idx) = substring_before.rfind(" — ") {
+                    start_idx = sep_idx + 3;
+                }
+                let raw_path = substring_before[start_idx..].trim().trim_start_matches('•').trim().to_string();
+                if !raw_path.is_empty() {
+                    let path_obj = std::path::Path::new(&raw_path);
+                    let file_name = path_obj.file_name()
+                        .and_then(|f| f.to_str())
+                        .map(|s| s.to_string())
+                        .unwrap_or(raw_path);
+                    return (Some(file_name), Some(lang.to_string()));
+                }
+            }
+        }
+    }
+    (None, None)
 }
 
-/// Parse file path, language, and project directory from a window title.
-/// Returns `(file_path, language, project_dir)`.
+fn detect_language(file_path: &str) -> Option<String> {
+    let file_lower = file_path.to_lowercase();
+    for &(ext, lang) in KNOWN_EXTENSIONS {
+        let ext_pattern = format!(".{}", ext);
+        if let Some(idx) = file_lower.find(&ext_pattern) {
+            let next_char = file_lower.chars().nth(idx + ext_pattern.len());
+            let is_boundary = match next_char {
+                None => true,
+                Some(c) => c.is_whitespace() || c == '-' || c == '—' || c == '–' || c == '|' || c == '>' || c == '<' || c == '•',
+            };
+            if is_boundary {
+                return Some(lang.to_string());
+            }
+        }
+    }
+    let path = std::path::Path::new(file_path);
+    if let Some(ext_os) = path.extension() {
+        if let Some(ext_str) = ext_os.to_str() {
+            let ext = ext_str.to_lowercase();
+            for &(k_ext, lang) in KNOWN_EXTENSIONS {
+                if ext == k_ext {
+                    return Some(lang.to_string());
+                }
+            }
+        }
+    }
+    Some("Unknown".to_string())
+}
+
 fn parse_coding_info(
     window_title: &str,
     editor_name: &str,
 ) -> (Option<String>, Option<String>, Option<String>) {
+    if editor_name == "AI Web Assistant" {
+        let title_lower = window_title.to_lowercase();
+        let service = AI_SERVICES.iter()
+            .find(|&&(key, _)| title_lower.contains(key))
+            .map(|&(_, name)| name)
+            .unwrap_or("AI Assistant");
+        return (Some(service.to_string()), Some("AI Prompt".to_string()), Some("Web AI Chat".to_string()));
+    }
 
-    // --- VS Code: "filename - folder - Visual Studio Code" ---
+    if editor_name == "Zed" {
+        let sep = if window_title.contains(" — ") {
+            Some(" — ")
+        } else if window_title.contains(" – ") {
+            Some(" – ")
+        } else if window_title.contains(" - ") {
+            Some(" - ")
+        } else {
+            None
+        };
+
+        if let Some(separator) = sep {
+            let parts: Vec<&str> = window_title.split(separator).collect();
+            if parts.len() >= 2 {
+                let part_a = parts[0].trim().to_string();
+                let part_b = parts[1..].join(separator).trim().to_string();
+
+                if let (Some(file), lang) = extract_file_and_lang(&part_b) {
+                    return (Some(file), lang, Some(part_a));
+                }
+                if let (Some(file), lang) = extract_file_and_lang(&part_a) {
+                    return (Some(file), lang, Some(part_b));
+                }
+                let b_has_file_indicators = part_b.contains('.') || part_b.contains('/') || part_b.contains('\\');
+                let a_has_file_indicators = part_a.contains('.') || part_a.contains('/') || part_a.contains('\\');
+                if b_has_file_indicators && !a_has_file_indicators {
+                    let path_obj = std::path::Path::new(&part_b);
+                    let file_name = path_obj.file_name()
+                        .and_then(|f| f.to_str())
+                        .map(|s| s.to_string())
+                        .unwrap_or(part_b.clone());
+                    let lang = detect_language(&file_name);
+                    return (Some(file_name), lang, Some(part_a));
+                } else if a_has_file_indicators && !b_has_file_indicators {
+                    let path_obj = std::path::Path::new(&part_a);
+                    let file_name = path_obj.file_name()
+                        .and_then(|f| f.to_str())
+                        .map(|s| s.to_string())
+                        .unwrap_or(part_a.clone());
+                    let lang = detect_language(&file_name);
+                    return (Some(file_name), lang, Some(part_b));
+                }
+
+                let path_obj = std::path::Path::new(&part_b);
+                let file_name = path_obj.file_name()
+                    .and_then(|f| f.to_str())
+                    .map(|s| s.to_string())
+                    .unwrap_or(part_b.clone());
+                let lang = detect_language(&file_name);
+                return (Some(file_name), lang, Some(part_a));
+            }
+        }
+        if let (Some(file), lang) = extract_file_and_lang(window_title) {
+            return (Some(file), lang, None);
+        }
+        let clean = window_title.trim();
+        if !clean.is_empty() {
+            if !clean.contains('.') && !clean.contains('\\') && !clean.contains('/') {
+                return (None, None, Some(clean.to_string()));
+            } else {
+                return (Some(clean.to_string()), None, None);
+            }
+        }
+    }
+
+    let (extracted_file, extracted_lang) = extract_file_and_lang(window_title);
+    let mut project_dir = None;
+    let parts: Vec<&str> = if window_title.contains(" – ") {
+        window_title.split(" – ").collect()
+    } else if window_title.contains(" - ") {
+        window_title.split(" - ").collect()
+    } else {
+        Vec::new()
+    };
+
+    if !parts.is_empty() {
+        if (editor_name == "VS Code" || editor_name == "Cursor" || editor_name == "Windsurf") && parts.len() >= 2 {
+            project_dir = Some(parts[1].trim().to_string());
+        } else if parts.len() >= 3 {
+            project_dir = Some(parts[0].trim().to_string());
+        }
+    }
+
+    if let Some(file) = extracted_file {
+        return (Some(file), extracted_lang, project_dir);
+    }
+
     if editor_name == "VS Code" || editor_name == "Cursor" || editor_name == "Windsurf" {
-        // Typical format: "<file> - <project> - Visual Studio Code"
-        // Or: "<file> • <project> - Visual Studio Code"
-        // Or: "Welcome - Visual Studio Code" (no project)
         let clean = window_title
             .trim_end_matches(" - Visual Studio Code")
             .trim_end_matches(" - Cursor")
@@ -809,7 +1003,6 @@ fn parse_coding_info(
         let clean = clean
             .trim_end_matches(" - Visual Studio Code")
             .trim();
-        // Split on " - " to get parts
         let parts: Vec<&str> = clean.split(" - ").collect();
         if parts.len() >= 2 {
             let file = parts[0].trim().trim_start_matches('•').trim().to_string();
@@ -823,30 +1016,12 @@ fn parse_coding_info(
         }
     }
 
-    // --- Zed: "filename — Zed" (em dash) ---
-    if editor_name == "Zed" {
-        if let Some(pos) = window_title.find(" — ") {
-            let file = window_title[..pos].trim().to_string();
-            let lang = detect_language(&file);
-            return (Some(file), lang, None);
-        }
-        // Also try plain " - Zed"
-        if let Some(stripped) = window_title.strip_suffix(" - Zed") {
-            let file = stripped.trim().to_string();
-            let lang = detect_language(&file);
-            return (Some(file), lang, None);
-        }
-    }
-
-    // --- JetBrains IDEs: "ProjectName – filename.ext – EditorName" (en dash) ---
-    // Pattern: "<project> – <file> – <IDE>"
     if matches!(
         editor_name,
         "IntelliJ IDEA" | "WebStorm" | "PyCharm" | "PhpStorm" | "CLion"
             | "GoLand" | "Rider" | "RubyMine" | "DataGrip" | "Fleet"
             | "Android Studio"
     ) {
-        // En dash separator
         let parts: Vec<&str> = window_title.split(" – ").collect();
         if parts.len() >= 3 {
             let project = parts[0].trim().to_string();
@@ -860,18 +1035,14 @@ fn parse_coding_info(
         }
     }
 
-    // --- Neovim / Vim / Helix / Lapce / Lite XL: title often IS the file path ---
     if matches!(editor_name, "Neovim" | "Vim" | "Helix" | "Lapce" | "Lite XL") {
-        // Try to extract the last path-like segment
         let title = window_title.trim();
-        // Strip editor prefix like "NVim" at start
         let candidate = title
             .trim_start_matches("NVim")
             .trim_start_matches("nvim")
             .trim_start_matches(" - ")
             .trim();
         if !candidate.is_empty() {
-            // If it looks like a file (has an extension or path sep)
             if candidate.contains('.') || candidate.contains('/') || candidate.contains('\\') {
                 let path = std::path::Path::new(candidate);
                 let file = path
@@ -891,7 +1062,6 @@ fn parse_coding_info(
         return (Some(title.to_string()), None, None);
     }
 
-    // --- Sublime Text: "filename - Sublime Text" ---
     if editor_name == "Sublime Text" {
         let clean = window_title
             .trim_end_matches(" - Sublime Text")
@@ -905,8 +1075,6 @@ fn parse_coding_info(
         }
     }
 
-    // --- Generic fallback: look for common " - EditorName" suffix ---
-    // Try to strip any trailing " - Something" that looks like the editor name
     for suffix in [
         " - Notepad++", " - Atom", " - Emacs", " - Xcode",
     ] {
@@ -917,37 +1085,159 @@ fn parse_coding_info(
         }
     }
 
-    // Last resort: return the full window title as "file_path"
     if !window_title.is_empty() {
-        return (Some(window_title.to_string()), None, None);
+        let clean_file = window_title.trim().to_string();
+        let detected_lang = detect_language(&clean_file);
+        return (Some(clean_file), detected_lang, None);
     }
 
     (None, None, None)
 }
 
+/// Supported AI web services and their display names.
+const AI_SERVICES: &[(&str, &str)] = &[
+    ("chatgpt", "ChatGPT"),
+    ("claude", "Claude AI"),
+    ("deepseek", "DeepSeek"),
+    ("gemini", "Gemini"),
+    ("v0.dev", "v0.dev"),
+    ("v0", "v0.dev"),
+    ("copilot", "Copilot"),
+    ("poe.com", "Poe"),
+    ("poe", "Poe"),
+    ("ollama", "Ollama"),
+    ("grok", "Grok AI"),
+    ("perplexity", "Perplexity"),
+    ("phind", "Phind"),
+    ("mistral", "Mistral AI"),
+    ("qwen", "Qwen"),
+    ("huggingface", "Hugging Face"),
+    ("blackbox", "Blackbox AI"),
+    ("lm-studio", "LM Studio"),
+    ("lmstudio", "LM Studio"),
+    ("jan.ai", "Jan AI"),
+    ("bolt.new", "Bolt.new"),
+    ("bolt", "Bolt.new"),
+    ("devin", "Devin AI"),
+    ("lovable", "Lovable.dev"),
+    ("sider", "Sider AI"),
+    ("monica", "Monica AI"),
+    ("open-webui", "Open WebUI"),
+    ("openwebui", "Open WebUI"),
+    ("librechat", "LibreChat"),
+    ("codeium", "Codeium"),
+    ("tabnine", "Tabnine"),
+    ("replit", "Replit Agent"),
+    ("aide", "Aide"),
+    ("amazon q", "Amazon Q"),
+    ("codewhisperer", "Amazon Q"),
+];
+
+/// Returns true if the active window is a browser on an AI website or a standalone AI app
+fn is_browser_ai_site(app_name: &str, window_title: &str) -> bool {
+    let app_lower = app_name.to_lowercase();
+    let title_lower = window_title.to_lowercase();
+
+    let is_browser = app_lower.contains("chrome") ||
+                     app_lower.contains("firefox") ||
+                     app_lower.contains("msedge") ||
+                     app_lower.contains("brave") ||
+                     app_lower.contains("safari") ||
+                     app_lower.contains("opera") ||
+                     app_lower.contains("vivaldi") ||
+                     app_lower.contains("browser");
+
+    if is_browser {
+        AI_SERVICES.iter().any(|&(key, _)| title_lower.contains(key))
+    } else {
+        AI_SERVICES.iter().any(|&(key, _)| app_lower.contains(key))
+    }
+}
+
 /// AI tools to detect (in editor name or window title).
 const AI_TOOLS: &[&str] = &[
-    "cursor",
-    "windsurf",
-    "github copilot",
-    "copilot",
-    "codeium",
-    "tabnine",
-    "claude",
+    "composer",
+    "copilot chat",
+    "ai chat",
+    "ask ai",
+    "assistant",
     "chatgpt",
+    "claude",
+    "deepseek",
     "gemini",
     "supermaven",
+    "qwen",
+    "copilot",
+    "ai-assisted",
+    "ai assistant",
+    "cursor chat",
+    "windsurf chat",
+    "ollama",
+    "ai prompt",
+    "prompt",
+    "generate",
+    "blackbox",
+    "codeium",
+    "tabnine",
+    "replit",
+    "monica",
+    "sider",
+    "bolt",
+    "lovable",
+    "devin",
 ];
 
 /// Returns true if this session involves AI assistance.
 fn is_ai_assisted(app_name: &str, window_title: &str, editor_name: &str) -> bool {
     let app_lower = app_name.to_lowercase();
     let title_lower = window_title.to_lowercase();
-    let editor_lower = editor_name.to_lowercase();
 
+    // НАХУЙ ЦІ ШІ
+    if editor_name == "AI Web Assistant" || AI_SERVICES.iter().any(|&(key, _)| app_lower.contains(key)) {
+        return true;
+    }
+
+    // For general code editors, check if the window title indicates active AI usage
     AI_TOOLS.iter().any(|&tool| {
-        app_lower.contains(tool)
-            || title_lower.contains(tool)
-            || editor_lower.contains(tool)
+        title_lower.contains(tool)
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_parser() {
+        let titles = vec![
+            ("timiGS- - vite-env.d.ts", "Zed"),
+            ("src\\components\\CodingTracker.vue <template> > div", "Zed"),
+            ("timiGS-", "Zed"),
+            ("timiGS- — CodingTracker.vue", "Zed"),
+            ("CodingTracker.vue - timiGS- - Visual Studio Code", "VS Code"),
+        ];
+        for (title, editor) in titles {
+            let res = parse_coding_info(title, editor);
+            println!("Title: '{}', Editor: '{}' => {:?}", title, editor, res);
+        }
+    }
+
+    #[test]
+    fn dump_db() {
+        let conn = rusqlite::Connection::open("C:\\Users\\baneronetwo\\AppData\\Roaming\\TimiGS\\activity.db").unwrap();
+        let mut stmt = conn.prepare("SELECT id, app_name, editor_name, file_path, language, is_ai_assisted, window_title FROM coding_sessions ORDER BY id DESC LIMIT 30").unwrap();
+        let rows = stmt.query_map([], |row| {
+            let id: i64 = row.get(0)?;
+            let app_name: String = row.get(1)?;
+            let editor_name: String = row.get(2)?;
+            let file_path: Option<String> = row.get(3)?;
+            let language: Option<String> = row.get(4)?;
+            let is_ai: i64 = row.get(5)?;
+            let window_title: String = row.get(6)?;
+            Ok((id, app_name, editor_name, file_path, language, is_ai, window_title))
+        }).unwrap();
+        for r in rows {
+            println!("{:?}", r.unwrap());
+        }
+    }
 }

@@ -37,7 +37,7 @@ opener = "0.7"
 urlencoding = "2"
 mime_guess = "2.0.5"
 rodio = "0.20"
-reqwest = { version = "0.11", default-features = false, features = ["blocking", "json"] }
+reqwest = { version = "0.11", default-features = false, features = ["blocking", "json", "rustls-tls"] }
 csv = "1.4.0"
 lazy_static = "1.4"
 
@@ -64,6 +64,8 @@ windows = { version = "0.58", features = [
     "Win32_Graphics_Gdi",
     "Win32_UI_Input_KeyboardAndMouse",
     "Win32_Media_Audio",
-    "Win32_System_Com"
+    "Win32_System_Com",
+    "Media_Control",
+    "Foundation"
 ] }
 

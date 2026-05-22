@@ -9,7 +9,36 @@
     "shell:allow-open",
     "process:default",
     "fs:default",
-
+    {
+      "identifier": "fs:allow-write-text-file",
+      "allow": [
+        { "path": "$DESKTOP/*" },
+        { "path": "$DOCUMENT/*" },
+        { "path": "$DOWNLOAD/*" },
+        { "path": "$TEMP/*" },
+        { "path": "**" }
+      ]
+    },
+    {
+      "identifier": "fs:allow-read-text-file",
+      "allow": [
+        { "path": "$DESKTOP/*" },
+        { "path": "$DOCUMENT/*" },
+        { "path": "$DOWNLOAD/*" },
+        { "path": "$TEMP/*" },
+        { "path": "**" }
+      ]
+    },
+    {
+      "identifier": "fs:allow-remove",
+      "allow": [
+        { "path": "$DESKTOP/*" },
+        { "path": "$DOCUMENT/*" },
+        { "path": "$DOWNLOAD/*" },
+        { "path": "$TEMP/*" },
+        { "path": "**" }
+      ]
+    },
     "dialog:default"
   ]
 }
