@@ -32,7 +32,7 @@ function confirmSelection() {
         <div class="screen-picker-modal glass-panel">
             <div class="modal-header">
                 <h3>Share Screen via TimiGS</h3>
-                <button class="btn-close" @click="$emit('close')">✕</button>
+                <button class="btn-close" @click="$emit('close')">X</button>
             </div>
             
             <div class="modal-body">

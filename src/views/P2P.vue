@@ -70,9 +70,9 @@ const toggleServer = async () => {
     }
 };
 
-// Simple attempt to guess local IP (using WebRTC trick or just instructions)
-// Browsers/Webview block local IP discovery often. 
-// We generally can't get it easily from JS without Tauri command.
-// For now we leave it blank or static instruction.
+
+
+
+
 
 </script>

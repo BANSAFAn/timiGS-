@@ -9,7 +9,7 @@ import es from "./locales/es.json";
 import pt from "./locales/pt.json";
 import pl from "./locales/pl.json";
 
-// Get saved language or default to English
+
 const savedLang = localStorage.getItem("timigs-language") || "en";
 
 export const i18n = createI18n({

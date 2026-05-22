@@ -6,7 +6,8 @@
         <span class="brand">TimiGS</span>
       </div>
       <span class="status-badge" :class="{ active: isTracking }">
-        {{ isTracking ? "● Tracking" : "○ Idle" }}
+        <span class="status-indicator-dot"></span>
+        <span>{{ isTracking ? "Tracking" : "Idle" }}</span>
       </span>
     </div>
 
@@ -70,8 +71,8 @@ async function refreshStatus() {
 }
 
 onMounted(() => {
+  document.documentElement.classList.add("tray-window-active");
   refreshStatus();
-  // Refresh each time the popup is shown
   document.addEventListener("visibilitychange", () => {
     if (!document.hidden) refreshStatus();
   });
@@ -107,7 +108,6 @@ async function quitApp() {
   }
 }
 
-// ESC key to hide
 document.addEventListener("keydown", (e) => {
   if (e.key === "Escape") hideTray();
 });
@@ -116,22 +116,17 @@ document.addEventListener("keydown", (e) => {
 <style scoped>
 .tray-popup {
   width: 220px;
-  background: #1a1d2e;
-  border: 1px solid rgba(139, 92, 246, 0.25);
+  background: rgba(26, 29, 46, 0.85);
+  border: 1px solid rgba(139, 92, 246, 0.3);
   border-radius: 12px;
   padding: 12px;
-  font-family:
-    "Segoe UI",
-    system-ui,
-    -apple-system,
-    sans-serif;
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
   color: #e2e8f0;
-  box-shadow:
-    0 16px 48px rgba(0, 0, 0, 0.5),
-    0 0 0 1px rgba(255, 255, 255, 0.04),
-    0 0 20px rgba(139, 92, 246, 0.08);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.04), 0 0 20px rgba(139, 92, 246, 0.12);
   overflow: hidden;
   user-select: none;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 }
 
 .tray-header {
@@ -163,6 +158,9 @@ document.addEventListener("keydown", (e) => {
 }
 
 .status-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   font-size: 0.7rem;
   padding: 3px 8px;
   border-radius: 10px;
@@ -175,6 +173,36 @@ document.addEventListener("keydown", (e) => {
 .status-badge.active {
   background: rgba(34, 197, 94, 0.12);
   color: #4ade80;
+}
+
+.status-indicator-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #94a3b8;
+  display: inline-block;
+  transition: all 0.2s ease;
+}
+
+.status-badge.active .status-indicator-dot {
+  background: #4ade80;
+  box-shadow: 0 0 8px #4ade80;
+  animation: pulse-dot 1.5s infinite;
+}
+
+@keyframes pulse-dot {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.25);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.9);
+    opacity: 0.8;
+  }
 }
 
 .tray-sep {
@@ -239,5 +267,13 @@ document.addEventListener("keydown", (e) => {
 .quit-btn:active {
   background: rgba(239, 68, 68, 0.18);
   transform: scale(0.98);
+}
+</style>
+
+<style>
+html.tray-window-active,
+html.tray-window-active body {
+  background: transparent !important;
+  background-color: transparent !important;
 }
 </style>

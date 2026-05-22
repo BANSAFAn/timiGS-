@@ -2,7 +2,7 @@
   <Teleport to="body">
     <div class="modal-overlay" @click.self="$emit('close')">
       <div class="modal-container" @click.stop>
-        <!-- Header -->
+        
         <div class="modal-header">
           <div class="modal-title-row">
             <div class="modal-icon">
@@ -21,7 +21,7 @@
           </button>
         </div>
 
-        <!-- Tabs -->
+        
         <div class="modal-tabs">
           <button 
             class="tab-btn" 
@@ -50,7 +50,7 @@
           </button>
         </div>
 
-        <!-- Search -->
+        
         <div class="modal-search">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="search-icon">
             <circle cx="11" cy="11" r="8"></circle>
@@ -64,9 +64,9 @@
           />
         </div>
 
-        <!-- Body -->
+        
         <div class="modal-body">
-          <!-- Tracked Processes Tab -->
+          
           <div v-if="activeTab === 'tracked'" class="process-list">
             <div v-if="filteredTracked.length === 0" class="empty-list">
               <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -107,7 +107,7 @@
             </div>
           </div>
 
-          <!-- Excluded Processes Tab -->
+          
           <div v-if="activeTab === 'excluded'" class="process-list">
             <div v-if="filteredExcluded.length === 0" class="empty-list">
               <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -156,7 +156,7 @@
           </div>
         </div>
 
-        <!-- Footer info -->
+        
         <div class="modal-footer">
           <div class="footer-info">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -184,7 +184,7 @@ const activeTab = ref<'tracked' | 'excluded'>('tracked');
 const searchQuery = ref('');
 const appIcons = ref<Record<string, string>>({});
 
-// Get unique tracked processes from today's summary
+
 const trackedProcesses = computed(() => {
   return store.todaySummary
     .filter(app => !store.isProcessExcluded(app.exe_path))
@@ -257,7 +257,7 @@ async function loadIcons() {
       if (base64) {
         appIcons.value[app.app_name] = `data:image/png;base64,${base64}`;
       }
-    } catch { /* fallback to letter */ }
+    } catch {  }
   }
 }
 
@@ -300,7 +300,7 @@ onMounted(async () => {
   overflow: hidden;
 }
 
-/* Header */
+
 .modal-header {
   display: flex;
   align-items: center;
@@ -354,7 +354,7 @@ onMounted(async () => {
   border-color: rgba(255, 255, 255, 0.15);
 }
 
-/* Tabs */
+
 .modal-tabs {
   display: flex;
   gap: 6px;
@@ -412,7 +412,7 @@ onMounted(async () => {
   color: #ef4444;
 }
 
-/* Search */
+
 .modal-search {
   position: relative;
   padding: 0 28px;
@@ -450,7 +450,7 @@ onMounted(async () => {
   color: rgba(255, 255, 255, 0.25);
 }
 
-/* Body */
+
 .modal-body {
   flex: 1;
   overflow-y: auto;
@@ -476,7 +476,7 @@ onMounted(async () => {
   background: rgba(255, 255, 255, 0.2);
 }
 
-/* Process List */
+
 .process-list {
   display: flex;
   flex-direction: column;
@@ -509,7 +509,7 @@ onMounted(async () => {
   border-color: rgba(239, 68, 68, 0.25);
 }
 
-/* Process Icon */
+
 .process-icon {
   width: 44px;
   height: 44px;
@@ -545,7 +545,7 @@ onMounted(async () => {
   font-size: 1rem;
 }
 
-/* Process Info */
+
 .process-info {
   flex: 1;
   min-width: 0;
@@ -581,7 +581,7 @@ onMounted(async () => {
   font-weight: 500;
 }
 
-/* Action Buttons */
+
 .action-btn {
   display: flex;
   align-items: center;
@@ -625,7 +625,7 @@ onMounted(async () => {
   transform: scale(1.02);
 }
 
-/* Empty List */
+
 .empty-list {
   display: flex;
   flex-direction: column;
@@ -646,7 +646,7 @@ onMounted(async () => {
   font-weight: 500;
 }
 
-/* Footer */
+
 .modal-footer {
   padding: 14px 28px;
   border-top: 1px solid rgba(255, 255, 255, 0.06);
@@ -666,7 +666,7 @@ onMounted(async () => {
   opacity: 0.6;
 }
 
-/* Animations */
+
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -683,7 +683,7 @@ onMounted(async () => {
   }
 }
 
-/* Responsive */
+
 @media (max-width: 600px) {
   .modal-container {
     max-width: 100%;

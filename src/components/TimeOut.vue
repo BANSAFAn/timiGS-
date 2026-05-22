@@ -1,6 +1,6 @@
 <template>
   <div class="timeout-widget">
-    <!-- Active Schedule Indicator -->
+    
     <div v-if="hasActiveSchedule && !status" class="active-schedule-banner">
       <div class="banner-content">
         <div class="banner-left" @click="editSchedule" style="cursor: pointer;">
@@ -17,9 +17,9 @@
       </div>
     </div>
 
-    <!-- Setup State -->
+    
     <div v-if="!status" class="timeout-setup">
-      <!-- Tab Navigation -->
+      
       <div class="mode-tabs">
         <button 
           class="mode-tab" 
@@ -39,9 +39,9 @@
         </button>
       </div>
 
-      <!-- Simple Breaks Tab -->
+      
       <div v-show="activeTab === 'simple'" class="tab-content">
-      <!-- Work Interval Card -->
+      
       <div class="settings-card work-card">
         <div class="card-header">
           <div class="card-icon work-icon" v-html="Icons.timeoutWork"></div>
@@ -90,7 +90,7 @@
         </div>
       </div>
 
-      <!-- Break Duration Card -->
+      
       <div class="settings-card break-card">
         <div class="card-header">
           <div class="card-icon break-icon" v-html="Icons.timeoutBreak"></div>
@@ -139,7 +139,7 @@
         </div>
       </div>
 
-      <!-- Music Card -->
+      
       <div class="settings-card music-card">
         <div class="card-header">
           <div class="card-icon music-icon" v-html="Icons.timeoutMusic"></div>
@@ -163,7 +163,7 @@
 
           <div class="music-list-modern">
             <div v-if="musicFiles.length === 0" class="empty-music-modern">
-              <span class="empty-icon">🎵</span>
+              <span class="empty-icon"></span>
               <p>{{ t('timeout.noMusic', 'No music files found') }}</p>
             </div>
             <div
@@ -196,7 +196,7 @@
         </div>
       </div>
 
-      <!-- Password Card -->
+      
       <div class="settings-card password-card">
         <div class="card-header">
           <div class="card-icon password-icon" v-html="Icons.timeoutLock"></div>
@@ -216,9 +216,9 @@
       </div>
       </div>
 
-      <!-- Schedule Mode Tab -->
+      
       <div v-show="activeTab === 'schedule'" class="tab-content">
-      <!-- Schedule Card -->
+      
       <div class="settings-card schedule-card">
         <div class="card-header">
           <div class="card-icon schedule-icon" v-html="Icons.timeoutWork"></div>
@@ -229,7 +229,7 @@
         </div>
 
         <div class="schedule-container">
-          <!-- Enable Schedule Toggle -->
+          
           <div class="schedule-toggle">
             <label class="checkbox-label-modern">
               <input type="checkbox" v-model="enableSchedule" />
@@ -238,9 +238,9 @@
             </label>
           </div>
 
-          <!-- Schedule Options (shown when enabled) -->
+          
           <div v-if="enableSchedule" class="schedule-options">
-            <!-- Time Range -->
+            
             <div class="time-picker">
               <label class="sub-label">{{ t('timeout.workingHours', 'Working Hours') }}</label>
               <div class="time-range-row">
@@ -284,7 +284,7 @@
               </div>
             </div>
 
-            <!-- Days of Week -->
+            
             <div class="days-picker">
               <label class="sub-label">{{ t('timeout.activeDays', 'Active Days') }}</label>
               <div class="days-row">
@@ -301,7 +301,7 @@
               </div>
             </div>
 
-            <!-- Custom Breaks -->
+            
             <div class="custom-breaks-section">
               <div class="breaks-header">
                 <label class="sub-label">{{ t('timeout.customBreaks', 'Custom Breaks') }}</label>
@@ -363,7 +363,7 @@
               </div>
             </div>
 
-            <!-- Info Box -->
+            
             <div class="schedule-info-box">
               <span class="info-icon">ℹ️</span>
               <p class="schedule-hint">
@@ -374,7 +374,7 @@
         </div>
       </div>
 
-      <!-- Password Card for Schedule Mode -->
+      
       <div class="settings-card password-card">
         <div class="card-header">
           <div class="card-icon password-icon" v-html="Icons.timeoutLock"></div>
@@ -394,23 +394,23 @@
       </div>
       </div>
 
-      <!-- Start Button -->
+      
       <button @click="startTimeout" class="btn-start-modern" :disabled="!canStart || isSaving">
         <span v-if="isSaving" class="btn-spinner"></span>
         <span v-else class="btn-icon" v-html="Icons.timeoutBreak"></span>
         <span>{{ getSaveButtonText() }}</span>
       </button>
 
-      <!-- Status Message -->
+      
       <div v-if="statusMessage" class="status-message" :class="statusMessageType">
         <span class="status-icon" v-html="getStatusIcon()"></span>
         <span>{{ statusMessage }}</span>
       </div>
     </div>
 
-    <!-- Active State -->
+    
     <div v-else class="timeout-active">
-      <!-- During Break -->
+      
       <div v-if="status.break_active" class="break-overlay">
         <div class="break-emoji" v-html="Icons.timeoutBreak"></div>
         <h3 class="break-title">Time to relax!</h3>
@@ -434,7 +434,7 @@
         <p class="break-note">All applications are blocked during break</p>
       </div>
 
-      <!-- Working Period -->
+      
       <div v-else class="working-state">
         <div class="status-badge working">
           <span class="status-dot"></span>
@@ -458,7 +458,7 @@
         </div>
       </div>
 
-      <!-- Cancel -->
+      
       <div class="cancel-section">
         <input
           type="password"
@@ -469,59 +469,9 @@
         <button @click="stopTimeout" class="btn-cancel">
           <span class="btn-icon" v-html="Icons.timeoutStop"></span> Cancel Time OUT
         </button>
-        <p v-if="cancelError" class="error-text">{{ cancelError }}</p>
       </div>
     </div>
   </div>
-
-  <!-- Full-screen break overlay -->
-  <Teleport to="body">
-    <div
-      v-if="status?.break_active"
-      class="fullscreen-break-overlay"
-      @click.prevent
-    >
-      <div class="overlay-content">
-        <div class="overlay-emoji" v-html="Icons.timeoutBreak"></div>
-        <h2>Time to Rest!</h2>
-        <p>Take a break, drink some tea, and relax.</p>
-        <div class="overlay-timer">{{ breakFormattedTime }}</div>
-
-        <!-- Music Controls -->
-        <div class="music-controls" v-if="isPlaying || audio">
-          <button class="music-btn" @click="toggleMusic" title="Play/Pause">
-            <span v-if="isPlaying" v-html="Icons.timeoutPause"></span>
-            <span v-else v-html="Icons.timeoutPlay"></span>
-          </button>
-          <input
-            type="range"
-            min="0"
-            max="1"
-            step="0.05"
-            v-model.number="volume"
-            @input="updateVolume"
-            class="volume-slider"
-          />
-        </div>
-
-        <div class="overlay-cancel">
-          <input
-            type="password"
-            v-model="overlayCancelPassword"
-            class="overlay-input"
-            placeholder="Enter password to cancel..."
-            @keydown.enter="stopTimeoutOverlay"
-          />
-          <button @click="stopTimeoutOverlay" class="overlay-btn">
-            Cancel
-          </button>
-          <p v-if="overlayCancelError" class="error-text">
-            {{ overlayCancelError }}
-          </p>
-        </div>
-      </div>
-    </div>
-  </Teleport>
 </template>
 
 <script setup lang="ts">
@@ -530,7 +480,6 @@ import { useI18n } from "vue-i18n";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { open as openDialog } from "@tauri-apps/plugin-dialog";
-import { readFile } from "@tauri-apps/plugin-fs";
 import { Icons } from "./icons/IconMap";
 
 const { t } = useI18n();
@@ -552,22 +501,20 @@ const breakMinutes = ref<number>(10);
 const breakSeconds = ref<number>(0);
 const password = ref("");
 const cancelPassword = ref("");
-const overlayCancelPassword = ref("");
 const cancelError = ref("");
-const overlayCancelError = ref("");
 const status = ref<TimeoutStatus | null>(null);
 let pollInterval: number | null = null;
 
-// Schedule
+
 const enableSchedule = ref(false);
-// Time range
+
 const scheduleStartHour = ref<number>(9);
 const scheduleStartMinute = ref<number>(0);
 const scheduleStartPeriod = ref<"AM" | "PM">("AM");
 const scheduleEndHour = ref<number>(5);
 const scheduleEndMinute = ref<number>(0);
 const scheduleEndPeriod = ref<"AM" | "PM">("PM");
-// Custom breaks
+
 interface CustomBreak {
   id: number;
   startHour: number;
@@ -578,19 +525,19 @@ interface CustomBreak {
   endPeriod: "AM" | "PM";
 }
 const customBreaks = ref<CustomBreak[]>([]);
-// Days
+
 const selectedDays = ref<number[]>([]); // 0 = Sunday, 1 = Monday, etc.
 
-// Status feedback
+
 const isSaving = ref(false);
 const statusMessage = ref("");
 const statusMessageType = ref<"success" | "error" | "info">("info");
 let statusTimeout: number | null = null;
 
-// Active tab for mode selection
+
 const activeTab = ref<"simple" | "schedule">("simple");
 
-// Check if schedule is active
+
 const hasActiveSchedule = computed(() => {
   const savedSchedule = localStorage.getItem("timigs-timeout-schedule");
   if (!savedSchedule) return false;
@@ -602,10 +549,9 @@ const hasActiveSchedule = computed(() => {
   }
 });
 
-// Music Controls
+
 const isPlaying = ref(false);
 const audio = ref<HTMLAudioElement | null>(null);
-const volume = ref(0.5);
 const musicFiles = ref<any[]>([]);
 const selectedMusic = ref<string>("");
 const playMusicDuringBreak = ref<boolean>(true);
@@ -613,7 +559,7 @@ const playMusicDuringBreak = ref<boolean>(true);
 async function loadMusicFiles() {
   try {
     musicFiles.value = await invoke("get_music_files_cmd");
-    // Auto-select first if none selected
+
     if (!selectedMusic.value && musicFiles.value.length > 0) {
       selectedMusic.value = musicFiles.value[0].filename;
     }
@@ -660,21 +606,6 @@ async function openMusicFolder() {
   }
 }
 
-function toggleMusic() {
-  if (!audio.value) return;
-  if (isPlaying.value) {
-    audio.value.pause();
-  } else {
-    audio.value.play();
-  }
-  isPlaying.value = !isPlaying.value;
-}
-
-function updateVolume() {
-  if (audio.value) {
-    audio.value.volume = volume.value;
-  }
-}
 
 const workTotalSecs = computed(
   () =>
@@ -696,7 +627,7 @@ const canStart = computed(
     password.value.length >= 1,
 );
 
-// Helper functions for UI feedback
+
 function showStatusMessage(message: string, type: "success" | "error" | "info", duration = 5000) {
   if (statusTimeout) {
     clearTimeout(statusTimeout);
@@ -756,22 +687,22 @@ function getScheduleSummary() {
 
 async function cancelSchedule() {
   try {
-    // Remove from localStorage
+
     localStorage.removeItem("timigs-timeout-schedule");
     
-    // Reset UI state
+
     enableSchedule.value = false;
     selectedDays.value = [];
     customBreaks.value = [];
     
     showStatusMessage(
-      "✓ Schedule cancelled successfully. Changes will take effect on next app restart.",
+      " Schedule cancelled successfully. Changes will take effect on next app restart.",
       "success",
       5000
     );
   } catch (e: any) {
     showStatusMessage(
-      `✗ Failed to cancel schedule: ${e.toString()}`,
+      ` Failed to cancel schedule: ${e.toString()}`,
       "error",
       5000
     );
@@ -779,7 +710,7 @@ async function cancelSchedule() {
 }
 
 function editSchedule() {
-  // Load the schedule into the form for editing
+
   const savedSchedule = localStorage.getItem("timigs-timeout-schedule");
   if (!savedSchedule) return;
   
@@ -795,7 +726,7 @@ function editSchedule() {
     customBreaks.value = parsed.customBreaks || [];
     selectedDays.value = parsed.days || [];
     
-    // Scroll to schedule section
+
     setTimeout(() => {
       const scheduleCard = document.querySelector('.schedule-card');
       if (scheduleCard) {
@@ -804,7 +735,7 @@ function editSchedule() {
     }, 100);
     
     showStatusMessage(
-      "✎️ Schedule loaded for editing. Make your changes and click 'Schedule Time OUT' to save.",
+      " Schedule loaded for editing. Make your changes and click 'Schedule Time OUT' to save.",
       "info",
       5000
     );
@@ -813,7 +744,7 @@ function editSchedule() {
   }
 }
 
-// Schedule management functions
+
 function toggleDay(day: number) {
   const index = selectedDays.value.indexOf(day);
   if (index > -1) {
@@ -915,40 +846,8 @@ async function loadStatus() {
   }
 }
 
-async function manageAudio(breakActive: boolean) {
-  if (breakActive && !audio.value && playMusicDuringBreak.value) {
-    // If a custom track is selected, play it
-    const selected = musicFiles.value.find(f => f.filename === selectedMusic.value);
+async function manageAudio(_breakActive: boolean) {
 
-    if (selected) {
-      try {
-        // Read file using Tauri FS API and create blob URL
-        const fileData = await readFile(selected.path);
-        const blob = new Blob([fileData], { type: 'audio/mpeg' });
-        const blobUrl = URL.createObjectURL(blob);
-        
-        audio.value = new Audio(blobUrl);
-        audio.value.loop = true;
-        audio.value.volume = volume.value;
-        await audio.value.play();
-        isPlaying.value = true;
-        return;
-      } catch (e) {
-        console.error("Failed to play selected audio:", e);
-        isPlaying.value = false;
-        return;
-      }
-    } else {
-      // No music selected, don't play anything
-      console.log("No music file selected");
-      isPlaying.value = false;
-      return;
-    }
-  } else if (!breakActive && audio.value) {
-    audio.value.pause();
-    audio.value = null;
-    isPlaying.value = false;
-  }
 }
 
 async function startTimeout() {
@@ -960,7 +859,7 @@ async function startTimeout() {
   try {
     const scheduleConfig = getScheduleConfig();
 
-    // If schedule is enabled, just save settings and don't start immediately
+
     if (enableSchedule.value) {
       await invoke("save_timeout_schedule_cmd", {
         intervalSecs: workTotalSecs.value,
@@ -974,7 +873,7 @@ async function startTimeout() {
         selectedDays: selectedDays.value,
       });
 
-      // Save schedule preferences
+
       localStorage.setItem("timigs-timeout-schedule", JSON.stringify({
         enabled: true,
         startHour: scheduleStartHour.value,
@@ -989,17 +888,17 @@ async function startTimeout() {
 
       password.value = "";
       
-      // Show success message
+
       const daysText = selectedDays.value.length > 0 
         ? ` on ${selectedDays.value.length} selected day(s)` 
         : "";
       showStatusMessage(
-        `✓ Schedule saved! Time OUT will start automatically${daysText} during working hours.`,
+        ` Schedule saved! Time OUT will start automatically${daysText} during working hours.`,
         "success",
         8000
       );
     } else {
-      // No schedule - start immediately
+
       await invoke("start_timeout_cmd", {
         intervalSecs: workTotalSecs.value,
         breakDurationSecs: breakTotalSecs.value,
@@ -1017,16 +916,16 @@ async function startTimeout() {
       password.value = "";
       await loadStatus();
       
-      // Show success message
+
       showStatusMessage(
-        "✓ Time OUT activated! Work session started.",
+        " Time OUT activated! Work session started.",
         "success",
         5000
       );
     }
   } catch (e: any) {
     showStatusMessage(
-      `✗ Error: ${e.toString()}`,
+      ` Error: ${e.toString()}`,
       "error",
       8000
     );
@@ -1047,40 +946,20 @@ async function stopTimeout() {
       pollInterval = null;
     }
     showStatusMessage(
-      "✓ Time OUT cancelled successfully.",
+      " Time OUT cancelled successfully.",
       "success",
       3000
     );
   } catch (e: any) {
     cancelError.value = e;
     showStatusMessage(
-      `✗ Failed to cancel: ${e.toString()}`,
+      ` Failed to cancel: ${e.toString()}`,
       "error",
       5000
     );
   }
 }
 
-async function stopTimeoutOverlay() {
-  overlayCancelError.value = "";
-  try {
-    await invoke("stop_timeout_cmd", { password: overlayCancelPassword.value });
-    overlayCancelPassword.value = "";
-    status.value = null;
-    manageAudio(false);
-    if (pollInterval) {
-      clearInterval(pollInterval);
-      pollInterval = null;
-    }
-    showStatusMessage(
-      "✓ Time OUT cancelled successfully.",
-      "success",
-      3000
-    );
-  } catch (e: any) {
-    overlayCancelError.value = e;
-  }
-}
 
 function startPolling() {
   if (pollInterval) clearInterval(pollInterval);
@@ -1101,13 +980,13 @@ onMounted(async () => {
   loadStatus();
   loadMusicFiles();
 
-  // Try to load persisted user preferences
+
   const savedMusic = localStorage.getItem("timigs-timeout-music");
   if (savedMusic) selectedMusic.value = savedMusic;
   const savedPlayState = localStorage.getItem("timigs-timeout-play");
   if (savedPlayState !== null) playMusicDuringBreak.value = savedPlayState === "true";
   
-  // Load saved schedule
+
   const savedSchedule = localStorage.getItem("timigs-timeout-schedule");
   if (savedSchedule) {
     try {
@@ -1132,7 +1011,7 @@ onMounted(async () => {
     loadStatus();
   });
   await listen("timeout-break-end", async () => {
-    // Stop music immediately when break ends
+
     if (audio.value) {
       audio.value.pause();
       audio.value = null;
@@ -1146,11 +1025,11 @@ onMounted(async () => {
 });
 
 onUnmounted(() => {
-  // Save preferences
+
   localStorage.setItem("timigs-timeout-music", selectedMusic.value);
   localStorage.setItem("timigs-timeout-play", String(playMusicDuringBreak.value));
 
-  // Stop music if component is unmounted
+
   if (audio.value) {
     audio.value.pause();
     audio.value = null;
@@ -1169,7 +1048,7 @@ onUnmounted(() => {
   gap: 18px;
 }
 
-/* Mode Tabs */
+
 .mode-tabs {
   display: flex;
   gap: 12px;
@@ -1232,9 +1111,9 @@ onUnmounted(() => {
   }
 }
 
-/* Active Schedule Banner */
+
 .active-schedule-banner {
-  background: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(59, 130, 246, 0.15) 100%);
+  background: var(--bg-tertiary) 0%, rgba(59, 130, 246, 0.15) 100%);
   border: 1px solid rgba(139, 92, 246, 0.3);
   border-radius: 16px;
   padding: 18px;
@@ -1390,7 +1269,7 @@ onUnmounted(() => {
   margin: 0;
 }
 
-/* Strict Mode Styles */
+
 .strict-mode-label {
   color: #ef4444 !important;
 }
@@ -1415,7 +1294,7 @@ onUnmounted(() => {
 
 
 
-/* Modern Card-Based Design */
+
 .settings-card {
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid rgba(255, 255, 255, 0.06);
@@ -1520,7 +1399,7 @@ onUnmounted(() => {
 
 
 
-/* Modern Time Inputs */
+
 .time-inputs-modern {
   display: flex;
   gap: 12px;
@@ -1559,7 +1438,7 @@ onUnmounted(() => {
   font-weight: 500;
 }
 
-/* Modern Music Manager */
+
 .music-manager-modern {
   display: flex;
   flex-direction: column;
@@ -1758,7 +1637,7 @@ onUnmounted(() => {
 }
 
 .checkbox-label-modern input[type="checkbox"]:checked + .checkbox-custom::after {
-  content: '✓';
+  content: '';
   color: white;
   font-size: 14px;
   font-weight: bold;
@@ -1773,7 +1652,7 @@ onUnmounted(() => {
   color: #fff;
 }
 
-/* Password Input Modern */
+
 .password-input-wrapper {
   width: 100%;
 }
@@ -1799,7 +1678,7 @@ onUnmounted(() => {
   color: var(--text-muted);
 }
 
-/* Start Button Modern */
+
 .btn-start-modern {
   width: 100%;
   display: flex;
@@ -1847,7 +1726,7 @@ onUnmounted(() => {
   to { transform: rotate(360deg); }
 }
 
-/* Status Message */
+
 .status-message {
   display: flex;
   align-items: center;
@@ -1902,7 +1781,7 @@ onUnmounted(() => {
   height: 100%;
 }
 
-/* Schedule Styles */
+
 .schedule-container {
   display: flex;
   flex-direction: column;
@@ -2098,7 +1977,7 @@ onUnmounted(() => {
   box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.15);
 }
 
-/* Custom Breaks Section */
+
 .custom-breaks-section {
   display: flex;
   flex-direction: column;
@@ -2297,7 +2176,7 @@ onUnmounted(() => {
 
 
 
-/* Music Manager UI */
+
 .music-manager {
   display: flex;
   flex-direction: column;
@@ -2463,7 +2342,7 @@ onUnmounted(() => {
   accent-color: #14b8a6;
 }
 
-/* Schedule Styles */
+
 .schedule-container {
   background: rgba(0, 0, 0, 0.2);
   border: 1px solid rgba(255, 255, 255, 0.05);
@@ -2650,7 +2529,7 @@ onUnmounted(() => {
   box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.2);
 }
 
-/* Custom Breaks Section */
+
 .custom-breaks-section {
   display: flex;
   flex-direction: column;
@@ -2855,7 +2734,7 @@ onUnmounted(() => {
   cursor: not-allowed;
 }
 
-/* Active States */
+
 .working-state {
   display: flex;
   flex-direction: column;
@@ -2926,7 +2805,7 @@ onUnmounted(() => {
   font-size: 1rem;
 }
 
-/* Break Overlay in card */
+
 .break-overlay {
   display: flex;
   flex-direction: column;
@@ -3010,7 +2889,7 @@ circle {
   margin: 0;
 }
 
-/* Cancel */
+
 .cancel-section {
   display: flex;
   flex-direction: column;
@@ -3037,7 +2916,7 @@ circle {
   margin: 0;
 }
 
-/* Fullscreen Break Overlay */
+
 .fullscreen-break-overlay {
   position: fixed;
   top: 0;

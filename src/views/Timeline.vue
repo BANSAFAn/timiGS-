@@ -8,10 +8,10 @@
     <div class="timeline-controls">
       <div class="search-box">
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="search-icon"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-        <input 
-          type="text" 
-          v-model="searchQuery" 
-          :placeholder="$t('timeline.searchPlaceholder') || 'Search apps...'" 
+        <input
+          type="text"
+          v-model="searchQuery"
+          :placeholder="$t('timeline.searchPlaceholder') || 'Search apps...'"
           class="search-input"
         />
       </div>
@@ -20,7 +20,7 @@
         <button class="nav-btn" @click="goToPreviousDay">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
         </button>
-        
+
         <div class="date-display">
           <div class="date-main">{{ formatDate(selectedDate) }}</div>
           <div class="date-sub" v-if="getDateLabel()">{{ getDateLabel() }}</div>
@@ -34,11 +34,11 @@
           <button class="nav-btn calendar-btn" :class="{ 'active': showCalendar }" @click="showCalendar = !showCalendar">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
           </button>
+
           
-          <!-- Custom Calendar Dropdown -->
           <div v-if="showCalendar" class="calendar-dropdown" @click.stop>
-            <CustomCalendar 
-              v-model="selectedDate" 
+            <CustomCalendar
+              v-model="selectedDate"
               :sessions-by-date="sessionsByDate"
               @update:modelValue="onDateSelected"
             />
@@ -80,7 +80,7 @@
               {{ formatDuration(group.totalTime) }}
             </div>
           </div>
-          
+
           <div v-show="expandedGroups.has(group.appName)" class="timeline-group-sessions">
             <div v-for="session in group.sessions" :key="session.id" class="timeline-item" @click="handleSessionClick(session)">
               <div class="timeline-time">
@@ -109,53 +109,8 @@
       </div>
     </div>
 
-    <!-- Coding Sessions Section -->
-    <div class="coding-timeline-section" v-if="codingSessions.length > 0">
-      <div class="coding-timeline-header">
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
-          stroke="currentColor" stroke-width="2">
-          <polyline points="16 18 22 12 16 6"/>
-          <polyline points="8 6 2 12 8 18"/>
-        </svg>
-        <span>{{ $t('coding.title') || 'Coding' }}</span>
-        <span class="coding-timeline-total">{{ formatDuration(codingTotalTime) }}</span>
-      </div>
-      <div class="coding-sessions-list">
-        <div v-for="session in codingSessions" :key="session.id" class="coding-session-item">
-          <div class="cs-time">
-            {{ formatTime(session.start_time) }} - {{ session.end_time ? formatTime(session.end_time) : 'Now' }}
-          </div>
-          <div class="cs-content">
-            <div class="cs-editor-badge" :class="getEditorBadgeClass(session.editor_name)">
-              {{ session.editor_name }}
-            </div>
-            <div class="cs-info">
-              <div class="cs-file" v-if="session.file_path">
-                <span class="cs-lang-dot" :style="{ background: getLangColor(session.language) }"></span>
-                <span class="cs-filename">{{ session.file_path }}</span>
-                <span class="cs-lang" v-if="session.language">{{ session.language }}</span>
-              </div>
-              <div class="cs-project" v-if="session.project_dir">
-                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 256 256" fill="currentColor" style="display:inline;vertical-align:middle;margin-right:3px;">
-                  <path d="M216,72H131.31L104,44.69A15.86,15.86,0,0,0,92.69,40H40A16,16,0,0,0,24,56V200.62A15.4,15.4,0,0,0,39.38,216H216.89A15.13,15.13,0,0,0,232,200.89V88A16,16,0,0,0,216,72ZM40,56H92.69l16,16H40ZM216,200H40V88H216Z"/>
-                </svg>
-                {{ session.project_dir }}
-              </div>
-            </div>
-            <div class="cs-right">
-              <span class="cs-duration">{{ formatDuration(session.duration_seconds) }}</span>
-              <span class="cs-ai" v-if="session.is_ai_assisted">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 256 256" fill="currentColor">
-                  <path d="M200,112a8,8,0,0,1-8,8H152a8,8,0,0,1,0-16h40A8,8,0,0,1,200,112Zm-8,24H152a8,8,0,0,0,0,16h40a8,8,0,0,0,0-16Zm-32,32H152a8,8,0,0,0,0,16h8a8,8,0,0,0,0-16ZM96,208H72a8,8,0,0,1-8-8V160a8,8,0,0,1,16,0v32H96a8,8,0,0,1,0,16Zm0-96H80V80a8,8,0,0,0-16,0v40a8,8,0,0,0,8,8H96a8,8,0,0,0,0-16ZM232,56V200a16,16,0,0,1-16,16H40a16,16,0,0,1-16-16V56A16,16,0,0,1,40,40H216A16,16,0,0,1,232,56Zm-16,0H40V200H216V56Z"/>
-                </svg>
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
 
-    <!-- Browser Stats Modal -->
+    
     <div v-if="showBrowserModal" class="modal-overlay" @click.self="showBrowserModal = false">
       <div class="modal-content">
         <div class="modal-header">
@@ -183,7 +138,7 @@
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { invoke } from '@tauri-apps/api/core';
-import { useActivityStore, type ActivitySession, type CodingSession } from '../stores/activity';
+import { useActivityStore, type ActivitySession } from '../stores/activity';
 import CustomCalendar from '../components/CustomCalendar.vue';
 
 const { t } = useI18n();
@@ -192,16 +147,12 @@ const store = useActivityStore();
 const selectedDate = ref(new Date());
 const showCalendar = ref(false);
 const sessions = ref<ActivitySession[]>([]);
-const codingSessions = ref<CodingSession[]>([]);
 
-const codingTotalTime = computed(() =>
-  codingSessions.value.reduce((acc, s) => acc + s.duration_seconds, 0)
-);
 const searchQuery = ref('');
 const appIcons = ref<Record<string, string>>({});
 const expandedGroups = ref<Set<string>>(new Set());
 
-// Group sessions by app
+
 interface SessionGroup {
   appName: string;
   exePath: string;
@@ -211,13 +162,13 @@ interface SessionGroup {
 
 const groupedSessions = computed(() => {
   const sessionList = searchQuery.value ? filteredSessions.value : sessions.value;
-  
-  // Group by app name and exe path
+
+
   const groups: Map<string, SessionGroup> = new Map();
-  
+
   sessionList.forEach(session => {
     const key = `${session.app_name}|${session.exe_path}`;
-    
+
     if (!groups.has(key)) {
       groups.set(key, {
         appName: session.app_name,
@@ -226,13 +177,13 @@ const groupedSessions = computed(() => {
         totalTime: 0
       });
     }
-    
+
     const group = groups.get(key)!;
     group.sessions.push(session);
     group.totalTime += session.duration_seconds;
   });
-  
-  // Convert to array and sort by total time
+
+
   return Array.from(groups.values())
     .sort((a, b) => b.totalTime - a.totalTime);
 });
@@ -251,7 +202,7 @@ function isExcluded(exePath: string): boolean {
   return store.isProcessExcluded(exePath);
 }
 
-// Browser Modal Logic
+
 const showBrowserModal = ref(false);
 const selectedBrowser = ref('');
 const browserSites = ref<{name: string, seconds: number}[]>([]);
@@ -278,8 +229,8 @@ function calculateBrowserStats(appName: string) {
   appSessions.forEach(session => {
     let site = 'Unknown';
     const title = session.window_title;
-    
-    // Clean title logic (copied from store/activity.ts)
+
+
     let cleanTitle = title
       .replace(/ - Google Chrome$/i, '')
       .replace(/ - Microsoft Edge$/i, '')
@@ -294,9 +245,9 @@ function calculateBrowserStats(appName: string) {
     } else {
       site = cleanTitle.trim();
     }
-    
+
     if (site === 'New Tab') return;
-    if (site.endsWith('.com') || site.endsWith('.org')) site = site; 
+    if (site.endsWith('.com') || site.endsWith('.org')) site = site;
 
     if (!siteUsage[site]) siteUsage[site] = 0;
     siteUsage[site] += session.duration_seconds;
@@ -317,7 +268,7 @@ const filteredSessions = computed(() => {
   );
 });
 
-// Sessions by date for calendar indicators
+
 const sessionsByDate = computed(() => {
   const map: Record<string, boolean> = {};
   sessions.value.forEach(session => {
@@ -332,7 +283,7 @@ function onDateSelected(date: Date) {
   showCalendar.value = false;
 }
 
-// Close calendar when clicking outside
+
 function handleClickOutside(event: MouseEvent) {
   const target = event.target as HTMLElement;
   if (!target.closest('.date-picker-wrapper')) {
@@ -368,26 +319,26 @@ const isToday = computed(() => {
 function getDateLabel(): string {
   const today = new Date();
   const date = selectedDate.value;
-  
+
   if (date.toDateString() === today.toDateString()) {
     return t('timeline.today') || 'Today';
   }
-  
+
   const yesterday = new Date(today);
   yesterday.setDate(yesterday.getDate() - 1);
   if (date.toDateString() === yesterday.toDateString()) {
     return t('timeline.yesterday') || 'Yesterday';
   }
-  
+
   return '';
 }
 
 function formatDate(date: Date): string {
-  return date.toLocaleDateString(undefined, { 
-    weekday: 'long', 
-    year: 'numeric', 
-    month: 'long', 
-    day: 'numeric' 
+  return date.toLocaleDateString(undefined, {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
   });
 }
 
@@ -396,9 +347,9 @@ function formatDateForInput(date: Date): string {
 }
 
 function formatTime(timeStr: string): string {
-  return new Date(timeStr).toLocaleTimeString(undefined, { 
-    hour: '2-digit', 
-    minute: '2-digit' 
+  return new Date(timeStr).toLocaleTimeString(undefined, {
+    hour: '2-digit',
+    minute: '2-digit'
   });
 }
 
@@ -410,31 +361,7 @@ function formatDuration(seconds: number): string {
   return `${mins}m`;
 }
 
-function getEditorBadgeClass(editor: string): string {
-  const e = editor.toLowerCase();
-  if (e.includes('cursor') || e.includes('windsurf')) return 'editor-ai';
-  if (e.includes('code') || e.includes('vs code')) return 'editor-vscode';
-  if (e.includes('zed')) return 'editor-zed';
-  if (e.includes('neovim') || e.includes('vim')) return 'editor-vim';
-  if (e.includes('intellij') || e.includes('webstorm') || e.includes('pycharm') ||
-      e.includes('clion') || e.includes('goland') || e.includes('phpstorm')) return 'editor-jetbrains';
-  return 'editor-default';
-}
 
-const LANG_COLORS: Record<string, string> = {
-  'Rust': '#CE422B', 'TypeScript': '#3178C6', 'JavaScript': '#F7DF1E',
-  'Python': '#3776AB', 'Go': '#00ADD8', 'Ruby': '#CC342D', 'Java': '#ED8B00',
-  'Kotlin': '#7F52FF', 'Swift': '#FA7343', 'C': '#A8B9CC', 'C++': '#00599C',
-  'C#': '#239120', 'PHP': '#777BB4', 'HTML': '#E34C26', 'CSS': '#1572B6',
-  'Vue': '#42B883', 'Svelte': '#FF3E00', 'Markdown': '#083FA1', 'JSON': '#555',
-  'YAML': '#CB171E', 'TOML': '#9C4121', 'Shell': '#4EAA25', 'PowerShell': '#012456',
-  'SQL': '#336791', 'Lua': '#000080', 'Dart': '#0175C2', 'Zig': '#F7A41D',
-};
-
-function getLangColor(lang: string | null): string {
-  if (!lang) return '#888';
-  return LANG_COLORS[lang] || '#888';
-}
 
 function goToPreviousDay() {
   const newDate = new Date(selectedDate.value);
@@ -453,15 +380,7 @@ function goToNextDay() {
 async function fetchSessions() {
   const dateStr = formatDateForInput(selectedDate.value);
   sessions.value = await store.getActivityRange(dateStr, dateStr);
-  // Load coding sessions for the selected date
-  try {
-    codingSessions.value = await invoke<CodingSession[]>('get_coding_sessions_range_cmd', {
-      from: dateStr,
-      to: dateStr
-    });
-  } catch {
-    codingSessions.value = [];
-  }
+
 }
 
 async function loadIcons(sessionList: ActivitySession[]) {
@@ -473,7 +392,7 @@ async function loadIcons(sessionList: ActivitySession[]) {
       if (base64) {
         appIcons.value[exePath] = `data:image/png;base64,${base64}`;
       }
-    } catch { /* icon not available, fallback to letter */ }
+    } catch {  }
   }
 }
 
@@ -488,7 +407,7 @@ onMounted(async () => {
   if (isToday.value) {
     await store.fetchTodayData();
     sessions.value = store.todaySessions;
-    codingSessions.value = store.todayCodingSessions;
+
   } else {
     await fetchSessions();
   }
@@ -496,7 +415,7 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-/* Page Layout */
+
 .page {
   padding-bottom: 40px;
 }
@@ -517,7 +436,7 @@ onMounted(async () => {
   margin-bottom: 8px;
 }
 
-/* Timeline Controls */
+
 .timeline-controls {
   margin-bottom: 24px;
   display: flex;
@@ -526,7 +445,7 @@ onMounted(async () => {
   flex-wrap: wrap;
 }
 
-/* Search Box */
+
 .search-box {
   position: relative;
   flex: 1;
@@ -560,7 +479,7 @@ onMounted(async () => {
   pointer-events: none;
 }
 
-/* Calendar Nav */
+
 .calendar-nav {
   display: flex;
   align-items: center;
@@ -630,7 +549,7 @@ onMounted(async () => {
   border-color: var(--color-primary);
 }
 
-/* Calendar Dropdown */
+
 .calendar-dropdown {
   position: absolute;
   top: calc(100% + 8px);
@@ -654,7 +573,7 @@ onMounted(async () => {
   position: relative;
 }
 
-/* Timeline Container */
+
 .timeline-container {
   padding-left: 8px;
 }
@@ -677,7 +596,7 @@ onMounted(async () => {
   z-index: 0;
 }
 
-/* Timeline Group */
+
 .timeline-group {
   position: relative;
   z-index: 1;
@@ -788,7 +707,7 @@ onMounted(async () => {
   border-radius: 20px;
 }
 
-/* Timeline Group Sessions */
+
 .timeline-group-sessions {
   margin-top: 8px;
   padding-left: 52px;
@@ -809,7 +728,7 @@ onMounted(async () => {
   }
 }
 
-/* Timeline Item */
+
 .timeline-item {
   display: grid;
   grid-template-columns: 100px 1fr;
@@ -899,7 +818,7 @@ onMounted(async () => {
   border-radius: 20px;
 }
 
-/* Modal */
+
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -1024,7 +943,7 @@ onMounted(async () => {
   transition: width 0.5s ease;
 }
 
-/* Animations */
+
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -1063,9 +982,9 @@ onMounted(async () => {
   opacity: 0.5;
 }
 
-/* Responsive */
 
-/* 4K Ultra Wide (2560px+) */
+
+
 @media (min-width: 2560px) {
   .page-container {
     max-width: 1800px;
@@ -1171,7 +1090,7 @@ onMounted(async () => {
   }
 }
 
-/* Large Desktop (1920px - 2560px) */
+
 @media (min-width: 1920px) and (max-width: 2559px) {
   .page-container {
     max-width: 1600px;
@@ -1186,14 +1105,14 @@ onMounted(async () => {
   }
 }
 
-/* Medium Desktop (1440px - 1920px) */
+
 @media (min-width: 1440px) and (max-width: 1919px) {
   .page-container {
     max-width: 1400px;
   }
 }
 
-/* Tablet Landscape (1024px - 1440px) */
+
 @media (min-width: 1024px) and (max-width: 1439px) {
   .page-container {
     max-width: 1000px;
@@ -1208,7 +1127,7 @@ onMounted(async () => {
   }
 }
 
-/* Tablet Portrait (768px - 1024px) */
+
 @media (max-width: 1024px) {
   .page-container {
     max-width: 90%;
@@ -1223,7 +1142,7 @@ onMounted(async () => {
   }
 }
 
-/* Small Tablet (600px - 768px) */
+
 @media (max-width: 768px) {
   .timeline-controls {
     flex-direction: column;
@@ -1266,7 +1185,7 @@ onMounted(async () => {
   }
 }
 
-/* Mobile Large (480px - 600px) */
+
 @media (max-width: 600px) {
   .page-container {
     max-width: 100%;
@@ -1415,7 +1334,7 @@ onMounted(async () => {
   }
 }
 
-/* Mobile Small (320px - 480px) */
+
 @media (max-width: 480px) {
   .page-container {
     padding: 0 10px;
@@ -1579,7 +1498,7 @@ onMounted(async () => {
   }
 }
 
-/* Extra Small Mobile (below 360px) */
+
 @media (max-width: 360px) {
   .page-container {
     padding: 0 8px;
@@ -1664,177 +1583,5 @@ onMounted(async () => {
   }
 }
 
-/* ── Coding Timeline Section ───────────────────────────────────────────────── */
-.coding-timeline-section {
-  margin-top: 28px;
-  background: var(--bg-card, rgba(255,255,255,0.04));
-  border: 1px solid rgba(99,102,241,0.2);
-  border-radius: 14px;
-  overflow: hidden;
-}
 
-.coding-timeline-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 14px 18px;
-  background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(139,92,246,0.08));
-  border-bottom: 1px solid rgba(99,102,241,0.15);
-  font-size: 0.88rem;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.coding-timeline-header svg {
-  color: #a5b4fc;
-  flex-shrink: 0;
-}
-
-.coding-timeline-total {
-  margin-left: auto;
-  font-size: 0.78rem;
-  color: #a5b4fc;
-  background: rgba(99,102,241,0.15);
-  padding: 3px 10px;
-  border-radius: 20px;
-  border: 1px solid rgba(99,102,241,0.25);
-}
-
-.coding-sessions-list {
-  display: flex;
-  flex-direction: column;
-}
-
-.coding-session-item {
-  display: grid;
-  grid-template-columns: 130px 1fr;
-  gap: 0;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-  transition: background 0.15s;
-}
-
-.coding-session-item:last-child {
-  border-bottom: none;
-}
-
-.coding-session-item:hover {
-  background: rgba(99,102,241,0.05);
-}
-
-.cs-time {
-  padding: 10px 14px;
-  font-size: 0.72rem;
-  color: var(--text-muted);
-  font-family: monospace;
-  display: flex;
-  align-items: center;
-  border-right: 1px solid rgba(255,255,255,0.05);
-  white-space: nowrap;
-}
-
-.cs-content {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 14px;
-  flex-wrap: wrap;
-}
-
-.cs-editor-badge {
-  padding: 2px 8px;
-  border-radius: 5px;
-  font-size: 0.68rem;
-  font-weight: 600;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.cs-editor-badge.editor-vscode  { background: rgba(0,122,204,0.18); color: #60a5fa; border: 1px solid rgba(0,122,204,0.28); }
-.cs-editor-badge.editor-zed     { background: rgba(83,191,162,0.18); color: #53BFA2; border: 1px solid rgba(83,191,162,0.28); }
-.cs-editor-badge.editor-vim     { background: rgba(24,157,94,0.18); color: #34d399; border: 1px solid rgba(24,157,94,0.28); }
-.cs-editor-badge.editor-jetbrains { background: rgba(255,49,140,0.12); color: #f472b6; border: 1px solid rgba(255,49,140,0.22); }
-.cs-editor-badge.editor-ai      { background: rgba(16,185,129,0.18); color: #10b981; border: 1px solid rgba(16,185,129,0.3); }
-.cs-editor-badge.editor-default { background: rgba(148,163,184,0.12); color: #94a3b8; border: 1px solid rgba(148,163,184,0.2); }
-
-.cs-info {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.cs-file {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-}
-
-.cs-lang-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.cs-filename {
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: var(--text-primary);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.cs-lang {
-  font-size: 0.65rem;
-  padding: 1px 5px;
-  background: rgba(148,163,184,0.1);
-  border-radius: 3px;
-  color: var(--text-muted);
-  flex-shrink: 0;
-}
-
-.cs-project {
-  font-size: 0.72rem;
-  color: var(--text-muted);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.cs-right {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-left: auto;
-  flex-shrink: 0;
-}
-
-.cs-duration {
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: var(--text-primary);
-  font-family: monospace;
-}
-
-.cs-ai {
-  font-size: 0.85rem;
-}
-
-@media (max-width: 600px) {
-  .coding-session-item {
-    grid-template-columns: 1fr;
-  }
-
-  .cs-time {
-    border-right: none;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
-    padding: 8px 14px 4px;
-  }
-
-  .cs-content {
-    padding: 6px 14px 10px;
-  }
-}
 </style>

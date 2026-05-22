@@ -13,13 +13,10 @@
         </div>
       </div>
 
-      <!-- Live Debug (Hidden in Prod usually, but good for now) -->
-      <!-- <div v-if="globalError" class="glass-card" style="border-color: var(--color-danger); margin-bottom: 20px;">
-        <h4 style="color: var(--color-danger)">Debug Info</h4>
-        <pre style="font-size: 10px; overflow: auto; max-height: 100px;">{{ globalError }}</pre>
-      </div> -->
+      
+      
 
-      <!-- Loading State -->
+      
       <div
         v-if="!isReady"
         class="glass-card flex-center"
@@ -35,9 +32,9 @@
         <p class="text-muted" style="margin-top: 20px">Loading settings...</p>
       </div>
 
-      <!-- Settings Content -->
+      
       <div v-else class="settings-grid animate-enter">
-        <!-- Appearance -->
+        
         <div class="modern-card">
           <div class="card-header-modern">
             <div class="card-icon" v-html="Icons.appearance"></div>
@@ -120,7 +117,7 @@
           </div>
         </div>
 
-        <!-- System -->
+        
         <div class="modern-card">
           <div class="card-header-modern">
             <div class="card-icon" v-html="Icons.system"></div>
@@ -170,7 +167,7 @@
               </div>
               <ModernToggle 
                 v-model="localSettings.autostart" 
-                @update:modelValue="toggleAutostart"
+                @update:modelValue="saveSettings"
               />
             </div>
 
@@ -186,7 +183,7 @@
               </div>
               <ModernToggle 
                 v-model="localSettings.minimize_to_tray" 
-                @update:modelValue="toggleMinimize"
+                @update:modelValue="saveSettings"
               />
             </div>
 
@@ -194,7 +191,7 @@
           </div>
         </div>
 
-        <!-- Doctor Mode -->
+        
         <div class="modern-card">
           <div class="card-header-modern">
             <div class="card-icon" v-html="Icons.doctorMode"></div>
@@ -290,7 +287,7 @@
           </div>
         </div>
 
-        <!-- Updates -->
+        
         <div class="modern-card">
           <div class="card-header-modern">
             <div class="card-icon" v-html="Icons.update"></div>
@@ -307,7 +304,7 @@
           </button>
         </div>
 
-        <!-- Data Management -->
+        
         <div class="modern-card">
           <div class="card-header-modern">
             <div class="card-icon" v-html="Icons.dataManage"></div>
@@ -333,7 +330,7 @@
                 </div>
               </div>
               <div class="export-controls">
-                <!-- Date Range Selector -->
+                
                 <div class="date-range-selector">
                   <button 
                     class="range-btn" 
@@ -365,7 +362,7 @@
                   </button>
                 </div>
                 
-                <!-- Custom Date Range -->
+                
                 <div v-if="exportRange === 'custom' && showDateRangePicker" class="custom-date-range">
                   <div class="date-input-group">
                     <label class="date-label">{{ $t('settings.startDate') || 'Start' }}</label>
@@ -385,7 +382,7 @@
                   </div>
                 </div>
                 
-                <!-- Export Button -->
+                
                 <div class="export-dropdown" :class="{ open: exportDropdownOpen }">
                 <button
                   class="export-dropdown-trigger btn btn-primary"
@@ -554,7 +551,7 @@
           </div>
         </div>
 
-        <!-- About & License (Mandatory Attribution) -->
+        
         <div class="modern-card">
           <div class="card-header-modern">
             <div class="card-icon" v-html="Icons.about"></div>
@@ -590,7 +587,7 @@
       </div>
     </div>
 
-    <!-- Update Modal -->
+    
     <Teleport to="body">
       <div
         v-if="showUpdateModal"
@@ -610,7 +607,7 @@
               A new version of TimiGS is available with new features and
               improvements.
             </p>
-            <!-- Download Progress -->
+            
             <div v-if="isUpdating" class="update-progress-section">
               <div class="update-progress-header">
                 <span>{{ updateStatusText }}</span>
@@ -645,7 +642,7 @@
       </div>
     </Teleport>
 
-    <!-- Reset Confirmation Modal -->
+    
     <Teleport to="body">
       <div
         v-if="showResetModal"
@@ -758,7 +755,7 @@ function updateDoctorModeMaxReminders() {
   doctorModeStore.setMaxReminders(doctorModeMaxReminders.value);
 }
 
-// Language State
+
 const langOpen = ref(false);
 const availableLanguages = [
   { code: "en", name: "English", flag: "🇬🇧", flagImg: "https://flagcdn.com/w40/gb.png" },
@@ -785,7 +782,7 @@ const currentLangName = computed(
 const currentLangFlag = computed(
   () =>
     availableLanguages.find((l) => l.code === localSettings.language)?.flag ||
-    "🌐",
+    "",
 );
 
 function changeLanguage(code: string) {
@@ -811,7 +808,7 @@ const localSettings = reactive({
   minimize_to_tray: true,
 });
 
-// Helper for safe invokes
+
 async function safeInvoke(cmd: string, args: any = {}) {
   try {
     return await invoke(cmd, args);
@@ -824,12 +821,12 @@ async function safeInvoke(cmd: string, args: any = {}) {
 async function initSettings() {
   globalError.value = "";
   try {
-    // 1. Fetch backend settings
+
     const settings: any = await safeInvoke("get_settings");
     if (settings && typeof settings === "object") {
       Object.assign(localSettings, settings);
 
-      // Sync frontend state
+
       locale.value = settings.language || "en";
       document.documentElement.setAttribute(
         "data-theme",
@@ -837,10 +834,10 @@ async function initSettings() {
       );
     }
 
-    // 2. Fetch system state
+
     await store.fetchTrackingStatus().catch(() => {});
 
-    // 2.5 Fetch real app version
+
     try {
       appVersion.value = await getVersion();
     } catch {
@@ -862,9 +859,9 @@ async function saveSettings() {
 }
 
 async function toggleTracking() {
-  // Check if on Linux and warn about dependencies
+
   if (navigator.userAgent.includes("Linux")) {
-    // Check if xdotool or wmctrl is available
+
     const { Command } = await import("@tauri-apps/plugin-shell");
     try {
       const xdotoolCheck = await Command.create("which", ["xdotool"]).execute();
@@ -896,19 +893,10 @@ async function toggleTracking() {
   }
 }
 
-function toggleAutostart() {
-  localSettings.autostart = !localSettings.autostart;
-  saveSettings();
-}
-
-function toggleMinimize() {
-  localSettings.minimize_to_tray = !localSettings.minimize_to_tray;
-  saveSettings();
-}
 
 
 
-// Update modal state
+
 const isUpdating = ref(false);
 const showUpdateModal = ref(false);
 const updateVersion = ref("");
@@ -926,7 +914,7 @@ const updateButtonText = computed(() => {
 
 async function checkForUpdates() {
   try {
-    // Primary: GitHub API (reliable, always has releases)
+
     const response = await window.fetch(
       "https://api.github.com/repos/BANSAFAn/timiGS-/releases/latest",
     );
@@ -935,12 +923,12 @@ async function checkForUpdates() {
     const latestVersion = data.tag_name.replace("v", "");
     if (latestVersion !== appVersion.value) {
       updateVersion.value = latestVersion;
-      // Try to get Tauri updater handle for downloadAndInstall
+
       try {
         const update = await check();
         if (update) cachedUpdate = update;
       } catch {
-        /* Tauri updater not available, will use browser fallback */
+        
       }
       showUpdateModal.value = true;
     } else {
@@ -950,7 +938,7 @@ async function checkForUpdates() {
     }
   } catch (error) {
     console.error("GitHub API check failed:", error);
-    // Fallback: Tauri updater plugin
+
     try {
       const update = await check();
       if (update) {
@@ -976,7 +964,7 @@ async function installUpdate() {
   updateStatusText.value = "Downloading update...";
 
   try {
-    // Re-check if we don't have cached update
+
     if (!cachedUpdate) {
       cachedUpdate = await check();
     }
@@ -1020,7 +1008,7 @@ async function installUpdate() {
   }
 }
 
-// Data Management
+
 const showResetModal = ref(false);
 const resetConfirmText = ref("");
 const isResetting = ref(false);
@@ -1033,7 +1021,7 @@ const customStartDate = ref("");
 const customEndDate = ref("");
 const showDateRangePicker = ref(false);
 
-// Auto-export settings
+
 const autoExportEnabled = ref(false);
 const autoExportInterval = ref(24);
 const autoExportFolder = ref("");
@@ -1085,7 +1073,7 @@ async function selectExportFolder() {
 async function exportData(format: "csv" | "html" | "json" | "markdown" = "csv") {
   isExporting.value = true;
   try {
-    // Calculate date range
+
     let startDate: string;
     let endDate: string;
     const today = new Date();
@@ -1139,7 +1127,7 @@ async function exportData(format: "csv" | "html" | "json" | "markdown" = "csv") 
   }
 }
 
-// Export dropdown functions
+
 async function importData() {
   isImporting.value = true;
   try {
@@ -1151,7 +1139,7 @@ async function importData() {
       const actualPath = Array.isArray(filePath) ? filePath[0] : filePath;
       const count = await invoke("import_data_cmd", { path: actualPath });
       notifications.success(`Successfully imported ${count} sessions.`);
-      // Optional: signal other components to reload data
+
     }
   } catch (e: any) {
     console.error("Import failed:", e);
@@ -1186,7 +1174,7 @@ function exportWithSelectedFormat() {
   exportDropdownOpen.value = false;
 }
 
-// Close dropdown when clicking outside
+
 function handleClickOutside(e: MouseEvent) {
   const dropdown = document.querySelector(".export-dropdown");
   if (dropdown && !dropdown.contains(e.target as Node)) {
@@ -1195,7 +1183,7 @@ function handleClickOutside(e: MouseEvent) {
 }
 
 onMounted(() => {
-  // Delay slightly to allow transition
+
   setTimeout(initSettings, 100);
   loadAutoExportSettings();
   document.addEventListener("click", handleClickOutside);
@@ -1213,7 +1201,7 @@ async function confirmResetData() {
     notifications.success(t("settings.resetSuccess"));
     showResetModal.value = false;
     resetConfirmText.value = "";
-    // Re-init settings to reflect defaults
+
     await initSettings();
   } catch (e: any) {
     console.error("Reset failed:", e);
@@ -1257,7 +1245,7 @@ async function confirmResetData() {
   color: var(--text-muted);
 }
 
-/* Theme Switcher - Solid Color */
+
 .theme-switcher {
   display: flex;
   background: var(--bg-tertiary);
@@ -1331,8 +1319,8 @@ async function confirmResetData() {
   font-size: 0.8rem;
 }
 
-/* Custom Select */
-/* Custom input */
+
+
 .modern-input {
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
@@ -1423,12 +1411,12 @@ async function confirmResetData() {
   vertical-align: middle;
 }
 
-/* Hide emoji when img is visible (loaded successfully) */
+
 .flag-icon-img + .flag-emoji-fallback {
   display: none;
 }
 
-/* When img is hidden via @error handler (display:none), emoji shows via normal flow */
+
 .flag-icon-img[style*="display: none"] + .flag-emoji-fallback {
   display: inline-block;
 }
@@ -1441,7 +1429,7 @@ async function confirmResetData() {
   border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-/* Update Modal */
+
 .update-modal-overlay {
   position: fixed;
   inset: 0;
@@ -1502,7 +1490,7 @@ async function confirmResetData() {
   margin-right: 8px;
 }
 
-/* Settings Page */
+
 .settings-page {
   max-width: 1000px;
   margin: 0 auto;
@@ -1539,7 +1527,7 @@ async function confirmResetData() {
   margin-top: 4px;
 }
 
-/* Modern Cards */
+
 .modern-card {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
@@ -1592,7 +1580,7 @@ async function confirmResetData() {
   margin: 4px 0 0 0;
 }
 
-/* Settings Group */
+
 .settings-group {
   display: flex;
   flex-direction: column;
@@ -1664,7 +1652,7 @@ async function confirmResetData() {
   overflow-wrap: break-word;
 }
 
-/* Modern Theme Switcher */
+
 .theme-switcher-modern {
   display: flex;
   gap: 8px;
@@ -1712,7 +1700,7 @@ async function confirmResetData() {
   font-weight: 600;
 }
 
-/* Modern Select */
+
 .modern-select {
   background: var(--bg-tertiary);
   border: 1px solid var(--border-color);
@@ -1731,7 +1719,7 @@ async function confirmResetData() {
   box-shadow: 0 0 0 3px rgba(91, 110, 225, 0.1);
 }
 
-/* Export Dropdown */
+
 .export-dropdown {
   position: relative;
   display: inline-block;
@@ -1895,7 +1883,7 @@ async function confirmResetData() {
   display: none;
 }
 
-/* Export Controls */
+
 .export-controls {
   display: flex;
   flex-direction: column;
@@ -1903,7 +1891,7 @@ async function confirmResetData() {
   width: 100%;
 }
 
-/* Date Range Selector */
+
 .date-range-selector {
   display: flex;
   gap: 6px;
@@ -1933,7 +1921,7 @@ async function confirmResetData() {
   color: white;
 }
 
-/* Custom Date Range */
+
 .custom-date-range {
   display: flex;
   gap: 12px;
@@ -1972,7 +1960,7 @@ async function confirmResetData() {
   box-shadow: 0 0 0 3px rgba(91, 110, 225, 0.1);
 }
 
-/* Auto-Export */
+
 .auto-export-item.setting-item {
   display: flex !important;
   align-items: center;
@@ -2051,7 +2039,7 @@ async function confirmResetData() {
   flex-shrink: 0;
 }
 
-/* Toggle Switch */
+
 .toggle-switch {
   position: relative;
   display: inline-block;
@@ -2102,7 +2090,7 @@ async function confirmResetData() {
   background-color: white;
 }
 
-/* Legacy toggle-switch (div-based) */
+
 .toggle-switch.checked .toggle-thumb {
   background: var(--color-primary);
   transform: translateX(24px);
@@ -2120,7 +2108,7 @@ async function confirmResetData() {
   box-shadow: var(--shadow-sm);
 }
 
-/* Responsive */
+
 @media (max-width: 768px) {
   .setting-item {
     padding: 16px;
@@ -2146,7 +2134,7 @@ async function confirmResetData() {
     font-size: 2.5rem;
   }
 
-  /* Export Controls Mobile */
+  
   .export-controls {
     gap: 10px;
   }
@@ -2168,7 +2156,7 @@ async function confirmResetData() {
     padding: 10px;
   }
 
-  /* Auto-Export Mobile */
+  
   .auto-export-item {
     flex-direction: column;
     align-items: flex-start;
@@ -2200,7 +2188,7 @@ async function confirmResetData() {
   }
 }
 
-/* Data Management - Danger Zone */
+
 .danger-zone {
   border-color: rgba(239, 68, 68, 0.2);
   background: rgba(239, 68, 68, 0.03);

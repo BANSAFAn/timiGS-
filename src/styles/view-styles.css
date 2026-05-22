@@ -1,8 +1,6 @@
-/* ============================================
-   UNIQUE VIEW STYLES - No Gradients, Clean Design
-   ============================================ */
 
-/* ============ DASHBOARD ============ */
+
+
 .dashboard-page {
   --dashboard-primary: #5b6ee1;
   --dashboard-secondary: #0ea5e9;
@@ -59,7 +57,7 @@
   background: var(--bg-hover);
 }
 
-/* ============ TIMELINE ============ */
+
 .timeline-page {
   --timeline-primary: #10b981;
   --timeline-secondary: #059669;
@@ -110,7 +108,7 @@
   height: 20px;
 }
 
-/* Enhanced Calendar Navigation */
+
 .timeline-page .calendar-nav {
   display: flex;
   align-items: center;
@@ -204,7 +202,7 @@
   transform: scale(1.05);
 }
 
-/* Custom Date Input Styling */
+
 .timeline-page input[type="date"] {
   font-family: inherit;
   background: var(--bg-secondary);
@@ -227,7 +225,7 @@
   box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
 }
 
-/* Timeline Group Headers */
+
 .timeline-page .timeline-group-header {
   background: var(--bg-card);
   border: 2px solid var(--border-color);
@@ -259,7 +257,7 @@
   transform: translateX(4px);
 }
 
-/* ============ ANALYTICS ============ */
+
 .analytics-page {
   --analytics-primary: #6366f1;
   --analytics-secondary: #4f46e5;
@@ -270,10 +268,10 @@
   margin-bottom: 32px;
 }
 
-/* Modern Stats Row */
+
 .analytics-page .stats-row {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 24px;
   margin-bottom: 40px;
 }
@@ -317,6 +315,31 @@
   box-shadow: var(--shadow-md);
 }
 
+.analytics-page .stat-card.green {
+  border-color: rgba(16, 185, 129, 0.2);
+}
+
+.analytics-page .stat-card.green:hover {
+  border-color: var(--color-success);
+  box-shadow: var(--shadow-md);
+}
+
+.analytics-page .stat-card.purple .stat-bg-icon {
+  color: var(--analytics-primary);
+}
+
+.analytics-page .stat-card.blue .stat-bg-icon {
+  color: var(--color-secondary);
+}
+
+.analytics-page .stat-card.orange .stat-bg-icon {
+  color: var(--color-warning);
+}
+
+.analytics-page .stat-card.green .stat-bg-icon {
+  color: var(--color-success);
+}
+
 .analytics-page .stat-bg-icon {
   position: absolute;
   top: 20px;
@@ -348,7 +371,7 @@
   margin-top: auto;
 }
 
-/* Charts Grid */
+
 .analytics-page .charts-grid {
   display: grid;
   grid-template-columns: 2fr 1fr;
@@ -412,7 +435,7 @@
   color: white;
 }
 
-/* Chart Containers */
+
 .analytics-page .chart-container {
   position: relative;
   height: 300px;
@@ -430,7 +453,7 @@
   position: relative;
 }
 
-/* Custom Legend - Modern Badge Style */
+
 .analytics-page .custom-legend {
   display: flex;
   flex-wrap: wrap;
@@ -481,7 +504,7 @@
   flex-shrink: 0;
 }
 
-/* Time Range Selector */
+
 .analytics-page .time-range-selector {
   display: flex;
   gap: 6px;
@@ -513,7 +536,7 @@
   box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
 }
 
-/* Date Range Badge */
+
 .analytics-page .date-range-badge {
   display: flex;
   align-items: center;
@@ -555,7 +578,7 @@
   cursor: not-allowed;
 }
 
-/* Section Blocks */
+
 .analytics-page .section-block {
   margin-top: 40px;
   padding-top: 32px;
@@ -598,7 +621,7 @@
   color: var(--color-success);
 }
 
-/* Website Grid - NEW DESIGN */
+
 .analytics-page .website-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
@@ -751,7 +774,7 @@
   color: white;
 }
 
-/* Music Grid */
+
 .analytics-page .music-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
@@ -878,7 +901,7 @@
   color: white;
 }
 
-/* Now Playing Card */
+
 .analytics-page .now-playing {
   background: var(--bg-tertiary);
   border: 1px solid var(--color-success);
@@ -918,7 +941,7 @@
   color: var(--text-muted);
 }
 
-/* Empty State */
+
 .analytics-page .empty-state {
   display: flex;
   flex-direction: column;
@@ -945,7 +968,7 @@
   opacity: 0.7;
 }
 
-/* Website History Modal */
+
 .analytics-page .website-modal-overlay {
   position: fixed;
   inset: 0;
@@ -1198,7 +1221,7 @@
   }
 }
 
-/* ============ WEATHER ============ */
+
 .weather-page {
   --weather-primary: #0ea5e9;
   --weather-secondary: #0284c7;
@@ -1259,7 +1282,7 @@
   background: var(--bg-secondary);
 }
 
-/* ============ TOOLS ============ */
+
 .tools-page {
   --tools-primary: #f59e0b;
   --tools-secondary: #d97706;
@@ -1289,7 +1312,7 @@
   display: none;
 }
 
-/* Tab Buttons with Unique Colors */
+
 .tools-page .tab-btn {
   flex: 1;
   min-width: fit-content;
@@ -1322,31 +1345,31 @@
   height: 100%;
 }
 
-/* Timeout Tab - Red */
+
 .tools-page .tab-btn[data-tab="timeout"] {
   --tab-color: #ef4444;
   --tab-hover: #dc2626;
 }
 
-/* Focus Tab - Green */
+
 .tools-page .tab-btn[data-tab="focus"] {
   --tab-color: #10b981;
   --tab-hover: #059669;
 }
 
-/* Tasks Tab - Purple */
+
 .tools-page .tab-btn[data-tab="tasks"] {
   --tab-color: #8b5cf6;
   --tab-hover: #7c3aed;
 }
 
-/* Timer Tab - Orange */
+
 .tools-page .tab-btn[data-tab="timer"] {
   --tab-color: #f59e0b;
   --tab-hover: #d97706;
 }
 
-/* Notepad Tab - Indigo */
+
 .tools-page .tab-btn[data-tab="notepad"] {
   --tab-color: #6366f1;
   --tab-hover: #4f46e5;
@@ -1767,7 +1790,7 @@
   font-weight: 500;
 }
 
-/* ============ TRANSFER ============ */
+
 .transfer-page {
   --transfer-primary: #06b6d4;
   --transfer-secondary: #0891b2;
@@ -1868,7 +1891,7 @@
   background: rgba(6, 182, 212, 0.05);
 }
 
-/* Mode Info Alert */
+
 .transfer-page .mode-info-alert {
   display: flex;
   align-items: flex-start;
@@ -1909,7 +1932,7 @@
   line-height: 1.5;
 }
 
-/* ============ SETTINGS ============ */
+
 .settings-page {
   --settings-primary: #6366f1;
   --settings-secondary: #4f46e5;
@@ -2031,7 +2054,7 @@
   line-height: 1.5;
 }
 
-/* Theme Switcher */
+
 .settings-page .theme-switcher-modern {
   display: flex;
   gap: 8px;
@@ -2068,7 +2091,7 @@
   box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
 }
 
-/* Toggle Switch */
+
 .settings-page .toggle-switch {
   position: relative;
   display: inline-block;
@@ -2119,7 +2142,13 @@
   background-color: white;
 }
 
-/* ============ RESPONSIVE ============ */
+
+@media (max-width: 1200px) {
+  .analytics-page .stats-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 @media (max-width: 768px) {
   .dashboard-page .stats-row {
     grid-template-columns: 1fr;

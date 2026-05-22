@@ -1,6 +1,6 @@
 <template>
   <div class="app-shell">
-    <!-- Desktop Sidebar -->
+    
     <aside class="sidebar" v-if="shouldShowNav">
       <div class="sidebar-header">
         <h1 class="brand-text">TimiGS</h1>
@@ -32,7 +32,7 @@
       </nav>
     </aside>
 
-    <!-- Content Area -->
+    
     <main class="main-content">
       <router-view v-slot="{ Component }">
         <transition name="page" mode="out-in">
@@ -41,7 +41,7 @@
       </router-view>
     </main>
 
-    <!-- Mobile Bottom Navigation -->
+    
     <nav class="bottom-nav" v-if="shouldShowNav">
       <router-link
         v-for="item in mobileNavItems"
@@ -57,17 +57,21 @@
   </div>
   <NotificationToast />
   <DoctorModeLockScreen />
+  <TimeOutGlobalOverlay />
   <ConfirmDialog ref="confirmDialogRef" />
   <TeamNotification ref="teamNotifRef" />
 </template>
 
 <script setup lang="ts">
-import { onMounted, watch, computed, ref } from "vue";
+import { onMounted, onUnmounted, watch, computed, ref } from "vue";
+import { useI18n } from "vue-i18n";
 import { useRouter, useRoute } from "vue-router";
 import { useActivityStore } from "./stores/activity";
 import { useDoctorModeStore } from "./stores/doctorMode";
+import { useTeamsStore } from "./stores/teams";
 import NotificationToast from "./components/NotificationToast.vue";
 import DoctorModeLockScreen from "./components/DoctorModeLockScreen.vue";
+import TimeOutGlobalOverlay from "./components/TimeOutGlobalOverlay.vue";
 import ConfirmDialog from "./components/ConfirmDialog.vue";
 import TeamNotification from "./components/TeamNotification.vue";
 import { Icons } from "./components/icons/IconMap";
@@ -81,14 +85,28 @@ interface NavItem {
   icon: string;
 }
 
-// Main navigation items (most used)
-const mainNavItems: NavItem[] = [
-  { path: "/", label: "nav.dashboard", labelShort: "nav.dashboardShort", icon: Icons.dashboard },
-  { path: "/timeline", label: "nav.timeline", labelShort: "nav.timelineShort", icon: Icons.timeline },
-  { path: "/analytics", label: "nav.analytics", labelShort: "nav.analyticsShort", icon: Icons.analytics },
-];
+const store = useActivityStore();
+const doctorModeStore = useDoctorModeStore();
+const teamsStore = useTeamsStore();
+const router = useRouter();
+const route = useRoute();
 
-// Secondary navigation items (less used)
+const hasCodingActivity = computed(() => {
+  return store.totalCodingTime > 0 || store.todayCodingSessions.length > 0 || store.currentCodingSession !== null;
+});
+
+const mainNavItems = computed<NavItem[]>(() => {
+  const items = [
+    { path: "/", label: "nav.dashboard", labelShort: "nav.dashboardShort", icon: Icons.dashboard },
+    { path: "/timeline", label: "nav.timeline", labelShort: "nav.timelineShort", icon: Icons.timeline },
+    { path: "/analytics", label: "nav.analytics", labelShort: "nav.analyticsShort", icon: Icons.analytics },
+  ];
+  if (hasCodingActivity.value) {
+    items.splice(2, 0, { path: "/coding", label: "nav.coding", labelShort: "nav.codingShort", icon: Icons.coding });
+  }
+  return items;
+});
+
 const secondaryNavItems: NavItem[] = [
   { path: "/team", label: "nav.team", labelShort: "nav.teamShort", icon: Icons.team },
   { path: "/tools", label: "nav.tools", labelShort: "nav.toolsShort", icon: Icons.tools },
@@ -96,23 +114,22 @@ const secondaryNavItems: NavItem[] = [
   { path: "/settings", label: "nav.settings", labelShort: "nav.settingsShort", icon: Icons.settings },
 ];
 
-// Mobile shows all items in a simplified order
-const mobileNavItems: NavItem[] = [
-  { path: "/", label: "nav.dashboard", labelShort: "nav.dashboardShort", icon: Icons.dashboard },
-  { path: "/timeline", label: "nav.timeline", labelShort: "nav.timelineShort", icon: Icons.timeline },
-  { path: "/analytics", label: "nav.analytics", labelShort: "nav.analyticsShort", icon: Icons.analytics },
-  { path: "/tools", label: "nav.tools", labelShort: "nav.toolsShort", icon: Icons.tools },
-  { path: "/settings", label: "nav.settings", labelShort: "nav.settingsShort", icon: Icons.settings },
-];
-
-const store = useActivityStore();
-const doctorModeStore = useDoctorModeStore();
-const router = useRouter();
-const route = useRoute();
+const mobileNavItems = computed<NavItem[]>(() => {
+  const items = [
+    { path: "/", label: "nav.dashboard", labelShort: "nav.dashboardShort", icon: Icons.dashboard },
+    { path: "/timeline", label: "nav.timeline", labelShort: "nav.timelineShort", icon: Icons.timeline },
+    { path: "/analytics", label: "nav.analytics", labelShort: "nav.analyticsShort", icon: Icons.analytics },
+    { path: "/tools", label: "nav.tools", labelShort: "nav.toolsShort", icon: Icons.tools },
+    { path: "/settings", label: "nav.settings", labelShort: "nav.settingsShort", icon: Icons.settings },
+  ];
+  if (hasCodingActivity.value) {
+    items.splice(2, 0, { path: "/coding", label: "nav.coding", labelShort: "nav.codingShort", icon: Icons.coding });
+  }
+  return items;
+});
 const confirmDialogRef = ref<InstanceType<typeof ConfirmDialog> | null>(null);
 const teamNotifRef = ref<InstanceType<typeof TeamNotification> | null>(null);
 
-// Register global refs after mount
 onMounted(() => {
   getConfirmDialog().setDialogRef(confirmDialogRef.value);
   setTeamNotifRef(teamNotifRef.value);
@@ -120,13 +137,29 @@ onMounted(() => {
 
 const shouldShowNav = computed(() => route.path !== "/tray");
 
-// Reactive Theme Switching
+const { locale } = useI18n();
+
+watch(
+  locale,
+  (newLocale) => {
+    if (newLocale === "ar") {
+      document.documentElement.setAttribute("dir", "rtl");
+    } else {
+      document.documentElement.setAttribute("dir", "ltr");
+    }
+  },
+  { immediate: true }
+);
+
 watch(
   () => store.settings.theme,
   (newTheme) => {
     document.documentElement.setAttribute("data-theme", newTheme);
   }
 );
+
+let pollInterval: number | null = null;
+let unlistenTick: (() => void) | null = null;
 
 onMounted(async () => {
   await store.checkPlatform();
@@ -136,25 +169,22 @@ onMounted(async () => {
   const { listen } = await import("@tauri-apps/api/event");
 
   await listen("navigate", (event: any) => {
-    console.log("🧭 Navigation event received:", event.payload);
+    console.log(" Navigation event received:", event.payload);
     router.push(event.payload).catch((err) => {
       console.error("Navigation failed:", err);
     });
   });
 
-  // Initialize Activity Tracking
   await store.fetchTrackingStatus();
   if (!store.isTracking) {
     console.log("Starting activity tracking...");
     await store.startTracking();
   }
 
-  // Initialize Doctor Mode
   if (doctorModeStore.enabled) {
     doctorModeStore.startTracking();
   }
 
-  // Block F7 key
   window.addEventListener("keydown", (e) => {
     if (e.key === "F7") {
       e.preventDefault();
@@ -162,12 +192,39 @@ onMounted(async () => {
     }
   });
 
-  console.log("✅ App mounted, navigation listener ready");
+  await store.fetchTodayData();
+  await store.fetchCurrentActivity();
+  await teamsStore.restoreGroupState();
+
+  pollInterval = window.setInterval(async () => {
+    if (store.isTracking) {
+      await store.fetchCurrentActivity();
+      await store.fetchTodayData();
+    }
+  }, 5000);
+
+  unlistenTick = await listen("activity-tracker-tick", async () => {
+    if (store.isTracking) {
+      await store.fetchCurrentActivity();
+      await store.fetchTodayData();
+    }
+  });
+
+  console.log(" App mounted, navigation listener ready");
+});
+
+onUnmounted(() => {
+  if (pollInterval) {
+    clearInterval(pollInterval);
+  }
+  if (unlistenTick) {
+    unlistenTick();
+  }
 });
 </script>
 
 <style scoped>
-/* Page Transitions - Smooth fade and slide */
+
 .page-enter-active,
 .page-leave-active {
   transition: opacity 0.2s ease, transform 0.2s ease;
@@ -183,7 +240,7 @@ onMounted(async () => {
   transform: translateY(-12px);
 }
 
-/* Icon Styles */
+
 .nav-icon {
   width: 20px;
   height: 20px;
@@ -212,14 +269,14 @@ onMounted(async () => {
   height: 100%;
 }
 
-/* Navigation Divider */
+
 .nav-divider {
   height: 1px;
   background: var(--border-color);
   margin: 12px 0;
 }
 
-/* Hide labels on mobile bottom nav */
+
 @media (max-width: 768px) {
   .bottom-nav-item span {
     display: none;

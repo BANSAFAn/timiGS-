@@ -107,25 +107,25 @@ export function detectCategory(appName: string, exePath: string = ''): string {
   const name = appName.toLowerCase();
   const path = exePath.toLowerCase();
 
-  // Games (Check specific names or common launcher paths)
+
   const gameKeywords = ['steam', 'epicgames', 'riot', 'league of', 'valorant', 'overwatch', 'minecraft', 'roblox', 'csgo', 'dota', 'gta', 'witcher', 'cyberpunk', 'ea app', 'battle.net'];
   if (gameKeywords.some(kw => name.includes(kw)) || path.includes('\\steam\\') || path.includes('\\epic games\\') || path.includes('\\riot games\\') || path.includes('battlenet')) {
     return 'Games';
   }
 
-  // Work (Office, IDEs, Design, Comms)
+
   const workKeywords = ['word', 'excel', 'powerpoint', 'code', 'studio', 'figma', 'notion', 'obsidian', 'webstorm', 'pycharm', 'intellij', 'slack', 'zoom', 'teams', 'illustrator', 'photoshop', 'after effects', 'premiere'];
   if (workKeywords.some(kw => name.includes(kw))) {
     return 'Work';
   }
 
-  // Rest (Music, Video, Social)
+
   const restKeywords = ['spotify', 'youtube music', 'discord', 'netflix', 'telegram', 'whatsapp', 'viber', 'tiktok', 'instagram', 'facebook', 'twitter'];
   if (restKeywords.some(kw => name.includes(kw))) {
     return 'Rest';
   }
 
-  // Programs (Browsers and Utilities)
+
   const programKeywords = ['chrome', 'edge', 'firefox', 'brave', 'opera', 'vivaldi', 'safari', 'explorer', 'settings', 'taskmgr'];
   if (programKeywords.some(kw => name.includes(kw))) {
     return 'Programs';
@@ -144,7 +144,7 @@ export const useActivityStore = defineStore('activity', {
     musicSummary: [] as MusicAppUsage[],
     totalMusicTime: 0,
     currentMusicSession: null as MusicSession | null,
-    // Coding tracker
+
     todayCodingSessions: [] as CodingSession[],
     codingStats: [] as CodingStats[],
     codingProjectStats: [] as CodingProjectStats[],
@@ -178,7 +178,7 @@ export const useActivityStore = defineStore('activity', {
     },
 
     topApps: (state) => {
-      // Sort by time descending
+
       return [...state.todaySummary].sort((a, b) => b.total_seconds - a.total_seconds).slice(0, 5);
     },
 
@@ -188,18 +188,18 @@ export const useActivityStore = defineStore('activity', {
 
       state.todaySessions.forEach(session => {
         const appNameLower = session.app_name.toLowerCase();
-        // Check if app is a browser
+
         if (BROWSERS.some(b => appNameLower.includes(b))) {
-          // Skip YouTube Music - it's tracked as music
+
           if (session.window_title.toLowerCase().includes('youtube music')) return;
           
           let site = 'Unknown';
           const title = session.window_title;
 
-          // Pattern 1: "Page Title - Site Name - Browser" or "Page Title - Site Name"
-          // We assume the Site Name is the last meaningful part before the browser suffix
 
-          // Remove browser suffix if present
+
+
+
           let cleanTitle = title
             .replace(/ - Google Chrome$/i, '')
             .replace(/ - Microsoft Edge$/i, '')
@@ -208,18 +208,18 @@ export const useActivityStore = defineStore('activity', {
             .replace(/ - Brave$/i, '')
             .replace(/ - Vivaldi$/i, '');
 
-          // Split by " - " or " | "
+
           const parts = cleanTitle.split(/ - | \| /);
 
           if (parts.length > 1) {
-            // Usually the site name is the last part, e.g. "Video - YouTube"
+
             site = parts[parts.length - 1].trim();
           } else {
-            // If no separator, use the whole title, or try to detect domains
+
             site = cleanTitle.trim();
           }
 
-          // Grouping common sites cleanup
+
           if (site === 'New Tab') return; // Skip new tabs
           if (site.endsWith('.com') || site.endsWith('.org')) site = site;
 
@@ -228,7 +228,7 @@ export const useActivityStore = defineStore('activity', {
         }
       });
 
-      // Convert to array and sort
+
       return Object.entries(SITE_USAGE)
         .map(([name, seconds]) => ({ name, seconds }))
         .sort((a, b) => b.seconds - a.seconds)
@@ -255,7 +255,7 @@ export const useActivityStore = defineStore('activity', {
       state.todaySummary.forEach(app => {
         let category = state.appCategories[app.app_name];
         
-        // Auto-detect if no category mapped
+
         if (!category || category === 'Uncategorized') {
            category = detectCategory(app.app_name, app.exe_path);
         }
@@ -263,12 +263,12 @@ export const useActivityStore = defineStore('activity', {
         if (summary[category] !== undefined) {
           summary[category] += app.total_seconds;
         } else {
-          // If a category was renamed or removed, fallback to Uncategorized
+
           summary['Uncategorized'] += app.total_seconds;
         }
       });
 
-      // Filter out categories with 0 seconds to avoid empty slices in pie chart
+
       return Object.entries(summary)
         .map(([name, seconds]) => ({ name, seconds }))
         .filter(cat => cat.seconds > 0)
@@ -347,7 +347,7 @@ export const useActivityStore = defineStore('activity', {
     async fetchSettings() {
       try {
         this.settings = await invoke<Settings>('get_settings');
-        // Apply theme
+
         document.documentElement.setAttribute('data-theme', this.settings.theme);
       } catch (error) {
         console.error('Failed to fetch settings:', error);
@@ -392,7 +392,7 @@ export const useActivityStore = defineStore('activity', {
     },
 
     async checkPlatform() {
-        // Desktop-only application
+
         this.isMobile = false;
     },
 
@@ -460,7 +460,7 @@ export const useActivityStore = defineStore('activity', {
 
     async saveAppCategory(appName: string, category: string) {
       try {
-        // Clone for reactivity
+
         const newCategories = { ...this.appCategories };
 
         if (category === 'Uncategorized' || !category) {
@@ -471,7 +471,7 @@ export const useActivityStore = defineStore('activity', {
 
         this.appCategories = newCategories;
 
-        // Save to backend
+
         await invoke('save_setting_cmd', {
           key: 'app_categories',
           value: JSON.stringify(newCategories)

@@ -9,7 +9,7 @@ export interface ConfirmOptions {
   showCancel?: boolean;
 }
 
-// Global reference to the ConfirmDialog component instance
+
 const dialogRef: Ref<{ show: (options: ConfirmOptions) => Promise<boolean> } | null> = ref(null);
 
 export function useConfirmDialog() {
@@ -25,7 +25,7 @@ export function useConfirmDialog() {
     return dialogRef.value.show(options);
   }
 
-  // Convenience methods
+
   async function warning(message: string, title = 'Warning'): Promise<boolean> {
     return confirm({ title, message, type: 'warning' });
   }
@@ -47,7 +47,7 @@ export function useConfirmDialog() {
   };
 }
 
-// Export a shared instance getter
+
 export function getConfirmDialog() {
   return {
     setDialogRef: (el: { show: (options: ConfirmOptions) => Promise<boolean> } | null) => {

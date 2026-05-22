@@ -6,7 +6,7 @@
         <p class="subtitle">Utilities to boost your productivity</p>
       </div>
 
-      <!-- Tab Navigation -->
+      
       <div class="tools-tabs">
         <button
           v-for="tab in tabs"
@@ -22,7 +22,7 @@
       </div>
 
       <div class="tools-content">
-        <!-- Shutdown Timer Card (Premium Gradient) -->
+        
         <div
           v-show="activeTab === 'timer'"
           class="tool-content-card timer-card"
@@ -39,7 +39,7 @@
           </div>
         </div>
 
-        <!-- Tasks Card -->
+        
         <div
           v-show="activeTab === 'tasks'"
           class="tool-content-card tasks-card"
@@ -55,7 +55,7 @@
           </div>
         </div>
 
-        <!-- Focus Mode Card -->
+        
         <div
           v-show="activeTab === 'focus'"
           class="tool-content-card focus-card"
@@ -72,7 +72,7 @@
           </div>
         </div>
 
-        <!-- Time OUT Card -->
+        
         <div
           v-show="activeTab === 'timeout'"
           class="tool-content-card timeout-card"
@@ -89,7 +89,7 @@
           </div>
         </div>
 
-        <!-- Notepad Card (Full Width) -->
+        
         <div
           v-show="activeTab === 'notepad'"
           class="tool-content-card notepad-card"
@@ -121,7 +121,7 @@
           </div>
 
           <div class="notepad-layout">
-            <!-- Sidebar -->
+            
             <div class="notes-sidebar custom-scrollbar">
               <div
                 v-for="note in notes"
@@ -170,7 +170,7 @@
               </div>
             </div>
 
-            <!-- Editor -->
+            
             <div class="note-editor">
               <div v-if="selectedNote" class="editor-container">
                 <div class="editor-header">
@@ -205,7 +205,7 @@
                   </div>
                 </div>
 
-                <!-- Apps Panel -->
+                
                 <div v-if="showAppsPanel && recentApps.length > 0" class="apps-panel">
                   <div class="apps-header">
                     <span>
@@ -575,7 +575,7 @@ onMounted(async () => {
   margin: 0;
 }
 
-/* Notepad Specifics */
+
 .notepad-card {
   min-height: 550px;
   background: rgba(245, 158, 11, 0.03);
@@ -686,7 +686,7 @@ onMounted(async () => {
   margin-bottom: 10px;
 }
 
-/* Note Editor */
+
 .note-editor {
   flex: 1;
   display: flex;
@@ -773,7 +773,7 @@ onMounted(async () => {
   color: #10b981;
 }
 
-/* Apps Panel */
+
 .apps-panel {
   padding: 16px 20px;
   background: rgba(0, 0, 0, 0.2);
@@ -914,7 +914,7 @@ onMounted(async () => {
   margin-bottom: 12px;
 }
 
-/* Button */
+
 .btn-new-note {
   display: flex;
   align-items: center;
@@ -936,7 +936,7 @@ onMounted(async () => {
   box-shadow: 0 6px 20px rgba(245, 158, 11, 0.3);
 }
 
-/* Scrollbar */
+
 .custom-scrollbar::-webkit-scrollbar {
   width: 6px;
 }
@@ -954,9 +954,9 @@ onMounted(async () => {
   background: rgba(255, 255, 255, 0.2);
 }
 
-/* Mobile Responsive */
 
-/* 4K Ultra Wide (2560px+) */
+
+
 @media (min-width: 2560px) {
   .page-container {
     max-width: 1800px;
@@ -989,7 +989,7 @@ onMounted(async () => {
   }
 }
 
-/* Large Desktop (1920px - 2560px) */
+
 @media (min-width: 1920px) and (max-width: 2559px) {
   .page-container {
     max-width: 1600px;
@@ -1004,7 +1004,7 @@ onMounted(async () => {
   }
 }
 
-/* Medium Desktop (1440px - 1920px) */
+
 @media (min-width: 1440px) and (max-width: 1919px) {
   .page-container {
     max-width: 1400px;
@@ -1015,7 +1015,7 @@ onMounted(async () => {
   }
 }
 
-/* Tablet Landscape (1024px - 1440px) */
+
 @media (min-width: 1024px) and (max-width: 1439px) {
   .page-container {
     max-width: 1000px;
@@ -1030,7 +1030,7 @@ onMounted(async () => {
   }
 }
 
-/* Tablet Portrait (900px - 1024px) */
+
 @media (max-width: 1024px) {
   .tools-page {
     padding-bottom: 20px;
@@ -1077,7 +1077,7 @@ onMounted(async () => {
   }
 }
 
-/* Small Tablet (768px - 900px) */
+
 @media (max-width: 900px) {
   .page-header h2 {
     font-size: 1.4rem;
@@ -1120,7 +1120,7 @@ onMounted(async () => {
   }
 }
 
-/* Mobile Large (600px - 768px) */
+
 @media (max-width: 768px) {
   .page-header h2 {
     font-size: 1.3rem;
@@ -1229,7 +1229,7 @@ onMounted(async () => {
   }
 }
 
-/* Mobile Medium (480px - 600px) */
+
 @media (max-width: 600px) {
   .page-container {
     max-width: 100%;
@@ -1351,7 +1351,7 @@ onMounted(async () => {
   }
 }
 
-/* Mobile Small (320px - 480px) */
+
 @media (max-width: 480px) {
   .page-container {
     padding: 0 10px;
@@ -1470,7 +1470,7 @@ onMounted(async () => {
   }
 }
 
-/* Extra Small Mobile (below 360px) */
+
 @media (max-width: 360px) {
   .page-container {
     padding: 0 8px;

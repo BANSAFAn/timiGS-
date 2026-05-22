@@ -72,14 +72,14 @@ const progressOffset = computed(() => {
   return 283 - (283 * timeLeft.value) / totalDuration.value;
 });
 
-// Load initial status
+
 async function loadStatus() {
   const remaining = await invoke<number | null>('get_timer_status_cmd');
   if (remaining !== null) {
       timeLeft.value = remaining;
-      // We don't know totalDuration from backend easily without storing it, 
-      // but for progress bar we can just approximate or hide it if needed. 
-      // For now let's assume max relative to current if we just loaded.
+
+
+
       if (totalDuration.value === 0) totalDuration.value = remaining;
       startPolling();
   }
@@ -114,7 +114,7 @@ function startPolling() {
     pollInterval = window.setInterval(async () => {
         const remaining = await invoke<number | null>('get_timer_status_cmd');
         if (remaining === null) {
-            // Timer finished or cancelled externally
+
             timeLeft.value = null;
             if (pollInterval) clearInterval(pollInterval);
         } else {
@@ -128,7 +128,7 @@ import { onMounted } from 'vue';
 onMounted(async () => {
     loadStatus();
     
-    // Listen for finish event
+
     await listen('timer-finished', () => {
         timeLeft.value = null;
         if (pollInterval) clearInterval(pollInterval);

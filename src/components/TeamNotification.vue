@@ -47,7 +47,7 @@ function add(notif: Omit<TeamNotification, 'id' | 'timestamp'>) {
     timestamp: Date.now()
   });
 
-  // Auto-remove after 5 seconds
+
   setTimeout(() => {
     remove(id);
   }, 5000);
@@ -192,7 +192,7 @@ defineExpose({
   height: 14px;
 }
 
-/* Animations */
+
 .team-notif-enter-active {
   animation: teamNotifSlideIn 0.3s ease-out;
 }

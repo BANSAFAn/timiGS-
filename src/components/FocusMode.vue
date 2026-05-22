@@ -1,6 +1,6 @@
 <template>
   <div class="focus-mode">
-    <!-- Setup State -->
+    
     <div v-if="!status" class="focus-setup">
       <div class="setup-section">
         <label class="section-label">
@@ -82,7 +82,7 @@
       </button>
     </div>
 
-    <!-- Active State -->
+    
     <div v-else class="focus-active">
       <div class="focus-target">
         <div class="target-badge" v-html="Icons.focusTarget"></div>
@@ -100,7 +100,7 @@
         <div class="time-display">{{ formattedTime }}</div>
       </div>
 
-      <!-- Music Player -->
+      
       <div v-if="musicFiles.length > 0" class="music-player">
         <div class="now-playing">
           <span class="music-icon" v-html="Icons.focusMusic"></span>
@@ -192,7 +192,7 @@ const cancelError = ref('');
 const status = ref<FocusStatus | null>(null);
 let pollInterval: number | null = null;
 
-// Music state
+
 const musicFiles = ref<MusicFile[]>([]);
 const selectedMusic = ref<string>('');
 const selectedTrack = ref<string>('');
@@ -278,7 +278,7 @@ async function stopFocus() {
       clearInterval(pollInterval);
       pollInterval = null;
     }
-    // Stop music when focus mode is stopped
+
     await stopMusic();
     stopMusicStatusPolling();
   } catch (e: any) {
@@ -299,7 +299,7 @@ function startPolling() {
   }, 1000);
 }
 
-// Music functions
+
 async function loadMusicFiles() {
   try {
     musicFiles.value = await invoke<MusicFile[]>('get_music_files_cmd');
@@ -349,7 +349,7 @@ async function previewMusic() {
     await stopMusic();
     isPreviewing.value = false;
   } else {
-    // Stop any existing music first to avoid conflicts
+
     await invoke('stop_music_cmd').catch(() => {});
     
     try {
@@ -368,7 +368,7 @@ async function previewMusic() {
 async function startMusicPlayback() {
   if (!selectedMusic.value) return;
   
-  // Check if music is already playing to avoid restart
+
   try {
     const currentStatus = await invoke<MusicPlaybackStatus>('get_music_status_cmd');
     if (currentStatus.is_playing && currentStatus.current_track === selectedMusic.value) {
@@ -494,16 +494,16 @@ function stopMusicStatusPolling() {
   }
 }
 
-// Watch for focus mode state changes
+
 watch(status, async (newStatus) => {
   if (newStatus && newStatus.active) {
-    // Focus mode started
+
     if (selectedMusic.value) {
       await startMusicPlayback();
     }
     startMusicStatusPolling();
   } else {
-    // Focus mode ended - stop music and polling
+
     stopMusicStatusPolling();
     await stopMusic();
   }
@@ -518,7 +518,7 @@ onMounted(() => {
 onUnmounted(() => {
   if (pollInterval) clearInterval(pollInterval);
   stopMusicStatusPolling();
-  // Ensure music is stopped when component unmounts
+
   invoke('stop_music_cmd').catch(() => {});
 });
 </script>
@@ -664,7 +664,7 @@ onUnmounted(() => {
 
 
 
-/* Active State */
+
 .focus-active {
   align-items: center;
   text-align: center;
@@ -784,7 +784,7 @@ circle {
   margin: 0;
 }
 
-/* Music Selection */
+
 .music-selection {
   display: flex;
   gap: 8px;
@@ -880,7 +880,7 @@ circle {
   cursor: not-allowed;
 }
 
-/* Music Player */
+
 .music-player {
   width: 100%;
   background: rgba(139, 92, 246, 0.1);

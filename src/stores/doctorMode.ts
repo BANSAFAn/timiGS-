@@ -1,49 +1,49 @@
-// src/stores/doctorMode.ts
+
 import { defineStore } from 'pinia';
 import { useNotificationStore } from './notifications';
 
 export const useDoctorModeStore = defineStore('doctorMode', {
   state: () => ({
     enabled: localStorage.getItem('doctorMode_enabled') === 'true',
-    // Interval in minutes for reminders (default 45)
+
     reminderIntervalMins: parseInt(localStorage.getItem('doctorMode_reminderInterval') || '45', 10),
-    // Lock duration in minutes (default 60)
+
     lockDurationMins: parseInt(localStorage.getItem('doctorMode_lockDuration') || '60', 10),
-    // Current session elapsed time in minutes
+
     elapsedMins: 0,
     intervalId: null as any | null,
-    // Number of reminders sent in current cycle
+
     reminderCount: 0,
-    // Maximum reminders before lock (default 4)
+
     maxReminders: parseInt(localStorage.getItem('doctorMode_maxReminders') || '4', 10),
-    // Whether PC is currently locked
+
     isLocked: false,
-    // Lock end time
+
     lockEndTime: 0,
-    // Last reminder time
+
     lastReminderTime: 0,
-    // Reactive timestamp for timer updates
+
     currentTime: Date.now(),
   }),
 
   getters: {
-    // Time remaining until lock (in minutes)
+
     timeUntilLock: (state) => {
       if (state.isLocked) return 0;
       const remindersNeeded = state.maxReminders - state.reminderCount;
       return Math.max(0, remindersNeeded * state.reminderIntervalMins);
     },
 
-    // Time remaining in current lock (in minutes) - reactive
+
     lockTimeRemaining: (state) => {
       if (!state.isLocked || !state.lockEndTime) return 0;
-      // Use currentTime to make this reactive
+
       const now = state.currentTime;
       const remaining = Math.max(0, (state.lockEndTime - now) / 60000);
       return remaining;
     },
     
-    // Lock time remaining in seconds for smooth display
+
     lockTimeRemainingSeconds: (state) => {
       if (!state.isLocked || !state.lockEndTime) return 0;
       const now = state.currentTime;
@@ -80,18 +80,18 @@ export const useDoctorModeStore = defineStore('doctorMode', {
 
     startTracking() {
       this.stopTracking();
-      // Reset tracking start
+
       this.elapsedMins = 0;
       this.reminderCount = 0;
       this.lastReminderTime = 0;
 
-      // Update every minute for reminders
+
       this.intervalId = setInterval(() => {
         this.elapsedMins += 1;
         this.checkReminders();
       }, 60000); // 1 minute
       
-      // Send immediate notification when enabled
+
       const notifications = useNotificationStore();
       notifications.success(
         `🌿 Doctor Mode Enabled!\n\n` +
@@ -119,8 +119,8 @@ export const useDoctorModeStore = defineStore('doctorMode', {
 
       const notifications = useNotificationStore();
 
-      // Check if we've reached a reminder interval
-      // Use >= to catch any missed minutes
+
+
       const nextReminderAt = (this.reminderCount + 1) * this.reminderIntervalMins;
       
       if (this.elapsedMins >= nextReminderAt && this.reminderCount < this.maxReminders) {
@@ -128,7 +128,7 @@ export const useDoctorModeStore = defineStore('doctorMode', {
         this.lastReminderTime = this.elapsedMins;
 
         if (this.reminderCount < this.maxReminders) {
-          // Send friendly reminder
+
           const messages = [
             `🌿 Doctor Mode: You've been at your PC for ${this.elapsedMins} minutes. Time to take a break! Go for a walk, stretch, or rest your eyes.`,
             `💚 Health Reminder: ${this.elapsedMins} minutes of screen time! Your body needs a break. Step away from the computer for a few minutes.`,
@@ -139,7 +139,7 @@ export const useDoctorModeStore = defineStore('doctorMode', {
           const messageIndex = (this.reminderCount - 1) % messages.length;
           notifications.warning(messages[messageIndex]);
         } else {
-          // Max reminders reached - lock the PC
+
           this.lockPC();
         }
       }
@@ -158,9 +158,9 @@ export const useDoctorModeStore = defineStore('doctorMode', {
         `Your health is more important than any task!`
       );
 
-      // Start countdown to unlock - update every second for smooth timer
+
       const unlockInterval = setInterval(() => {
-        // Update currentTime to make lockTimeRemaining reactive
+
         this.currentTime = Date.now();
         
         const remaining = this.lockTimeRemainingSeconds;
@@ -184,7 +184,7 @@ export const useDoctorModeStore = defineStore('doctorMode', {
       this.resetSession();
     },
 
-    // Manual unlock (for emergencies)
+
     emergencyUnlock() {
       this.unlock();
       const notifications = useNotificationStore();
@@ -194,7 +194,7 @@ export const useDoctorModeStore = defineStore('doctorMode', {
       );
     },
     
-    // Force unlock (for testing/debugging)
+
     forceUnlock() {
       this.isLocked = false;
       this.lockEndTime = 0;

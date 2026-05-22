@@ -12,7 +12,7 @@
           <p class="subtitle">Insights into your productivity patterns</p>
         </div>
         <div class="header-controls">
-          <!-- Time Range Selector -->
+          
           <div class="time-range-selector">
             <button class="range-btn" :class="{ active: selectedRange === 'week' }" @click="selectedRange = 'week'">{{ $t('common.week') || 'Week' }}</button>
             <button class="range-btn" :class="{ active: selectedRange === 'month' }" @click="selectedRange = 'month'">{{ $t('common.month') || 'Month' }}</button>
@@ -32,7 +32,7 @@
       </div>
 
       <div class="analytics-dashboard">
-        <!-- Key Metrics Row -->
+        
         <div class="stats-row animate-enter">
           <div class="stat-card premium-card purple">
             <div class="stat-bg-icon" v-html="Icons.clock"></div>
@@ -58,11 +58,18 @@
               <span class="stat-value text-ellipsis" :title="store.topApps[0]?.app_name">{{ store.topApps[0]?.app_name || '-' }}</span>
             </div>
           </div>
+          <div class="stat-card premium-card green">
+            <div class="stat-bg-icon" v-html="Icons.tools"></div>
+            <div class="stat-content">
+              <span class="stat-label">{{ $t('analytics.programsOpened') }}</span>
+              <span class="stat-value">{{ store.appCount }}</span>
+            </div>
+          </div>
         </div>
 
-        <!-- Main Charts Grid -->
+        
         <div class="charts-grid animate-enter" style="animation-delay: 0.1s">
-          <!-- Activity Trend (Large) -->
+          
           <div class="chart-card large-chart">
             <div class="card-header">
               <h3>{{ $t('analytics.trend') }}</h3>
@@ -72,7 +79,7 @@
             </div>
           </div>
 
-          <!-- App Breakdown -->
+          
           <div class="chart-card app-breakdown-card">
             <div class="card-header flex-between">
               <h3>{{ $t('analytics.breakdownByApp') }}</h3>
@@ -82,12 +89,12 @@
             </div>
             
             <div class="app-breakdown-content">
-              <!-- Left: Pie Chart -->
+              
               <div class="app-breakdown-chart">
                 <Pie v-if="store.topApps.length > 0" :data="appChartData" :options="pieChartOptions" />
               </div>
               
-              <!-- Right: Apps List -->
+              
               <div class="app-breakdown-list">
                 <div class="app-list-header">
                   <span>Application</span>
@@ -112,7 +119,7 @@
           </div>
         </div>
 
-        <!-- Top Websites -->
+        
         <div class="section-block animate-enter websites-section" style="animation-delay: 0.2s" v-if="store.websiteUsage.length > 0">
            <div class="section-header">
              <h3>
@@ -152,7 +159,7 @@
            </div>
         </div>
 
-        <!-- Music Listening Section -->
+        
         <div class="section-block animate-enter music-section" style="animation-delay: 0.25s" v-if="store.musicSummary.length > 0">
            <div class="section-header">
              <h3>
@@ -203,7 +210,7 @@
              </div>
            </div>
 
-           <!-- Now Playing (if there's a current music session) -->
+           
            <div class="now-playing" v-if="currentMusicSession">
              <div class="now-playing-header">
                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -236,20 +243,19 @@
            </div>
         </div>
 
-        <!-- Empty State -->
+        
         <div v-if="weeklyStats.length === 0 && store.topApps.length === 0 && !store.isLoading" class="empty-state animate-enter">
           <div class="empty-icon" v-html="Icons.analytics" style="width:48px;height:48px;opacity:0.5;margin:0 auto 12px auto;color:var(--text-muted)"></div>
           <h3>No Data Available Yet</h3>
           <p>Start using your applications to see analytics here.</p>
         </div>
 
-        <!-- Coding Tracker Section -->
-        <CodingTracker class="animate-enter" style="animation-delay: 0.3s" />
+
 
       </div>
     </div>
 
-    <!-- Detail Modal (App Breakdown) -->
+    
     <Teleport to="body">
       <div v-if="showDetailModal" class="modal-overlay" @click.self="showDetailModal = false">
         <div class="modal-content animate-enter">
@@ -270,7 +276,8 @@
                 <tr v-for="app in store.topApps" :key="app.app_name" class="table-row">
                   <td>
                     <div class="app-row">
-                      <span class="app-icon-mini" :style="{ background: getAppColor(app.app_name) }">
+                      <img v-if="appIcons[app.app_name]" :src="appIcons[app.app_name]" class="app-icon-mini-img" :alt="app.app_name" />
+                      <span v-else class="app-icon-mini" :style="{ background: getAppColor(app.app_name) }">
                         {{ app.app_name.charAt(0) }}
                       </span>
                       {{ app.app_name }}
@@ -290,7 +297,7 @@
       </div>
     </Teleport>
 
-    <!-- Music History Modal -->
+    
     <Teleport to="body">
       <div v-if="showMusicHistory" class="modal-overlay" @click.self="showMusicHistory = false">
         <div class="modal-content animate-enter music-history-modal">
@@ -336,7 +343,7 @@
       </div>
     </Teleport>
 
-    <!-- Website History Modal -->
+    
     <Teleport to="body">
       <div v-if="showWebsiteHistory" class="modal-overlay" @click.self="showWebsiteHistory = false">
         <div class="modal-content animate-enter website-history-modal">
@@ -353,9 +360,17 @@
             <button class="close-btn" @click="showWebsiteHistory = false">×</button>
           </div>
           <div class="modal-body custom-scrollbar" style="max-height: 60vh;">
-            <div v-if="websiteHistorySessions.length === 0" class="empty-day">No browsing sessions recorded</div>
+            <div class="website-search-container" style="margin-bottom: 16px;">
+              <input 
+                v-model="websiteSearchQuery" 
+                type="text" 
+                placeholder="Search by title or link..." 
+                class="website-search-input"
+              />
+            </div>
+            <div v-if="filteredWebsiteHistorySessions.length === 0" class="empty-day">No browsing sessions recorded</div>
             <div v-else class="website-sessions-list">
-              <div v-for="session in websiteHistorySessions" :key="session.id" class="website-session-item">
+              <div v-for="session in filteredWebsiteHistorySessions" :key="session.id" class="website-session-item">
                 <div class="website-session-icon">
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="12" cy="12" r="10"></circle>
@@ -365,12 +380,21 @@
                 </div>
                 <div class="website-session-info">
                   <div class="website-session-title">{{ session.window_title || 'Unknown Page' }}</div>
-                  <div class="website-session-url" :title="extractUrl(session.window_title)">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;vertical-align:middle;margin-right:4px;">
+                  <div 
+                    class="website-session-url" 
+                    :class="{ 'copied': copiedSessions[session.id] }"
+                    :title="copiedSessions[session.id] ? 'Copied!' : 'Click to copy link'" 
+                    @click="copyLink(extractUrl(session.window_title), session.id)"
+                    style="cursor:pointer;"
+                  >
+                    <svg v-if="copiedSessions[session.id]" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;vertical-align:middle;margin-right:4px;">
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    <svg v-else xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;vertical-align:middle;margin-right:4px;">
                       <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
                       <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
                     </svg>
-                    {{ extractUrl(session.window_title) }}
+                    {{ copiedSessions[session.id] ? 'Copied!' : extractUrl(session.window_title) }}
                   </div>
                 </div>
                 <div class="website-session-time">
@@ -394,7 +418,7 @@ import { Line, Pie } from 'vue-chartjs';
 import { useI18n } from 'vue-i18n';
 import { Icons } from '../components/icons/IconMap';
 import { invoke } from '@tauri-apps/api/core';
-import CodingTracker from '../components/CodingTracker.vue';
+
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, PointElement, LineElement, Tooltip, Legend, Filler);
 
@@ -402,28 +426,59 @@ const { t } = useI18n();
 const store = useActivityStore();
 const showDetailModal = ref(false);
 
-// Current music session from store (for "Now Playing")
+
 const currentMusicSession = computed(() => store.currentMusicSession);
 
-// App icons
+
 const appIcons = ref<Record<string, string>>({});
 
-// Music History Modal
+
 const showMusicHistory = ref(false);
 const musicHistoryApp = ref('');
 const musicHistorySessions = ref<MusicSession[]>([]);
 const musicHistoryTotalTime = ref(0);
 const musicHistoryColor = ref('#ec4899');
-// Я забув що ви не розумієте моєї мови, хоча зря :3
-// Website History Modal
+
+
 const showWebsiteHistory = ref(false);
 const websiteHistoryName = ref('');
 const websiteHistorySessions = ref<ActivitySession[]>([]);
 const websiteHistoryTotalTime = ref(0);
+const copiedSessions = ref<Record<string, boolean>>({});
+const websiteSearchQuery = ref('');
 
-// Favicon cache
+const filteredWebsiteHistorySessions = computed(() => {
+  const query = websiteSearchQuery.value.trim().toLowerCase();
+  if (!query) return websiteHistorySessions.value;
+  return websiteHistorySessions.value.filter(session => {
+    const title = (session.window_title || '').toLowerCase();
+    const url = extractUrl(session.window_title).toLowerCase();
+    return title.includes(query) || url.includes(query);
+  });
+});
+
+watch(showWebsiteHistory, (val) => {
+  if (!val) {
+    websiteSearchQuery.value = '';
+    copiedSessions.value = {};
+  }
+});
+
+function copyLink(url: string, sessionId: string | number) {
+  if (!url) return;
+  const idStr = String(sessionId);
+  navigator.clipboard.writeText(url).then(() => {
+    copiedSessions.value[idStr] = true;
+    setTimeout(() => {
+      copiedSessions.value[idStr] = false;
+    }, 1500);
+  });
+}
+
+
 const faviconCache = ref<Record<string, string>>({});
 const faviconErrors = ref<Set<string>>(new Set());
+const faviconLoading = ref<Set<string>>(new Set());
 
 function getMusicPercentage(seconds: number): number {
   if (store.totalMusicTime === 0) return 0;
@@ -460,23 +515,45 @@ function getMusicBarGradient(index: number): string {
 function getFaviconUrl(siteName: string): string {
   if (faviconCache.value[siteName]) return faviconCache.value[siteName];
 
-  // Try to extract domain from site name
-  const domain = extractDomain(siteName);
-  if (domain) {
-    const faviconUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
-    faviconCache.value[siteName] = faviconUrl;
-    return faviconUrl;
+
+  if (!faviconLoading.value.has(siteName)) {
+    loadFavicon(siteName);
   }
 
-  // Fallback: return a default favicon URL
+
   return 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%2306b6d4" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>';
 }
 
+async function loadFavicon(siteName: string) {
+  faviconLoading.value.add(siteName);
+  try {
+    const domain = extractDomain(siteName);
+    if (domain) {
+      const cleanDomain = domain
+        .replace('https://', '')
+        .replace('http://', '')
+        .replace('www.', '')
+        .trim();
+        
+      const base64 = await invoke<string | null>('get_website_favicon', { domain: cleanDomain });
+      if (base64) {
+        faviconCache.value[siteName] = base64;
+        return;
+      }
+    }
+  } catch (error) {
+    console.error('Failed to load website favicon:', error);
+  }
+  
+
+  faviconCache.value[siteName] = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44"><rect width="44" height="44" rx="10" fill="rgba(6,182,212,0.2)"/><text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" font-size="20" font-weight="bold" fill="%2306b6d4">' + encodeURIComponent(siteName.charAt(0).toUpperCase()) + '</text></svg>';
+}
+
 function extractDomain(siteName: string): string | null {
-  // Clean up site name
+
   const cleanName = siteName.trim();
 
-  // Direct domain patterns
+
   const domainPatterns = [
     { pattern: /youtube/i, domain: 'youtube.com' },
     { pattern: /google/i, domain: 'google.com' },
@@ -505,7 +582,7 @@ function extractDomain(siteName: string): string | null {
     }
   }
 
-  // Try to detect URL pattern in site name
+
   const urlPattern = /(?:https?:\/\/)?(?:www\.)?([a-zA-Z0-9-]+\.[a-zA-Z]{2,})/i;
   const match = cleanName.match(urlPattern);
   if (match) {
@@ -518,13 +595,13 @@ function extractDomain(siteName: string): string | null {
 function handleFaviconError(event: Event, siteName: string) {
   const target = event.target as HTMLImageElement;
   faviconErrors.value.add(siteName);
-  // Set fallback SVG as source
+
   target.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44"><rect width="44" height="44" rx="10" fill="rgba(6,182,212,0.2)"/><text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" font-size="20" font-weight="bold" fill="%2306b6d4">' + encodeURIComponent(siteName.charAt(0).toUpperCase()) + '</text></svg>';
 }
 
 function handleWebsiteFaviconError(event: Event, siteName: string) {
   const target = event.target as HTMLImageElement;
-  // Set fallback SVG as source
+
   target.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44"><rect width="44" height="44" rx="10" fill="rgba(6,182,212,0.2)"/><text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" font-size="20" font-weight="bold" fill="%2306b6d4">' + encodeURIComponent(siteName.charAt(0).toUpperCase()) + '</text></svg>';
 }
 
@@ -547,13 +624,13 @@ async function openMusicHistory(appName: string) {
   try {
     const today = new Date().toISOString().split('T')[0];
     
-    // Use the dedicated music activity range method
+
     const musicSessions = await store.getMusicActivityRange(today, today);
     
-    // Normalize app name for comparison
+
     const targetName = appName.toLowerCase();
     
-    // Common music app name variations
+
     const musicAppVariations = [
       targetName,
       targetName + ' music',
@@ -561,16 +638,16 @@ async function openMusicHistory(appName: string) {
       targetName.replace(' music', ''),
     ];
     
-    // For Spotify specifically, also check for "spotify music"
+
     if (targetName.includes('spotify')) {
       musicAppVariations.push('spotify music', 'spotifymusic');
     }
     
-    // Filter sessions by app name
+
     const filteredSessions = musicSessions
       .filter(s => {
         const sessionName = s.app_name.toLowerCase();
-        // Check all variations
+
         return musicAppVariations.some(variation => 
           sessionName === variation || 
           sessionName.includes(variation) || 
@@ -594,14 +671,14 @@ async function openWebsiteHistory(siteName: string) {
     const today = new Date().toISOString().split('T')[0];
     const sessions = await store.getActivityRange(today, today);
     
-    // Filter browser sessions that match this site
+
     const BROWSERS = ['chrome', 'msedge', 'firefox', 'opera', 'brave', 'vivaldi'];
     const websiteSessions = sessions
       .filter(s => {
         const appNameLower = s.app_name.toLowerCase();
         const isBrowser = BROWSERS.some(b => appNameLower.includes(b));
         const title = s.window_title || '';
-        // Check if site name appears in the title
+
         const matchesSite = title.toLowerCase().includes(siteName.toLowerCase()) || 
                            siteName.toLowerCase().includes(title.toLowerCase());
         return isBrowser && matchesSite;
@@ -619,7 +696,7 @@ async function openWebsiteHistory(siteName: string) {
 function extractUrl(windowTitle: string): string {
   if (!windowTitle) return '';
   
-  // Remove browser suffixes first
+
   let cleanTitle = windowTitle
     .replace(/ - Google Chrome$/i, '')
     .replace(/ - Microsoft Edge$/i, '')
@@ -629,23 +706,23 @@ function extractUrl(windowTitle: string): string {
     .replace(/ - Vivaldi$/i, '')
     .replace(/^\(\d+\)\s*/i, ''); // Remove notification counts like "(1)"
   
-  // Try to extract URL from various patterns
+
   
-  // Pattern 1: Full URL in title (e.g., "https://youtube.com - Video Title")
+
   const fullUrlPattern = /(https?:\/\/[^\s<>"{}|\\^`\[\]]+)/i;
   const fullUrlMatch = cleanTitle.match(fullUrlPattern);
   if (fullUrlMatch) {
     return fullUrlMatch[1];
   }
   
-  // Pattern 2: Domain pattern (e.g., "youtube.com" somewhere in title)
+
   const domainPattern = /\b([a-zA-Z0-9-]+\.(?:com|org|net|io|co|edu|gov|mil|biz|info|me|tv|fm|ly|app|dev|ai|ru|ua|de|fr|es|it|jp|cn|in|br|mx|nl|se|no|dk|fi|pl|cz|sk|hu|ro|bg|hr|si|rs|ua|by|kz|az|ge|am|md|lt|lv|ee)\b(?:\/[^\s<>"{}|\\^`\[\]]*)?)/i;
   const domainMatch = cleanTitle.match(domainPattern);
   if (domainMatch) {
     return 'https://' + domainMatch[1];
   }
   
-  // Pattern 3: For YouTube specifically - extract video URL
+
   if (/youtube/i.test(cleanTitle)) {
     const videoIdMatch = cleanTitle.match(/watch\?v=([a-zA-Z0-9_-]+)/i);
     if (videoIdMatch) {
@@ -654,7 +731,7 @@ function extractUrl(windowTitle: string): string {
     return 'https://youtube.com';
   }
   
-  // Pattern 4: For common sites
+
   const commonSites: Record<string, string> = {
     'youtube studio': 'https://studio.youtube.com',
     'youtube творческая студия': 'https://studio.youtube.com',
@@ -682,7 +759,7 @@ function extractUrl(windowTitle: string): string {
     }
   }
   
-  // If no URL found, return the cleaned title
+
   return cleanTitle.trim();
 }
 
@@ -691,12 +768,12 @@ function formatDate(dateStr: string): string {
   return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
-// Time range
+
 const selectedRange = ref<'day' | 'week' | 'month'>('week');
 const dayOffset = ref(0);
 const monthOffset = ref(0);
 
-// --- Week Navigation ---
+
 const weekOffset = ref(0); // 0 = current week, -1 = last week, etc.
 interface DailyStatLocal { date: string; total_seconds: number; app_count: number; }
 const customWeeklyStats = ref<DailyStatLocal[]>([]);
@@ -786,8 +863,8 @@ function nextPeriod() {
 }
 
 async function fetchPeriodData() {
-  // If it's the current period and we are on week/day view and offset is 0
-  // we could potentially just use store methods, but custom fetching covers all bases uniformly.
+
+
   let fromStr = '';
   let toStr = '';
 
@@ -812,7 +889,7 @@ async function fetchPeriodData() {
 
   const sessions = await store.getActivityRange(fromStr, toStr);
   
-  // Aggregate sessions into daily stats
+
   const daily: Record<string, DailyStatLocal> = {};
   for (const s of sessions) {
     const dateKey = s.start_time.split('T')[0];
@@ -822,7 +899,7 @@ async function fetchPeriodData() {
     daily[dateKey].total_seconds += s.duration_seconds;
   }
   
-  // Count unique apps per day
+
   const appsPerDay: Record<string, Set<string>> = {};
   for (const s of sessions) {
     const dateKey = s.start_time.split('T')[0];
@@ -833,12 +910,12 @@ async function fetchPeriodData() {
     daily[d].app_count = appsPerDay[d]?.size || 0;
   }
   
-  // Fill in missing days
+
   const result: DailyStatLocal[] = [];
   const start = new Date(fromStr);
   const end = new Date(toStr);
   
-  // If viewing a single day, just show one data point
+
   if (start.getTime() === end.getTime()) {
     const key = start.toISOString().split('T')[0];
     result.push(daily[key] || { date: key, total_seconds: 0, app_count: 0 });
@@ -852,7 +929,7 @@ async function fetchPeriodData() {
   customWeeklyStats.value = result;
 }
 
-// --- Colors & Formatting ---
+
 const appColors: Record<string, string> = {};
 const colorPalette = ['#6366f1', '#06b6d4', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981'];
 let colorIndex = 0;
@@ -904,7 +981,7 @@ function formatDurationFull(seconds: number): string {
 }
 
 function calculatePercentage(seconds: number): string {
-    // Calculate total time from all apps, not weekly stats
+
     const totalAppsTime = store.topApps.reduce((acc, app) => acc + app.total_seconds, 0) || 1;
     return ((seconds / totalAppsTime) * 100).toFixed(1);
 }
@@ -912,7 +989,7 @@ function calculatePercentage(seconds: number): string {
 const totalWeekTime = computed(() => weeklyStats.value.reduce((acc, d) => acc + d.total_seconds, 0));
 const dailyAverage = computed(() => weeklyStats.value.length ? Math.round(totalWeekTime.value / weeklyStats.value.length) : 0);
 
-// --- Charts ---
+
 const lineChartData = computed(() => ({
   labels: weeklyStats.value.map(d => new Date(d.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })).reverse(),
   datasets: [{
@@ -975,13 +1052,13 @@ const pieChartOptions = {
 
 onMounted(async () => {
   await fetchPeriodData();
-  // Load icons for top apps
+
   store.topApps.forEach(app => {
     if (app.exe_path) {
       loadIcon(app.app_name, app.exe_path);
     }
   });
-  // Load icons for music apps
+
   store.musicApps.forEach(app => {
     if (app.exe_path) {
       loadIcon(app.app_name, app.exe_path);
@@ -992,7 +1069,7 @@ onMounted(async () => {
   }
 });
 
-// Watch for range changes and reset offset + fetch data
+
 watch(selectedRange, async () => {
   dayOffset.value = 0;
   weekOffset.value = 0;
@@ -1211,10 +1288,10 @@ watch(selectedRange, async () => {
   opacity: 0.7;
 }
 
-/* Stats Row */
+
 .stats-row {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 24px;
   margin-bottom: 36px;
 }
@@ -1282,13 +1359,28 @@ watch(selectedRange, async () => {
 }
 .stat-card.orange:hover::before { opacity: 1; }
 
+.stat-card.green { 
+  border-color: rgba(16, 185, 129, 0.2);
+  background: rgba(16, 185, 129, 0.06);
+}
+.stat-card.green:hover {
+  box-shadow: 0 12px 40px rgba(16, 185, 129, 0.2), 0 0 80px rgba(16, 185, 129, 0.08);
+  border-color: rgba(16, 185, 129, 0.4);
+}
+.stat-card.green::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: #10b981;
+  opacity: 0; transition: opacity 0.4s;
+}
+.stat-card.green:hover::before { opacity: 1; }
+
 .stat-bg-icon {
   position: absolute; right: -10px; bottom: -10px;
   width: 90px; height: 90px; opacity: 0.1;
   transform: rotate(-15deg); pointer-events: none; transition: all 0.4s;
 }
 .stat-card:hover .stat-bg-icon { opacity: 0.2; transform: rotate(-10deg) scale(1.15); }
-.stat-bg-icon :deep(svg) { width: 100%; height: 100%; stroke: currentColor; fill: currentColor; }
+.stat-bg-icon :deep(svg) { width: 100%; height: 100%; stroke: currentColor; fill: none; }
 
 .stat-label { 
   font-size: 0.9rem; 
@@ -1318,7 +1410,7 @@ watch(selectedRange, async () => {
   font-weight: 500;
 }
 
-/* Charts Grid */
+
 .charts-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
@@ -1385,7 +1477,7 @@ watch(selectedRange, async () => {
   position: relative;
 }
 
-/* App Breakdown - New Full Width Design */
+
 .app-breakdown-card {
   grid-column: 1 / -1;
 }
@@ -1659,7 +1751,7 @@ watch(selectedRange, async () => {
   border-color: rgba(255, 255, 255, 0.2);
 }
 
-/* Websites Grid */
+
 .websites-section {
   border: 1px solid rgba(6, 182, 212, 0.25);
   background: rgba(6, 182, 212, 0.05);
@@ -1872,7 +1964,7 @@ watch(selectedRange, async () => {
   border-color: rgba(6, 182, 212, 0.4);
 }
 
-/* Empty State */
+
 .empty-state { 
   text-align: center; 
   padding: 80px 20px; 
@@ -1901,7 +1993,7 @@ watch(selectedRange, async () => {
   font-weight: 400;
 }
 
-/* Modal */
+
 .modal-overlay {
   position: fixed; 
   inset: 0; 
@@ -2019,6 +2111,16 @@ watch(selectedRange, async () => {
   box-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
 
+.app-icon-mini-img {
+  width: 32px; 
+  height: 32px; 
+  border-radius: 10px;
+  object-fit: contain;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
 .mono-font { 
   font-family: 'Consolas', monospace; 
   color: var(--text-muted);
@@ -2049,16 +2151,16 @@ watch(selectedRange, async () => {
   background: rgba(255, 255, 255, 0.02);
 }
 
-/* ===== RESPONSIVE BREAKPOINTS ===== */
 
-/* 4K Ultra Wide (2560px+) */
+
+
 @media (min-width: 2560px) {
   .page-container {
     max-width: 1800px;
   }
 
   .stats-row {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 32px;
   }
 
@@ -2095,7 +2197,7 @@ watch(selectedRange, async () => {
   }
 }
 
-/* Large Desktop (1920px - 2560px) */
+
 @media (min-width: 1920px) and (max-width: 2559px) {
   .page-container {
     max-width: 1600px;
@@ -2114,14 +2216,14 @@ watch(selectedRange, async () => {
   }
 }
 
-/* Medium Desktop (1440px - 1920px) */
+
 @media (min-width: 1440px) and (max-width: 1919px) {
   .page-container {
     max-width: 1400px;
   }
 }
 
-/* Tablet Landscape (1024px - 1440px) */
+
 @media (min-width: 1024px) and (max-width: 1439px) {
   .page-container {
     max-width: 1000px;
@@ -2136,14 +2238,14 @@ watch(selectedRange, async () => {
   }
 }
 
-/* Tablet Portrait (900px - 1024px) */
+
 @media (max-width: 1024px) {
   .page-container {
     max-width: 90%;
   }
 
   .stats-row {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: 16px;
   }
 
@@ -2164,7 +2266,7 @@ watch(selectedRange, async () => {
   }
 }
 
-/* Small Tablet (768px - 900px) */
+
 @media (max-width: 900px) {
   .stats-row {
     grid-template-columns: 1fr;
@@ -2224,7 +2326,7 @@ watch(selectedRange, async () => {
   }
 }
 
-/* Mobile Large (600px - 768px) */
+
 @media (max-width: 768px) {
   .page-header {
     flex-direction: column;
@@ -2303,7 +2405,7 @@ watch(selectedRange, async () => {
   }
 }
 
-/* Mobile Medium (480px - 600px) */
+
 @media (max-width: 600px) {
   .page-container {
     max-width: 100%;
@@ -2426,7 +2528,7 @@ watch(selectedRange, async () => {
   }
 }
 
-/* Mobile Small (320px - 480px) */
+
 @media (max-width: 480px) {
   .page-container {
     padding: 0 10px;
@@ -2600,7 +2702,7 @@ watch(selectedRange, async () => {
   }
 }
 
-/* Extra Small Mobile (below 320px) */
+
 @media (max-width: 360px) {
   .page-container {
     padding: 0 8px;
@@ -2688,7 +2790,7 @@ watch(selectedRange, async () => {
   } 
 }
 
-/* Daily Detail Modal */
+
 .empty-day { 
   text-align: center; 
   padding: 60px 40px; 
@@ -2774,7 +2876,7 @@ watch(selectedRange, async () => {
   font-weight: 500;
 }
 
-/* Music Section */
+
 .music-section {
   border: 1px solid rgba(236, 72, 153, 0.25);
   background: rgba(236, 72, 153, 0.05);
@@ -3002,7 +3104,7 @@ watch(selectedRange, async () => {
   border-color: rgba(236, 72, 153, 0.4);
 }
 
-/* Now Playing */
+
 .now-playing {
   margin-top: 24px;
   background: rgba(255, 255, 255, 0.03);
@@ -3136,7 +3238,7 @@ watch(selectedRange, async () => {
   50% { opacity: 0.6; transform: scale(1.15); }
 }
 
-/* Music History Modal */
+
 .music-history-modal {
   max-width: 700px;
 }
@@ -3241,7 +3343,7 @@ watch(selectedRange, async () => {
   font-feature-settings: "tnum";
 }
 
-/* Website History Modal */
+
 .website-history-modal {
   max-width: 700px;
 }
@@ -3340,6 +3442,40 @@ watch(selectedRange, async () => {
   margin-top: 4px;
   width: fit-content;
   max-width: 100%;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  user-select: none;
+}
+
+.website-session-url:hover {
+  background: rgba(6, 182, 212, 0.2);
+}
+
+.website-session-url.copied {
+  background: rgba(16, 185, 129, 0.15) !important;
+  color: #10b981 !important;
+}
+
+.website-search-container {
+  display: flex;
+  width: 100%;
+}
+
+.website-search-input {
+  width: 100%;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
+  outline: none;
+  transition: var(--transition-fast);
+}
+
+.website-search-input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
 }
 
 .website-session-time {

@@ -1,7 +1,7 @@
 <template>
   <div class="page page-shell dashboard-page">
     <div class="page-container">
-      <!-- Header -->
+      
       <div class="page-header">
         <div class="header-left">
           <h2>{{ $t("dashboard.title") }}</h2>
@@ -15,10 +15,10 @@
         </div>
       </div>
 
-      <!-- Process Exclude Modal -->
+      
       <ProcessExcludeModal v-if="showExcludeModal" @close="showExcludeModal = false" />
 
-      <!-- Active Now Hero Card -->
+      
       <div class="hero-card animate-enter">
         <div class="hero-content">
           <div class="active-section">
@@ -48,7 +48,7 @@
               </p>
             </div>
 
-            <!-- Exclude Button -->
+            
             <button
               class="exclude-btn hero-exclude"
               @click="showExcludeModal = true"
@@ -65,9 +65,9 @@
         </div>
       </div>
 
-      <!-- Stats Row -->
+      
       <div class="stats-row animate-enter" style="animation-delay: 0.1s">
-        <!-- Total Time -->
+        
         <div class="stat-card">
           <div class="stat-icon-box primary">
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -83,7 +83,7 @@
           </div>
         </div>
 
-        <!-- Apps Used -->
+        
         <div class="stat-card">
           <div class="stat-icon-box accent">
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -101,7 +101,7 @@
           </div>
         </div>
 
-        <!-- Sessions -->
+        
         <div class="stat-card">
           <div class="stat-icon-box success">
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -118,9 +118,9 @@
         </div>
       </div>
 
-      <!-- Main Grid -->
+      
       <div class="main-grid animate-enter" style="animation-delay: 0.2s">
-        <!-- Top Apps -->
+        
         <div class="grid-card apps-card">
           <div class="card-header">
             <h3>{{ $t("dashboard.topApps") }}</h3>
@@ -167,7 +167,7 @@
           </div>
         </div>
 
-        <!-- Chart Section -->
+        
         <div class="grid-card chart-card">
           <div class="card-header">
             <h3>{{ $t("dashboard.todaySummary") }}</h3>
@@ -204,7 +204,7 @@
                 :options="barOptions"
               />
 
-              <!-- Center Stats for Doughnut -->
+              
               <div class="chart-center" v-if="selectedChartType === 'doughnut'">
                 <span class="center-value">{{ formatDuration(store.totalTimeToday) }}</span>
                 <span class="center-label">Total</span>
@@ -219,7 +219,7 @@
             </div>
           </div>
 
-          <!-- Legend -->
+          
           <div class="chart-legend" v-if="chartData.labels.length">
             <div
               v-for="(label, i) in chartData.labels.slice(0, 5)"
@@ -313,7 +313,7 @@ function getProgressColor(index: number): string {
   return colors[index % colors.length];
 }
 
-// Chart Data
+
 const chartData = computed(() => ({
   labels: store.topApps.slice(0, 5).map((app) => app.app_name),
   datasets: [
@@ -390,7 +390,7 @@ const barOptions = {
   },
 };
 
-// Icons
+
 async function loadIcon(appName: string, path: string) {
   if (appIcons.value[appName] || !path) return;
   try {
@@ -544,7 +544,7 @@ onUnmounted(() => {
   50% { opacity: 0.7; transform: scale(0.9); }
 }
 
-/* Hero Card */
+
 .hero-card {
   position: relative;
   border-radius: var(--radius-2xl);
@@ -663,7 +663,7 @@ onUnmounted(() => {
   font-weight: 400;
 }
 
-/* Stats Row */
+
 .stats-row {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -749,7 +749,7 @@ onUnmounted(() => {
   color: var(--text-main);
 }
 
-/* Main Grid */
+
 .main-grid {
   display: grid;
   grid-template-columns: 1.3fr 1fr;
@@ -797,7 +797,7 @@ onUnmounted(() => {
   border: 1px solid var(--border-color);
 }
 
-/* App List */
+
 .app-list {
   display: flex;
   flex-direction: column;
@@ -975,7 +975,7 @@ onUnmounted(() => {
   font-weight: 500;
 }
 
-/* Empty State */
+
 .empty-state {
   text-align: center;
   padding: 60px 20px;
@@ -999,7 +999,7 @@ onUnmounted(() => {
   opacity: 0.7;
 }
 
-/* Chart */
+
 .chart-tabs {
   display: flex;
   gap: 6px;
@@ -1083,7 +1083,7 @@ onUnmounted(() => {
   margin-bottom: 16px;
 }
 
-/* Chart Legend */
+
 .chart-legend {
   display: flex;
   flex-wrap: wrap;
@@ -1124,7 +1124,7 @@ onUnmounted(() => {
   text-overflow: ellipsis;
 }
 
-/* Animations */
+
 .animate-enter {
   animation: fadeSlideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
   opacity: 0;
@@ -1141,7 +1141,7 @@ onUnmounted(() => {
   }
 }
 
-/* Mobile Responsive */
+
 @media (max-width: 900px) {
   .stats-row {
     grid-template-columns: 1fr;

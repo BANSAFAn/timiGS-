@@ -1,14 +1,14 @@
 <template>
   <div class="teams-page" @mousemove="onDrag" @mouseup="stopDrag">
     
-    <!-- 1. FULLSCREEN LAYERS (Auth & Lobby) -->
+    
     <Transition name="fade">
       <div v-if="!store.isConnected" class="fullscreen-layer">
         
-        <!-- A. Identity Setup -->
+        
         <div v-if="!store.myProfile.name" class="center-content">
            <div class="glass-panel setup-panel animate-up">
-              <div class="panel-icon">🔑</div>
+              <div class="panel-icon"></div>
               <h1>Welcome to Teams</h1>
               <p class="subtitle">Collaborate with your team in real-time.</p>
 
@@ -18,9 +18,9 @@
            </div>
         </div>
 
-        <!-- B. Lobby (Join/Create) -->
+        
          <div v-else class="lobby-fullscreen">
-           <!-- Fixed Top Header -->
+           
            <div class="lobby-header">
                <div class="user-badge glass-panel">
                    <span class="avatar-small">{{ store.myProfile.name[0] }}</span>
@@ -31,7 +31,7 @@
                </div>
            </div>
            
-           <!-- Centered Lobby Content -->
+           
            <div class="lobby-center">
                <div class="lobby-wrapper animate-up">
                    <div class="lobby-title">
@@ -40,9 +40,9 @@
                    </div>
                    
                    <div class="lobby-options">
-                       <!-- Join Card -->
+                       
                        <div class="glass-card option-card">
-                           <div class="card-icon">👋</div>
+                           <div class="card-icon"></div>
                            <h3>Join Team</h3>
                            <p class="card-desc">Enter a team ID to join an existing session</p>
                            <div class="input-group">
@@ -54,14 +54,14 @@
                            <p v-if="joinError" class="error-msg">{{ joinError }}</p>
                        </div>
                        
-                       <!-- Separator -->
+                       
                        <div class="or-divider">
                            <span>OR</span>
                        </div>
 
-                       <!-- Create Card -->
+                       
                        <div class="glass-card option-card primary-glow">
-                           <div class="card-icon">🚀</div>
+                           <div class="card-icon"></div>
                            <h3>Create Team</h3>
                            <p class="card-desc">Start a new session as leader</p>
                            <button class="btn btn-primary full" @click="createTeam">Start Now</button>
@@ -75,49 +75,49 @@
     </Transition>
 
 
-    <!-- 2. MAIN INTERFACE (Connected) -->
+    
     <div v-if="store.isConnected" class="main-interface">
         
-        <!-- LEFT: STAGE AREA -->
+        
         <div class="stage-area" :class="{ 'theater-mode': isTheaterMode }">
             
-            <!-- Video Grid -->
+            
             <div class="video-stage">
-                <!-- Featured / Screen Share -->
+                
                 <div class="featured-view" v-if="featuredPeerId">
                      <video :srcObject="featuredStream" autoplay playsinline class="featured-video"></video>
                      <div class="featured-label">
                          <span class="badge red" v-if="isFeaturedSharing">Screen Share</span>
                          {{ featuredName }}
                      </div>
-                     <button class="btn-close-feature" @click="featuredPeerId = null">✕ Minimize</button>
+                     <button class="btn-close-feature" @click="featuredPeerId = null">X Minimize</button>
                 </div>
 
-                <!-- Normal Grid -->
+                
                 <div class="grid-view" :class="{ 'strip-row': featuredPeerId, 'single-view': store.members.length === 1 && !featuredPeerId }">
                      
-                     <!-- Remote Peers -->
+                     
                      <div class="video-item" v-for="[peerId, stream] in store.remoteStreams" :key="peerId" @click="setFeatured(peerId)">
                          <video :srcObject="stream" autoplay playsinline></video>
                          <div class="peer-name">{{ getMemberName(peerId) }}</div>
                      </div>
                      
-                     <!-- Local Self (If not featured) -->
+                     
                      <div class="video-item local" v-if="store.localStream && featuredPeerId !== store.myProfile.id">
                          <video :srcObject="store.localStream" autoplay playsinline muted></video>
                          <div class="peer-name">You</div>
                      </div>
                      
-                     <!-- Empty State -->
+                     
                      <div class="empty-stage" v-if="store.remoteStreams.size === 0 && !store.localStream && !featuredPeerId">
-                         <div class="empty-icon">🎧</div>
+                         <div class="empty-icon"></div>
                          <h3>Waiting for people...</h3>
                          <p>Share your ID: <span class="code" @click="copyId">{{ store.myProfile.id }}</span></p>
                      </div>
                 </div>
             </div>
 
-            <!-- Floating Controls Bottom -->
+            
             <div class="control-bar-wrapper">
                 <div class="control-bar glass-panel">
                     <button class="ctrl-btn" :class="{ off: isMuted }" @click="store.toggleMute()" title="Mic">
@@ -147,26 +147,26 @@
             </div>
         </div>
 
-        <!-- RIGHT: SIDEBAR (Tabs) -->
+        
         <Transition name="slide-right">
         <div class="sidebar-area glass-panel" v-if="!isTheaterMode">
-             <!-- Tabs Header -->
+             
              <div class="tabs-header">
                  <button class="tab-btn" :class="{ active: currentTab === 'chat' }" @click="currentTab = 'chat'">
-                    💬 Chat
+                     Chat
                  </button>
                  <button class="tab-btn" :class="{ active: currentTab === 'people' }" @click="currentTab = 'people'">
-                    👥 ({{ store.members.length }})
+                     ({{ store.members.length }})
                  </button>
                  <button class="tab-btn" :class="{ active: currentTab === 'goals' }" @click="currentTab = 'goals'">
-                    🎯 Goals
+                     Goals
                  </button>
              </div>
 
-             <!-- Tab Content -->
+             
              <div class="tab-content">
                  
-                 <!-- CHAT TAB -->
+                 
                  <div v-if="currentTab === 'chat'" class="tab-pane chat-pane">
                      <div v-if="!isChatDetached" class="chat-container-inner">
                         <div class="chat-header-actions">
@@ -182,7 +182,7 @@
                          </div>
                          <div class="chat-input-area">
                              <input v-model="chatMsg" @keyup.enter="sendChat" placeholder="Type..." />
-                             <button @click="sendChat">➤</button>
+                             <button @click="sendChat">-></button>
                          </div>
                      </div>
                      <div v-else class="detached-placeholder">
@@ -191,17 +191,17 @@
                      </div>
                  </div>
 
-                 <!-- PEOPLE TAB -->
+                 
                  <div v-if="currentTab === 'people'" class="tab-pane people-pane">
                      <div class="section-title">In Call</div>
                      <div class="member-list">
                          <div class="member-card" v-for="m in store.members" :key="m.id">
                              <div class="m-avatar" :class="{ voice: m.status === 'voice' }">{{ m.name[0] }}</div>
                              <div class="m-info">
-                                 <div class="m-name">{{ m.name }} <span v-if="m.isLeader">👑</span></div>
+                                 <div class="m-name">{{ m.name }} <span v-if="m.isLeader"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 256 256" fill="currentColor" style="display:inline;vertical-align:middle;margin-left:4px;margin-right:2px;"><path d="M240,96a15.89,15.89,0,0,0-20.17-15.11l-34,11.33L149.2,36a16,16,0,0,0-30.4,0L82.16,92.22l-34-11.33a16,16,0,0,0-20.3,20.3l24,72A16,16,0,0,0,67.35,184H188.65a16,16,0,0,0,15.52-10.81l24-72A15.9,15.9,0,0,0,240,96ZM188.65,168H67.35l-21.33-64,36.56,12.19a16,16,0,0,0,19.38-9.45L128,45.25l26,59.54a16,16,0,0,0,19.38,9.45l36.56-12.19ZM200,208a8,8,0,0,1-8,8H64a8,8,0,0,1,0-16H192A8,8,0,0,1,200,208Z"/></svg></span></div>
                                  <div class="m-status">{{ m.currentApp || 'Idle' }}</div>
                              </div>
-                             <button v-if="store.isLeader && m.id !== store.myProfile.id" class="btn-icon-sm" @click="kickMember(m.id)">✕</button>
+                             <button v-if="store.isLeader && m.id !== store.myProfile.id" class="btn-icon-sm" @click="kickMember(m.id)">X</button>
                          </div>
                      </div>
                      
@@ -209,24 +209,24 @@
                          <label>Invite ID</label>
                          <div class="copy-row" @click="copyId">
                              <span>{{ store.myProfile.id }}</span>
-                             <span class="copy-icon">📋</span>
+                             <span class="copy-icon"></span>
                          </div>
                      </div>
                  </div>
 
-                 <!-- GOALS TAB -->
+                 
                  <div v-if="currentTab === 'goals'" class="tab-pane goals-pane">
-                     <!-- Active Goal -->
+                     
                      <div class="goal-active-card glass-card" v-if="store.activeGoal && store.activeGoal.status === 'active'">
                          <div class="goal-head">
-                             <span class="g-icon">🔥</span>
+                             <span class="g-icon"></span>
                              <div>
                                  <h4>{{ store.activeGoal.appName }}</h4>
                                  <small>{{ Math.floor(store.activeGoal.targetSeconds / 60) }} min target</small>
                              </div>
                          </div>
                          
-                         <!-- Live Tracking Indicator -->
+                         
                          <div class="tracking-status" :class="{ active: isTrackingGoal }">
                              <span class="dot"></span>
                              <span>{{ isTrackingGoal ? 'Tracking Active' : 'Waiting for app...' }}</span>
@@ -238,13 +238,13 @@
                          </div>
                      </div>
 
-                     <!-- Set Goal -->
+                     
                      <div v-else class="empty-goals">
                          <p>No active team goal.</p>
                          <button v-if="store.isLeader" class="btn btn-primary small" @click="showGoalModal = true">Set Goal</button>
                      </div>
 
-                     <!-- Progress List -->
+                     
                      <div class="progress-list">
                          <div class="p-item" v-for="m in store.members" :key="m.id">
                              <div class="p-head">
@@ -262,11 +262,11 @@
         </div>
         </Transition>
 
-        <!-- FLOATING CHAT WINDOW -->
+        
         <div v-if="isChatDetached" class="floating-chat glass-panel" :style="{ top: chatPos.y + 'px', left: chatPos.x + 'px' }">
              <div class="float-header" @mousedown="startDrag">
-                 <span>💬 Chat</span>
-                 <button class="btn-close-sm" @click="attachChat">✕</button>
+                 <span> Chat</span>
+                 <button class="btn-close-sm" @click="attachChat">X</button>
              </div>
              <div class="msg-list" ref="detachedChatBox">
                  <div class="sys-msg">Team created. Welcome!</div>
@@ -277,18 +277,18 @@
              </div>
              <div class="chat-input-area">
                  <input v-model="chatMsg" @keyup.enter="sendChat" placeholder="Type..." />
-                 <button @click="sendChat">➤</button>
+                 <button @click="sendChat">-></button>
              </div>
         </div>
 
     </div>
 
-    <!-- MODALS -->
     
-    <!-- Goal Modal -->
+    
+    
     <div class="modal-backdrop" v-if="showGoalModal" @click.self="showGoalModal = false">
         <div class="glass-panel modal">
-            <h2>🎯 New Goal</h2>
+            <h2> New Goal</h2>
             <input v-model="goalApp" placeholder="App Name (e.g. VS Code)" class="input-std" />
             <div class="time-opts">
                 <button v-for="t in [15,30,60]" :key="t" @click="goalMinutes=t" :class="{selected: goalMinutes===t}">{{t}}m</button>
@@ -297,15 +297,15 @@
         </div>
     </div>
 
-    <!-- Settings Modal - Premium A/V Settings -->
+    
     <div class="modal-backdrop" v-if="showDeviceSettings" @click.self="showDeviceSettings = false">
         <div class="glass-panel modal av-settings-modal">
             <div class="modal-header">
                 <div class="modal-title">
-                    <span class="modal-icon">🎛️</span>
+                    <span class="modal-icon"></span>
                     <h2>Audio & Video</h2>
                 </div>
-                <button class="btn-close-modal" @click="showDeviceSettings = false">✕</button>
+                <button class="btn-close-modal" @click="showDeviceSettings = false">X</button>
             </div>
             
             <div class="modal-body">
@@ -366,11 +366,11 @@
         </div>
     </div>
 
-    <!-- Leave Team Confirmation Modal -->
+    
     <div class="modal-overlay" v-if="showLeaveModal" @click.self="showLeaveModal = false">
         <div class="glass-card modal-content small-modal">
             <div class="modal-header center">
-                 <div class="modal-icon warning">⚠️</div>
+                 <div class="modal-icon warning"></div>
                  <h3>Leave Team?</h3>
             </div>
             <div class="modal-body text-center">
@@ -383,7 +383,7 @@
         </div>
     </div>
 
-    <!-- Custom Screen Picker -->
+    
     <Transition name="fade">
         <ScreenPicker 
             v-if="showScreenPicker"
@@ -404,7 +404,7 @@ const store = useTeamsStore();
 const activityStore = useActivityStore();
 const router = useRouter();
 
-// UI State
+
 const currentTab = ref<'chat' | 'people' | 'goals'>('chat');
 const isTheaterMode = ref(false);
 const showGoalModal = ref(false);
@@ -415,21 +415,21 @@ const chatMsg = ref("");
 const chatBox = ref<HTMLElement | null>(null);
 const detachedChatBox = ref<HTMLElement | null>(null);
 
-// Floating Chat State
+
 const isChatDetached = ref(false);
 const chatPos = ref({ x: 100, y: 100 });
 const isDragging = ref(false);
 const dragOffset = ref({ x: 0, y: 0 });
 
-// Lobby State
+
 const tempName = ref(store.myProfile.name);
 const joinId = ref("");
 
-// Logic State
+
 const goalApp = ref("");
 const goalMinutes = ref(30);
 
-// Video Layout Logic
+
 const featuredPeerId = ref<string | null>(null);
 
 const isFeaturedSharing = computed(() => {
@@ -451,13 +451,13 @@ const isMuted = computed(() => store.isMuted);
 const isCameraOn = computed(() => store.isCameraOn);
 const isScreenSharing = computed(() => store.isScreenSharing);
 
-// Live Tracking Computeds
+
 const isTrackingGoal = computed(() => {
     if (!store.activeGoal || store.activeGoal.status !== 'active') return false;
     return activityStore.currentActivity?.app_name?.toLowerCase().includes(store.activeGoal.appName.toLowerCase()) || false;
 });
 
-// --- Helpers ---
+
 function getMemberName(id: string) {
     if (id === store.myProfile.id) return "You";
     return store.members.find(m => m.id === id)?.name || "Unknown";
@@ -471,7 +471,7 @@ function toggleTheater() {
     isTheaterMode.value = !isTheaterMode.value;
 }
 
-// --- Device Settings ---
+
 async function openDeviceSettings() {
     try {
         await store.loadDevices();
@@ -481,7 +481,7 @@ async function openDeviceSettings() {
     showDeviceSettings.value = true;
 }
 
-// --- Leave Team ---
+
 async function confirmLeave() {
     showLeaveModal.value = false;
     await store.leaveVoice();
@@ -490,12 +490,12 @@ async function confirmLeave() {
     window.location.reload();
 }
 
-// --- Floating Chat Logic ---
+
 function detachChat() {
     isChatDetached.value = true;
     chatPos.value = { x: window.innerWidth - 320, y: 100 }; // Default pos
-    // Auto-theater maybe? 
-    // isTheaterMode.value = true; 
+
+
 }
 
 function attachChat() {
@@ -517,7 +517,7 @@ function stopDrag() {
     isDragging.value = false;
 }
 
-// --- Watchers ---
+
 watch(() => store.members.map(m => ({ id: m.id, s: m.isScreenSharing })), (newVal, oldVal) => {
     const fresh = newVal.find(n => n.s && (!oldVal || !oldVal.find(o => o.id === n.id)?.s));
     if (fresh) {
@@ -533,7 +533,7 @@ watch(() => store.messages.length, () => {
     });
 });
 
-// --- Actions ---
+
 
 async function createTeam() {
     await store.createTeam();
@@ -547,11 +547,11 @@ async function joinTeam() {
     isJoining.value = true;
     joinError.value = "";
     
-    // Attempt join
+
     await store.joinTeam(joinId.value);
     
-    // Wait for connection or timeout
-    // store.isConnected updates reactively when connection opens
+
+
     setTimeout(() => {
         if (!store.isConnected && isJoining.value) {
             isJoining.value = false;
@@ -561,7 +561,7 @@ async function joinTeam() {
     }, 8000);
 }
 
-// Watch for success
+
 watch(() => store.isConnected, (connected) => {
     if (connected) isJoining.value = false;
 });
@@ -597,7 +597,7 @@ function kickMember(id: string) {
     store.kickMember(id);
 }
 
-// Tracking
+
 let trackInt = 0;
 onMounted(async () => {
    trackInt = window.setInterval(async () => {
@@ -619,18 +619,18 @@ onUnmounted(() => clearInterval(trackInt));
 </script>
 
 <style scoped>
-/* RESET & LAYOUT */
+
 .teams-page {
     width: 100vw;
     height: 100vh;
-    background: #0f0f13; /* Deep dark background */
+    background: #0f0f13; 
     color: #fff;
     font-family: 'Inter', sans-serif;
     overflow: hidden;
     position: relative;
 }
 
-/* 1. FULLSCREEN LAYERS */
+
 .fullscreen-layer {
     position: absolute;
     inset: 0;
@@ -658,20 +658,20 @@ onUnmounted(() => clearInterval(trackInt));
 }
 .glass-card:hover { background: rgba(255,255,255,0.08); transform: translateY(-2px); }
 
-/* Setup Panel */
+
 .setup-panel { text-align: center; }
 .panel-icon { font-size: 3rem; margin-bottom: 16px; }
 h1 { font-size: 2rem; margin-bottom: 8px; font-weight: 700; letter-spacing: -1px; }
 .subtitle { color: #888; margin-bottom: 32px; }
 
-/* Buttons */
+
 .btn { padding: 12px 24px; border-radius: 12px; border: none; font-weight: 600; cursor: pointer; font-size: 1rem; transition: all 0.2s; }
 .btn-primary { background: #6366f1; color: white; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); }
 .btn-primary:hover { background: #4f46e5; transform: scale(1.02); }
 .btn-accent { background: #06b6d4; color: white; }
 .full { width: 100%; }
 
-/* Lobby - Full Screen Centered Layout */
+
 .lobby-fullscreen {
     position: absolute;
     inset: 0;
@@ -839,14 +839,14 @@ h1 { font-size: 2rem; margin-bottom: 8px; font-weight: 700; letter-spacing: -1px
     box-shadow: 0 0 0 3px rgba(99,102,241,0.2);
 }
 
-/* 2. MAIN INTERFACE */
+
 .main-interface { display: flex; width: 100%; height: 100%; }
 
-/* Stage Area (Left) */
+
 .stage-area { flex: 1; display: flex; flex-direction: column; position: relative; background: #000; }
 .video-stage { flex: 1; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; }
 
-/* Grid View - Smart Auto Fit */
+
 .grid-view {
     display: flex;
     flex-wrap: wrap;
@@ -855,13 +855,13 @@ h1 { font-size: 2rem; margin-bottom: 8px; font-weight: 700; letter-spacing: -1px
     align-content: center;
     gap: 16px;
     padding: 24px;
-    padding-bottom: 90px; /* Space for control bar */
+    padding-bottom: 90px; 
     width: 100%;
     height: 100%;
-    overflow-y: auto; /* Fallback */
+    overflow-y: auto; 
 }
 
-/* Strip Row (when someone is featured) */
+
 .grid-view.strip-row {
     height: auto;
     max-height: 180px;
@@ -878,7 +878,7 @@ h1 { font-size: 2rem; margin-bottom: 8px; font-weight: 700; letter-spacing: -1px
 }
 .grid-view.strip-row .video-item { width: 180px; height: 120px; min-width: 180px; flex-grow: 0; }
 
-/* Dynamic Video Items */
+
 .video-item {
     flex: 1 1 320px;
     max-width: 48%;
@@ -899,7 +899,7 @@ h1 { font-size: 2rem; margin-bottom: 8px; font-weight: 700; letter-spacing: -1px
     border-color: rgba(99,102,241,0.4);
 }
 
-/* Adjust for single view */
+
 .grid-view.single-view .video-item { 
     max-width: 100%; 
     max-height: 100%; 
@@ -910,7 +910,7 @@ h1 { font-size: 2rem; margin-bottom: 8px; font-weight: 700; letter-spacing: -1px
     border: none;
 }
 
-/* 3+ items -> 33% width */
+
 .grid-view:has(.video-item:nth-last-child(n+3)) .video-item { max-width: 45%; }
 .grid-view:has(.video-item:nth-last-child(n+5)) .video-item { max-width: 30%; }
 
@@ -935,7 +935,7 @@ h1 { font-size: 2rem; margin-bottom: 8px; font-weight: 700; letter-spacing: -1px
     box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
 
-/* Featured View (Screen Share) */
+
 .featured-view {
     flex: 1;
     width: 100%;
@@ -999,7 +999,7 @@ h1 { font-size: 2rem; margin-bottom: 8px; font-weight: 700; letter-spacing: -1px
     box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
 }
 
-/* Controls Floating - Centered and lifted */
+
 .control-bar-wrapper {
     position: absolute;
     bottom: 24px;
@@ -1009,7 +1009,7 @@ h1 { font-size: 2rem; margin-bottom: 8px; font-weight: 700; letter-spacing: -1px
     pointer-events: none;
     z-index: 50;
 }
-/* Control Bar */
+
 .control-bar {
     pointer-events: auto;
     position: absolute;
@@ -1030,7 +1030,7 @@ h1 { font-size: 2rem; margin-bottom: 8px; font-weight: 700; letter-spacing: -1px
     overflow-x: auto;
 }
 
-/* Hide scrollbar for control bar if it overflows on very small screens */
+
 .control-bar::-webkit-scrollbar {
     display: none;
 }
@@ -1090,7 +1090,7 @@ h1 { font-size: 2rem; margin-bottom: 8px; font-weight: 700; letter-spacing: -1px
 }
 
 
-/* Sidebar Area (Right) */
+
 .sidebar-area { width: 360px; background: #131318; border-left: 1px solid #222; display: flex; flex-direction: column; flex-shrink: 0; }
 .tabs-header { display: flex; border-bottom: 1px solid #222; background: #0f0f13; }
 .tab-btn { flex: 1; padding: 16px; background: transparent; border: none; color: #666; font-weight: 600; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; }
@@ -1100,7 +1100,7 @@ h1 { font-size: 2rem; margin-bottom: 8px; font-weight: 700; letter-spacing: -1px
 .tab-content { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
 .tab-pane { padding: 20px; flex: 1; display: flex; flex-direction: column; }
 
-/* Chat Pane */
+
 .chat-container-inner { display: flex; flex-direction: column; height: 100%; }
 .chat-header-actions { display: flex; justify-content: space-between; margin-bottom: 8px; color: #888; }
 .msg-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-bottom: 12px; }
@@ -1113,13 +1113,13 @@ h1 { font-size: 2rem; margin-bottom: 8px; font-weight: 700; letter-spacing: -1px
 .chat-input-area { display: flex; gap: 8px; margin-top: auto; }
 .chat-input-area input { flex: 1; background: #222; border: 1px solid #333; padding: 10px; border-radius: 8px; color: white; }
 
-/* Floating Chat */
+
 .floating-chat { position: fixed; width: 300px; height: 400px; z-index: 200; display: flex; flex-direction: column; padding: 16px; box-shadow: 0 20px 50px rgba(0,0,0,0.8); border: 1px solid rgba(255,255,255,0.1); }
 .float-header { cursor: move; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px; margin-bottom: 8px; color: #fff; font-weight: bold; }
 .btn-close-sm { background: none; border: none; color: #666; cursor: pointer; font-size: 1.2rem; }
 .detached-placeholder { text-align: center; color: #666; margin-top: 40px; }
 
-/* People Pane */
+
 .member-card { display: flex; align-items: center; gap: 12px; padding: 10px; border-radius: 8px; transition: 0.2s; cursor: default; }
 .member-card:hover { background: rgba(255,255,255,0.03); }
 .m-avatar { width: 36px; height: 36px; border-radius: 50%; background: #333; display: flex; align-items: center; justify-content: center; font-weight: bold; }
@@ -1130,7 +1130,7 @@ h1 { font-size: 2rem; margin-bottom: 8px; font-weight: 700; letter-spacing: -1px
 .invite-box { margin-top: auto; background: #1a1a20; padding: 12px; border-radius: 8px; }
 .copy-row { display: flex; justify-content: space-between; align-items: center; margin-top: 4px; font-family: monospace; background: black; padding: 8px; border-radius: 4px; cursor: pointer; }
 
-/* Goals Pane */
+
 .goal-active-card { background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.2); }
 .goal-head { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
 .g-icon { font-size: 1.5rem; }
@@ -1158,7 +1158,7 @@ h1 { font-size: 2rem; margin-bottom: 8px; font-weight: 700; letter-spacing: -1px
 
 .error-msg { color: #f43f5e; font-size: 0.85rem; margin-top: 8px; }
 
-/* Premium A/V Settings Modal */
+
 .av-settings-modal {
     width: 420px;
     max-width: 90%;
@@ -1274,7 +1274,7 @@ h1 { font-size: 2rem; margin-bottom: 8px; font-weight: 700; letter-spacing: -1px
     border-top: 1px solid rgba(255,255,255,0.1);
 }
 
-/* Control Bar Button Improvements */
+
 .ctrl-btn svg {
     width: 22px;
     height: 22px;

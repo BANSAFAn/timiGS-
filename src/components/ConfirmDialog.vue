@@ -185,7 +185,7 @@ defineExpose({ show });
   min-width: 100px;
 }
 
-/* Animations */
+
 .animate-scale {
   animation: dialogScale 0.2s ease-out;
 }

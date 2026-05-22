@@ -21,7 +21,7 @@
       </div>
     </div>
 
-    <!-- Tasks List -->
+    
     <div class="tasks-list">
       <div v-if="loading" class="state-message">
         {{ $t('common.loading', 'Loading...') }}
@@ -51,7 +51,7 @@
           </div>
         </div>
         
-        <!-- Progress Bar (Only for active tasks) -->
+        
         <div v-if="task.status === 'active'" class="progress-container">
           <div class="progress-bar">
             <div class="progress-fill" :style="{ width: getProgress(task) + '%' }"></div>
@@ -67,7 +67,7 @@
       </div>
     </div>
 
-    <!-- Add Button / Form (Only in Active View) -->
+    
     <div v-if="viewMode === 'active'" class="widget-footer">
       <button
         v-if="!showAddForm"
@@ -77,7 +77,7 @@
         <span v-html="Icons.tasksAdd"></span> {{ $t('tasks.addTask', 'Add New Task') }}
       </button>
 
-      <!-- Add Form -->
+      
       <div v-else class="add-form">
         <div class="form-group mb-2 relative">
              <label class="input-label">{{ $t('tasks.appName', 'App Name') }}</label>
@@ -88,7 +88,7 @@
                 placeholder="e.g. Code.exe" 
                 class="input-field"
              />
-             <!-- Suggestions Dropdown -->
+             
              <div v-if="showAppSuggestions && recentApps.length > 0" class="suggestions-list">
                  <div 
                     v-for="app in recentApps" 
@@ -101,7 +101,7 @@
              </div>
         </div>
 
-        <!-- Optional Website/Title Filter (shown if browser) -->
+        
         <div v-if="isBrowser(newTask.app_name)" class="form-group mb-2">
             <label class="input-label">Website / Title Keyword</label>
             <input 
@@ -120,7 +120,7 @@
             />
         </div>
         
-        <!-- Time Input Row -->
+        
         <div class="form-row mb-3">
              <div class="input-wrapper flex-1">
                 <label class="input-label">Hours</label>
@@ -255,7 +255,7 @@ function openAddForm() {
 }
 
 function handleInputBlur() {
-    // Moved from inline to function to avoid template errors
+
     setTimeout(() => {
         showAppSuggestions.value = false;
     }, 200);
@@ -371,7 +371,7 @@ function exportCsv() {
         </html>
     `;
     
-    // We export as .xls Extension so Excel opens it with the rich HTML rendering enabled automatically
+
     const blob = new Blob([htmlContent], { type: 'application/vnd.ms-excel;charset=utf-8;' });
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
@@ -384,8 +384,8 @@ function exportCsv() {
 }
 
 function getProgress(task: Task) {
-    // Placeholder until we implement backend fetching
-    // Ideally: (current / goal) * 100
+
+
     const current = taskUsage.value[task.id] || 0;
     if (task.goal_seconds === 0) return 0;
     return Math.min(100, Math.round((current / task.goal_seconds) * 100));
@@ -402,10 +402,10 @@ function formatDuration(seconds: number) {
 
 onMounted(async () => {
   loadTasks();
-  // Poll for updates (though without backend command it wont update much yet)
+
   pollInterval = setInterval(loadTasks, 60000);
   
-  // Listen for task completion events
+
   await listen('task-completed', (event: any) => {
     console.log('Task completed:', event.payload);
     loadTasks(); // Reload tasks to show updated status
@@ -416,8 +416,8 @@ onUnmounted(() => {
     if (pollInterval) clearInterval(pollInterval);
 });
 
-// We need to expose a command to get usage! 
-// I will add 'get_task_progress' to backend in next step.
+
+
 </script>
 
 <style scoped>
@@ -660,7 +660,7 @@ onUnmounted(() => {
   transform: scale(1.1);
 }
 
-/* Progress Bar */
+
 .progress-container {
   display: flex;
   flex-direction: column;
@@ -733,7 +733,7 @@ onUnmounted(() => {
   font-weight: 600;
 }
 
-/* Footer / Form */
+
 .widget-footer {
   border-top: 1px solid rgba(255, 255, 255, 0.08);
   padding-top: 16px;
@@ -887,7 +887,7 @@ onUnmounted(() => {
   gap: 10px;
 }
 
-/* Mobile Responsive */
+
 @media (max-width: 768px) {
   .widget-header h3 {
     font-size: 1.1rem;

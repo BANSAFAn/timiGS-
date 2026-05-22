@@ -37,7 +37,7 @@ const { remove, add } = store;
 onMounted(async () => {
   const teamsStore = useTeamsStore();
 
-  // Listen for system notifications from Rust backend
+
   await listen('system-notification', (event: any) => {
     const { title, body } = event.payload;
     const type = detectType(title, body);
@@ -48,7 +48,7 @@ onMounted(async () => {
       type,
     });
 
-    // Forward notification to connected team members
+
     if (teamsStore.isConnected) {
         teamsStore.broadcast({
             type: 'SYSTEM_NOTIFICATION',
@@ -57,16 +57,16 @@ onMounted(async () => {
     }
   });
 
-  // Listen for task completed
+
   await listen('task-completed', () => {
     add({
-      title: 'Task Completed! 🎉',
+      title: 'Task Completed! ',
       message: "You've reached your goal!",
       type: 'success',
     });
   });
 
-  // Listen for timer warnings
+
   await listen('timer-warning', (event: any) => {
     add({
       title: event.payload.title || 'Timer Warning',
@@ -78,9 +78,9 @@ onMounted(async () => {
 
 function detectType(title: string, body: string): 'success' | 'error' | 'warning' | 'info' {
   const text = (title + ' ' + body).toLowerCase();
-  if (text.includes('completed') || text.includes('success') || text.includes('🎉')) {
+  if (text.includes('completed') || text.includes('success') || text.includes('')) {
     return 'success';
-  } else if (text.includes('warning') || text.includes('soon') || text.includes('⚠️')) {
+  } else if (text.includes('warning') || text.includes('soon') || text.includes('')) {
     return 'warning';
   } else if (text.includes('error') || text.includes('failed')) {
     return 'error';
@@ -98,7 +98,7 @@ function detectType(title: string, body: string): 'success' | 'error' | 'warning
   display: flex;
   flex-direction: column;
   gap: 12px;
-  pointer-events: none; /* Allow clicking through container */
+  pointer-events: none; 
 }
 
 .toast-card {
@@ -135,7 +135,7 @@ function detectType(title: string, body: string): 'success' | 'error' | 'warning
 .toast-card.warning { border-left-color: #f59e0b; }
 .toast-card.info { border-left-color: #3b82f6; }
 
-/* Transitions */
+
 .toast-enter-active,
 .toast-leave-active {
   transition: all 0.3s ease;

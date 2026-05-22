@@ -7,12 +7,18 @@ import Tools from "./views/Tools.vue";
 import Transfer from "./views/Transfer.vue";
 import Team from "./views/Team.vue";
 import Tray from "./views/Tray.vue";
+import Coding from "./views/Coding.vue";
 
 const routes = [
   {
     path: "/",
     name: "Dashboard",
     component: Dashboard,
+  },
+  {
+    path: "/coding",
+    name: "Coding",
+    component: Coding,
   },
   {
     path: "/timeline",
@@ -49,7 +55,7 @@ const routes = [
     name: "Tray",
     component: Tray,
   },
-  // Catch-all route - redirect to dashboard
+
   {
     path: "/:pathMatch(.*)*",
     redirect: "/",
@@ -61,7 +67,7 @@ export const router = createRouter({
   routes,
 });
 
-// Add navigation guard for error handling
+
 router.onError((error, to) => {
   console.error('[Router Error]', error, 'Navigating to:', to.path);
 });
@@ -72,8 +78,9 @@ router.beforeEach((to, from, next) => {
 });
 
 router.afterEach((to, from, failure) => {
-  console.log('[Router] After navigation from:', from.path, 'to:', to.path, 'failure:', failure);
   if (failure) {
-    console.error('[Router] Navigation failed:', failure);
+    console.error('[Router] Navigation failed from:', from.path, 'to:', to.path, 'error:', failure);
+  } else {
+    console.log('[Router] Navigation successful to:', to.path);
   }
 });

@@ -52,13 +52,13 @@
       </div>
       
       <div class="lock-tips">
-        <h3>💡 Healthy Break Ideas:</h3>
+        <h3> Healthy Break Ideas:</h3>
         <ul>
-          <li>🚶 Take a 10-minute walk outside</li>
-          <li>🧘 Do some stretching exercises</li>
+          <li> Take a 10-minute walk outside</li>
+          <li> Do some stretching exercises</li>
           <li>️ Rest your eyes - look at distant objects</li>
-          <li>💧 Drink a glass of water or tea</li>
-          <li>🌿 Get some fresh air</li>
+          <li> Drink a glass of water or tea</li>
+          <li> Get some fresh air</li>
         </ul>
       </div>
       
@@ -109,11 +109,11 @@ function handleEmergencyUnlock() {
   }
 }
 
-// Update timer every second for smooth animation
+
 let timerInterval: any = null;
 
 onMounted(() => {
-  // Update currentTime every second to make the timer reactive
+
   timerInterval = setInterval(() => {
     doctorModeStore.currentTime = Date.now();
   }, 1000);
@@ -149,7 +149,7 @@ onUnmounted(() => {
 .lock-screen-bg {
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, #0a0b10 0%, #1a1b26 50%, #0a0b10 100%);
+  background: var(--bg-tertiary);
   overflow: hidden;
 }
 
@@ -157,9 +157,9 @@ onUnmounted(() => {
   position: absolute;
   inset: 0;
   background-image: 
-    radial-gradient(circle at 20% 50%, rgba(91, 110, 225, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 40% 20%, rgba(236, 72, 153, 0.05) 0%, transparent 50%);
+    var(--bg-tertiary) 0%, transparent 50%),
+    var(--bg-tertiary) 0%, transparent 50%),
+    var(--bg-tertiary) 0%, transparent 50%);
   animation: patternMove 20s ease-in-out infinite;
 }
 
@@ -374,7 +374,7 @@ onUnmounted(() => {
   box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
 }
 
-/* Responsive */
+
 @media (max-width: 768px) {
   .lock-screen-content {
     padding: 32px 24px;

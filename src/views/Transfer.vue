@@ -1,14 +1,14 @@
 <template>
   <div class="page transfer-page">
     <div class="page-container">
-      <!-- Header -->
+      
       <div class="page-header">
         <div class="header-content">
           <h2>P2P Transfer</h2>
           <p class="subtitle">Secure direct file transfer between devices</p>
         </div>
         <div class="header-right">
-          <!-- Mode Toggle -->
+          
           <div class="mode-toggle">
             <button class="mode-btn" :class="{ active: transferMode === 'token' }" @click="transferMode = 'token'">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
@@ -25,7 +25,7 @@
           </div>
         </div>
         
-        <!-- Network Mode Info Alert -->
+        
         <div class="mode-info-alert" v-if="transferMode === 'token'">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
           <div>
@@ -42,7 +42,7 @@
         </div>
       </div>
 
-      <!-- Tab Navigation -->
+      
       <div class="tab-nav">
         <div class="tab-slider" :style="{ transform: activeTab === 'receive' ? 'translateX(100%)' : 'translateX(0)' }"></div>
         <button 
@@ -67,13 +67,13 @@
         </button>
       </div>
 
-      <!-- Main Content -->
+      
       <div class="tab-panels">
-        <!-- SEND TAB -->
+        
         <transition name="slide-fade" mode="out-in">
           <div v-if="activeTab === 'send'" key="send" class="panel send-panel">
 
-            <!-- ===== IP MODE - SEND ===== -->
+            
             <template v-if="transferMode === 'ip'">
               <div class="section-card">
                 <div class="card-header">
@@ -118,9 +118,9 @@
               </div>
             </template>
 
-            <!-- ===== TOKEN MODE - SEND (existing) ===== -->
+            
             <template v-else>
-            <!-- Connection Section -->
+            
             <div class="connect-section" v-if="!isConnected">
               <div class="section-card">
                 <div class="card-header">
@@ -150,7 +150,7 @@
               </div>
             </div>
 
-            <!-- Connected - Ready to Send -->
+            
             <div v-else class="send-ready">
               <div class="connected-badge">
                 <span class="pulse-ring"></span>
@@ -158,7 +158,7 @@
                 <span>Connected to <strong>{{ targetPeerId.substring(0, 12) }}...</strong></span>
               </div>
 
-              <!-- Drop Zone -->
+              
               <div
                 class="drop-zone"
                 :class="{ 'has-file': selectedFile, 'dragging': isDragging }"
@@ -188,7 +188,7 @@
               </div>
               <input type="file" ref="fileInput" @change="onFileSelected" class="hidden-input" />
 
-              <!-- Transfer Progress -->
+              
               <div v-if="isTransferring" class="progress-section">
                 <div class="progress-header">
                   <span>Sending...</span>
@@ -199,7 +199,7 @@
                 </div>
               </div>
 
-              <!-- Send Button -->
+              
               <button
                 class="btn-send"
                 @click="startTransfer"
@@ -219,10 +219,10 @@
             </template>
           </div>
 
-          <!-- RECEIVE TAB -->
+          
           <div v-else-if="activeTab === 'receive'" key="receive" class="panel receive-panel">
 
-            <!-- ===== IP MODE - RECEIVE ===== -->
+            
             <template v-if="transferMode === 'ip'">
               <div class="section-card">
                 <div class="card-header">
@@ -243,7 +243,7 @@
                   </button>
                 </div>
 
-                <!-- Logs -->
+                
                 <div v-if="ipLogs.length > 0" class="ip-logs" style="margin-top: 20px;">
                   <h4 style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px;">Logs</h4>
                   <div class="log-area">
@@ -253,9 +253,9 @@
               </div>
             </template>
 
-            <!-- ===== TOKEN MODE - RECEIVE (existing) ===== -->
+            
             <template v-else>
-            <!-- Token Section -->
+            
             <div class="section-card token-card">
               <div class="card-header">
                 <span class="card-icon" v-html="Icons.lock"></span>
@@ -272,11 +272,11 @@
               <p class="token-hint">Share this token with the sender</p>
             </div>
 
-            <!-- Status -->
+            
             <div class="status-card">
               <div class="status-icon" :class="{ active: isConnected }">
                 <div class="status-pulse" v-if="!isConnected"></div>
-                {{ isConnected ? '✓' : '...' }}
+                {{ isConnected ? '' : '...' }}
               </div>
               <div class="status-info">
                 <span class="status-label">{{ isConnected ? 'Connection Established' : 'Waiting for connection...' }}</span>
@@ -284,7 +284,7 @@
               </div>
             </div>
 
-            <!-- Save Path -->
+            
             <div class="section-card compact">
               <label>Save Location</label>
               <div class="input-row">
@@ -297,7 +297,7 @@
               </div>
             </div>
 
-            <!-- Pending File Confirmation -->
+            
             <transition name="bounce">
               <div v-if="pendingFile" class="pending-card">
                 <div class="pending-header">
@@ -318,7 +318,7 @@
               </div>
             </transition>
 
-            <!-- Receiving Progress -->
+            
             <div v-if="incomingFile" class="receiving-card">
               <div class="receiving-header">
                 <span class="receiving-icon" v-html="Icons.download"></span>
@@ -335,7 +335,7 @@
 
             <p v-if="transferStatus" class="status-text success">{{ transferStatus }}</p>
 
-            <!-- Transfer History -->
+            
             <div class="history-section" v-if="transferHistory.length > 0">
               <h3 class="history-title">Recent Transfers</h3>
               <div class="history-list">
@@ -370,10 +370,10 @@ import { Icons } from "../components/icons/IconMap";
 
 const notifications = useNotificationStore();
 
-// ── Mode ──
+
 const transferMode = ref<'token' | 'ip'>('token');
 
-// ── IP Mode State ──
+
 const localIp = ref('');
 const targetIp = ref('');
 const ipServerRunning = ref(false);
@@ -381,7 +381,7 @@ const ipTransferring = ref(false);
 const ipStatus = ref('');
 const ipLogs = ref<string[]>([]);
 
-// State
+
 const activeTab = ref("send");
 const myPeerId = ref("");
 const targetPeerId = ref("");
@@ -393,13 +393,13 @@ const transferProgress = ref(0);
 const savePath = ref("");
 const isDragging = ref(false);
 
-// File State
+
 const selectedFile = ref<File | null>(null);
 const fileInput = ref<HTMLInputElement | null>(null);
 const incomingFile = ref<{ name: string; size: number } | null>(null);
 const pendingFile = ref<{ name: string; size: number } | null>(null);
 
-// History
+
 interface TransferRecord {
   id: string;
   name: string;
@@ -410,7 +410,7 @@ interface TransferRecord {
 }
 const transferHistory = ref<TransferRecord[]>([]);
 
-// P2P Objects
+
 let peer: Peer | null = null;
 let conn: any = null;
 let receivedChunks: { [key: number]: ArrayBuffer } = {};
@@ -425,7 +425,7 @@ onUnmounted(() => {
   peer?.destroy();
 });
 
-// ── IP Mode Functions ──
+
 async function fetchLocalIp() {
   try {
     localIp.value = await invoke('get_local_ip') as string;
@@ -466,24 +466,24 @@ async function sendViaIp() {
   ipStatus.value = '';
 
   try {
-    // Read the file, then save it temporarily and invoke the command
+
     const arrayBuffer = await selectedFile.value.arrayBuffer();
     const bytes = Array.from(new Uint8Array(arrayBuffer));
     
-    // Save to temp first
+
     const tmpPath = await invoke('save_local_file', {
       filename: '_p2p_send_' + selectedFile.value.name,
       data: bytes,
       targetFolder: null
     }) as string;
 
-    // Send via Rust
+
     const result = await invoke('send_p2p_file', {
       targetIp: targetIp.value,
       filePath: tmpPath
     }) as string;
 
-    ipStatus.value = '✓ ' + result;
+    ipStatus.value = ' ' + result;
     notifications.success(result);
     addIpLog('Sent: ' + selectedFile.value.name);
     selectedFile.value = null;
@@ -540,7 +540,7 @@ function initPeer() {
     });
 
     peer.on('disconnected', () => {
-      // Auto-reconnect
+
       setTimeout(() => { try { peer?.reconnect(); } catch {} }, 5000);
     });
   } catch (e) {
@@ -581,7 +581,7 @@ function getFileIcon(filename: string): string {
   return icons[ext] || Icons.exportCSV;
 }
 
-// SENDER LOGIC
+
 function connectToPeer() {
   if (!targetPeerId.value || !peer) return;
   connectionError.value = '';
@@ -677,7 +677,7 @@ function beginChunkTransfer() {
         setTimeout(readNextChunk, 5);
       } else {
         isTransferring.value = false;
-        transferStatus.value = "Transfer complete! ✓";
+        transferStatus.value = "Transfer complete! ";
         conn.send({ type: 'complete', totalChunks: chunkIndex });
         
         transferHistory.value.unshift({
@@ -700,7 +700,7 @@ function beginChunkTransfer() {
   readNextChunk();
 }
 
-// RECEIVER LOGIC
+
 function setupReceiverConnection() {
   isConnected.value = true;
   receivedChunks = {};
@@ -808,7 +808,7 @@ function rejectTransfer() {
   padding-bottom: 40px;
 }
 
-/* Mode Toggle */
+
 .header-right {
   display: flex;
   align-items: center;
@@ -844,7 +844,7 @@ function rejectTransfer() {
   color: var(--text-color);
 }
 
-/* IP Mode */
+
 .ip-hint {
   color: var(--text-muted);
   font-size: 0.9rem;
@@ -965,7 +965,7 @@ function rejectTransfer() {
   box-shadow: 0 0 8px #10b981;
 }
 
-/* Tab Navigation */
+
 .tab-nav {
   display: flex;
   position: relative;
@@ -1014,7 +1014,7 @@ function rejectTransfer() {
   color: var(--text-color);
 }
 
-/* Panels */
+
 .tab-panels {
   min-height: 400px;
 }
@@ -1028,7 +1028,7 @@ function rejectTransfer() {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Section Card */
+
 .section-card {
   background: rgba(255,255,255,0.03);
   border: 1px solid rgba(255,255,255,0.06);
@@ -1117,7 +1117,7 @@ function rejectTransfer() {
   margin-top: 12px;
 }
 
-/* Connected Badge */
+
 .connected-badge {
   display: inline-flex;
   align-items: center;
@@ -1158,7 +1158,7 @@ function rejectTransfer() {
   font-size: 0.8rem;
 }
 
-/* Drop Zone */
+
 .drop-zone {
   border: 2px dashed rgba(255,255,255,0.15);
   border-radius: 20px;
@@ -1214,7 +1214,7 @@ function rejectTransfer() {
   display: none;
 }
 
-/* File Preview */
+
 .file-preview {
   display: flex;
   align-items: center;
@@ -1263,7 +1263,7 @@ function rejectTransfer() {
   color: #ef4444;
 }
 
-/* Progress */
+
 .progress-section {
   margin-bottom: 20px;
 }
@@ -1299,7 +1299,7 @@ function rejectTransfer() {
   background: #10b981;
 }
 
-/* Send Button */
+
 .btn-send {
   width: 100%;
   display: flex;
@@ -1337,7 +1337,7 @@ function rejectTransfer() {
   color: #10b981;
 }
 
-/* Token Card */
+
 .token-card {
   text-align: center;
 }
@@ -1390,7 +1390,7 @@ function rejectTransfer() {
   font-size: 0.9rem;
 }
 
-/* Status Card */
+
 .status-card {
   display: flex;
   align-items: center;
@@ -1448,7 +1448,7 @@ function rejectTransfer() {
   font-size: 0.85rem;
 }
 
-/* Pending Card */
+
 .pending-card {
   background: rgba(99,102,241,0.15);
   border: 1px solid rgba(99,102,241,0.3);
@@ -1528,7 +1528,7 @@ function rejectTransfer() {
   transform: translateY(-1px);
 }
 
-/* Receiving Card */
+
 .receiving-card {
   background: rgba(16,185,129,0.1);
   border: 1px solid rgba(16,185,129,0.2);
@@ -1567,7 +1567,7 @@ function rejectTransfer() {
   color: #10b981;
 }
 
-/* History */
+
 .history-section {
   margin-top: 32px;
   padding-top: 24px;
@@ -1645,7 +1645,7 @@ function rejectTransfer() {
   white-space: nowrap;
 }
 
-/* Transitions */
+
 .slide-fade-enter-active,
 .slide-fade-leave-active {
   transition: all 0.3s ease;
@@ -1675,7 +1675,7 @@ function rejectTransfer() {
   100% { transform: scale(1); opacity: 1; }
 }
 
-/* Mobile */
+
 @media (max-width: 600px) {
   .input-row {
     flex-direction: column;

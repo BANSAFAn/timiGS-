@@ -1,7 +1,7 @@
 <template>
   <div class="page weather-page">
     <div class="page-container">
-      <!-- Header -->
+      
       <div class="page-header">
         <div class="header-left">
           <h2>{{ $t("weather.title") || "Weather & History" }}</h2>
@@ -27,7 +27,7 @@
         </div>
       </div>
 
-      <!-- Hero Weather Card -->
+      
       <div 
         class="hero-weather-card animate-enter" 
         :class="getWeatherClass(current.code)"
@@ -90,19 +90,19 @@
         </div>
       </div>
       
-      <!-- Loading State -->
+      
       <div class="hero-weather-card loading-card animate-enter" v-else-if="isEnabled">
         <div class="loading-spinner"></div>
         <span>Loading Weather...</span>
       </div>
 
-      <!-- 5-Day Forecast Section -->
+      
       <div class="section-block animate-enter" style="animation-delay: 0.1s" v-if="isEnabled && forecast.length > 0">
         <div class="section-header">
           <h3 class="section-title">5-Day Forecast</h3>
         </div>
         
-        <!-- Premium Forecast Cards -->
+        
         <div class="forecast-list">
           <div 
             class="forecast-item" 
@@ -142,7 +142,7 @@
         </div>
       </div>
 
-      <!-- History Section -->
+      
       <div class="section-block animate-enter" style="animation-delay: 0.2s">
         <div class="section-header">
           <h3 class="section-title">Activity History</h3>
@@ -196,7 +196,7 @@
       </div>
     </div>
 
-    <!-- Settings Modal -->
+    
     <Teleport to="body">
       <div class="modal-overlay" v-if="showSettings" @click.self="showSettings = false">
         <div class="modal-card" @click.stop>
@@ -280,7 +280,7 @@
         </div>
       </div>
     </Teleport>
-    <!-- History Detail Modal -->
+    
     <Teleport to="body">
       <div v-if="showDetailModal" class="modal-overlay" @click.self="showDetailModal = false">
         <div class="modal-card detail-modal">
@@ -320,7 +320,7 @@
       </div>
     </Teleport>
 
-    <!-- Geolocation Pre-Prompt Modal -->
+    
     <Teleport to="body">
       <div v-if="showGeoPrompt" class="geo-modal-overlay" @click.self="showGeoPrompt = false">
         <div class="geo-modal animate-geo-enter">
@@ -365,7 +365,7 @@ import ModernToggle from '../components/ModernToggle.vue';
 import { invoke } from '@tauri-apps/api/core';
 import { Icons } from '../components/icons/IconMap';
 
-// Geolocation state
+
 const isGeolocating = ref(false);
 const geoError = ref('');
 const showGeoPrompt = ref(false);
@@ -380,7 +380,7 @@ async function useMyLocation() {
   geoError.value = '';
 
   if (!navigator.geolocation) {
-    // No browser geolocation — go straight to IP-based
+
     console.warn('navigator.geolocation not available, using IP-based fallback');
     await ipBasedGeolocation();
     return;
@@ -392,11 +392,11 @@ async function useMyLocation() {
       const lon = position.coords.longitude;
 
       try {
-        // Reverse geocode to get city name
+
         const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=&latitude=${lat}&longitude=${lon}&count=1&format=json`);
         const data = await res.json();
 
-        // Fallback: use coordinates directly
+
         config.latitude = lat;
         config.longitude = lon;
 
@@ -404,7 +404,7 @@ async function useMyLocation() {
           config.name = data.results[0].name;
           config.country = data.results[0].country;
         } else {
-          // If reverse geocode fails, try nearby search
+
           const res2 = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=10`);
           const data2 = await res2.json();
           config.name = data2.address?.city || data2.address?.town || data2.address?.village || `${lat.toFixed(2)}, ${lon.toFixed(2)}`;
@@ -417,7 +417,7 @@ async function useMyLocation() {
         searchResults.value = [];
       } catch (e) {
         geoError.value = 'Failed to detect location name';
-        // Still set coordinates so weather works
+
         config.latitude = lat;
         config.longitude = lon;
         config.name = `${lat.toFixed(2)}, ${lon.toFixed(2)}`;
@@ -429,7 +429,7 @@ async function useMyLocation() {
       }
     },
     (error) => {
-      // Browser geolocation failed (common in Tauri WebView2) — fall back to IP-based
+
       console.warn('Browser geolocation failed, using IP-based fallback:', error.message);
       ipBasedGeolocation();
     },
@@ -468,14 +468,14 @@ async function ipBasedGeolocation() {
 const isEnabled = ref(true);
 const showSettings = ref(false);
 
-// --- Forecast Helpers ---
+
 function formatDate(dateStr: string) {
   const date = new Date(dateStr);
   return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
 function getTempBarPosition(temp: number) {
-  // Map temp from range -10 to 40 roughly to 0-100%
+
   const min = -15;
   const max = 40;
   const clamped = Math.max(min, Math.min(max, temp));
@@ -507,7 +507,7 @@ const config = reactive<WeatherConfig>({
   unit: 'C'
 });
 
-// --- Search Logic ---
+
 const searchQuery = ref("");
 const isSearching = ref(false);
 const searchResults = ref<any[]>([]);
@@ -555,7 +555,7 @@ function getFlagEmoji(countryCode: string) {
   return String.fromCodePoint(...codePoints);
 }
 
-// --- Weather Data ---
+
 interface CurrentWeather {
   temp: number | null;
   code: number;
@@ -584,7 +584,7 @@ async function fetchWeather() {
      const data = await res.json();
      
      if (data.current_weather) {
-        // Get humidity from hourly data (current hour)
+
         const currentHour = new Date().getHours();
         const humidity = data.hourly?.relativehumidity_2m?.[currentHour] || 50;
         
@@ -637,7 +637,7 @@ function getWeatherDesc(code: number) {
 }
 
 function getWeatherIcon(code: number) {
-   // Returns SVG strings instead of emojis
+
    if (code === 0) return `<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path></svg>`; // Sun
    if (code >= 1 && code <= 3) return `<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path></svg>`; // Cloud
    if (code >= 45 && code <= 48) return `<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="5" x2="19" y2="5"></line><line x1="5" y1="12" x2="19" y2="12"></line><line x1="5" y1="19" x2="19" y2="19"></line></svg>`; // Fog
@@ -647,7 +647,7 @@ function getWeatherIcon(code: number) {
    return `<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path></svg>`; // Fallback Cloud
 }
 
-// --- History ---
+
 interface AppUsage {
    name: string;
    duration: number;
@@ -670,7 +670,6 @@ function saveConfig() {
 }
 
 function toggleWeather() {
-   isEnabled.value = !isEnabled.value;
    localStorage.setItem('weather_enabled', isEnabled.value.toString());
 }
 
@@ -707,11 +706,11 @@ async function loadIcon(appName: string) {
         appIcons.value[appName] = `data:image/png;base64,${icon}`;
      }
   } catch (e) {
-     // Silent fail
+
   }
 }
 
-// History Detail State
+
 const showDetailModal = ref(false);
 const selectedDayEntry = ref<HistoryEntry | null>(null);
 const selectedDaySessions = ref<any[]>([]);
@@ -719,8 +718,8 @@ const selectedDaySessions = ref<any[]>([]);
 function openHistoryDetail(entry: HistoryEntry) {
   selectedDayEntry.value = entry;
   showDetailModal.value = true;
-  // We need to re-fetch or filter sessions for this day if we stored them?
-  // We didn't store raw sessions in history entry yet. Let's fix that.
+
+
   loadDaySessions(entry.date);
 }
 
@@ -728,7 +727,7 @@ async function loadDaySessions(dateStr: string) {
   const sessions = await activityStore.getActivityRange(dateStr, dateStr);
   selectedDaySessions.value = sessions.sort((a, b) => new Date(b.end_time || b.start_time).getTime() - new Date(a.end_time || a.start_time).getTime());
   
-  // Load icons for these sessions too
+
   sessions.forEach(s => loadIcon(s.app_name));
 }
 
@@ -751,7 +750,7 @@ async function loadHistory() {
    const sessions = await activityStore.getActivityRange(fromStr, toStr);
    const newHistory: HistoryEntry[] = [];
 
-   // Build exe_path map from sessions
+
    sessions.forEach(s => {
      if (s.exe_path && !exePathMap.value[s.app_name]) {
        exePathMap.value[s.app_name] = s.exe_path;
@@ -778,7 +777,7 @@ async function loadHistory() {
       const topApps = sortedApps.slice(0, 4);
       const moreCount = Math.max(0, sortedApps.length - 4);
       
-      // Load icons (now using exe_path from map)
+
       topApps.forEach(app => loadIcon(app.name));
 
       const forecastDay = forecast.value.find(d => d.date === dateStr);
@@ -915,7 +914,7 @@ onMounted(() => {
   left: 20px;
 }
 
-/* Hero Weather Card */
+
 .hero-weather-card {
   position: relative;
   border-radius: 24px;
@@ -1165,7 +1164,7 @@ onMounted(() => {
   to { transform: rotate(360deg); }
 }
 
-/* Section Block */
+
 .section-block {
   margin-bottom: 32px;
 }
@@ -1180,7 +1179,7 @@ onMounted(() => {
   color: var(--text-muted);
 }
 
-/* Temperature Graph */
+
 .temp-graph-card {
   background: rgba(255,255,255,0.03);
   border: 1px solid rgba(255,255,255,0.06);
@@ -1219,7 +1218,7 @@ onMounted(() => {
 .legend-dot.high { background: #fb7185; box-shadow: 0 0 8px rgba(251,113,133,0.5); }
 .legend-dot.low { background: #60a5fa; box-shadow: 0 0 8px rgba(96,165,250,0.5); }
 
-/* Forecast Grid */
+
 .forecast-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
@@ -1293,7 +1292,7 @@ onMounted(() => {
   color: #60a5fa;
 }
 
-/* History Timeline */
+
 .history-timeline {
   position: relative;
   padding-left: 40px;
@@ -1427,7 +1426,7 @@ onMounted(() => {
   font-size: 0.9rem;
 }
 
-/* Modal Styles */
+
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -1659,7 +1658,7 @@ onMounted(() => {
   transform: translateY(-1px);
 }
 
-/* Animations */
+
 .animate-enter {
   animation: fadeSlideIn 0.5s ease forwards;
   opacity: 0;
@@ -1676,7 +1675,7 @@ onMounted(() => {
   }
 }
 
-/* Forecast List Styles */
+
 .forecast-list {
   display: flex;
   flex-direction: column;
@@ -1743,7 +1742,7 @@ onMounted(() => {
   width: 250px;
 }
 
-/* Temp Bar Visualization */
+
 .temp-range {
   display: flex;
   align-items: center;
@@ -1772,7 +1771,7 @@ onMounted(() => {
   position: absolute;
   top: 0;
   bottom: 0;
-  /* left and right set dynamically */
+  
 }
 
 .temp-bar-fill {
@@ -1783,7 +1782,7 @@ onMounted(() => {
   opacity: 0.8;
 }
 
-/* Weather specific styles for icons/text colors if needed */
+
 .weather-clear { color: #f59e0b; }
 .weather-rainy { color: #3b82f6; }
 .weather-snowy { color: #06b6d4; }
@@ -1799,7 +1798,7 @@ onMounted(() => {
   font-size: 0.8rem;
 }
 
-/* App Group & Icons */
+
 .app-group {
   display: flex;
   align-items: center;
@@ -1841,7 +1840,7 @@ onMounted(() => {
   color: var(--text-muted);
 }
 
-/* Detail Modal specific */
+
 .detail-modal {
   width: 500px;
   max-width: 90%;
@@ -1949,7 +1948,7 @@ onMounted(() => {
   font-size: 0.8rem;
 }
 
-/* Geolocation Button */
+
 .btn-geolocation {
   display: flex;
   align-items: center;
@@ -1990,7 +1989,7 @@ onMounted(() => {
   text-align: center;
 }
 
-/* Geolocation Pre-Prompt Modal */
+
 .geo-modal-overlay {
   position: fixed;
   inset: 0;

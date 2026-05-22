@@ -1,6 +1,5 @@
 <template>
   <div class="coding-tracker-section" v-if="store.totalCodingTime > 0 || store.currentCodingSession">
-    <!-- Section Header -->
     <div class="section-header">
       <h3>
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
@@ -11,6 +10,12 @@
         {{ t('coding.title') }}
       </h3>
       <div class="header-badges">
+        <span class="header-badge active-lang-badge" v-if="mostActiveLanguage">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 256 256" fill="currentColor" style="display:inline;vertical-align:middle;margin-right:4px;">
+            <path d="M240,96a15.89,15.89,0,0,0-20.17-15.11l-34,11.33L149.2,36a16,16,0,0,0-30.4,0L82.16,92.22l-34-11.33a16,16,0,0,0-20.3,20.3l24,72A16,16,0,0,0,67.35,184H188.65a16,16,0,0,0,15.52-10.81l24-72A15.9,15.9,0,0,0,240,96ZM188.65,168H67.35l-21.33-64,36.56,12.19a16,16,0,0,0,19.38-9.45L128,45.25l26,59.54a16,16,0,0,0,19.38,9.45l36.56-12.19ZM200,208a8,8,0,0,1-8,8H64a8,8,0,0,1,0-16H192A8,8,0,0,1,200,208Z"/>
+          </svg>
+          {{ t('coding.most_active_lang') }}: {{ mostActiveLanguage.language }} ({{ mostActiveLanguage.pct }}%)
+        </span>
         <span class="header-badge coding-badge">{{ formatDuration(store.totalCodingTime) }}</span>
         <span class="header-badge ai-badge" v-if="store.totalAiCodingTime > 0">
           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 256 256" fill="currentColor" style="display:inline;vertical-align:middle;margin-right:4px;">
@@ -21,7 +26,6 @@
       </div>
     </div>
 
-    <!-- Currently Coding (live indicator) -->
     <div class="now-coding" v-if="store.currentCodingSession">
       <div class="now-coding-header">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
@@ -61,7 +65,6 @@
       </div>
     </div>
 
-    <!-- AI vs Manual split bar -->
     <div class="coding-split-card" v-if="store.totalCodingTime > 0">
       <div class="split-row">
         <div class="split-item manual">
@@ -90,14 +93,12 @@
           <div class="split-percent">{{ store.aiCodingPercent }}%</div>
         </div>
       </div>
-      <!-- Progress bar -->
       <div class="split-bar-bg">
         <div class="split-bar-manual" :style="{ width: (100 - store.aiCodingPercent) + '%' }"></div>
         <div class="split-bar-ai" :style="{ width: store.aiCodingPercent + '%' }"></div>
       </div>
     </div>
 
-    <!-- Language breakdown -->
     <div class="coding-languages" v-if="store.topCodingLanguages.length > 0">
       <div class="subsection-title">{{ t('coding.languages') }}</div>
       <div class="lang-grid">
@@ -132,7 +133,6 @@
       </div>
     </div>
 
-    <!-- Projects breakdown -->
     <div class="coding-projects" v-if="store.topCodingProjects.length > 0">
       <div class="subsection-title">{{ t('coding.projects') }}</div>
       <div class="project-list">
@@ -158,15 +158,133 @@
         </div>
       </div>
     </div>
+    <div class="coding-files" v-if="fileStats.length > 0">
+      <div class="subsection-header" @click="isFilesExpanded = !isFilesExpanded">
+        <span class="subsection-title">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" style="display:inline;vertical-align:middle;margin-right:6px;">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+          </svg>
+          {{ t('coding.files_worked') }}
+        </span>
+        <button class="expand-btn">
+          {{ isFilesExpanded ? t('coding.hide_files') : t('coding.show_files') }}
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" :class="{ rotated: isFilesExpanded }">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="files-list" v-if="isFilesExpanded">
+        <div v-for="file in fileStats" :key="file.filePath + file.language + file.projectDir" class="file-item-card">
+          <div class="file-main-info">
+            <div class="file-meta">
+              <span class="lang-color-dot" :style="{ background: getLangColor(file.language) }"></span>
+              <span class="file-name" :title="file.filePath">{{ file.filePath }}</span>
+              <span class="lang-tag" v-if="file.language">{{ file.language }}</span>
+            </div>
+            <div class="file-project" :title="file.projectDir">
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 256 256" fill="currentColor" style="display:inline;vertical-align:middle;margin-right:4px;">
+                <path d="M216,72H131.31L104,44.69A15.86,15.86,0,0,0,92.69,40H40A16,16,0,0,0,24,56V200.62A15.4,15.4,0,0,0,39.38,216H216.89A15.13,15.13,0,0,0,232,200.89V88A16,16,0,0,0,216,72ZM40,56H92.69l16,16H40ZM216,200H40V88H216Z"/>
+              </svg>
+              {{ file.projectDir }}
+            </div>
+          </div>
+
+          <div class="file-split-section">
+            <div class="file-duration-container">
+              <span class="file-duration-total">{{ formatDuration(file.totalSeconds) }}</span>
+              <div class="file-split-mini">
+                <span class="mini-manual" v-if="file.manualSeconds > 0">
+                  {{ formatDuration(file.manualSeconds) }}
+                </span>
+                <span class="mini-ai" v-if="file.aiSeconds > 0">
+                  {{ formatDuration(file.aiSeconds) }} AI
+                </span>
+              </div>
+            </div>
+            <div class="file-split-bar" v-if="file.totalSeconds > 0">
+              <div class="file-bar-manual" :style="{ width: (100 - file.aiPercent) + '%' }"></div>
+              <div class="file-bar-ai" :style="{ width: file.aiPercent + '%' }"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref, computed } from 'vue';
 import { useActivityStore } from '../stores/activity';
 import { useI18n } from 'vue-i18n';
 
 const store = useActivityStore();
 const { t } = useI18n();
+
+const isFilesExpanded = ref(true);
+
+const mostActiveLanguage = computed(() => {
+  if (store.topCodingLanguages.length === 0) return null;
+  const top = store.topCodingLanguages[0];
+  const pct = store.totalCodingTime > 0 ? Math.round((top.total_seconds / store.totalCodingTime) * 100) : 0;
+  return { language: top.language, pct };
+});
+
+const fileStats = computed(() => {
+  const fileMap: Record<string, {
+    filePath: string;
+    language: string;
+    projectDir: string;
+    totalSeconds: number;
+    aiSeconds: number;
+    manualSeconds: number;
+  }> = {};
+
+  store.todayCodingSessions.forEach(session => {
+    let file = session.file_path || 'Workspace / General';
+    if (file.includes('/') || file.includes('\\')) {
+      const parts = file.split(/[/\\]/);
+      file = parts[parts.length - 1];
+    }
+    if (file.trim() === '') {
+      file = 'Workspace / General';
+    }
+
+    const lang = session.language || 'Unknown';
+    const proj = session.project_dir || 'No Project';
+
+    const key = `${file}|${lang}|${proj}`;
+
+    if (!fileMap[key]) {
+      fileMap[key] = {
+        filePath: file,
+        language: lang,
+        projectDir: proj,
+        totalSeconds: 0,
+        aiSeconds: 0,
+        manualSeconds: 0
+      };
+    }
+
+    const duration = session.duration_seconds || 0;
+    fileMap[key].totalSeconds += duration;
+    if (session.is_ai_assisted) {
+      fileMap[key].aiSeconds += duration;
+    } else {
+      fileMap[key].manualSeconds += duration;
+    }
+  });
+
+  return Object.values(fileMap)
+    .map(f => ({
+      ...f,
+      aiPercent: f.totalSeconds > 0 ? Math.round((f.aiSeconds / f.totalSeconds) * 100) : 0
+    }))
+    .sort((a, b) => b.totalSeconds - a.totalSeconds);
+});
 
 function formatDuration(seconds: number): string {
   if (seconds < 60) return `${seconds}s`;
@@ -246,12 +364,12 @@ function getProjectPct(proj: { total_seconds: number }): number {
 }
 
 const PROJECT_GRADIENTS = [
-  'linear-gradient(90deg, #6366f1, #8b5cf6)',
-  'linear-gradient(90deg, #3b82f6, #06b6d4)',
-  'linear-gradient(90deg, #10b981, #84cc16)',
-  'linear-gradient(90deg, #f59e0b, #ef4444)',
-  'linear-gradient(90deg, #ec4899, #a855f7)',
-  'linear-gradient(90deg, #14b8a6, #3b82f6)',
+  'var(--bg-tertiary)',
+  'var(--bg-tertiary)',
+  'var(--bg-tertiary)',
+  'var(--bg-tertiary)',
+  'var(--bg-tertiary)',
+  'var(--bg-tertiary)',
 ];
 
 function getProjectGradient(idx: number): string {
@@ -305,20 +423,19 @@ function getRankClass(idx: number): string {
 }
 
 .coding-badge {
-  background: linear-gradient(135deg, rgba(99,102,241,0.2), rgba(139,92,246,0.2));
+  background: var(--bg-tertiary), rgba(139,92,246,0.2));
   border: 1px solid rgba(99,102,241,0.35);
   color: #a5b4fc;
 }
 
 .ai-badge {
-  background: linear-gradient(135deg, rgba(16,185,129,0.2), rgba(5,150,105,0.2));
+  background: var(--bg-tertiary), rgba(5,150,105,0.2));
   border: 1px solid rgba(16,185,129,0.35);
   color: #6ee7b7;
 }
 
-/* Now coding */
 .now-coding {
-  background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(139,92,246,0.08));
+  background: var(--bg-tertiary), rgba(139,92,246,0.08));
   border: 1px solid rgba(99,102,241,0.25);
   border-radius: 12px;
   padding: 14px 16px;
@@ -372,7 +489,6 @@ function getRankClass(idx: number): string {
   flex-wrap: wrap;
 }
 
-/* Editor badges */
 .coding-editor-badge {
   padding: 3px 10px;
   border-radius: 6px;
@@ -444,7 +560,6 @@ function getRankClass(idx: number): string {
   white-space: nowrap;
 }
 
-/* AI vs Manual split */
 .coding-split-card {
   background: var(--bg-card, rgba(255,255,255,0.04));
   border: 1px solid var(--border-color, rgba(255,255,255,0.08));
@@ -507,19 +622,18 @@ function getRankClass(idx: number): string {
 
 .split-bar-manual {
   height: 100%;
-  background: linear-gradient(90deg, #6366f1, #818cf8);
+  background: var(--bg-tertiary);
   border-radius: 4px 0 0 4px;
   transition: width 0.5s ease;
 }
 
 .split-bar-ai {
   height: 100%;
-  background: linear-gradient(90deg, #10b981, #34d399);
+  background: var(--bg-tertiary);
   border-radius: 0 4px 4px 0;
   transition: width 0.5s ease;
 }
 
-/* Languages */
 .subsection-title {
   font-size: 0.78rem;
   font-weight: 600;
@@ -615,7 +729,6 @@ function getRankClass(idx: number): string {
   transition: width 0.5s ease;
 }
 
-/* Projects */
 .project-list {
   display: flex;
   flex-direction: column;
@@ -720,5 +833,176 @@ function getRankClass(idx: number): string {
   .lang-grid {
     grid-template-columns: 1fr;
   }
+}
+
+.active-lang-badge {
+  background: var(--bg-tertiary), rgba(202,138,4,0.15));
+  border: 1px solid rgba(234,179,8,0.3);
+  color: #fef08a;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.coding-files {
+  margin-top: 16px;
+  background: var(--bg-card, rgba(255,255,255,0.03));
+  border: 1px solid var(--border-color, rgba(255,255,255,0.06));
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.subsection-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  user-select: none;
+}
+
+.expand-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.expand-btn svg {
+  transition: transform 0.2s ease;
+}
+
+.expand-btn svg.rotated {
+  transform: rotate(180deg);
+}
+
+.files-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 350px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.file-item-card {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.04);
+  border-radius: 8px;
+  padding: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+.file-item-card:hover {
+  background: rgba(255,255,255,0.03);
+  border-color: rgba(99,102,241,0.25);
+}
+
+.file-main-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  flex: 1;
+}
+
+.file-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.file-project {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.file-split-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  width: 140px;
+  flex-shrink: 0;
+}
+
+.file-duration-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1px;
+}
+
+.file-duration-total {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.file-split-mini {
+  display: flex;
+  gap: 6px;
+  font-size: 0.65rem;
+}
+
+.file-split-mini .mini-manual {
+  color: #a5b4fc;
+}
+
+.file-split-mini .mini-ai {
+  color: #6ee7b7;
+}
+
+.file-split-bar {
+  width: 100%;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255,255,255,0.06);
+  overflow: hidden;
+  display: flex;
+}
+
+.file-bar-manual {
+  height: 100%;
+  background: #6366f1;
+}
+
+.file-bar-ai {
+  height: 100%;
+  background: #10b981;
+}
+
+.files-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.files-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.files-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+}
+
+.files-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
 }
 </style>

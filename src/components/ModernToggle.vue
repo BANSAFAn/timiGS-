@@ -77,7 +77,7 @@ function handleToggle() {
   cursor: not-allowed;
 }
 
-/* Track */
+
 .toggle-track {
   position: absolute;
   inset: 0;
@@ -91,7 +91,7 @@ function handleToggle() {
 .toggle-track-bg {
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, var(--color-primary) 0%, #8b5cf6 100%);
+  background: var(--bg-tertiary) 0%, #8b5cf6 100%);
   opacity: 0;
   transition: opacity 0.3s ease;
 }
@@ -105,7 +105,7 @@ function handleToggle() {
   opacity: 1;
 }
 
-/* Icons */
+
 .toggle-icons {
   position: absolute;
   inset: 0;
@@ -148,7 +148,7 @@ function handleToggle() {
   transform: scale(0.5);
 }
 
-/* Thumb */
+
 .toggle-thumb {
   position: absolute;
   top: 50%;
@@ -171,7 +171,7 @@ function handleToggle() {
   position: absolute;
   inset: -4px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(91, 110, 225, 0.4) 0%, transparent 70%);
+  background: var(--bg-tertiary) 0%, transparent 70%);
   opacity: 0;
   transition: opacity 0.3s ease;
   animation: pulse 2s ease-in-out infinite;
@@ -210,7 +210,7 @@ function handleToggle() {
     0 0 0 1px rgba(255, 255, 255, 0.2) inset;
 }
 
-/* Hover effects */
+
 .modern-toggle:not(.toggle-disabled):hover .toggle-track {
   border-color: var(--color-primary);
 }
@@ -221,7 +221,7 @@ function handleToggle() {
     0 0 0 1px rgba(255, 255, 255, 0.15) inset;
 }
 
-/* Active/Click effect */
+
 .modern-toggle:not(.toggle-disabled):active .toggle-thumb {
   width: 24px;
 }
@@ -230,7 +230,7 @@ function handleToggle() {
   right: 0px;
 }
 
-/* Small size adjustments */
+
 .toggle-small .toggle-thumb {
   width: 16px;
   height: 16px;
@@ -250,7 +250,7 @@ function handleToggle() {
   height: 10px;
 }
 
-/* Large size adjustments */
+
 .toggle-large .toggle-thumb {
   width: 24px;
   height: 24px;
@@ -270,7 +270,7 @@ function handleToggle() {
   height: 14px;
 }
 
-/* Dark theme enhancements */
+
 [data-theme="dark"] .toggle-track {
   background: rgba(255, 255, 255, 0.05);
 }
@@ -279,7 +279,7 @@ function handleToggle() {
   box-shadow: 0 0 0 3px rgba(91, 110, 225, 0.25);
 }
 
-/* Light theme adjustments */
+
 [data-theme="light"] .toggle-track {
   background: rgba(0, 0, 0, 0.05);
 }

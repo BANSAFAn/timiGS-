@@ -20,7 +20,7 @@
       </button>
     </div>
 
-    <!-- Year Picker Dropdown -->
+    
     <div v-if="showYearPicker" class="year-picker-dropdown">
       <div class="year-picker-header">
         <button @click="yearPickerStart -= 12">
@@ -112,7 +112,7 @@ const yearPickerYears = computed(() => {
 const calendarDays = computed(() => {
   const days = [];
   const firstDay = new Date(currentYear.value, currentMonth.value, 1);
-  // lastDay not needed — we iterate 42 days from startDate
+
   const startDate = new Date(firstDay);
   startDate.setDate(startDate.getDate() - firstDay.getDay());
 
@@ -272,7 +272,7 @@ watch(() => props.modelValue, (newDate) => {
   transform: rotate(180deg);
 }
 
-/* Year Picker Dropdown */
+
 .year-picker-dropdown {
   position: absolute;
   top: 60px;
@@ -356,7 +356,7 @@ watch(() => props.modelValue, (newDate) => {
   font-weight: 600;
 }
 
-/* Weekdays */
+
 .calendar-weekdays {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -374,7 +374,7 @@ watch(() => props.modelValue, (newDate) => {
   letter-spacing: 0.5px;
 }
 
-/* Calendar Days */
+
 .calendar-days {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -441,7 +441,7 @@ watch(() => props.modelValue, (newDate) => {
   bottom: 4px;
 }
 
-/* Calendar Footer */
+
 .calendar-footer {
   display: flex;
   justify-content: space-between;
@@ -469,7 +469,7 @@ watch(() => props.modelValue, (newDate) => {
   font-weight: 600;
 }
 
-/* Responsive */
+
 @media (max-width: 768px) {
   .custom-calendar {
     min-width: 260px;
