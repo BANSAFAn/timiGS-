@@ -1198,6 +1198,7 @@ async function confirmResetData() {
   isResetting.value = true;
   try {
     await invoke("reset_all_data_cmd");
+    store.clearAllData();
     notifications.success(t("settings.resetSuccess"));
     showResetModal.value = false;
     resetConfirmText.value = "";

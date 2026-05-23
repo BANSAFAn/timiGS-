@@ -510,6 +510,23 @@ export const useActivityStore = defineStore('activity', {
       }
     },
 
+    clearAllData() {
+      this.currentActivity = null;
+      this.currentSession = null;
+      this.todaySummary = [];
+      this.todaySessions = [];
+      this.weeklyStats = [];
+      this.musicSummary = [];
+      this.totalMusicTime = 0;
+      this.currentMusicSession = null;
+      this.todayCodingSessions = [];
+      this.codingStats = [];
+      this.codingProjectStats = [];
+      this.totalCodingTime = 0;
+      this.totalAiCodingTime = 0;
+      this.currentCodingSession = null;
+    },
+
     isProcessExcluded(exePath: string): boolean {
       const exeLower = exePath.toLowerCase();
       return this.excludedProcesses.some(p => p.toLowerCase() === exeLower);

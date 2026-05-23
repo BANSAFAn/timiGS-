@@ -97,7 +97,7 @@ const Footer: React.FC<FooterProps> = ({ t }) => {
           <div className="md:col-span-3 md:col-start-7">
             <h4 className="text-xs font-semibold text-text-tertiary uppercase tracking-wider mb-6">Operations</h4>
             <ul className="space-y-3">
-              {['Download', 'Releases', 'Documentation', 'Testing'].map(item => (
+              {['Download', 'Releases', 'Docs', 'Testing'].map(item => (
                 <li key={item}>
                   <a href={`/en/${item.toLowerCase()}`} className="text-sm text-text-secondary hover:text-text-primary flex items-center gap-2 group transition-colors">
                      <span className="text-brand-500 opacity-0 -ml-4 transition-all group-hover:opacity-100 group-hover:ml-0">›</span>
