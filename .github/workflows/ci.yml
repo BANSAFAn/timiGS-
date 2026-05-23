@@ -108,7 +108,7 @@ jobs:
         if: matrix.container == 'archlinux:latest'
         run: |
           pacman -Sy --noconfirm
-          pacman -S --noconfirm --needed nodejs npm curl git make pkgconf gcc clang openssl webkit2gtk-4.1 gtk3 libappindicator-gtk3 librsvg patchelf alsa-lib rustup
+          pacman -S --noconfirm --needed nodejs npm curl git make pkgconf gcc clang openssl webkit2gtk-4.1 gtk3 libappindicator-gtk3 librsvg patchelf alsa-lib rustup xdg-utils
           rustup default stable
 
       - name: Install dependencies (Ubuntu)
