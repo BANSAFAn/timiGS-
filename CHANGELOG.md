@@ -1,5 +1,54 @@
 # Changelog
 
+## [1.7.0](https://github.com/BANSAFAn/timiGS-/compare/v1.6.0...v1.7.0) (2026-05-23)
+
+
+### Features
+
+* clean flat ui redesign, remove emojis and comments globally ([8ad587d](https://github.com/BANSAFAn/timiGS-/commit/8ad587d7f0d9f797bdf5c9cc2224a84087591adf))
+* **team:** automatically disconnect team session on app restart ([ed77e34](https://github.com/BANSAFAn/timiGS-/commit/ed77e3418d47588f7d822a6d967bb59189479b4a))
+
+
+### Bug Fixes
+
+* discord rich deleting (not working !) ([7ccf395](https://github.com/BANSAFAn/timiGS-/commit/7ccf3958bd85022b85067afcca0d5d7dcf3cf197))
+* **tauri:** fix windows media session manager and command compilation ([0313950](https://github.com/BANSAFAn/timiGS-/commit/03139505f4b59a20b8ad0e3d87ee2648e0ea3203))
+* tracker.rs delete log ([9171d6c](https://github.com/BANSAFAn/timiGS-/commit/9171d6c0064da2260d085c8b089a77f165d7b9a7))
+* **windows:** ensure powershell.exe is resolved correctly in Tauri signCommand ([c2fd299](https://github.com/BANSAFAn/timiGS-/commit/c2fd2991a48776df12bd1a65d7a28ec48f1b9bf6))
+* **windows:** style installer checkboxes for dark theme and remove redundant startup actions to prevent AV detection ([2d4a3f7](https://github.com/BANSAFAn/timiGS-/commit/2d4a3f74be68bb138183b47848c34fd14c7fd88d))
+* **windows:** use absolute path to powershell.exe in signCommand ([c2f0b31](https://github.com/BANSAFAn/timiGS-/commit/c2f0b315a7e1857b24a3aee62d25fb385cb19021))
+
+
+### Miscellaneous
+
+* **main:** release 1.6.0 ([6e3ed52](https://github.com/BANSAFAn/timiGS-/commit/6e3ed52be7a3336659b04ddd1074fcd64bceac4e))
+
+
+### Documentation
+
+* update platform build statuses ([84fb024](https://github.com/BANSAFAn/timiGS-/commit/84fb024c02303631e2d63000342a32f7d94a59ae))
+* update platform build statuses ([06afbe4](https://github.com/BANSAFAn/timiGS-/commit/06afbe4922d18fd02ecc2f9d737d29f6d6164986))
+* update technology stack in README ([7393922](https://github.com/BANSAFAn/timiGS-/commit/7393922172a999048ec6146ebd5a934e129d6933))
+
+
+### CI/CD
+
+* add glibc compatibility layers and disable FUSE for Linux AppImage bundle ([8447691](https://github.com/BANSAFAn/timiGS-/commit/84476915d9544c2bf70efd18c7586e56106dcf5a))
+* disable appimage bundling on alpine container builds to prevent linuxdeploy errors ([d029b62](https://github.com/BANSAFAn/timiGS-/commit/d029b62444205f5818e3c398ff57eb03fdb1a48a))
+* fix alpine build dependency and support wrapped PEM certificates ([a50f075](https://github.com/BANSAFAn/timiGS-/commit/a50f075401f7af224f65bbe8c7e8114b62806840))
+* fix linux ([eb3aabd](https://github.com/BANSAFAn/timiGS-/commit/eb3aabd3e86f45dc9a89feb0cdd401f63d5dd9b7))
+* fix release ([c961894](https://github.com/BANSAFAn/timiGS-/commit/c9618940b3fac089a26010de0015b2aa2589e8bc))
+* maybe fix linux alpine ([b4adc0e](https://github.com/BANSAFAn/timiGS-/commit/b4adc0eaf71a5beb0cff7eb08a871440388f7a68))
+* remove all code signing configurations and scripts ([ea7f3ff](https://github.com/BANSAFAn/timiGS-/commit/ea7f3ff5b0041f946e46d1de211e5a2be7105d08))
+* singpatch.io ([d3774cd](https://github.com/BANSAFAn/timiGS-/commit/d3774cd17f14550a132e6569612e2a93b6c7452a))
+* update alpine linux ([61f8ece](https://github.com/BANSAFAn/timiGS-/commit/61f8ece78f7e79b19a9a7e2e25f06ed64918dce2))
+* use portable Node.js wrapper for Windows signing and fix GHA secret name ([0c1be92](https://github.com/BANSAFAn/timiGS-/commit/0c1be921319b59c01656a032d53b3ef2190d5bbe))
+
+
+### Build System
+
+* configure relative base path for production build in vite ([009a0b9](https://github.com/BANSAFAn/timiGS-/commit/009a0b9cec018365e71e3dcb689102e025ceea38))
+
 ## [1.6.0](https://github.com/BANSAFAn/timiGS-/compare/v1.5.0...v1.6.0) (2026-05-19)
 
 
