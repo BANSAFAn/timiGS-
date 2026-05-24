@@ -176,25 +176,33 @@ export const useTeamsStore = defineStore("teams", () => {
     return myProfile.name;
   }
 
-  function initializePeer() {
+  function initializePeer(customId?: string) {
     return new Promise<string>((resolve, reject) => {
+      const targetId = customId ? `timigs-group-${customId.toUpperCase()}` : undefined;
+
       if (peer.value) {
+        if (targetId && peer.value.id !== targetId) {
+          peer.value.destroy();
+          peer.value = null;
+        } else {
+          resolve(peer.value.id);
+          return;
+        }
+      }
+
+      if (!targetId && peer.value) {
         resolve(peer.value.id);
         return;
       }
 
-
-      const newPeer = new Peer();
+      const newPeer = targetId ? new Peer(targetId) : new Peer();
 
       newPeer.on('open', (id) => {
         myProfile.id = id;
         peer.value = newPeer;
         console.log("My Peer ID:", id);
 
-
         newPeer.on('connection', handleIncomingConnection);
-
-
         newPeer.on('call', handleIncomingCall);
 
         resolve(id);
@@ -802,7 +810,6 @@ export const useTeamsStore = defineStore("teams", () => {
 
 
 
-  const groupRegistry = new Map<string, string>();
 
   function generateGroupCode(): string {
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -823,18 +830,16 @@ export const useTeamsStore = defineStore("teams", () => {
   }
 
   async function createGroup(name?: string): Promise<{ groupCode: string; groupName: string }> {
-    await initializePeer();
-    isLeader.value = true;
-    currentTeamId.value = myProfile.id;
-    groupLeaderPeerId.value = myProfile.id;
-
     const code = generateGroupCode();
     const gName = generateGroupName(name || '');
 
+    await initializePeer(code);
+
+    isLeader.value = true;
+    currentTeamId.value = myProfile.id;
+    groupLeaderPeerId.value = myProfile.id;
     groupCode.value = code;
     groupName.value = gName;
-
-    groupRegistry.set(code, myProfile.id);
 
     members.value = [{
       id: myProfile.id,
@@ -855,28 +860,65 @@ export const useTeamsStore = defineStore("teams", () => {
   }
 
   async function joinGroupByCode(code: string): Promise<boolean> {
-    const leaderPeerId = groupRegistry.get(code.toUpperCase());
-    if (!leaderPeerId) {
-      return false;
-    }
+    const cleanCode = code.trim().toUpperCase();
+    const leaderPeerId = `timigs-group-${cleanCode}`;
 
     await initializePeer();
+
     isLeader.value = false;
     currentTeamId.value = leaderPeerId;
     groupLeaderPeerId.value = leaderPeerId;
-    groupCode.value = code.toUpperCase();
+    groupCode.value = cleanCode;
 
-    const conn = peer.value!.connect(leaderPeerId);
-    conn.on('open', () => {
-      console.log("Connected to Group Leader:", leaderPeerId);
-      connections.value.push(conn);
+    return new Promise<boolean>((resolve) => {
+      let resolved = false;
+
+      const conn = peer.value!.connect(leaderPeerId);
+
+      const onOpen = () => {
+        if (resolved) return;
+        resolved = true;
+        console.log("Connected to Group Leader:", leaderPeerId);
+        connections.value.push(conn);
+        
+        cleanup();
+        saveGroupState().then(() => {
+          startActivityPolling().then(() => {
+            resolve(true);
+          });
+        });
+      };
+
+      const onError = (err: any) => {
+        if (resolved) return;
+        if (err.type === 'peer-unavailable' || err.message?.includes('unavailable')) {
+          resolved = true;
+          cleanup();
+          leaveGroup();
+          resolve(false);
+        }
+      };
+
+      const cleanup = () => {
+        conn.off('open', onOpen);
+        peer.value!.off('error', onError);
+      };
+
+      conn.on('open', onOpen);
+      peer.value!.on('error', onError);
+
+      conn.on('data', (d: any) => handleData(d, conn));
+      conn.on('close', leaveGroup);
+
+      setTimeout(() => {
+        if (!resolved) {
+          resolved = true;
+          cleanup();
+          leaveGroup();
+          resolve(false);
+        }
+      }, 7000);
     });
-    conn.on('data', (d: any) => handleData(d, conn));
-    conn.on('close', leaveGroup);
-
-    await saveGroupState();
-    await startActivityPolling();
-    return true;
   }
 
   async function getTempStateFilePath() {
@@ -911,10 +953,6 @@ export const useTeamsStore = defineStore("teams", () => {
         remove(path).catch(() => {});
       }
     });
-
-    if (groupRegistry.has(groupCode.value)) {
-      groupRegistry.delete(groupCode.value);
-    }
   }
 
   async function saveGroupState() {
@@ -994,8 +1032,7 @@ export const useTeamsStore = defineStore("teams", () => {
       const oldMyPeerId = state.myPeerId;
 
       if (state.isLeader) {
-        await initializePeer();
-        groupRegistry.set(groupCode.value, myProfile.id);
+        await initializePeer(groupCode.value);
 
         if (oldMyPeerId && oldMyPeerId !== myProfile.id) {
           const selfIndex = members.value.findIndex(m => m.id === oldMyPeerId);
