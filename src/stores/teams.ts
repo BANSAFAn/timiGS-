@@ -179,19 +179,20 @@ export const useTeamsStore = defineStore("teams", () => {
   function initializePeer(customId?: string) {
     return new Promise<string>((resolve, reject) => {
       const targetId = customId ? `timigs-group-${customId.toUpperCase()}` : undefined;
+      const currentPeer = peer.value;
 
-      if (peer.value) {
-        if (targetId && peer.value.id !== targetId) {
-          peer.value.destroy();
+      if (currentPeer) {
+        if (targetId && currentPeer.id !== targetId) {
+          currentPeer.destroy();
           peer.value = null;
         } else {
-          resolve(peer.value.id);
+          resolve(currentPeer.id);
           return;
         }
       }
 
-      if (!targetId && peer.value) {
-        resolve(peer.value.id);
+      if (!targetId && currentPeer) {
+        resolve(currentPeer.id);
         return;
       }
 
