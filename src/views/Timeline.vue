@@ -61,6 +61,16 @@
             <div class="group-info">
               <div class="group-app-name">
                 {{ group.appName }}
+                <span
+                  class="app-tag-pill-mini"
+                  :style="{
+                    color: getProgramTag(group.appName, group.exePath).color,
+                    backgroundColor: getProgramTag(group.appName, group.exePath).bg,
+                    borderColor: getProgramTag(group.appName, group.exePath).border
+                  }"
+                >
+                  {{ $t(getProgramTag(group.appName, group.exePath).labelKey) }}
+                </span>
                 <span v-if="isExcluded(group.exePath)" class="excluded-badge">
                   <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="12" cy="12" r="10"></circle>
@@ -89,7 +99,19 @@
               <div class="timeline-content">
                 <div class="timeline-app" :class="{ 'is-clickable': isBrowser(session.app_name) }">
                   <div class="timeline-app-info">
-                    <div class="app-name">{{ session.app_name }}</div>
+                    <div class="app-name-row">
+                      <div class="app-name">{{ session.app_name }}</div>
+                      <span
+                        class="app-tag-pill-mini"
+                        :style="{
+                          color: getProgramTag(session.app_name, session.exe_path).color,
+                          backgroundColor: getProgramTag(session.app_name, session.exe_path).bg,
+                          borderColor: getProgramTag(session.app_name, session.exe_path).border
+                        }"
+                      >
+                        {{ $t(getProgramTag(session.app_name, session.exe_path).labelKey) }}
+                      </span>
+                    </div>
                     <div class="window-title">{{ session.window_title }}</div>
                   </div>
                   <div class="session-duration">
@@ -138,7 +160,7 @@
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { invoke } from '@tauri-apps/api/core';
-import { useActivityStore, type ActivitySession } from '../stores/activity';
+import { useActivityStore, getProgramTag, type ActivitySession } from '../stores/activity';
 import CustomCalendar from '../components/CustomCalendar.vue';
 
 const { t } = useI18n();
@@ -794,11 +816,32 @@ onMounted(async () => {
   min-width: 0;
 }
 
+.app-name-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  margin-bottom: 2px;
+}
+
 .timeline-app-info .app-name {
   font-weight: 600;
   font-size: 1rem;
-  margin-bottom: 2px;
   color: var(--text-main);
+}
+
+.app-tag-pill-mini {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  border: 1px solid currentColor;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: inline-flex;
+  align-items: center;
+  opacity: 0.85;
+  flex-shrink: 0;
 }
 
 .window-title {

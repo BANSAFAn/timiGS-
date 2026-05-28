@@ -853,6 +853,7 @@ async function initSettings() {
 
 async function saveSettings() {
   locale.value = localSettings.language;
+  localStorage.setItem("timigs-language", localSettings.language);
   document.documentElement.setAttribute("data-theme", localSettings.theme);
   await safeInvoke("save_settings", { settings: localSettings });
   await store.fetchSettings();

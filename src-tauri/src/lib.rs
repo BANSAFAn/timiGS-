@@ -92,8 +92,10 @@ pub fn run() {
             let mut start_minimized = is_autostart;
             
             if let Ok(matches) = app.cli().matches() {
-                if matches.args.get("minimized").is_some() {
-                    start_minimized = true;
+                if let Some(arg_data) = matches.args.get("minimized") {
+                    if arg_data.value.as_bool().unwrap_or(false) || arg_data.occurrences > 0 {
+                        start_minimized = true;
+                    }
                 }
             }
             
@@ -278,6 +280,7 @@ pub fn run() {
             commands::get_total_ai_coding_time_today,
             commands::get_current_coding_session,
             commands::get_current_media_info,
+            commands::lookup_app_info_online,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

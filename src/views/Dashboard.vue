@@ -39,6 +39,17 @@
                   <span class="status-pulse"></span>
                   {{ $t("dashboard.activeNow") }}
                 </span>
+                <span
+                  v-if="currentActivity"
+                  class="app-tag-pill"
+                  :style="{
+                    color: getProgramTag(currentActivity.app_name, currentActivity.exe_path).color,
+                    backgroundColor: getProgramTag(currentActivity.app_name, currentActivity.exe_path).bg,
+                    borderColor: getProgramTag(currentActivity.app_name, currentActivity.exe_path).border
+                  }"
+                >
+                  {{ $t(getProgramTag(currentActivity.app_name, currentActivity.exe_path).labelKey) }}
+                </span>
               </div>
               <h2 class="active-app">
                 {{ currentActivity ? currentActivity.app_name : $t("dashboard.idle") }}
@@ -137,7 +148,19 @@
                 </span>
               </div>
               <div class="app-details">
-                <span class="app-name">{{ app.app_name }}</span>
+                <div class="app-name-row">
+                  <span class="app-name">{{ app.app_name }}</span>
+                  <span
+                    class="app-tag-pill-mini"
+                    :style="{
+                      color: getProgramTag(app.app_name, app.exe_path).color,
+                      backgroundColor: getProgramTag(app.app_name, app.exe_path).bg,
+                      borderColor: getProgramTag(app.app_name, app.exe_path).border
+                    }"
+                  >
+                    {{ $t(getProgramTag(app.app_name, app.exe_path).labelKey) }}
+                  </span>
+                </div>
                 <div class="app-progress-row">
                   <div class="progress-track">
                     <div
@@ -239,7 +262,7 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from "vue";
 import { invoke } from "@tauri-apps/api/core";
-import { useActivityStore } from "../stores/activity";
+import { useActivityStore, getProgramTag } from "../stores/activity";
 import ProcessExcludeModal from "../components/ProcessExcludeModal.vue";
 import { Doughnut, Bar } from "vue-chartjs";
 import {
@@ -916,16 +939,50 @@ onUnmounted(() => {
   min-width: 0;
 }
 
+.app-name-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  margin-bottom: 8px;
+}
+
 .app-name {
   display: block;
   font-weight: 700;
   font-size: 1rem;
-  margin-bottom: 8px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   letter-spacing: -0.3px;
   color: var(--text-main);
+}
+
+.app-tag-pill {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: var(--radius-md);
+  border: 1px solid currentColor;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: inline-flex;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+.app-tag-pill-mini {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  border: 1px solid currentColor;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: inline-flex;
+  align-items: center;
+  opacity: 0.85;
+  flex-shrink: 0;
 }
 
 .app-progress-row {

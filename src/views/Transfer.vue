@@ -92,7 +92,7 @@
                     <p class="drop-text">Drop file here or click to browse</p>
                   </div>
                   <div v-else class="file-preview">
-                    <div class="file-icon">{{ getFileIcon(selectedFile.name) }}</div>
+                    <div class="file-icon" v-html="getFileIcon(selectedFile.name)"></div>
                     <div class="file-info">
                       <span class="file-name">{{ selectedFile.name }}</span>
                       <span class="file-size">{{ formatFileSize(selectedFile.size) }}</span>
@@ -178,7 +178,7 @@
                 </div>
                 
                 <div v-else class="file-preview">
-                  <div class="file-icon">{{ getFileIcon(selectedFile.name) }}</div>
+                  <div class="file-icon" v-html="getFileIcon(selectedFile.name)"></div>
                   <div class="file-info">
                     <span class="file-name">{{ selectedFile.name }}</span>
                     <span class="file-size">{{ formatFileSize(selectedFile.size) }}</span>
@@ -305,7 +305,7 @@
                   <h4>Incoming File</h4>
                 </div>
                 <div class="pending-file">
-                  <div class="file-icon-lg">{{ getFileIcon(pendingFile.name) }}</div>
+                  <div class="file-icon-lg" v-html="getFileIcon(pendingFile.name)"></div>
                   <div class="file-details">
                     <span class="file-name">{{ pendingFile.name }}</span>
                     <span class="file-size">{{ formatFileSize(pendingFile.size) }}</span>

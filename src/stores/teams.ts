@@ -436,7 +436,7 @@ export const useTeamsStore = defineStore("teams", () => {
       }
       voiceConnections.value.forEach(call => call.close());
       voiceConnections.value = [];
-      remoteStreams.value.clear();
+      remoteStreams.value = new Map();
       voiceActive.value = false;
       isMuted.value = false;
       isCameraOn.value = false;
@@ -472,9 +472,11 @@ export const useTeamsStore = defineStore("teams", () => {
       call.on('stream', (remoteStream) => {
           console.log("Got remote stream from", call.peer);
           remoteStreams.value.set(call.peer, remoteStream);
+          remoteStreams.value = new Map(remoteStreams.value);
       });
       call.on('close', () => {
           remoteStreams.value.delete(call.peer);
+          remoteStreams.value = new Map(remoteStreams.value);
       });
       call.on('error', (e) => console.error("Call error", e));
       voiceConnections.value.push(call);
@@ -517,6 +519,9 @@ export const useTeamsStore = defineStore("teams", () => {
         if (!isLeader.value) {
           members.value = data.payload.members;
           activeGoal.value = data.payload.goal;
+          if (data.payload.groupName !== undefined) {
+            groupName.value = data.payload.groupName;
+          }
           saveGroupState();
         }
         break;
@@ -617,7 +622,7 @@ export const useTeamsStore = defineStore("teams", () => {
 
      let index = members.value.findIndex(m => m.id === conn.peer);
      if (index === -1 && payload.name) {
-       index = members.value.findIndex(m => m.name === payload.name);
+       index = members.value.findIndex(m => m.name === payload.name && m.id !== myProfile.id && !m.isLeader);
      }
 
      if (index !== -1) {
@@ -713,6 +718,7 @@ export const useTeamsStore = defineStore("teams", () => {
       payload: {
         members: members.value,
         goal: activeGoal.value,
+        groupName: groupName.value,
       }
     };
     connections.value.forEach(conn => conn.send(state));

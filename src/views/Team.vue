@@ -140,7 +140,68 @@
           </div>
         </div>
 
-        
+        <!-- Voice Chat Widget -->
+        <div class="voice-chat-card animate-enter">
+          <div class="voice-card-header">
+            <div class="voice-header-left">
+              <span class="voice-icon" v-html="voiceActive ? Icons.doctorMode : Icons.team"></span>
+              <h3>Voice Chat Channel</h3>
+              <span v-if="voiceActive" class="voice-live-badge animate-pulse-slow">LIVE</span>
+            </div>
+            <div class="voice-users-count" v-if="voiceActive">
+              {{ voiceActiveUsersCount }} in call
+            </div>
+          </div>
+          
+          <div class="voice-card-body">
+            <!-- NOT JOINED STATE -->
+            <div v-if="!voiceActive" class="voice-not-joined">
+              <p>Join the real-time team voice room to speak with connected members.</p>
+              <button class="btn btn-primary btn-voice-join" @click="handleJoinVoice">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
+                Join Voice Chat
+              </button>
+            </div>
+
+            <!-- JOINED STATE -->
+            <div v-else class="voice-joined">
+              <!-- Grid of users in voice -->
+              <div class="voice-participants">
+                <div v-for="participant in voiceParticipants" :key="participant.id" class="voice-participant-tag">
+                  <div class="vp-avatar" :style="{ background: memberColor(participant.id) }">
+                    {{ participant.name.charAt(0).toUpperCase() }}
+                  </div>
+                  <span class="vp-name">{{ participant.name }} {{ participant.id === myProfile.id ? '(You)' : '' }}</span>
+                  <span class="vp-mic-status" v-if="participant.id === myProfile.id && isMuted">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-danger"><line x1="1" x2="23" y1="1" y2="23"/><path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V5a3 3 0 0 0-5.94-.6"/><path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
+                  </span>
+                </div>
+              </div>
+
+              <!-- Controls bar -->
+              <div class="voice-controls-row">
+                <button class="btn-voice-control" :class="{ 'is-active': isMuted }" @click="handleToggleMute" :title="isMuted ? 'Unmute Mic' : 'Mute Mic'">
+                  <svg v-if="!isMuted" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
+                  <svg v-else xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-danger"><line x1="1" x2="23" y1="1" y2="23"/><path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V5a3 3 0 0 0-5.94-.6"/><path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
+                </button>
+                <button class="btn-voice-control btn-voice-leave" @click="handleLeaveVoice" title="Leave Voice Chat">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.68 13.31a16 16 0 0 0 3.41 2.6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7 2 2 0 0 1 1.72 2v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.42 19.42 0 0 1-5.3-5.3A19.79 19.79 0 0 1 2 5.18 2 2 0 0 1 4 3h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8 10.91"/><line x1="22" x2="2" y1="2" y2="22"/></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hidden remote audio players -->
+        <div style="display: none;">
+          <audio 
+            v-for="[peerId, stream] in Array.from(remoteStreams.entries())" 
+            :key="peerId"
+            :ref="el => playRemoteStream(el, stream)"
+            autoplay
+          ></audio>
+        </div>
+
         <div class="members-section">
           <div class="section-header">
             <h4>{{ $t('team.members') || 'Members' }} ({{ members.length }})</h4>
@@ -681,6 +742,33 @@ const currentUserUniqueApps = computed(() => getUniqueApps(currentUserMember.val
 const currentUserTasks = computed(() => currentUserMember.value.tasks || []);
 const currentUserFocusModeActive = computed(() => !!currentUserMember.value.focusModeActive);
 const currentUserInTimeout = computed(() => !!currentUserMember.value.inTimeout);
+const voiceActive = computed(() => teamsStore.voiceActive);
+const remoteStreams = computed(() => teamsStore.remoteStreams);
+const isMuted = computed(() => teamsStore.isMuted);
+
+const voiceParticipants = computed(() => {
+  return members.value.filter(m => m.status === 'voice');
+});
+
+const voiceActiveUsersCount = computed(() => voiceParticipants.value.length);
+
+function handleJoinVoice() {
+  teamsStore.joinVoice();
+}
+
+function handleLeaveVoice() {
+  teamsStore.leaveVoice();
+}
+
+function handleToggleMute() {
+  teamsStore.toggleMute();
+}
+
+function playRemoteStream(el: any, stream: MediaStream) {
+  if (el && stream) {
+    el.srcObject = stream;
+  }
+}
 
 
 
@@ -3201,5 +3289,190 @@ input:checked + .slider::before {
     opacity: 1;
     transform: translateX(-50%) scale(1);
   }
+}
+
+/* Voice Chat Panel Styles */
+.voice-chat-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.voice-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 16px;
+  margin-bottom: 16px;
+}
+
+.voice-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.voice-icon {
+  width: 32px;
+  height: 32px;
+  background: rgba(139, 92, 246, 0.1);
+  color: #8b5cf6;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.voice-icon :deep(svg) {
+  width: 18px;
+  height: 18px;
+}
+
+.voice-header-left h3 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0;
+}
+
+.voice-live-badge {
+  background: #ef4444;
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 4px;
+  letter-spacing: 0.05em;
+}
+
+.voice-users-count {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.05);
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+
+.voice-not-joined {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+.voice-not-joined p {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.btn-voice-join {
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+  border-radius: var(--radius-lg);
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.voice-joined {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.voice-participants {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.voice-participant-tag {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  color: var(--text-main);
+  transition: all 0.3s ease;
+}
+
+.voice-participant-tag.is-speaking {
+  border-color: #10b981;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
+}
+
+.vp-avatar {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-transform: uppercase;
+}
+
+.vp-name {
+  font-weight: 500;
+}
+
+.vp-mic-status {
+  display: flex;
+  align-items: center;
+}
+
+.voice-controls-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.btn-voice-control {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-voice-control:hover {
+  background: var(--bg-tertiary);
+  transform: scale(1.05);
+}
+
+.btn-voice-control.is-active {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+}
+
+.btn-voice-leave {
+  background: #ef4444;
+  color: white;
+  border: none;
+}
+
+.btn-voice-leave:hover {
+  background: #dc2626;
+  color: white;
 }
 </style>

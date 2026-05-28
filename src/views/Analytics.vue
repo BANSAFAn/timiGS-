@@ -58,6 +58,15 @@
               <span class="stat-value text-ellipsis" :title="store.topApps[0]?.app_name">{{ store.topApps[0]?.app_name || '-' }}</span>
             </div>
           </div>
+          <div class="stat-card premium-card teal">
+            <div class="stat-bg-icon" v-html="Icons.dashboard"></div>
+            <div class="stat-content">
+              <span class="stat-label">{{ $t('analytics.mostUsedCategory') }}</span>
+              <span class="stat-value text-ellipsis" :style="{ color: topCategory.color }" :title="topCategory.seconds > 0 ? $t(topCategory.labelKey) : '-'">
+                {{ topCategory.seconds > 0 ? $t(topCategory.labelKey) : '-' }}
+              </span>
+            </div>
+          </div>
           <div class="stat-card premium-card green">
             <div class="stat-bg-icon" v-html="Icons.tools"></div>
             <div class="stat-content">
@@ -381,6 +390,7 @@
                 <div class="website-session-info">
                   <div class="website-session-title">{{ session.window_title || 'Unknown Page' }}</div>
                   <div 
+                    v-if="isValidUrl(extractUrl(session.window_title))"
                     class="website-session-url" 
                     :class="{ 'copied': copiedSessions[session.id] }"
                     :title="copiedSessions[session.id] ? 'Copied!' : 'Click to copy link'" 
@@ -412,7 +422,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue';
-import { useActivityStore, type ActivitySession, type MusicSession } from '../stores/activity';
+import { useActivityStore, getProgramTag, type ActivitySession, type MusicSession } from '../stores/activity';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, ArcElement, PointElement, LineElement, Tooltip, Legend, Filler } from 'chart.js';
 import { Line, Pie } from 'vue-chartjs';
 import { useI18n } from 'vue-i18n';
@@ -425,6 +435,72 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, PointElemen
 const { t } = useI18n();
 const store = useActivityStore();
 const showDetailModal = ref(false);
+
+function getCategoryTagInfo(key: string) {
+  switch (key) {
+    case 'Programming':
+      return { labelKey: 'dashboard.tagProgramming', color: '#818cf8', bg: 'rgba(99, 102, 241, 0.08)', border: 'rgba(99, 102, 241, 0.2)' };
+    case 'Games':
+      return { labelKey: 'dashboard.tagGames', color: '#fbbf24', bg: 'rgba(245, 158, 11, 0.08)', border: 'rgba(245, 158, 11, 0.2)' };
+    case 'Social':
+      return { labelKey: 'dashboard.tagSocial', color: '#38bdf8', bg: 'rgba(14, 165, 233, 0.08)', border: 'rgba(14, 165, 233, 0.2)' };
+    case 'Study':
+      return { labelKey: 'dashboard.tagStudy', color: '#2dd4bf', bg: 'rgba(45, 212, 191, 0.08)', border: 'rgba(45, 212, 191, 0.2)' };
+    case 'Work':
+      return { labelKey: 'dashboard.tagWork', color: '#34d399', bg: 'rgba(16, 185, 129, 0.08)', border: 'rgba(16, 185, 129, 0.2)' };
+    case 'Entertainment':
+    case 'Rest':
+      return { labelKey: 'dashboard.tagEntertainment', color: '#f472b6', bg: 'rgba(244, 114, 182, 0.08)', border: 'rgba(244, 114, 182, 0.2)' };
+    case 'System':
+    case 'Programs':
+      return { labelKey: 'dashboard.tagSystem', color: '#94a3b8', bg: 'rgba(148, 163, 184, 0.06)', border: 'rgba(148, 163, 184, 0.15)' };
+    case 'Browser':
+      return { labelKey: 'dashboard.tagBrowser', color: '#06b6d4', bg: 'rgba(6, 182, 212, 0.08)', border: 'rgba(6, 182, 212, 0.2)' };
+    default:
+      return { labelKey: 'dashboard.tagUncategorized', color: '#94a3b8', bg: 'rgba(148, 163, 184, 0.06)', border: 'rgba(148, 163, 184, 0.15)' };
+  }
+}
+
+const topCategory = computed(() => {
+  const summary: Record<string, number> = {};
+  
+  store.todaySummary.forEach(app => {
+    const tag = getProgramTag(app.app_name, app.exe_path);
+    const categoryKey = tag.key;
+    if (!summary[categoryKey]) {
+      summary[categoryKey] = 0;
+    }
+    summary[categoryKey] += app.total_seconds;
+  });
+
+  let maxSeconds = -1;
+  let bestCategoryKey = 'Uncategorized';
+
+  for (const [key, seconds] of Object.entries(summary)) {
+    if (key !== 'Uncategorized' && seconds > maxSeconds) {
+      maxSeconds = seconds;
+      bestCategoryKey = key;
+    }
+  }
+
+  if (maxSeconds === -1 && summary['Uncategorized'] > 0) {
+    bestCategoryKey = 'Uncategorized';
+  }
+
+  const tagInfo = getCategoryTagInfo(bestCategoryKey);
+  return {
+    key: bestCategoryKey,
+    labelKey: tagInfo.labelKey,
+    color: tagInfo.color,
+    bg: tagInfo.bg,
+    border: tagInfo.border,
+    seconds: maxSeconds > 0 ? maxSeconds : (summary['Uncategorized'] || 0)
+  };
+});
+
+function isValidUrl(str: string): boolean {
+  return typeof str === 'string' && (str.startsWith('http://') || str.startsWith('https://'));
+}
 
 
 const currentMusicSession = computed(() => store.currentMusicSession);
@@ -735,6 +811,11 @@ function extractUrl(windowTitle: string): string {
   const commonSites: Record<string, string> = {
     'youtube studio': 'https://studio.youtube.com',
     'youtube творческая студия': 'https://studio.youtube.com',
+    'gemini.google': 'https://gemini.google.com',
+    'gemini': 'https://gemini.google.com',
+    'chatgpt': 'https://chatgpt.com',
+    'claude': 'https://claude.ai',
+    'deepseek': 'https://chat.deepseek.com',
     'google': 'https://google.com',
     'facebook': 'https://facebook.com',
     'twitter': 'https://twitter.com',
@@ -1291,7 +1372,7 @@ watch(selectedRange, async () => {
 
 .stats-row {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 24px;
   margin-bottom: 36px;
 }
@@ -1373,6 +1454,21 @@ watch(selectedRange, async () => {
   opacity: 0; transition: opacity 0.4s;
 }
 .stat-card.green:hover::before { opacity: 1; }
+ 
+.stat-card.teal { 
+  border-color: rgba(20, 184, 166, 0.2);
+  background: rgba(20, 184, 166, 0.06);
+}
+.stat-card.teal:hover {
+  box-shadow: 0 12px 40px rgba(20, 184, 166, 0.2), 0 0 80px rgba(20, 184, 166, 0.08);
+  border-color: rgba(20, 184, 166, 0.4);
+}
+.stat-card.teal::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: #14b8a6;
+  opacity: 0; transition: opacity 0.4s;
+}
+.stat-card.teal:hover::before { opacity: 1; }
 
 .stat-bg-icon {
   position: absolute; right: -10px; bottom: -10px;
@@ -2160,7 +2256,7 @@ watch(selectedRange, async () => {
   }
 
   .stats-row {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     gap: 32px;
   }
 

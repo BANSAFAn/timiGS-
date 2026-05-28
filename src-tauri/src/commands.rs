@@ -882,3 +882,65 @@ pub async fn get_current_media_info() -> Option<MediaInfo> {
         None
     }
 }
+
+#[command]
+pub async fn lookup_app_info_online(app_name: String) -> Result<Option<(String, String)>, String> {
+    let clean_name = app_name
+        .trim()
+        .replace(".exe", "")
+        .replace("-", " ")
+        .replace("_", " ");
+
+    let res = tokio::task::spawn_blocking(move || {
+        let client = match reqwest::blocking::Client::builder()
+            .user_agent("TimiGS/1.0 (contact@timigs.com)")
+            .timeout(std::time::Duration::from_secs(5))
+            .build() {
+                Ok(c) => c,
+                Err(e) => return Err(e.to_string()),
+            };
+
+        let search_url = format!(
+            "https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch={}&format=json&utf8=1",
+            urlencoding::encode(&clean_name)
+        );
+
+        let search_res: serde_json::Value = match client
+            .get(&search_url)
+            .send()
+            .and_then(|r| r.json()) {
+                Ok(json) => json,
+                Err(e) => return Err(e.to_string()),
+            };
+
+        let title = search_res["query"]["search"][0]["title"]
+            .as_str()
+            .map(|t| t.to_string());
+
+        if let Some(t) = title {
+            let summary_url = format!(
+                "https://en.wikipedia.org/api/rest_v1/page/summary/{}",
+                urlencoding::encode(&t)
+            );
+            let summary_res: serde_json::Value = match client
+                .get(&summary_url)
+                .send()
+                .and_then(|r| r.json()) {
+                    Ok(json) => json,
+                    Err(e) => return Err(e.to_string()),
+                };
+
+            let description = summary_res["description"]
+                .as_str()
+                .or_else(|| summary_res["extract"].as_str())
+                .map(|d| d.to_string())
+                .unwrap_or_default();
+
+            return Ok(Some((t, description)));
+        }
+
+        Ok(None)
+    }).await.map_err(|e| e.to_string())?;
+
+    res
+}

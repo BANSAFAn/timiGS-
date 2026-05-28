@@ -165,6 +165,9 @@ onMounted(async () => {
   await store.checkPlatform();
   await store.fetchSettings();
   document.documentElement.setAttribute("data-theme", store.settings.theme);
+  const lang = store.settings.language || "en";
+  locale.value = lang;
+  localStorage.setItem("timigs-language", lang);
 
   const { listen } = await import("@tauri-apps/api/event");
 

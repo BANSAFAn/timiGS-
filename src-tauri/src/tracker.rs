@@ -8,6 +8,9 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::thread;
 use std::time::Duration;
 
+/// Cached media transport info for enriching background music tracking
+static LAST_MEDIA_TITLE: Lazy<Mutex<Option<String>>> = Lazy::new(|| Mutex::new(None));
+
 #[cfg(windows)]
 use windows::Win32::{
     Foundation::HWND,
@@ -153,6 +156,11 @@ fn get_foreground_window_info() -> Option<ActiveWindow> {
                     || name_only.eq_ignore_ascii_case("LockApp")
                     || name_only.eq_ignore_ascii_case("timigs")
                     || name_only.eq_ignore_ascii_case("antigravity")
+                    || name_only.eq_ignore_ascii_case("Rainmeter")
+                    || name_only.eq_ignore_ascii_case("StartMenuExperienceHost")
+                    || name_only.eq_ignore_ascii_case("SearchHost")
+                    || name_only.eq_ignore_ascii_case("ShellExperienceHost")
+                    || name_only.eq_ignore_ascii_case("Nvidia Share")
                     || db::is_process_excluded(&full_path)
                 {
                     let _ = windows::Win32::Foundation::CloseHandle(handle);
@@ -332,28 +340,32 @@ pub fn start_tracking_with_app_handle(app_handle: tauri::AppHandle) {
                             active.app_name.clone()
                         };
 
+                        // Enrich generic titles like "Spotify Free" with real track info
+                        let enriched_title = enrich_music_title(&app_name, &active.window_title);
+
                         // Handle music session
-                        if active.exe_path != last_music_app {
+                        if active.exe_path != last_music_app || enriched_title != last_title {
                             // End previous music session
                             if let Some(session) = CURRENT_MUSIC_SESSION.lock().take() {
                                 let _ = db::end_music_session(session.id);
                             }
 
-                            // Start new music session
+                            // Start new music session with enriched title
                             if let Ok(id) = db::start_music_session(
                                 &app_name,
-                                Some(&active.window_title),
+                                Some(&enriched_title),
                                 &active.exe_path
                             ) {
                                 *CURRENT_MUSIC_SESSION.lock() = Some(CurrentMusicSession {
                                     id,
                                     app_name: app_name.clone(),
-                                    window_title: Some(active.window_title.clone()),
+                                    window_title: Some(enriched_title.clone()),
                                     exe_path: active.exe_path.clone(),
                                 });
                             }
 
-                            last_music_app = active.exe_path;
+                            last_music_app = active.exe_path.clone();
+                            last_title = enriched_title;
                         }
 
                         // End coding session if music is active
@@ -514,28 +526,32 @@ pub fn start_tracking() {
                             active.app_name.clone()
                         };
 
+                        // Enrich generic titles like "Spotify Free" with real track info
+                        let enriched_title = enrich_music_title(&app_name, &active.window_title);
+
                         // Handle music session
-                        if active.exe_path != last_music_app {
+                        if active.exe_path != last_music_app || enriched_title != last_title {
                             // End previous music session
                             if let Some(session) = CURRENT_MUSIC_SESSION.lock().take() {
                                 let _ = db::end_music_session(session.id);
                             }
 
-                            // Start new music session
+                            // Start new music session with enriched title
                             if let Ok(id) = db::start_music_session(
                                 &app_name,
-                                Some(&active.window_title),
+                                Some(&enriched_title),
                                 &active.exe_path
                             ) {
                                 *CURRENT_MUSIC_SESSION.lock() = Some(CurrentMusicSession {
                                     id,
                                     app_name: app_name.clone(),
-                                    window_title: Some(active.window_title.clone()),
+                                    window_title: Some(enriched_title.clone()),
                                     exe_path: active.exe_path.clone(),
                                 });
                             }
 
-                            last_music_app = active.exe_path;
+                            last_music_app = active.exe_path.clone();
+                            last_title = enriched_title;
                         }
 
                         // End coding session if music is active
@@ -697,6 +713,73 @@ fn is_music_app(app_name: &str, exe_path: &str) -> bool {
     }
 
     false
+}
+
+/// Check if a Spotify window title is generic (not showing a real track)
+fn is_generic_music_title(title: &str) -> bool {
+    let t = title.to_lowercase();
+    t == "spotify free" ||
+    t == "spotify premium" ||
+    t == "spotify" ||
+    t == "spotify – free" ||
+    t == "spotify — free" ||
+    t == "spotify - free" ||
+    t == "spotify - premium" ||
+    t.is_empty()
+}
+
+/// Try to get the real media title from Windows Media Transport Controls.
+/// This works even when Spotify is minimized/background and shows "Spotify Free".
+#[cfg(target_os = "windows")]
+fn get_media_transport_title() -> Option<String> {
+    let result: Result<Option<String>, windows::core::Error> = (|| {
+        let manager = windows::Media::Control::GlobalSystemMediaTransportControlsSessionManager::RequestAsync()?.get()?;
+        let session = manager.GetCurrentSession()?;
+        let properties = session.TryGetMediaPropertiesAsync()?.get()?;
+        let title = properties.Title()?.to_string();
+        let artist = properties.Artist()?.to_string();
+        if title.is_empty() && artist.is_empty() {
+            Ok(None)
+        } else if artist.is_empty() {
+            Ok(Some(title))
+        } else {
+            Ok(Some(format!("{} - {}", artist, title)))
+        }
+    })();
+    result.ok().flatten()
+}
+
+#[cfg(not(target_os = "windows"))]
+fn get_media_transport_title() -> Option<String> {
+    None
+}
+
+/// Enrich the window title for music apps.
+/// If Spotify shows a generic title like "Spotify Free", replace it with
+/// the real track info from the Windows Media Transport Controls API.
+fn enrich_music_title(app_name: &str, original_title: &str) -> String {
+    let app_lower = app_name.to_lowercase();
+    
+    // Only enrich for known music apps with generic titles
+    if (app_lower.contains("spotify") || app_lower.contains("yandex") || 
+        app_lower.contains("deezer") || app_lower.contains("tidal") ||
+        app_lower.contains("apple")) && is_generic_music_title(original_title) {
+        // Try to get real track info from OS media transport
+        if let Some(media_title) = get_media_transport_title() {
+            // Cache the last known media title
+            *LAST_MEDIA_TITLE.lock() = Some(media_title.clone());
+            return media_title;
+        }
+        // Fallback to cached title
+        if let Some(cached) = LAST_MEDIA_TITLE.lock().as_ref() {
+            return cached.clone();
+        }
+    } else if !is_generic_music_title(original_title) {
+        // Update cache when a real title is visible
+        *LAST_MEDIA_TITLE.lock() = Some(original_title.to_string());
+    }
+    
+    original_title.to_string()
 }
 
 /// Check if a browser window title indicates YouTube Music
@@ -1131,6 +1214,46 @@ const AI_SERVICES: &[(&str, &str)] = &[
     ("aide", "Aide"),
     ("amazon q", "Amazon Q"),
     ("codewhisperer", "Amazon Q"),
+    // New AI services
+    ("z.ai", "Z.AI"),
+    ("omniroute", "OmniRoute"),
+    ("openrouter", "OpenRouter"),
+    ("together.ai", "Together AI"),
+    ("together", "Together AI"),
+    ("groq", "Groq"),
+    ("fireworks.ai", "Fireworks AI"),
+    ("fireworks", "Fireworks AI"),
+    ("cohere", "Cohere"),
+    ("anyscale", "Anyscale"),
+    ("replicate", "Replicate"),
+    ("cerebras", "Cerebras"),
+    ("sambanova", "SambaNova"),
+    ("lepton", "Lepton AI"),
+    ("lepton.ai", "Lepton AI"),
+    ("glhf", "GLHF"),
+    ("novita", "Novita AI"),
+    ("you.com", "You.com AI"),
+    ("pi.ai", "Pi AI"),
+    ("reka", "Reka AI"),
+    ("tencent", "Tencent Hunyuan"),
+    ("hunyuan", "Tencent Hunyuan"),
+    ("doubao", "Doubao"),
+    ("kimi", "Kimi AI"),
+    ("moonshot", "Moonshot AI"),
+    ("zhipu", "Zhipu AI"),
+    ("glm", "Zhipu GLM"),
+    ("baichuan", "Baichuan"),
+    ("minimax", "MiniMax"),
+    ("yi.ai", "01.AI Yi"),
+    ("01.ai", "01.AI"),
+    ("ernie", "Baidu Ernie"),
+    ("wenxin", "Baidu Wenxin"),
+    ("cursor tab", "Cursor Tab"),
+    ("continue.dev", "Continue"),
+    ("continue", "Continue"),
+    ("aider", "Aider"),
+    ("avante", "Avante"),
+    ("codecompanion", "CodeCompanion"),
 ];
 
 /// Returns true if the active window is a browser on an AI website or a standalone AI app
@@ -1185,6 +1308,19 @@ const AI_TOOLS: &[&str] = &[
     "bolt",
     "lovable",
     "devin",
+    // New AI tools
+    "z.ai",
+    "omniroute",
+    "openrouter",
+    "groq",
+    "together",
+    "fireworks",
+    "continue",
+    "aider",
+    "avante",
+    "codecompanion",
+    "zed ai",
+    "inline assist",
 ];
 
 /// Returns true if this session involves AI assistance.

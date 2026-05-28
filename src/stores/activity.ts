@@ -114,13 +114,32 @@ export function detectCategory(appName: string, exePath: string = ''): string {
   }
 
 
-  const workKeywords = ['word', 'excel', 'powerpoint', 'code', 'studio', 'figma', 'notion', 'obsidian', 'webstorm', 'pycharm', 'intellij', 'slack', 'zoom', 'teams', 'illustrator', 'photoshop', 'after effects', 'premiere'];
+  const workKeywords = [
+    'word', 'excel', 'powerpoint', 'code', 'studio', 'figma', 'notion', 'obsidian',
+    'webstorm', 'pycharm', 'intellij', 'slack', 'zoom', 'teams',
+    'illustrator', 'photoshop', 'after effects', 'premiere',
+    // Code editors
+    'cursor', 'windsurf', 'zed', 'neovim', 'nvim', 'vim', 'helix', 'lapce',
+    'sublime', 'atom', 'emacs', 'fleet', 'kiro', 'qoder', 'antigravity',
+    'rustrover', 'goland', 'rider', 'clion', 'phpstorm', 'datagrip',
+    // AI coding tools (browser-based)
+    'chatgpt', 'claude', 'deepseek', 'gemini', 'copilot', 'v0.dev',
+    'z.ai', 'qwen', 'omniroute', 'openrouter', 'perplexity', 'phind',
+    'bolt.new', 'lovable', 'devin', 'replit',
+  ];
   if (workKeywords.some(kw => name.includes(kw))) {
     return 'Work';
   }
 
 
-  const restKeywords = ['spotify', 'youtube music', 'discord', 'netflix', 'telegram', 'whatsapp', 'viber', 'tiktok', 'instagram', 'facebook', 'twitter'];
+  const restKeywords = [
+    'spotify', 'youtube music', 'discord', 'netflix', 'telegram', 'whatsapp',
+    'viber', 'tiktok', 'instagram', 'facebook', 'twitter',
+    // More music apps
+    'yandex music', 'apple music', 'tidal', 'deezer', 'soundcloud',
+    'foobar2000', 'musicbee', 'aimp', 'winamp', 'itunes', 'audible',
+    'vlc', 'mpv', 'potplayer',
+  ];
   if (restKeywords.some(kw => name.includes(kw))) {
     return 'Rest';
   }
@@ -132,6 +151,285 @@ export function detectCategory(appName: string, exePath: string = ''): string {
   }
 
   return 'Uncategorized';
+}
+
+export interface ProgramTag {
+  key: string;
+  labelKey: string;
+  color: string;
+  bg: string;
+  border: string;
+}
+
+const pendingLookups = new Set<string>();
+
+async function runOnlineAppClassification(appName: string) {
+  if (pendingLookups.has(appName)) return;
+  pendingLookups.add(appName);
+
+  try {
+    console.log(`[Online Lookup] Querying Wikipedia for app: ${appName}`);
+    const result = await invoke<[string, string] | null>('lookup_app_info_online', { appName });
+
+    if (result) {
+      const [title, desc] = result;
+      const lowerDesc = desc.toLowerCase();
+      console.log(`[Online Lookup] Wikipedia matched "${title}" with description: ${desc}`);
+
+      let category = 'Uncategorized';
+
+      if (
+        lowerDesc.includes('video game') ||
+        lowerDesc.includes('digital distribution platform') ||
+        lowerDesc.includes('game engine') ||
+        lowerDesc.includes('mmorpg') ||
+        lowerDesc.includes('multiplayer') ||
+        lowerDesc.includes('shooter') ||
+        lowerDesc.includes('arcade') ||
+        lowerDesc.includes('gameplay') ||
+        lowerDesc.includes('game developed')
+      ) {
+        category = 'Games';
+      } else if (
+        lowerDesc.includes('source code editor') ||
+        lowerDesc.includes('text editor') ||
+        lowerDesc.includes('integrated development environment') ||
+        lowerDesc.includes('compiler') ||
+        lowerDesc.includes('debugger') ||
+        lowerDesc.includes('software development') ||
+        lowerDesc.includes('programming language') ||
+        lowerDesc.includes('git client') ||
+        lowerDesc.includes('database administration') ||
+        lowerDesc.includes('database client') ||
+        lowerDesc.includes('api testing')
+      ) {
+        category = 'Programming';
+      }
+
+      else if (
+        lowerDesc.includes('instant messaging') ||
+        lowerDesc.includes('social media') ||
+        lowerDesc.includes('chat') ||
+        lowerDesc.includes('messenger') ||
+        lowerDesc.includes('voip') ||
+        lowerDesc.includes('telecommunications') ||
+        lowerDesc.includes('social networking') ||
+        lowerDesc.includes('communication service')
+      ) {
+        category = 'Social';
+      }
+
+      else if (
+        lowerDesc.includes('media player') ||
+        lowerDesc.includes('music stream') ||
+        lowerDesc.includes('audio player') ||
+        lowerDesc.includes('video stream') ||
+        lowerDesc.includes('music downloader') ||
+        lowerDesc.includes('synthesizer') ||
+        lowerDesc.includes('digital audio workstation') ||
+        lowerDesc.includes('daw') ||
+        lowerDesc.includes('movie player')
+      ) {
+        category = 'Entertainment';
+      }
+
+      else if (
+        lowerDesc.includes('encyclopedia') ||
+        lowerDesc.includes('dictionary') ||
+        lowerDesc.includes('calculator') ||
+        lowerDesc.includes('flashcard') ||
+        lowerDesc.includes('learning platform') ||
+        lowerDesc.includes('pdf reader') ||
+        lowerDesc.includes('document reader') ||
+        lowerDesc.includes('language learning')
+      ) {
+        category = 'Study';
+      }
+
+      else if (
+        lowerDesc.includes('spreadsheet') ||
+        lowerDesc.includes('presentation software') ||
+        lowerDesc.includes('word processor') ||
+        lowerDesc.includes('graphics editor') ||
+        lowerDesc.includes('vector graphics') ||
+        lowerDesc.includes('3d computer graphics') ||
+        lowerDesc.includes('cad') ||
+        lowerDesc.includes('project management') ||
+        lowerDesc.includes('note-taking') ||
+        lowerDesc.includes('note taking') ||
+        lowerDesc.includes('collaborative platform') ||
+        lowerDesc.includes('office suite') ||
+        lowerDesc.includes('word processing')
+      ) {
+        category = 'Work';
+      }
+      else if (
+        lowerDesc.includes('web browser') ||
+        lowerDesc.includes('operating system') ||
+        lowerDesc.includes('file manager') ||
+        lowerDesc.includes('system utility') ||
+        lowerDesc.includes('task manager') ||
+        lowerDesc.includes('terminal emulator') ||
+        lowerDesc.includes('command line') ||
+        lowerDesc.includes('screenshot') ||
+        lowerDesc.includes('screencast') ||
+        lowerDesc.includes('customization tool') ||
+        lowerDesc.includes('desktop enhancement') ||
+        lowerDesc.includes('user interface') ||
+        lowerDesc.includes('windows shell') ||
+        lowerDesc.includes('search engine')
+      ) {
+        category = 'System';
+      }
+
+      if (category !== 'Uncategorized') {
+        console.log(`[Online Lookup] Successfully classified "${appName}" as "${category}"`);
+        const store = useActivityStore();
+        await store.saveAppCategory(appName, category);
+      } else {
+        console.log(`[Online Lookup] Could not classify "${appName}" from description. Defaulting to Uncategorized.`);
+      }
+    } else {
+      console.log(`[Online Lookup] No Wikipedia article found for "${appName}"`);
+    }
+  } catch (err) {
+    console.error(`[Online Lookup] Error looking up "${appName}":`, err);
+  }
+}
+
+export function getProgramTag(appName: string, exePath: string = ''): ProgramTag {
+  if (!appName) {
+    return {
+      key: 'Uncategorized',
+      labelKey: 'dashboard.tagUncategorized',
+      color: '#94a3b8',
+      bg: 'rgba(148, 163, 184, 0.06)',
+      border: 'rgba(148, 163, 184, 0.15)'
+    };
+  }
+
+  try {
+    const store = useActivityStore();
+    const savedCategory = store.appCategories[appName];
+    if (savedCategory) {
+      if (savedCategory === 'Programming') {
+        return { key: 'Programming', labelKey: 'dashboard.tagProgramming', color: '#818cf8', bg: 'rgba(99, 102, 241, 0.08)', border: 'rgba(99, 102, 241, 0.2)' };
+      }
+      if (savedCategory === 'Games') {
+        return { key: 'Games', labelKey: 'dashboard.tagGames', color: '#fbbf24', bg: 'rgba(245, 158, 11, 0.08)', border: 'rgba(245, 158, 11, 0.2)' };
+      }
+      if (savedCategory === 'Social') {
+        return { key: 'Social', labelKey: 'dashboard.tagSocial', color: '#38bdf8', bg: 'rgba(14, 165, 233, 0.08)', border: 'rgba(14, 165, 233, 0.2)' };
+      }
+      if (savedCategory === 'Study') {
+        return { key: 'Study', labelKey: 'dashboard.tagStudy', color: '#2dd4bf', bg: 'rgba(45, 212, 191, 0.08)', border: 'rgba(45, 212, 191, 0.2)' };
+      }
+      if (savedCategory === 'Work') {
+        return { key: 'Work', labelKey: 'dashboard.tagWork', color: '#34d399', bg: 'rgba(16, 185, 129, 0.08)', border: 'rgba(16, 185, 129, 0.2)' };
+      }
+      if (savedCategory === 'Rest' || savedCategory === 'Entertainment') {
+        return { key: 'Entertainment', labelKey: 'dashboard.tagEntertainment', color: '#f472b6', bg: 'rgba(244, 114, 182, 0.08)', border: 'rgba(244, 114, 182, 0.2)' };
+      }
+      if (savedCategory === 'Programs' || savedCategory === 'System') {
+        return { key: 'System', labelKey: 'dashboard.tagSystem', color: '#94a3b8', bg: 'rgba(148, 163, 184, 0.06)', border: 'rgba(148, 163, 184, 0.15)' };
+      }
+      if (savedCategory === 'Browser') {
+        return { key: 'Browser', labelKey: 'dashboard.tagBrowser', color: '#06b6d4', bg: 'rgba(6, 182, 212, 0.08)', border: 'rgba(6, 182, 212, 0.2)' };
+      }
+    }
+  } catch {}
+
+  const name = appName.toLowerCase();
+  const path = exePath.toLowerCase();
+
+
+  const progKeywords = [
+    'code', 'vscode', 'visual studio', 'zed', 'cursor', 'windsurf', 'neovim', 'nvim', 'vim',
+    'helix', 'lapce', 'sublime', 'atom', 'emacs', 'fleet', 'kiro', 'qoder', 'antigravity',
+    'webstorm', 'pycharm', 'intellij', 'rustrover', 'goland', 'rider', 'clion', 'phpstorm',
+    'datagrip', 'android studio', 'xcode', 'qt creator', 'eclipse', 'compiler', 'builder',
+    'dev-c++', 'code::blocks', 'dbeaver', 'pgadmin', 'postman', 'github', 'git', 'sourcetree'
+  ];
+  if (progKeywords.some(kw => name.includes(kw)) || path.includes('vscode') || path.includes('visual studio')) {
+    return { key: 'Programming', labelKey: 'dashboard.tagProgramming', color: '#818cf8', bg: 'rgba(99, 102, 241, 0.08)', border: 'rgba(99, 102, 241, 0.2)' };
+  }
+
+  // 2.2 Games (Игры)
+  const gameKeywords = [
+    'steam', 'epicgames', 'riot', 'league of', 'valorant', 'overwatch', 'minecraft',
+    'roblox', 'csgo', 'dota', 'gta', 'witcher', 'cyberpunk', 'ea app', 'battle.net',
+    'game', 'play', 'retroarch', 'emulator', 'cs2', 'halflife', 'portal', 'genshin'
+  ];
+  if (gameKeywords.some(kw => name.includes(kw)) || path.includes('\\steam\\') || path.includes('\\epic games\\') || path.includes('\\riot games\\') || path.includes('battlenet')) {
+    return { key: 'Games', labelKey: 'dashboard.tagGames', color: '#fbbf24', bg: 'rgba(245, 158, 11, 0.08)', border: 'rgba(245, 158, 11, 0.2)' };
+  }
+
+  // 2.3 Social / Chat (Общение)
+  const socialKeywords = [
+    'discord', 'telegram', 'whatsapp', 'viber', 'tiktok', 'instagram', 'facebook',
+    'twitter', 'skype', 'messenger', 'signal', 'wechat', 'slack'
+  ];
+  if (socialKeywords.some(kw => name.includes(kw))) {
+    return { key: 'Social', labelKey: 'dashboard.tagSocial', color: '#38bdf8', bg: 'rgba(14, 165, 233, 0.08)', border: 'rgba(14, 165, 233, 0.2)' };
+  }
+
+  // 2.4 Study (Учеба)
+  const studyKeywords = [
+    'duolingo', 'anki', 'coursera', 'edx', 'quizlet', 'moodle', 'canvas', 'wikipedia',
+    'scholar', 'pdf', 'reader', 'book', 'calculator', 'math', 'dictionary', 'translate',
+    'word', 'excel', 'powerpoint'
+  ];
+  if (studyKeywords.some(kw => name.includes(kw)) || name.includes('учеба') || name.includes('study')) {
+    return { key: 'Study', labelKey: 'dashboard.tagStudy', color: '#2dd4bf', bg: 'rgba(45, 212, 191, 0.08)', border: 'rgba(45, 212, 191, 0.2)' };
+  }
+
+  // 2.5 Work (Работа)
+  const workKeywords = [
+    'teams', 'zoom', 'figma', 'photoshop', 'illustrator', 'premiere', 'after effects',
+    'indesign', 'lightroom', 'autocad', 'blender', 'trello', 'jira', 'asana', 'linear',
+    'notion', 'obsidian', 'onenote', 'wps'
+  ];
+  if (workKeywords.some(kw => name.includes(kw)) || name.includes('work') || name.includes('работа')) {
+    return { key: 'Work', labelKey: 'dashboard.tagWork', color: '#34d399', bg: 'rgba(16, 185, 129, 0.08)', border: 'rgba(16, 185, 129, 0.2)' };
+  }
+
+  // 2.6 Entertainment / Music (Отдых / Развлечения)
+  const entKeywords = [
+    'spotify', 'youtube', 'netflix', 'yandex music', 'apple music', 'tidal', 'deezer',
+    'soundcloud', 'foobar2000', 'musicbee', 'aimp', 'winamp', 'itunes', 'vlc', 'mpv',
+    'potplayer', 'twitch', 'prime video', 'plex', 'cinema', 'movie'
+  ];
+  if (entKeywords.some(kw => name.includes(kw)) || name.includes('music') || name.includes('музыка')) {
+    return { key: 'Entertainment', labelKey: 'dashboard.tagEntertainment', color: '#f472b6', bg: 'rgba(244, 114, 182, 0.08)', border: 'rgba(244, 114, 182, 0.2)' };
+  }
+
+  const browserKeywords = [
+    'chrome', 'edge', 'firefox', 'brave', 'opera', 'vivaldi', 'safari', 'browser', 'zen', 'msedge'
+  ];
+  if (browserKeywords.some(kw => name.includes(kw)) || name.includes('browser')) {
+    return { key: 'Browser', labelKey: 'dashboard.tagBrowser', color: '#06b6d4', bg: 'rgba(6, 182, 212, 0.08)', border: 'rgba(6, 182, 212, 0.2)' };
+  }
+
+  const sysKeywords = [
+    'explorer', 'settings', 'taskmgr', 'terminal', 'cmd', 'powershell', 'bash', 'file', 'total', 
+    'cmd.exe', 'powershell.exe', 'conhost.exe', 'explorer.exe'
+  ];
+  if (sysKeywords.some(kw => name.includes(kw))) {
+    return { key: 'System', labelKey: 'dashboard.tagSystem', color: '#94a3b8', bg: 'rgba(148, 163, 184, 0.06)', border: 'rgba(148, 163, 184, 0.15)' };
+  }
+
+  // 3. Fallback: If uncategorized, run background online lookup and return other
+  if (appName && appName !== 'Idle' && appName !== 'No activity detected' && appName !== '?' && !appName.includes('TimiGS')) {
+    runOnlineAppClassification(appName);
+  }
+
+  return {
+    key: 'Uncategorized',
+    labelKey: 'dashboard.tagUncategorized',
+    color: '#94a3b8',
+    bg: 'rgba(148, 163, 184, 0.06)',
+    border: 'rgba(148, 163, 184, 0.15)'
+  };
 }
 
 export const useActivityStore = defineStore('activity', {
@@ -192,7 +490,7 @@ export const useActivityStore = defineStore('activity', {
         if (BROWSERS.some(b => appNameLower.includes(b))) {
 
           if (session.window_title.toLowerCase().includes('youtube music')) return;
-          
+
           let site = 'Unknown';
           const title = session.window_title;
 
@@ -254,7 +552,7 @@ export const useActivityStore = defineStore('activity', {
 
       state.todaySummary.forEach(app => {
         let category = state.appCategories[app.app_name];
-        
+
 
         if (!category || category === 'Uncategorized') {
            category = detectCategory(app.app_name, app.exe_path);

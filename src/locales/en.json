@@ -36,7 +36,16 @@
     "noData": "No activity recorded yet today",
     "hours": "hours",
     "minutes": "minutes",
-    "seconds": "seconds"
+    "seconds": "seconds",
+    "tagProgramming": "Programming",
+    "tagGames": "Game",
+    "tagWork": "Work",
+    "tagStudy": "Study",
+    "tagEntertainment": "Entertainment",
+    "tagSocial": "Social",
+    "tagSystem": "System",
+    "tagBrowser": "Browser",
+    "tagUncategorized": "Other"
   },
   "timeline": {
     "title": "Activity Timeline",
@@ -61,6 +70,7 @@
     "dailyAverage": "Daily Average",
     "last7Days": "Last 7 Days",
     "mostUsed": "Most Used Apps",
+    "mostUsedCategory": "Top Category",
     "totalWeek": "Total This Week",
     "trend": "Compared to last week",
     "productiveTime": "Productive Time",

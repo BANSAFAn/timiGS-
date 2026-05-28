@@ -97,24 +97,20 @@ static TIMEOUT_STATE: Lazy<Mutex<Option<TimeoutSession>>> = Lazy::new(|| Mutex::
 static TIMEOUT_RUNNING: AtomicBool = AtomicBool::new(false);
 static BREAK_ACTIVE: AtomicBool = AtomicBool::new(false);
 static SCHEDULE_ENABLED: AtomicBool = AtomicBool::new(false);
-// Time range
 static SCHEDULE_START_HOUR: AtomicU64 = AtomicU64::new(9);
 static SCHEDULE_START_MINUTE: AtomicU64 = AtomicU64::new(0);
 static SCHEDULE_END_HOUR: AtomicU64 = AtomicU64::new(17);
 static SCHEDULE_END_MINUTE: AtomicU64 = AtomicU64::new(0);
-// Custom breaks (stored as minutes from midnight + duration)
 static CUSTOM_BREAKS: Lazy<Mutex<Vec<CustomBreak>>> = Lazy::new(|| Mutex::new(vec![]));
-// Days
 static SCHEDULE_DAYS: Lazy<Mutex<Vec<u32>>> = Lazy::new(|| Mutex::new(vec![]));
-// Schedule work/break settings
-static SCHEDULE_INTERVAL_SECS: AtomicU64 = AtomicU64::new(2700); // 45 min default
-static SCHEDULE_BREAK_DURATION_SECS: AtomicU64 = AtomicU64::new(600); // 10 min default
+static SCHEDULE_INTERVAL_SECS: AtomicU64 = AtomicU64::new(2700);
+static SCHEDULE_BREAK_DURATION_SECS: AtomicU64 = AtomicU64::new(600);
 static SCHEDULE_PASSWORD_HASH: Lazy<Mutex<String>> = Lazy::new(|| Mutex::new(String::new()));
 
 #[derive(Debug, Clone)]
 pub struct CustomBreak {
-    pub start_time_minutes: u32,  // Start time in minutes from midnight (e.g., 2:30 PM = 870)
-    pub end_time_minutes: u32,    // End time in minutes from midnight (e.g., 3:00 PM = 900)
+    pub start_time_minutes: u32,
+    pub end_time_minutes: u32,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -329,19 +325,19 @@ pub fn start_timeout(
                                         // Handle case where break crosses midnight
                                         (24 * 60 - break_item.start_time_minutes) + break_item.end_time_minutes
                                     };
-                                    
+
                                     let break_duration_secs = (break_duration_minutes as u64) * 60;
-                                    
+
                                     // Update break duration for this scheduled break
                                     SCHEDULE_BREAK_DURATION_SECS.store(break_duration_secs, Ordering::SeqCst);
-                                    
+
                                     let session = TIMEOUT_STATE.lock();
                                     if let Some(s) = session.as_ref() {
                                         next_break_sched.store(s.interval_secs, Ordering::SeqCst);
                                     }
                                     drop(session);
 
-                                    println!("Scheduled break triggered at {}:{:02} for {} minutes", 
+                                    println!("Scheduled break triggered at {}:{:02} for {} minutes",
                                         current_hour, current_minute, break_duration_minutes);
                                     let _ = app_handle_schedule.emit("timeout-schedule-triggered", ());
                                 }
@@ -349,13 +345,13 @@ pub fn start_timeout(
                             }
                         }
                     }
-                    
+
                     if current_minute != last_checked_minute && current_minute == 0 {
                         // Reset at the start of each hour to allow re-triggering
                         last_checked_minute = 999;
                     }
                 }
-                
+
                 thread::sleep(Duration::from_secs(10));
             }
         });
@@ -418,11 +414,11 @@ pub fn save_timeout_schedule(
     app_handle: &tauri::AppHandle,
 ) -> Result<(), String> {
     let breaks_count = custom_breaks.len();
-    
+
     SCHEDULE_INTERVAL_SECS.store(interval_secs, Ordering::SeqCst);
     SCHEDULE_BREAK_DURATION_SECS.store(break_duration_secs, Ordering::SeqCst);
     *SCHEDULE_PASSWORD_HASH.lock() = simple_hash(password);
-    
+
     SCHEDULE_START_HOUR.store(schedule_start_hour, Ordering::SeqCst);
     SCHEDULE_START_MINUTE.store(schedule_start_minute, Ordering::SeqCst);
     SCHEDULE_END_HOUR.store(schedule_end_hour, Ordering::SeqCst);
@@ -430,15 +426,15 @@ pub fn save_timeout_schedule(
     *CUSTOM_BREAKS.lock() = custom_breaks;
     *SCHEDULE_DAYS.lock() = selected_days;
     SCHEDULE_ENABLED.store(true, Ordering::SeqCst);
-    
+
     println!("Timeout schedule saved with {} breaks", breaks_count);
-    
+
     // Start schedule monitoring if not already running
     if !TIMEOUT_RUNNING.load(Ordering::SeqCst) {
         TIMEOUT_RUNNING.store(true, Ordering::SeqCst);
         start_schedule_monitoring(app_handle.clone());
     }
-    
+
     Ok(())
 }
 
@@ -479,15 +475,15 @@ fn start_schedule_monitoring(app_handle: tauri::AppHandle) {
                                     // Handle case where break crosses midnight
                                     (24 * 60 - break_item.start_time_minutes) + break_item.end_time_minutes
                                 };
-                                
+
                                 let break_duration_secs = (break_duration_minutes as u64) * 60;
-                                
+
                                 // Create a timeout session for this scheduled break
                                 let interval_secs = SCHEDULE_INTERVAL_SECS.load(Ordering::SeqCst);
                                 let password_hash = SCHEDULE_PASSWORD_HASH.lock().clone();
                                 let next_break = Arc::new(AtomicU64::new(0));
                                 let break_countdown = Arc::new(AtomicU64::new(break_duration_secs));
-                                
+
                                 let session = TimeoutSession {
                                     interval_secs,
                                     break_duration_secs,
@@ -495,19 +491,19 @@ fn start_schedule_monitoring(app_handle: tauri::AppHandle) {
                                     next_break_countdown: next_break.clone(),
                                     break_countdown: break_countdown.clone(),
                                 };
-                                
+
                                 *TIMEOUT_STATE.lock() = Some(session);
                                 BREAK_ACTIVE.store(true, Ordering::SeqCst);
-                                
-                                println!("Scheduled break triggered at {}:{:02} for {} minutes", 
+
+                                println!("Scheduled break triggered at {}:{:02} for {} minutes",
                                     current_hour, current_minute, break_duration_minutes);
-                                
+
                                 // Set window to break mode
                                 set_break_window_state(&app_handle, true);
-                                
+
                                 let _ = app_handle.emit("timeout-break-start", ());
                                 let _ = app_handle.emit("timeout-schedule-triggered", ());
-                                
+
                                 // Start break countdown thread
                                 let app_clone = app_handle.clone();
                                 let break_countdown_clone = break_countdown.clone();
@@ -529,13 +525,13 @@ fn start_schedule_monitoring(app_handle: tauri::AppHandle) {
                         }
                     }
                 }
-                
+
                 if current_minute != last_checked_minute && current_minute == 0 {
                     // Reset at the start of each hour to allow re-triggering
                     last_checked_minute = 999;
                 }
             }
-            
+
             thread::sleep(Duration::from_secs(10));
         }
     });
