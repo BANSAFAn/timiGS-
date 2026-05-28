@@ -1,5 +1,31 @@
 # Changelog
 
+## [1.8.0](https://github.com/BANSAFAn/timiGS-/compare/v1.7.0...v1.8.0) (2026-05-28)
+
+
+### Features
+
+* **analytics:** add top category card, fix url matcher, persist language and complete localization ([86ecfd6](https://github.com/BANSAFAn/timiGS-/commit/86ecfd61c183625a1a9242f2f60788d6f14c0d84))
+
+
+### Bug Fixes
+
+* **team:** implement direct deterministic Peer IDs for true P2P group connections ([d01934a](https://github.com/BANSAFAn/timiGS-/commit/d01934a97a622ae4b642263a4aebb2d444999cf1))
+* **team:** resolve TypeScript compilation type narrowing error on initializePeer ([3374aa3](https://github.com/BANSAFAn/timiGS-/commit/3374aa3ea283efab3d3805167b3cdadf3c979e53))
+
+
+### Translations
+
+* new update p2p ([6aa8a75](https://github.com/BANSAFAn/timiGS-/commit/6aa8a750187544a8249612ebebb8f3ffe07d20b9))
+
+
+### CI/CD
+
+* add support for Arch Linux builds in CI and release workflows ([1786451](https://github.com/BANSAFAn/timiGS-/commit/1786451ba367a672dcddd2f7cfd8f35e505d831d))
+* add xdg-utils dependency to Arch Linux build containers to prevent AppImage bundle errors ([9e8779d](https://github.com/BANSAFAn/timiGS-/commit/9e8779d21ec8fe14d24d0d22a2581948c0068f1a))
+* remove arch linux support from GHA workflows ([9525255](https://github.com/BANSAFAn/timiGS-/commit/95252553d44f95a192e850dc3a637a534280c01b))
+* set APPIMAGE_EXTRACT_AND_RUN environment variable in CI build-check workflow ([2d944e1](https://github.com/BANSAFAn/timiGS-/commit/2d944e1cfd8b559bfd8a68637852d820cf394b49))
+
 ## [1.7.0](https://github.com/BANSAFAn/timiGS-/compare/v1.6.0...v1.7.0) (2026-05-23)
 
 
