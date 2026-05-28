@@ -4,24 +4,24 @@
       
       <div class="page-header">
         <div class="header-content">
-          <h2>P2P Transfer</h2>
-          <p class="subtitle">Secure direct file transfer between devices</p>
+          <h2>{{ $t('transfer.title', 'P2P Transfer') }}</h2>
+          <p class="subtitle">{{ $t('transfer.subtitle', 'Secure direct file transfer between devices') }}</p>
         </div>
         <div class="header-right">
           
           <div class="mode-toggle">
             <button class="mode-btn" :class="{ active: transferMode === 'token' }" @click="transferMode = 'token'">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-              Token
+              {{ $t('transfer.modeToken', 'Token') }}
             </button>
             <button class="mode-btn" :class="{ active: transferMode === 'ip' }" @click="switchToIpMode">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-              IP
+              {{ $t('transfer.modeIp', 'IP') }}
             </button>
           </div>
           <div class="connection-indicator" :class="{ connected: transferMode === 'token' ? isConnected : ipServerRunning }">
             <span class="indicator-dot"></span>
-            <span>{{ (transferMode === 'token' ? isConnected : ipServerRunning) ? 'Online' : 'Offline' }}</span>
+            <span>{{ (transferMode === 'token' ? isConnected : ipServerRunning) ? $t('transfer.online', 'Online') : $t('transfer.offline', 'Offline') }}</span>
           </div>
         </div>
         
@@ -29,15 +29,15 @@
         <div class="mode-info-alert" v-if="transferMode === 'token'">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
           <div>
-            <strong>Token mode requires internet connection</strong>
-            <p>For local network transfer without internet, use IP mode instead.</p>
+            <strong>{{ $t('transfer.tokenAlertTitle', 'Token mode requires internet connection') }}</strong>
+            <p>{{ $t('transfer.tokenAlertDesc', 'For local network transfer without internet, use IP mode instead.') }}</p>
           </div>
         </div>
         <div class="mode-info-alert ip-mode" v-else-if="transferMode === 'ip'">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
           <div>
-            <strong>Local Network Mode</strong>
-            <p>Both devices must be on the same Wi-Fi network. No internet required.</p>
+            <strong>{{ $t('transfer.ipAlertTitle', 'Local Network Mode') }}</strong>
+            <p>{{ $t('transfer.ipAlertDesc', 'Both devices must be on the same Wi-Fi network. No internet required.') }}</p>
           </div>
         </div>
       </div>
@@ -53,7 +53,7 @@
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/>
           </svg>
-          Send
+          {{ $t('transfer.send', 'Send') }}
         </button>
         <button 
           class="tab-btn" 
@@ -63,7 +63,7 @@
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/>
           </svg>
-          Receive
+          {{ $t('transfer.receive', 'Receive') }}
         </button>
       </div>
 
@@ -78,18 +78,18 @@
               <div class="section-card">
                 <div class="card-header">
                   <span class="card-icon" v-html="Icons.globe"></span>
-                  <h3>Send via IP</h3>
+                  <h3>{{ $t('transfer.sendViaIp', 'Send via IP') }}</h3>
                 </div>
-                <p class="ip-hint">Enter the target device's IP (shown on their Receive tab). Both devices must be on the same Wi-Fi network.</p>
+                <p class="ip-hint">{{ $t('transfer.sendIpHint', 'Enter the target device\'s IP (shown on their Receive tab). Both devices must be on the same Wi-Fi network.') }}</p>
                 <div class="input-row" style="margin-top: 16px;">
-                  <input v-model="targetIp" type="text" placeholder="e.g. 192.168.1.42" class="input-field" />
+                  <input v-model="targetIp" type="text" :placeholder="$t('transfer.ipPlaceholder', 'e.g. 192.168.1.42')" class="input-field" />
                 </div>
                 <div class="drop-zone" :class="{ 'has-file': selectedFile, 'dragging': isDragging }" @click="triggerFileSelect" @drop.prevent="onDrop" @dragover.prevent="isDragging = true" @dragleave="isDragging = false" style="margin-top: 20px;">
                   <div v-if="!selectedFile" class="drop-content">
                     <div class="drop-icon">
                       <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
                     </div>
-                    <p class="drop-text">Drop file here or click to browse</p>
+                    <p class="drop-text">{{ $t('transfer.dropZoneText', 'Drop file here or click to browse') }}</p>
                   </div>
                   <div v-else class="file-preview">
                     <div class="file-icon" v-html="getFileIcon(selectedFile.name)"></div>
@@ -104,7 +104,7 @@
 
                 <div v-if="ipTransferring" class="progress-section">
                   <div class="progress-header">
-                    <span>Sending...</span>
+                    <span>{{ $t('transfer.sending', 'Sending...') }}</span>
                   </div>
                   <div class="progress-track">
                     <div class="progress-fill" style="width:100%; animation: pulse-bar 1.5s infinite;"></div>
@@ -112,7 +112,7 @@
                 </div>
 
                 <button class="btn-send" @click="sendViaIp" :disabled="!selectedFile || !targetIp || ipTransferring" v-if="selectedFile" style="margin-top: 20px;">
-                  <span v-html="Icons.transfer"></span> {{ ipTransferring ? 'Sending...' : 'Send File' }}
+                  <span v-html="Icons.transfer"></span> {{ ipTransferring ? $t('transfer.sending', 'Sending...') : $t('transfer.sendFile', 'Send File') }}
                 </button>
                 <p v-if="ipStatus" class="status-text" :class="{ success: ipStatus.includes('success') }">{{ ipStatus }}</p>
               </div>
@@ -125,13 +125,13 @@
               <div class="section-card">
                 <div class="card-header">
                   <span class="card-icon" v-html="Icons.transfer"></span>
-                  <h3>Connect to Receiver</h3>
+                  <h3>{{ $t('transfer.connectToReceiver', 'Connect to Receiver') }}</h3>
                 </div>
                 <div class="input-row">
                   <input
                     v-model="targetPeerId"
                     type="text"
-                    placeholder="Enter receiver's token..."
+                    :placeholder="$t('transfer.tokenPlaceholder', 'Enter receiver\'s token...')"
                     class="input-field"
                     :disabled="isConnected"
                   />
@@ -143,7 +143,7 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                       <polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" x2="14" y1="3" y2="10"/><line x1="3" x2="10" y1="21" y2="14"/>
                     </svg>
-                    Connect
+                    {{ $t('transfer.connect', 'Connect') }}
                   </button>
                 </div>
                 <p v-if="connectionError" class="error-text">{{ connectionError }}</p>
@@ -155,7 +155,7 @@
               <div class="connected-badge">
                 <span class="pulse-ring"></span>
                 <span class="badge-icon" v-html="Icons.check"></span>
-                <span>Connected to <strong>{{ targetPeerId.substring(0, 12) }}...</strong></span>
+                <span>{{ $t('transfer.connectedTo', 'Connected to') }} <strong>{{ targetPeerId.substring(0, 12) }}...</strong></span>
               </div>
 
               
@@ -173,8 +173,8 @@
                       <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/>
                     </svg>
                   </div>
-                  <p class="drop-text">Drop file here or click to browse</p>
-                  <span class="drop-hint">Maximum file size: Unlimited</span>
+                  <p class="drop-text">{{ $t('transfer.dropZoneText', 'Drop file here or click to browse') }}</p>
+                  <span class="drop-hint">{{ $t('transfer.maxSizeHint', 'Maximum file size: Unlimited') }}</span>
                 </div>
                 
                 <div v-else class="file-preview">
@@ -191,7 +191,7 @@
               
               <div v-if="isTransferring" class="progress-section">
                 <div class="progress-header">
-                  <span>Sending...</span>
+                  <span>{{ $t('transfer.sending', 'Sending...') }}</span>
                   <span class="progress-percent">{{ transferProgress }}%</span>
                 </div>
                 <div class="progress-track">
@@ -209,7 +209,7 @@
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/>
                 </svg>
-                {{ isTransferring ? 'Sending...' : 'Send File' }}
+                {{ isTransferring ? $t('transfer.sending', 'Sending...') : $t('transfer.sendFile', 'Send File') }}
               </button>
 
               <p v-if="transferStatus" class="status-text" :class="{ success: transferStatus.includes('complete') }">
@@ -227,25 +227,25 @@
               <div class="section-card">
                 <div class="card-header">
                   <span class="card-icon" v-html="Icons.globe"></span>
-                  <h3>Receive via IP</h3>
+                  <h3>{{ $t('transfer.receiveViaIp', 'Receive via IP') }}</h3>
                 </div>
-                <p class="ip-hint">Start the server so other devices can send files to this PC. Files are saved to your Downloads folder.</p>
+                <p class="ip-hint">{{ $t('transfer.receiveIpHint', 'Start the server so other devices can send files to this PC. Files are saved to your Downloads folder.') }}</p>
 
                 <div class="ip-info-card" style="margin-top: 16px;">
-                  <div class="ip-label">Your IP Address</div>
-                  <div class="ip-value" @click="copyIp">{{ localIp || 'Detecting...' }} <span v-if="localIp" class="copy-hint" v-html="Icons.exportJSON"></span></div>
-                  <div class="ip-port">Port: 4444</div>
+                  <div class="ip-label">{{ $t('transfer.yourIp', 'Your IP Address') }}</div>
+                  <div class="ip-value" @click="copyIp">{{ localIp || $t('transfer.detecting', 'Detecting...') }} <span v-if="localIp" class="copy-hint" v-html="Icons.exportJSON"></span></div>
+                  <div class="ip-port">{{ $t('transfer.port', 'Port: 4444') }}</div>
                 </div>
 
                 <div style="margin-top: 20px; display: flex; gap: 12px;">
                   <button class="btn-connect" :class="{ 'btn-stop': ipServerRunning }" @click="toggleIpServer" style="flex: 1;">
-                    {{ ipServerRunning ? '⏹ Stop Server' : '▶ Start Server' }}
+                    {{ ipServerRunning ? $t('transfer.stopServer', '⏹ Stop Server') : $t('transfer.startServer', '▶ Start Server') }}
                   </button>
                 </div>
 
                 
                 <div v-if="ipLogs.length > 0" class="ip-logs" style="margin-top: 20px;">
-                  <h4 style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px;">Logs</h4>
+                  <h4 style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px;">{{ $t('transfer.logs', 'Logs') }}</h4>
                   <div class="log-area">
                     <div v-for="(log, i) in ipLogs" :key="i" class="log-line">{{ log }}</div>
                   </div>
@@ -259,17 +259,17 @@
             <div class="section-card token-card">
               <div class="card-header">
                 <span class="card-icon" v-html="Icons.lock"></span>
-                <h3>Your Token</h3>
+                <h3>{{ $t('transfer.yourToken', 'Your Token') }}</h3>
               </div>
               <div class="token-display" @click="copyToken">
-                <span class="token-text">{{ myPeerId || 'Generating...' }}</span>
+                <span class="token-text">{{ myPeerId || $t('transfer.generating', 'Generating...') }}</span>
                 <button class="copy-btn" v-if="myPeerId">
                   <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
                   </svg>
                 </button>
               </div>
-              <p class="token-hint">Share this token with the sender</p>
+              <p class="token-hint">{{ $t('transfer.tokenHint', 'Share this token with the sender') }}</p>
             </div>
 
             
@@ -279,20 +279,20 @@
                 {{ isConnected ? '' : '...' }}
               </div>
               <div class="status-info">
-                <span class="status-label">{{ isConnected ? 'Connection Established' : 'Waiting for connection...' }}</span>
-                <span class="status-detail">{{ isConnected ? 'Ready to receive files' : 'Sender will connect using your token' }}</span>
+                <span class="status-label">{{ isConnected ? $t('transfer.connectionEstablished', 'Connection Established') : $t('transfer.waitingConnection', 'Waiting for connection...') }}</span>
+                <span class="status-detail">{{ isConnected ? $t('transfer.readyReceive', 'Ready to receive files') : $t('transfer.senderHint', 'Sender will connect using your token') }}</span>
               </div>
             </div>
 
             
             <div class="section-card compact">
-              <label>Save Location</label>
+              <label>{{ $t('transfer.saveLocation', 'Save Location') }}</label>
               <div class="input-row">
                 <input
                   v-model="savePath"
                   type="text"
                   class="input-field"
-                  placeholder="Default: Downloads folder"
+                  :placeholder="$t('transfer.defaultDownloads', 'Default: Downloads folder')"
                 />
               </div>
             </div>
@@ -302,7 +302,7 @@
               <div v-if="pendingFile" class="pending-card">
                 <div class="pending-header">
                   <span class="pending-icon" v-html="Icons.download"></span>
-                  <h4>Incoming File</h4>
+                  <h4>{{ $t('transfer.incomingFile', 'Incoming File') }}</h4>
                 </div>
                 <div class="pending-file">
                   <div class="file-icon-lg" v-html="getFileIcon(pendingFile.name)"></div>
@@ -312,8 +312,8 @@
                   </div>
                 </div>
                 <div class="pending-actions">
-                  <button class="btn-reject" @click="rejectTransfer">Decline</button>
-                  <button class="btn-accept" @click="acceptTransfer">Accept</button>
+                  <button class="btn-reject" @click="rejectTransfer">{{ $t('transfer.decline', 'Decline') }}</button>
+                  <button class="btn-accept" @click="acceptTransfer">{{ $t('transfer.accept', 'Accept') }}</button>
                 </div>
               </div>
             </transition>
@@ -330,14 +330,14 @@
               <div class="progress-track">
                 <div class="progress-fill receiving" :style="{ width: transferProgress + '%' }"></div>
               </div>
-              <span class="progress-label">{{ transferProgress }}% received</span>
+              <span class="progress-label">{{ transferProgress }}% {{ $t('transfer.receivedLabel', 'received') }}</span>
             </div>
 
             <p v-if="transferStatus" class="status-text success">{{ transferStatus }}</p>
 
             
             <div class="history-section" v-if="transferHistory.length > 0">
-              <h3 class="history-title">Recent Transfers</h3>
+              <h3 class="history-title">{{ $t('transfer.recentTransfers', 'Recent Transfers') }}</h3>
               <div class="history-list">
                 <div v-for="item in transferHistory" :key="item.id" class="history-item">
                   <div class="history-icon" :class="item.type">
@@ -363,11 +363,13 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from "vue";
+import { useI18n } from "vue-i18n";
 import Peer from "peerjs";
 import { invoke } from "@tauri-apps/api/core";
 import { useNotificationStore } from "../stores/notifications";
 import { Icons } from "../components/icons/IconMap";
 
+const { t } = useI18n();
 const notifications = useNotificationStore();
 
 
@@ -485,12 +487,12 @@ async function sendViaIp() {
 
     ipStatus.value = ' ' + result;
     notifications.success(result);
-    addIpLog('Sent: ' + selectedFile.value.name);
+    addIpLog(t('transfer.sent', 'Sent') + ': ' + selectedFile.value.name);
     selectedFile.value = null;
   } catch (e) {
-    ipStatus.value = 'Error: ' + e;
-    notifications.error('Transfer failed: ' + e);
-    addIpLog('Error: ' + e);
+    ipStatus.value = t('transfer.error', 'Error') + ': ' + e;
+    notifications.error(t('transfer.transferFailed', 'Transfer failed') + ': ' + e);
+    addIpLog(t('transfer.error', 'Error') + ': ' + e);
   } finally {
     ipTransferring.value = false;
   }
@@ -499,7 +501,7 @@ async function sendViaIp() {
 function copyIp() {
   if (localIp.value) {
     navigator.clipboard.writeText(localIp.value);
-    notifications.success('IP copied!');
+    notifications.success(t('transfer.ipCopied', 'IP copied!'));
   }
 }
 
@@ -527,15 +529,15 @@ function initPeer() {
 
     peer.on('error', (err: any) => {
       if (err.type === 'peer-unavailable') {
-        connectionError.value = "Peer not found. Check the token.";
+        connectionError.value = t('transfer.peerNotFound', 'Peer not found. Check the token.');
       } else if (err.type === 'server-error' || err.type === 'network') {
-        connectionError.value = "Cannot reach signaling server. Check your internet connection or use IP mode instead.";
-        notifications.warning("Token mode requires internet. Try IP mode for local transfers.");
+        connectionError.value = t('transfer.cannotReachSignaling', 'Cannot reach signaling server. Check your internet connection or use IP mode instead.');
+        notifications.warning(t('transfer.tokenModeRequiresInternet', 'Token mode requires internet. Try IP mode for local transfers.'));
       } else if (err.type === 'disconnected') {
-        connectionError.value = "Disconnected from server. Reconnecting...";
+        connectionError.value = t('transfer.disconnectedReconnecting', 'Disconnected from server. Reconnecting...');
         setTimeout(() => { try { peer?.reconnect(); } catch {} }, 3000);
       } else {
-        connectionError.value = "P2P Error: " + (err.type || err);
+        connectionError.value = t('transfer.p2pError', 'P2P Error') + ': ' + (err.type || err);
       }
     });
 
@@ -544,7 +546,7 @@ function initPeer() {
       setTimeout(() => { try { peer?.reconnect(); } catch {} }, 5000);
     });
   } catch (e) {
-    connectionError.value = "Failed to initialize P2P. Use IP mode instead.";
+    connectionError.value = t('transfer.failedInitP2p', 'Failed to initialize P2P. Use IP mode instead.');
     console.error("PeerJS init error:", e);
   }
 }
@@ -552,7 +554,7 @@ function initPeer() {
 function copyToken() {
   if (myPeerId.value) {
     navigator.clipboard.writeText(myPeerId.value);
-    notifications.success("Token copied!");
+    notifications.success(t('transfer.tokenCopied', 'Token copied!'));
   }
 }
 
@@ -594,7 +596,7 @@ function connectToPeer() {
   });
   
   conn.on('error', (err: any) => {
-    connectionError.value = "Connection failed: " + err;
+    connectionError.value = t('transfer.connectionFailed', 'Connection failed') + ': ' + err;
     isConnected.value = false;
   });
   
@@ -602,15 +604,15 @@ function connectToPeer() {
     if (data.type === 'accept') {
       beginChunkTransfer();
     } else if (data.type === 'reject') {
-      transferStatus.value = "Transfer rejected by peer.";
+      transferStatus.value = t('transfer.transferRejectedPeer', 'Transfer rejected by peer.');
       isTransferring.value = false;
-      notifications.error("Transfer rejected.");
+      notifications.error(t('transfer.transferRejected', 'Transfer rejected.'));
     }
   });
 
   conn.on('close', () => {
     isConnected.value = false;
-    transferStatus.value = "Connection closed.";
+    transferStatus.value = t('transfer.connectionClosed', 'Connection closed.');
   });
 }
 
@@ -638,20 +640,20 @@ function startTransfer() {
   const file = selectedFile.value;
   isTransferring.value = true;
   transferProgress.value = 0;
-  transferStatus.value = "Starting transfer...";
+  transferStatus.value = t('transfer.startingTransfer', 'Starting transfer...');
 
   conn.send({
     type: 'offer',
     name: file.name,
     size: file.size
   });
-  transferStatus.value = "Waiting for acceptance...";
+  transferStatus.value = t('transfer.waitingAcceptance', 'Waiting for acceptance...');
 }
 
 function beginChunkTransfer() {
   if (!selectedFile.value || !conn) return;
   const file = selectedFile.value;
-  transferStatus.value = "Sending data...";
+  transferStatus.value = t('transfer.sendingData', 'Sending data...');
 
   const chunkSize = 16384 * 4;
   const reader = new FileReader();
@@ -677,7 +679,7 @@ function beginChunkTransfer() {
         setTimeout(readNextChunk, 5);
       } else {
         isTransferring.value = false;
-        transferStatus.value = "Transfer complete! ";
+        transferStatus.value = t('transfer.transferComplete', 'Transfer complete!');
         conn.send({ type: 'complete', totalChunks: chunkIndex });
         
         transferHistory.value.unshift({
@@ -709,7 +711,7 @@ function setupReceiverConnection() {
   conn.on('data', async (data: any) => {
     if (data.type === 'offer') {
       pendingFile.value = { name: data.name, size: data.size };
-      notifications.info(`Incoming file: ${data.name}`);
+      notifications.info(t('transfer.incomingFileNotif', { name: data.name }));
       return;
     }
     
@@ -725,7 +727,7 @@ function setupReceiverConnection() {
     if (data.type === 'complete') {
        saveReceivedFile(data.totalChunks);
        return;
-    }
+     }
   });
 
   conn.on('close', () => {
@@ -741,7 +743,7 @@ async function saveReceivedFile(totalChunks: number) {
     if (receivedChunks[i]) {
       chunksArray.push(receivedChunks[i]);
     } else {
-      notifications.error("Transfer corrupted: missing chunks.");
+      notifications.error(t('transfer.transferCorrupted', 'Transfer corrupted: missing chunks.'));
       return;
     }
   }
@@ -750,16 +752,16 @@ async function saveReceivedFile(totalChunks: number) {
   const arrayBuffer = await blob.arrayBuffer();
   const bytes = Array.from(new Uint8Array(arrayBuffer));
 
-  transferStatus.value = "Saving file...";
+  transferStatus.value = t('transfer.savingFile', 'Saving file...');
   
   try {
     const savedPath = await invoke('save_local_file', {
        filename: incomingFile.value.name,
        data: bytes,
        targetFolder: savePath.value || null
-    });
-    transferStatus.value = `File saved to: ${savedPath}`;
-    notifications.success(`File Received! Saved to: ${savedPath}`);
+    }) as string;
+    transferStatus.value = t('transfer.fileReceivedNotif', { path: savedPath });
+    notifications.success(t('transfer.fileReceivedNotif', { path: savedPath }));
     
     transferHistory.value.unshift({
       id: Date.now().toString(),
@@ -771,8 +773,8 @@ async function saveReceivedFile(totalChunks: number) {
     });
 
   } catch (e) {
-    transferStatus.value = "Error saving file: " + e;
-    notifications.error("Save Error: " + e);
+    transferStatus.value = t('transfer.saveError', 'Error saving file') + ': ' + e;
+    notifications.error(t('transfer.saveError', 'Save Error') + ': ' + e);
   }
   
   incomingFile.value = null;

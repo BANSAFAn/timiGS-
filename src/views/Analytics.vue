@@ -9,7 +9,7 @@
       <div class="page-header">
         <div class="header-left">
           <h2>{{ $t('analytics.title') }}</h2>
-          <p class="subtitle">Insights into your productivity patterns</p>
+          <p class="subtitle">{{ $t('analytics.subtitle', 'Insights into your productivity patterns') }}</p>
         </div>
         <div class="header-controls">
           
@@ -177,7 +177,7 @@
                  <circle cx="6" cy="18" r="3"></circle>
                  <circle cx="18" cy="16" r="3"></circle>
                </svg>
-               Music Listening
+               {{ $t('analytics.musicListening', 'Music Listening') }}
              </h3>
              <span class="header-badge total-music">{{ formatDuration(store.totalMusicTime) }}</span>
            </div>
@@ -208,7 +208,7 @@
                </div>
                <div class="music-time">
                  <span class="time-value" :title="formatDurationFull(music.total_seconds)">{{ formatTimeReadable(music.total_seconds) }}</span>
-                 <span class="time-label">{{ music.session_count }} sessions</span>
+                 <span class="time-label">{{ music.session_count }} {{ $t('analytics.sessions', 'sessions') }}</span>
                </div>
                <div class="music-view-history">
                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -226,10 +226,10 @@
                  <circle cx="12" cy="12" r="10"></circle>
                  <polyline points="12 6 12 12 16 14"></polyline>
                </svg>
-               <span>Now Playing</span>
+               <span>{{ $t('analytics.nowPlaying', 'Now Playing') }}</span>
                <span class="now-playing-live-badge">
                  <span class="live-indicator"></span>
-                 LIVE
+                 {{ $t('analytics.live', 'LIVE') }}
                </span>
              </div>
              <div class="now-playing-content">
@@ -1495,7 +1495,7 @@ watch(selectedRange, async () => {
   white-space: nowrap; 
   overflow: hidden; 
   text-overflow: ellipsis; 
-  max-width: 160px; 
+  max-width: 100%; 
   display: block;
   font-weight: 600;
 }
