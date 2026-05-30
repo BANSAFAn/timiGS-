@@ -28,12 +28,7 @@ RequestExecutionLevel admin
 !define MUI_HEADERIMAGE_BITMAP "windows\installer-header.bmp"
 !define MUI_WELCOMEFINISHPAGE_BITMAP "windows\installer-finish.bmp"
 
-!define MUI_BGCOLOR "0a0a12"
-!define MUI_TEXTCOLOR "e8e8f0"
-!define MUI_WELCOMEPAGE_BGCOLOR "060609"
-!define MUI_WELCOMEPAGE_TEXTCOLOR "e8e8f0"
-!define MUI_FINISHPAGE_BGCOLOR "060609"
-!define MUI_FINISHPAGE_TEXTCOLOR "e8e8f0"
+
 
 !insertmacro MUI_PAGE_WELCOME
 !insertmacro MUI_PAGE_LICENSE "LICENSE"
@@ -106,21 +101,18 @@ Function ComponentsPage
 
   ${NSD_CreateLabel} 0 0 100% 24u "Configure ${APP_NAME} installation options:"
   Pop $R0
-  SetCtlColors $R0 0xe8e8f0 0x0a0a12
 
   ${NSD_CreateCheckbox} 20u 35u 100% 12u "$(DESC_SecDesk)"
   Pop $Checkbox_Desktop
   SendMessage $Checkbox_Desktop ${BM_SETCHECK} ${BST_CHECKED} 0
-  SetCtlColors $Checkbox_Desktop 0xe8e8f0 0x0a0a12
 
   ${NSD_CreateCheckbox} 20u 55u 100% 12u "$(DESC_SecStart)"
   Pop $Checkbox_Start
   SendMessage $Checkbox_Start ${BM_SETCHECK} ${BST_UNCHECKED} 0
-  SetCtlColors $Checkbox_Start 0xe8e8f0 0x0a0a12
 
   ${NSD_CreateLabel} 20u 75u 100% 32u "Note: You can change these settings later in the application."
   Pop $R1
-  SetCtlColors $R1 0x888888 0x0a0a12
+  SetCtlColors $R1 0x666666 ""
 
   nsDialogs::Show
 FunctionEnd
