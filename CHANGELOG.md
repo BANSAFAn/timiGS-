@@ -1,5 +1,25 @@
 # Changelog
 
+## [1.9.0](https://github.com/BANSAFAn/timiGS-/compare/v1.8.1...v1.9.0) (2026-05-30)
+
+
+### Features
+
+* **activity:** add affinity, krita, and clip studio to Creative program keywords ([dde2f3a](https://github.com/BANSAFAn/timiGS-/commit/dde2f3a127ff8ddb375dacbb8a549ef669d0a18b))
+* **activity:** add new program tags, premium compact sidebar, and code simplifications ([2485795](https://github.com/BANSAFAn/timiGS-/commit/2485795a802d8a7ff675b47c05c5ea272bf4ea48))
+* **activity:** classify browser sessions into specialized tags using window title website mapping ([301e5ba](https://github.com/BANSAFAn/timiGS-/commit/301e5ba26f23a8dd9363dc6189d8cc567c24f330))
+* **dashboard:** show TimiGS active state and previous activity when focused ([66a7b0e](https://github.com/BANSAFAn/timiGS-/commit/66a7b0ea2d8c4529907fd73b0ae1746a27d8e01f))
+
+
+### Bug Fixes
+
+* **windows:** resolve installer text readability issues by utilizing native modern light layout ([4323086](https://github.com/BANSAFAn/timiGS-/commit/43230866c942337cd65ce543c0488990c3661985))
+
+
+### Styles
+
+* **windows:** improve installer design with Segoe UI typography and premium spacious layout ([fbc1105](https://github.com/BANSAFAn/timiGS-/commit/fbc1105bcfa9ed5659f4b504af89473480f26bf8))
+
 ## [1.8.1](https://github.com/BANSAFAn/timiGS-/compare/v1.8.0...v1.8.1) (2026-05-30)
 
 
