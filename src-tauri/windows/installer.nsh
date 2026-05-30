@@ -19,6 +19,7 @@ InstallDir "$PROGRAMFILES64\${APP_NAME}"
 InstallDirRegKey HKLM "${UNINSTALL_KEY}" "InstallLocation"
 
 RequestExecutionLevel admin
+SetFont "Segoe UI" 9
 
 !define MUI_ABORTWARNING
 !define MUI_UNABORTWARNING
@@ -99,20 +100,28 @@ Function ComponentsPage
   nsDialogs::Create 1018
   Pop $Dialog
 
-  ${NSD_CreateLabel} 0 0 100% 24u "Configure ${APP_NAME} installation options:"
+  ${NSD_CreateLabel} 0 0 100% 12u "Configure ${APP_NAME} installation options:"
   Pop $R0
 
-  ${NSD_CreateCheckbox} 20u 35u 100% 12u "$(DESC_SecDesk)"
+  ${NSD_CreateLabel} 0 16u 100% 1u ""
+  Pop $R2
+  SetCtlColors $R2 "" 0xE5E7EB
+
+  ${NSD_CreateCheckbox} 15u 26u 100% 12u "$(DESC_SecDesk)"
   Pop $Checkbox_Desktop
   SendMessage $Checkbox_Desktop ${BM_SETCHECK} ${BST_CHECKED} 0
 
-  ${NSD_CreateCheckbox} 20u 55u 100% 12u "$(DESC_SecStart)"
+  ${NSD_CreateCheckbox} 15u 42u 100% 12u "$(DESC_SecStart)"
   Pop $Checkbox_Start
   SendMessage $Checkbox_Start ${BM_SETCHECK} ${BST_UNCHECKED} 0
 
-  ${NSD_CreateLabel} 20u 75u 100% 32u "Note: You can change these settings later in the application."
+  ${NSD_CreateLabel} 0 60u 100% 1u ""
+  Pop $R3
+  SetCtlColors $R3 "" 0xE5E7EB
+
+  ${NSD_CreateLabel} 15u 68u 100% 24u "Note: You can change these settings later in the application."
   Pop $R1
-  SetCtlColors $R1 0x666666 ""
+  SetCtlColors $R1 0x6B7280 ""
 
   nsDialogs::Show
 FunctionEnd
