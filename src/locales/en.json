@@ -51,7 +51,11 @@
     "tagCreative": "Creative & Design",
     "tagAI": "AI & Assistants",
     "tagFinance": "Finance & Business",
-    "tagUtilities": "Utilities & Tools"
+    "tagUtilities": "Utilities & Tools",
+    "timigsActive": "TimiGS Main Dashboard",
+    "timigsActiveDesc": "Viewing stats and tracking",
+    "previousActivity": "Previous Activity:",
+    "noPreviousActivity": "No previous activity detected"
   },
   "timeline": {
     "title": "Activity Timeline",

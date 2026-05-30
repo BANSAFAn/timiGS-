@@ -53,7 +53,11 @@
     "tagCreative": "Творчість та Дизайн",
     "tagAI": "ШІ та Асистенти",
     "tagFinance": "Фінанси та Бізнес",
-    "tagUtilities": "Утиліти та Інструменти"
+    "tagUtilities": "Утиліти та Інструменти",
+    "timigsActive": "Головна частина TimiGS",
+    "timigsActiveDesc": "Перегляд статистики та відстеження",
+    "previousActivity": "Попередня активність:",
+    "noPreviousActivity": "Попередньої активності не виявлено"
   },
   "timeline": {
     "title": "Історія активності",

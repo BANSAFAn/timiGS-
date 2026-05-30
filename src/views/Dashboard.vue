@@ -22,44 +22,101 @@
       <div class="hero-card animate-enter">
         <div class="hero-content">
           <div class="active-section">
-            <div class="active-icon-box">
-              <img
-                v-if="currentActivity?.app_name && appIcons[currentActivity.app_name]"
-                :src="appIcons[currentActivity.app_name]"
-                class="app-icon-img"
-              />
-              <div v-else class="app-icon-fallback">
-                {{ currentActivity?.app_name?.charAt(0) || "?" }}
+            <template v-if="isAppFocused">
+              <div class="active-icon-box timigs-brand-icon animate-pop-in">
+                <span class="brand-letter">T</span>
               </div>
-            </div>
 
-            <div class="active-info">
-              <div class="status-row">
-                <span class="status-badge">
-                  <span class="status-pulse"></span>
-                  {{ $t("dashboard.activeNow") }}
-                </span>
-                <span
-                  v-if="currentActivity"
-                  class="app-tag-pill"
-                  :style="{
-                    color: getProgramTag(currentActivity.app_name, currentActivity.exe_path, currentActivity.window_title).color,
-                    backgroundColor: getProgramTag(currentActivity.app_name, currentActivity.exe_path, currentActivity.window_title).bg,
-                    borderColor: getProgramTag(currentActivity.app_name, currentActivity.exe_path, currentActivity.window_title).border
-                  }"
-                >
-                  {{ $t(getProgramTag(currentActivity.app_name, currentActivity.exe_path, currentActivity.window_title).labelKey) }}
-                </span>
+              <div class="active-info">
+                <div class="status-row">
+                  <span class="status-badge">
+                    <span class="status-pulse"></span>
+                    {{ $t("dashboard.activeNow") }}
+                  </span>
+                  <span
+                    class="app-tag-pill"
+                    :style="{
+                      color: '#5b6ee1',
+                      backgroundColor: 'rgba(91, 110, 225, 0.08)',
+                      borderColor: 'rgba(91, 110, 225, 0.2)'
+                    }"
+                  >
+                    TimiGS
+                  </span>
+                </div>
+                <h2 class="active-app">
+                  TimiGS
+                </h2>
+                <p class="active-window">
+                  {{ $t("dashboard.timigsActive") }}
+                </p>
+
+                <!-- Previous Activity Section -->
+                <div class="previous-activity-box animate-slide-up" v-if="store.currentSession">
+                  <span class="prev-label">{{ $t("dashboard.previousActivity") }}</span>
+                  <div class="prev-session-info">
+                    <img
+                      v-if="appIcons[store.currentSession.app_name]"
+                      :src="appIcons[store.currentSession.app_name]"
+                      class="prev-icon-img"
+                    />
+                    <div v-else class="prev-icon-fallback">
+                      {{ store.currentSession.app_name.charAt(0) }}
+                    </div>
+                    <div class="prev-text">
+                      <span class="prev-app-name">{{ store.currentSession.app_name }}</span>
+                      <span class="prev-window-title" v-if="store.currentSession.window_title">
+                        &mdash; {{ store.currentSession.window_title }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div class="previous-activity-box animate-slide-up" v-else>
+                  <span class="prev-label">{{ $t("dashboard.previousActivity") }}</span>
+                  <span class="prev-no-data">{{ $t("dashboard.noPreviousActivity") }}</span>
+                </div>
               </div>
-              <h2 class="active-app">
-                {{ currentActivity ? currentActivity.app_name : $t("dashboard.idle") }}
-              </h2>
-              <p class="active-window" v-if="currentActivity">
-                {{ currentActivity.window_title }}
-              </p>
-            </div>
+            </template>
 
-            
+            <template v-else>
+              <div class="active-icon-box">
+                <img
+                  v-if="currentActivity?.app_name && appIcons[currentActivity.app_name]"
+                  :src="appIcons[currentActivity.app_name]"
+                  class="app-icon-img"
+                />
+                <div v-else class="app-icon-fallback">
+                  {{ currentActivity?.app_name?.charAt(0) || "?" }}
+                </div>
+              </div>
+
+              <div class="active-info">
+                <div class="status-row">
+                  <span class="status-badge">
+                    <span class="status-pulse"></span>
+                    {{ $t("dashboard.activeNow") }}
+                  </span>
+                  <span
+                    v-if="currentActivity"
+                    class="app-tag-pill"
+                    :style="{
+                      color: getProgramTag(currentActivity.app_name, currentActivity.exe_path, currentActivity.window_title).color,
+                      backgroundColor: getProgramTag(currentActivity.app_name, currentActivity.exe_path, currentActivity.window_title).bg,
+                      borderColor: getProgramTag(currentActivity.app_name, currentActivity.exe_path, currentActivity.window_title).border
+                    }"
+                  >
+                    {{ $t(getProgramTag(currentActivity.app_name, currentActivity.exe_path, currentActivity.window_title).labelKey) }}
+                  </span>
+                </div>
+                <h2 class="active-app">
+                  {{ currentActivity ? currentActivity.app_name : $t("dashboard.idle") }}
+                </h2>
+                <p class="active-window" v-if="currentActivity">
+                  {{ currentActivity.window_title }}
+                </p>
+              </div>
+            </template>
+
             <button
               class="exclude-btn hero-exclude"
               @click="showExcludeModal = true"
@@ -282,6 +339,16 @@ const currentActivity = computed(() => store.currentActivity);
 const selectedChartType = ref("doughnut");
 const appIcons = ref<Record<string, string>>({});
 const showExcludeModal = ref(false);
+const isAppFocused = ref(document.hasFocus());
+
+function handleFocus() {
+  isAppFocused.value = true;
+  refreshData();
+}
+
+function handleBlur() {
+  isAppFocused.value = false;
+}
 
 const currentDate = new Date().toLocaleDateString(undefined, {
   weekday: "long",
@@ -428,6 +495,9 @@ async function refreshData() {
   if (store.currentActivity?.exe_path) {
     loadIcon(store.currentActivity.app_name, store.currentActivity.exe_path);
   }
+  if (store.currentSession?.exe_path) {
+    loadIcon(store.currentSession.app_name, store.currentSession.exe_path);
+  }
   await store.fetchTodayData();
   store.topApps.forEach((app) => loadIcon(app.app_name, app.exe_path));
 }
@@ -436,10 +506,14 @@ onMounted(async () => {
   await store.fetchExcludedProcesses();
   refreshData();
   intervalId = window.setInterval(refreshData, 5000);
+  window.addEventListener("focus", handleFocus);
+  window.addEventListener("blur", handleBlur);
 });
 
 onUnmounted(() => {
   if (intervalId) clearInterval(intervalId);
+  window.removeEventListener("focus", handleFocus);
+  window.removeEventListener("blur", handleBlur);
 });
 </script>
 
@@ -1273,5 +1347,120 @@ onUnmounted(() => {
     width: 100%;
     justify-content: center;
   }
+}
+
+/* TimiGS active state & Previous activity styles */
+.timigs-brand-icon {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 0 20px rgba(91, 110, 225, 0.35) !important;
+}
+
+.brand-letter {
+  font-size: 3rem;
+  font-weight: 900;
+  color: #ffffff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  font-family: var(--font-sans);
+}
+
+.previous-activity-box {
+  margin-top: 18px;
+  padding: 12px 18px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-width: 600px;
+  transition: all 0.3s ease;
+}
+
+.previous-activity-box:hover {
+  border-color: var(--color-primary);
+  background: var(--bg-hover);
+}
+
+.prev-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.prev-session-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.prev-icon-img {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
+
+.prev-icon-fallback {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  background: var(--bg-tertiary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  border: 1px solid var(--border-color);
+}
+
+.prev-text {
+  font-size: 0.85rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.prev-app-name {
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.prev-window-title {
+  color: var(--text-muted);
+  font-weight: 400;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.prev-no-data {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.animate-pop-in {
+  animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes popIn {
+  0% { transform: scale(0.85); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes slideUp {
+  0% { transform: translateY(10px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
 }
 </style>
