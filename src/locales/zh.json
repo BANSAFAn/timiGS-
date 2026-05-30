@@ -21,7 +21,9 @@
     "transferShort": "发送",
     "team": "团队",
     "teamShort": "团队",
-    "weather": "天气"
+    "weather": "天气",
+    "collapse": "折叠",
+    "expand": "展开"
   },
   "dashboard": {
     "title": "仪表板",
@@ -46,7 +48,11 @@
     "tagSocial": "社交",
     "tagSystem": "系统",
     "tagBrowser": "浏览器",
-    "tagUncategorized": "其他"
+    "tagUncategorized": "其他",
+    "tagCreative": "创意与设计",
+    "tagAI": "人工智能与助手",
+    "tagFinance": "财务与商业",
+    "tagUtilities": "实用工具与百宝箱"
   },
   "timeline": {
     "title": "活动时间轴",

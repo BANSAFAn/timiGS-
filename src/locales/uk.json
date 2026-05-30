@@ -22,7 +22,9 @@
     "team": "Команда",
     "teamShort": "Команда",
     "weather": "Погода",
-    "weatherShort": "Погода"
+    "weatherShort": "Погода",
+    "collapse": "Згорнути",
+    "expand": "Розгорнути"
   },
   "dashboard": {
     "title": "Головна",
@@ -47,7 +49,11 @@
     "tagSocial": "Спілкування",
     "tagSystem": "Система",
     "tagBrowser": "Браузер",
-    "tagUncategorized": "Інше"
+    "tagUncategorized": "Інше",
+    "tagCreative": "Творчість та Дизайн",
+    "tagAI": "ШІ та Асистенти",
+    "tagFinance": "Фінанси та Бізнес",
+    "tagUtilities": "Утиліти та Інструменти"
   },
   "timeline": {
     "title": "Історія активності",

@@ -1,7 +1,7 @@
 <template>
   <div class="app-shell">
     
-    <aside class="sidebar" v-if="shouldShowNav">
+    <aside class="sidebar" :class="{ 'compact': isCompact }" v-if="shouldShowNav">
       <div class="sidebar-header">
         <h1 class="brand-text">TimiGS</h1>
       </div>
@@ -29,6 +29,15 @@
           <div class="nav-icon" v-html="item.icon"></div>
           <span>{{ $t(item.label) }}</span>
         </router-link>
+
+        <button
+          class="nav-link compact-toggle-btn"
+          @click="toggleCompact"
+          :title="isCompact ? $t('nav.expand') : $t('nav.collapse')"
+        >
+          <div class="nav-icon" v-html="isCompact ? (isRtl ? Icons.chevronLeft : Icons.chevronRight) : (isRtl ? Icons.chevronRight : Icons.chevronLeft)"></div>
+          <span>{{ isCompact ? '' : $t('nav.collapse') }}</span>
+        </button>
       </nav>
     </aside>
 
@@ -157,6 +166,15 @@ watch(
     document.documentElement.setAttribute("data-theme", newTheme);
   }
 );
+
+const isCompact = ref(localStorage.getItem("sidebar-compact") === "true");
+
+const toggleCompact = () => {
+  isCompact.value = !isCompact.value;
+  localStorage.setItem("sidebar-compact", String(isCompact.value));
+};
+
+const isRtl = computed(() => locale.value === "ar");
 
 let pollInterval: number | null = null;
 let unlistenTick: (() => void) | null = null;

@@ -21,7 +21,9 @@
     "transferShort": "Senden",
     "team": "Team",
     "teamShort": "Team",
-    "weather": "Wetter"
+    "weather": "Wetter",
+    "collapse": "Einklappen",
+    "expand": "Ausklappen"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -46,7 +48,11 @@
     "tagSocial": "Sozial",
     "tagSystem": "System",
     "tagBrowser": "Browser",
-    "tagUncategorized": "Sonstige"
+    "tagUncategorized": "Sonstige",
+    "tagCreative": "Kreativität & Design",
+    "tagAI": "KI & Assistenten",
+    "tagFinance": "Finanzen & Business",
+    "tagUtilities": "Dienstprogramme & Tools"
   },
   "timeline": {
     "title": "Aktivitätszeitachse",

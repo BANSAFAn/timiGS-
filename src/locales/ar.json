@@ -21,7 +21,9 @@
     "transferShort": "إرسال",
     "team": "الفريق",
     "teamShort": "الفريق",
-    "weather": "الطقس"
+    "weather": "الطقس",
+    "collapse": "طي",
+    "expand": "توسيع"
   },
   "dashboard": {
     "title": "لوحة القيادة",
@@ -46,7 +48,11 @@
     "tagSocial": "اجتماعي",
     "tagSystem": "النظام",
     "tagBrowser": "المتصفح",
-    "tagUncategorized": "أخرى"
+    "tagUncategorized": "أخرى",
+    "tagCreative": "الإبداع والتصميم",
+    "tagAI": "الذكاء الاصطناعي والمساعدون",
+    "tagFinance": "المال والأعمال",
+    "tagUtilities": "الأدوات والمرافق"
   },
   "timeline": {
     "title": "الجدول الزمني للنشاط",

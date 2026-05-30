@@ -141,7 +141,96 @@ body {
   flex-direction: column;
   padding: 20px 16px;
   z-index: 50;
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1), padding 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar.compact {
+  width: 80px;
+  min-width: 80px;
+  padding: 20px 10px;
+}
+
+.sidebar.compact .brand-text {
+  display: none;
+}
+
+.sidebar.compact .sidebar-header {
+  padding: 12px 0;
+  margin-bottom: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.sidebar.compact .sidebar-header::after {
+  content: 'T';
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--color-primary);
+  display: block;
+  text-align: center;
+}
+
+.sidebar.compact .nav-link {
+  justify-content: center;
+  padding: 12px;
+  gap: 0;
+}
+
+.sidebar.compact .nav-link span {
+  display: none;
+}
+
+.sidebar.compact .nav-link .nav-icon {
+  margin: 0;
+}
+
+.sidebar.compact .nav-divider {
+  margin: 8px 0;
+}
+
+.sidebar.compact .compact-toggle-btn span {
+  display: none;
+}
+
+/* Compact Toggle Button */
+.compact-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  color: var(--text-muted);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.9375rem;
+  transition: var(--transition-smooth);
+  position: relative;
+  overflow: hidden;
+  background: none;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  margin-top: auto; /* Push to bottom of sidebar-nav */
+}
+
+.compact-toggle-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-main);
+}
+
+.compact-toggle-btn .nav-icon {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform var(--transition-fast);
+}
+
+.compact-toggle-btn:hover .nav-icon {
+  transform: scale(1.1);
 }
 
 .sidebar-header {

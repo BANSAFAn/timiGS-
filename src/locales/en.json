@@ -20,7 +20,9 @@
     "transfer": "Transfer",
     "transferShort": "Send",
     "team": "Team",
-    "teamShort": "Team"
+    "teamShort": "Team",
+    "collapse": "Collapse",
+    "expand": "Expand"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -45,7 +47,11 @@
     "tagSocial": "Social",
     "tagSystem": "System",
     "tagBrowser": "Browser",
-    "tagUncategorized": "Other"
+    "tagUncategorized": "Other",
+    "tagCreative": "Creative & Design",
+    "tagAI": "AI & Assistants",
+    "tagFinance": "Finance & Business",
+    "tagUtilities": "Utilities & Tools"
   },
   "timeline": {
     "title": "Activity Timeline",

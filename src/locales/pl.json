@@ -21,7 +21,9 @@
     "transferShort": "Wyślij",
     "team": "Zespół",
     "teamShort": "Zespół",
-    "weather": "Pogoda"
+    "weather": "Pogoda",
+    "collapse": "Zwiń",
+    "expand": "Rozwiń"
   },
   "dashboard": {
     "title": "Pulpit",
@@ -46,7 +48,11 @@
     "tagSocial": "Społeczności",
     "tagSystem": "System",
     "tagBrowser": "Przeglądarka",
-    "tagUncategorized": "Inne"
+    "tagUncategorized": "Inne",
+    "tagCreative": "Kreatywność i Projektowanie",
+    "tagAI": "AI i Asystenci",
+    "tagFinance": "Finanse i Biznes",
+    "tagUtilities": "Narzędzia i Narzędzia pomocnicze"
   },
   "timeline": {
     "title": "Oś Czasu Aktywności",

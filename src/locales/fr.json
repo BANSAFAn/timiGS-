@@ -21,7 +21,9 @@
     "transferShort": "Envoyer",
     "team": "Équipe",
     "teamShort": "Équipe",
-    "weather": "Météo"
+    "weather": "Météo",
+    "collapse": "Réduire",
+    "expand": "Développer"
   },
   "dashboard": {
     "title": "Tableau de bord",
@@ -46,7 +48,11 @@
     "tagSocial": "Social",
     "tagSystem": "Système",
     "tagBrowser": "Navigateur",
-    "tagUncategorized": "Autres"
+    "tagUncategorized": "Autres",
+    "tagCreative": "Créatif & Design",
+    "tagAI": "IA & Assistants",
+    "tagFinance": "Finance & Affaires",
+    "tagUtilities": "Utilitaires & Outils"
   },
   "timeline": {
     "title": "Chronologie de l'activité",

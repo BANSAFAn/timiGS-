@@ -4,7 +4,7 @@ import Peer, { type DataConnection, type MediaConnection } from "peerjs";
 import { invoke } from "@tauri-apps/api/core";
 import { save } from "@tauri-apps/plugin-dialog";
 import { writeTextFile, readTextFile, remove } from "@tauri-apps/plugin-fs";
-import { useActivityStore, detectCategory } from "./activity";
+import { useActivityStore, detectCategory, CATEGORY_STYLES } from "./activity";
 
 export interface TeamMember {
   id: string;
@@ -1237,20 +1237,16 @@ export const useTeamsStore = defineStore("teams", () => {
       .slice(0, 10);
 
     const totalCategorySeconds = Array.from(categoryMap.values()).reduce((a, b) => a + b, 0);
-    const categoryColors: Record<string, string> = {
-      'Work': '#5b6ee1',
-      'Game': '#ef4444',
-      'Rest': '#10b981',
-      'Programs': '#8b5cf6',
-      'Uncategorized': '#6b7280'
-    };
     const categoryBreakdown: CategoryBreakdown[] = Array.from(categoryMap.entries())
-      .map(([category, totalSeconds]) => ({
-        category,
-        totalSeconds,
-        percentage: totalCategorySeconds > 0 ? Math.round((totalSeconds / totalCategorySeconds) * 100) : 0,
-        color: categoryColors[category] || '#6b7280'
-      }))
+      .map(([category, totalSeconds]) => {
+        const style = CATEGORY_STYLES[category] || CATEGORY_STYLES.Uncategorized;
+        return {
+          category,
+          totalSeconds,
+          percentage: totalCategorySeconds > 0 ? Math.round((totalSeconds / totalCategorySeconds) * 100) : 0,
+          color: style.color
+        };
+      })
       .sort((a, b) => b.totalSeconds - a.totalSeconds);
 
     return {
