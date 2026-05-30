@@ -370,7 +370,7 @@ const KEYWORD_CATEGORIES: KeywordCategory[] = [
   },
   {
     key: 'Creative',
-    keywords: ['figma', 'photoshop', 'illustrator', 'premiere', 'after effects', 'indesign', 'lightroom', 'blender', 'canva', 'gimp', 'inkscape', 'davinci resolve', 'audacity', 'design', 'paint', 'coreldraw', 'creative']
+    keywords: ['figma', 'photoshop', 'illustrator', 'premiere', 'after effects', 'indesign', 'lightroom', 'blender', 'canva', 'gimp', 'inkscape', 'davinci resolve', 'audacity', 'design', 'paint', 'coreldraw', 'creative', 'affinity', 'krita', 'clip studio']
   },
   {
     key: 'Finance',
