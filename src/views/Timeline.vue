@@ -104,12 +104,12 @@
                       <span
                         class="app-tag-pill-mini"
                         :style="{
-                          color: getProgramTag(session.app_name, session.exe_path).color,
-                          backgroundColor: getProgramTag(session.app_name, session.exe_path).bg,
-                          borderColor: getProgramTag(session.app_name, session.exe_path).border
+                          color: getProgramTag(session.app_name, session.exe_path, session.window_title).color,
+                          backgroundColor: getProgramTag(session.app_name, session.exe_path, session.window_title).bg,
+                          borderColor: getProgramTag(session.app_name, session.exe_path, session.window_title).border
                         }"
                       >
-                        {{ $t(getProgramTag(session.app_name, session.exe_path).labelKey) }}
+                        {{ $t(getProgramTag(session.app_name, session.exe_path, session.window_title).labelKey) }}
                       </span>
                     </div>
                     <div class="window-title">{{ session.window_title }}</div>

@@ -421,7 +421,7 @@ const KEYWORD_CATEGORIES: KeywordCategory[] = [
   }
 ];
 
-export function getProgramTag(appName: string, exePath: string = ''): ProgramTag {
+export function getProgramTag(appName: string, exePath: string = '', windowTitle: string = ''): ProgramTag {
   if (!appName) {
     return {
       key: 'Uncategorized',
@@ -439,6 +439,55 @@ export function getProgramTag(appName: string, exePath: string = ''): ProgramTag
 
   const name = appName.toLowerCase();
   const path = exePath.toLowerCase();
+  const title = windowTitle.toLowerCase();
+
+  // If the app is a browser, try classifying based on the window title (website visited)
+  const BROWSERS = ['chrome', 'edge', 'firefox', 'brave', 'opera', 'vivaldi', 'safari', 'browser', 'zen', 'msedge'];
+  const isBrowser = BROWSERS.some(b => name.includes(b)) || path.includes('chrome') || path.includes('browser') || path.includes('msedge');
+  
+  if (isBrowser && title) {
+    // 1. AI Websites
+    const aiWebsites = ['chatgpt', 'claude.ai', 'gemini.google', 'deepseek', 'perplexity', 'poe.com', 'huggingface', 'openai', 'v0.dev'];
+    if (aiWebsites.some(site => title.includes(site))) {
+      return { key: 'AI', ...CATEGORY_STYLES.AI };
+    }
+
+    // 2. Creative Websites
+    const creativeWebsites = ['figma', 'canva', 'adobe', 'behance', 'dribbble', 'photopea', 'pinterest', 'artstation', 'midjourney'];
+    if (creativeWebsites.some(site => title.includes(site))) {
+      return { key: 'Creative', ...CATEGORY_STYLES.Creative };
+    }
+
+    // 3. Finance/Crypto Websites
+    const financeWebsites = ['binance', 'tradingview', 'metamask', 'coinmarketcap', 'coinbase', 'bybit', 'sheets.google', 'paypal', 'stripe', 'bank', 'ledger'];
+    if (financeWebsites.some(site => title.includes(site))) {
+      return { key: 'Finance', ...CATEGORY_STYLES.Finance };
+    }
+
+    // 4. Programming/Developer Websites
+    const devWebsites = ['github', 'gitlab', 'stackoverflow', 'npmjs', 'crates.io', 'localhost', 'vercel', 'netlify', 'codepen', 'jsfiddle', 'mdn', 'w3schools', 'dev.to'];
+    if (devWebsites.some(site => title.includes(site)) || title.includes('docs.')) {
+      return { key: 'Programming', ...CATEGORY_STYLES.Programming };
+    }
+
+    // 5. Study Websites
+    const studyWebsites = ['wikipedia', 'coursera', 'udemy', 'duolingo', 'stackexchange', 'quizlet', 'khanacademy', 'researchgate'];
+    if (studyWebsites.some(site => title.includes(site))) {
+      return { key: 'Study', ...CATEGORY_STYLES.Study };
+    }
+
+    // 6. Social Websites
+    const socialWebsites = ['discord', 'telegram', 'whatsapp', 'viber', 'facebook', 'instagram', 'twitter', 'x.com', 'linkedin', 'reddit'];
+    if (socialWebsites.some(site => title.includes(site))) {
+      return { key: 'Social', ...CATEGORY_STYLES.Social };
+    }
+
+    // 7. Entertainment/Music Websites
+    const entWebsites = ['youtube', 'netflix', 'spotify', 'twitch', 'soundcloud', 'apple music', 'prime video', 'hulu', 'disney+'];
+    if (entWebsites.some(site => title.includes(site))) {
+      return { key: 'Entertainment', ...CATEGORY_STYLES.Entertainment };
+    }
+  }
 
   for (const cat of KEYWORD_CATEGORIES) {
     if (

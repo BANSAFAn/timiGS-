@@ -43,12 +43,12 @@
                   v-if="currentActivity"
                   class="app-tag-pill"
                   :style="{
-                    color: getProgramTag(currentActivity.app_name, currentActivity.exe_path).color,
-                    backgroundColor: getProgramTag(currentActivity.app_name, currentActivity.exe_path).bg,
-                    borderColor: getProgramTag(currentActivity.app_name, currentActivity.exe_path).border
+                    color: getProgramTag(currentActivity.app_name, currentActivity.exe_path, currentActivity.window_title).color,
+                    backgroundColor: getProgramTag(currentActivity.app_name, currentActivity.exe_path, currentActivity.window_title).bg,
+                    borderColor: getProgramTag(currentActivity.app_name, currentActivity.exe_path, currentActivity.window_title).border
                   }"
                 >
-                  {{ $t(getProgramTag(currentActivity.app_name, currentActivity.exe_path).labelKey) }}
+                  {{ $t(getProgramTag(currentActivity.app_name, currentActivity.exe_path, currentActivity.window_title).labelKey) }}
                 </span>
               </div>
               <h2 class="active-app">
