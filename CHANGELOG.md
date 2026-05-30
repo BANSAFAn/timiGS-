@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.8.1](https://github.com/BANSAFAn/timiGS-/compare/v1.8.0...v1.8.1) (2026-05-30)
+
+
+### Bug Fixes
+
+* **updater:** resolve update failures by enabling updater artifacts, injecting signing keys, and upgrading reqwest to resolve security vulnerabilities ([33b84e1](https://github.com/BANSAFAn/timiGS-/commit/33b84e160245c8b4d99fe325761fff845a56e1f4))
+
+
+### Miscellaneous
+
+* **deps:** bump tar ([0ad615f](https://github.com/BANSAFAn/timiGS-/commit/0ad615f41e6def8fd147e97f760478bbcbe39d02))
+* **updater:** update updater public key with newly generated Ed25519 key pair ([56bcfb9](https://github.com/BANSAFAn/timiGS-/commit/56bcfb9a19ff62b2bd3364ca148b91ce0b79a559))
+
 ## [1.8.0](https://github.com/BANSAFAn/timiGS-/compare/v1.7.0...v1.8.0) (2026-05-28)
 
 
