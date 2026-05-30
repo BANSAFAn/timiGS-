@@ -92,7 +92,7 @@
   },
   "plugins": {
     "updater": {
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDBGREMyQzIyQ0IwQTJEOEUKUldTT0xRckxJaXpjRHcrNnltak5wM0NIWGRBMHppU0JMdzY2eUlNNnpMS08xQ2JObVdqd05qY0UK",
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDYyMjhBQ0M2QzdBQ0JGRTEKUldUaHY2ekh4cXdvWXNPcFZ5UWpZd1JEdHRZVVlZU1N3NU5QOFVmMmw0MWpVRmozR0IrT2VQN2gK",
       "endpoints": [
         "https://github.com/BANSAFAn/timiGS-/releases/latest/download/latest.json"
       ]
