@@ -326,36 +326,41 @@ onUnmounted(() => {
 
 .compact-clock-svg {
   filter: drop-shadow(0 0 2px rgba(91, 110, 225, 0.15));
-  animation: clock-pulse 4s ease-in-out infinite;
+  animation: clock-pulse-once 5s ease-out forwards;
 }
 
 .clock-hour-hand {
   transform-origin: 12px 12px;
-  animation: rotate-hand 30s linear infinite;
+  animation: spin-hour-once 5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
 
 .clock-minute-hand {
   transform-origin: 12px 12px;
-  animation: rotate-hand 5s linear infinite;
+  animation: spin-minute-once 5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 .animate-fade-in {
   animation: fadeIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
-@keyframes rotate-hand {
+@keyframes spin-hour-once {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
 
-@keyframes clock-pulse {
-  0%, 100% { 
-    filter: drop-shadow(0 0 2px rgba(91, 110, 225, 0.15));
-    opacity: 0.9;
-  }
-  50% { 
-    filter: drop-shadow(0 0 6px rgba(91, 110, 225, 0.45));
+@keyframes spin-minute-once {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(1080deg); }
+}
+
+@keyframes clock-pulse-once {
+  0% { 
+    filter: drop-shadow(0 0 6px rgba(91, 110, 225, 0.5));
     opacity: 1;
+  }
+  100% { 
+    filter: drop-shadow(0 0 2px rgba(91, 110, 225, 0.15));
+    opacity: 0.95;
   }
 }
 
