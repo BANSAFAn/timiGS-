@@ -4,6 +4,14 @@
     <aside class="sidebar" :class="{ 'compact': isCompact }" v-if="shouldShowNav">
       <div class="sidebar-header">
         <h1 class="brand-text">TimiGS</h1>
+        <div class="compact-logo animate-fade-in" v-if="isCompact">
+          <svg viewBox="0 0 24 24" width="28" height="28" class="compact-clock-svg" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="12" r="10" stroke="var(--color-primary)" stroke-width="2" fill="none" />
+            <circle cx="12" cy="12" r="1.2" fill="var(--color-primary)" />
+            <line x1="12" y1="12" x2="12" y2="7.5" stroke="var(--color-primary)" stroke-width="2" stroke-linecap="round" class="clock-hour-hand" />
+            <line x1="12" y1="12" x2="15.5" y2="12" stroke="var(--color-primary)" stroke-width="1.5" stroke-linecap="round" class="clock-minute-hand" />
+          </svg>
+        </div>
       </div>
       <nav class="sidebar-nav">
         <router-link
@@ -306,5 +314,53 @@ onUnmounted(() => {
   .nav-icon-mobile {
     margin-bottom: 0;
   }
+}
+
+/* Compact sidebar animated clock styles */
+.compact-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.compact-clock-svg {
+  filter: drop-shadow(0 0 2px rgba(91, 110, 225, 0.15));
+  animation: clock-pulse 4s ease-in-out infinite;
+}
+
+.clock-hour-hand {
+  transform-origin: 12px 12px;
+  animation: rotate-hand 30s linear infinite;
+}
+
+.clock-minute-hand {
+  transform-origin: 12px 12px;
+  animation: rotate-hand 5s linear infinite;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes rotate-hand {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes clock-pulse {
+  0%, 100% { 
+    filter: drop-shadow(0 0 2px rgba(91, 110, 225, 0.15));
+    opacity: 0.9;
+  }
+  50% { 
+    filter: drop-shadow(0 0 6px rgba(91, 110, 225, 0.45));
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.85); }
+  to { opacity: 1; transform: scale(1); }
 }
 </style>

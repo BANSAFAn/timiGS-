@@ -162,14 +162,7 @@ body {
   align-items: center;
 }
 
-.sidebar.compact .sidebar-header::after {
-  content: 'T';
-  font-size: 1.5rem;
-  font-weight: 800;
-  color: var(--color-primary);
-  display: block;
-  text-align: center;
-}
+
 
 .sidebar.compact .nav-link {
   justify-content: center;
