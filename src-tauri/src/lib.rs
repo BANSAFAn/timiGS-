@@ -76,7 +76,29 @@ pub fn run() {
         .plugin(tauri_plugin_autostart::init(
             MacosLauncher::LaunchAgent,
             Some(vec!["--minimized"]),
-        ));
+        ))
+        .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
+            use tauri::Manager;
+            if let Some(window) = app.get_webview_window("main") {
+                let _ = window.show();
+                let _ = window.unminimize();
+                let _ = window.set_focus();
+                
+                // Force focus on Windows
+                let _ = window.set_always_on_top(true);
+                let _ = window.set_always_on_top(false);
+            }
+            
+            // Check language and send notification
+            let lang = db::get_settings().language;
+            let (title, body) = if lang == "uk" {
+                ("TimiGS вже запущено", "Програма вже працює. Перевірте екран або системний трей.")
+            } else {
+                ("TimiGS is already running", "The application is already active. Checking screen or system tray.")
+            };
+            
+            notifications::send_notification(app, title, body);
+        }));
 
     let builder = builder.setup(|app| {
         #[cfg(target_os = "ios")]
