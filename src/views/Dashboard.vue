@@ -24,7 +24,61 @@
           <div class="active-section">
             <template v-if="isAppFocused">
               <div class="active-icon-box timigs-brand-icon animate-pop-in">
-                <span class="brand-letter">T</span>
+                <svg viewBox="0 0 64 64" class="sleeping-cat-svg" width="68" height="68" xmlns="http://www.w3.org/2000/svg">
+                  <defs>
+                    <linearGradient id="catBodyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stop-color="#ffffff" />
+                      <stop offset="100%" stop-color="#cbd5e1" />
+                    </linearGradient>
+                    <linearGradient id="catTailGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stop-color="#cbd5e1" />
+                      <stop offset="100%" stop-color="#94a3b8" />
+                    </linearGradient>
+                  </defs>
+                  
+                  <!-- Main body (curled up) -->
+                  <circle cx="36" cy="36" r="18" fill="url(#catBodyGrad)" />
+                  
+                  <!-- Head -->
+                  <circle cx="24" cy="28" r="11" fill="url(#catBodyGrad)" />
+                  
+                  <!-- Left Ear -->
+                  <path d="M 16 22 L 10 11 L 22 18 Z" fill="url(#catBodyGrad)" />
+                  <path d="M 17 20 L 13 13 L 21 18 Z" fill="#fda4af" />
+                  
+                  <!-- Right Ear -->
+                  <path d="M 26 18 L 32 7 L 32 20 Z" fill="url(#catBodyGrad)" />
+                  <path d="M 27 18 L 31 9 L 31 19 Z" fill="#fda4af" />
+                  
+                  <!-- Tail wrapped around -->
+                  <path d="M 48 42 C 54 40, 54 28, 48 26 C 44 25, 42 28, 44 31 Q 45 32, 47 31" 
+                        stroke="url(#catTailGrad)" stroke-width="5" stroke-linecap="round" fill="none" />
+                  
+                  <!-- Closed sleeping eyes (happy curves) -->
+                  <path d="M 16 29 Q 18.5 32 21 29" stroke="#475569" stroke-width="1.5" stroke-linecap="round" fill="none" />
+                  <path d="M 25 29 Q 27.5 32 30 29" stroke="#475569" stroke-width="1.5" stroke-linecap="round" fill="none" />
+                  
+                  <!-- Nose -->
+                  <polygon points="23,31 25,31 24,32.2" fill="#f43f5e" />
+                  
+                  <!-- Whiskers -->
+                  <line x1="14" y1="31" x2="8" y2="31" stroke="#94a3b8" stroke-width="1" stroke-linecap="round" />
+                  <line x1="14" y1="33" x2="7" y2="34" stroke="#94a3b8" stroke-width="1" stroke-linecap="round" />
+                  
+                  <line x1="30" y1="31" x2="36" y2="31" stroke="#94a3b8" stroke-width="1" stroke-linecap="round" />
+                  <line x1="30" y1="33" x2="37" y2="34" stroke="#94a3b8" stroke-width="1" stroke-linecap="round" />
+                  
+                  <!-- Soft shadow/highlight for paws -->
+                  <circle cx="20" cy="44" r="3" fill="#cbd5e1" />
+                  <circle cx="28" cy="45" r="3" fill="#cbd5e1" />
+
+                  <!-- Floating Zzz's -->
+                  <g class="zzz-group">
+                    <text x="44" y="20" fill="#e9d5ff" font-family="Arial" font-size="8" font-weight="bold" class="zzz-1">z</text>
+                    <text x="48" y="14" fill="#d8b4fe" font-family="Arial" font-size="10" font-weight="bold" class="zzz-2">z</text>
+                    <text x="53" y="9" fill="#c084fc" font-family="Arial" font-size="12" font-weight="bold" class="zzz-3">Z</text>
+                  </g>
+                </svg>
               </div>
 
               <div class="active-info">
@@ -1354,14 +1408,61 @@ onUnmounted(() => {
   background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%) !important;
   border-color: rgba(255, 255, 255, 0.1) !important;
   box-shadow: 0 0 20px rgba(91, 110, 225, 0.35) !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
 }
 
-.brand-letter {
-  font-size: 3rem;
-  font-weight: 900;
-  color: #ffffff;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  font-family: var(--font-sans);
+.sleeping-cat-svg {
+  transform-origin: center bottom;
+  animation: cat-breath 4s ease-in-out infinite;
+}
+
+.zzz-1, .zzz-2, .zzz-3 {
+  transform-origin: center;
+  opacity: 0;
+}
+
+.zzz-1 {
+  animation: float-zzz 3.5s ease-in-out infinite;
+  animation-delay: 0s;
+}
+
+.zzz-2 {
+  animation: float-zzz 3.5s ease-in-out infinite;
+  animation-delay: 1.1s;
+}
+
+.zzz-3 {
+  animation: float-zzz 3.5s ease-in-out infinite;
+  animation-delay: 2.2s;
+}
+
+@keyframes float-zzz {
+  0% {
+    transform: translateY(4px) scale(0.7);
+    opacity: 0;
+  }
+  30% {
+    opacity: 0.95;
+  }
+  80% {
+    opacity: 0.7;
+  }
+  100% {
+    transform: translateY(-8px) scale(1.1);
+    opacity: 0;
+  }
+}
+
+@keyframes cat-breath {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.04) translateY(-1px);
+  }
 }
 
 .previous-activity-box {
