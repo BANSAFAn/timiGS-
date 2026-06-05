@@ -112,6 +112,7 @@ export default function DocsViewer({ lang = "en" }: { lang?: string }) {
       .catch((err) => {
         console.error("Failed to load doc", err);
         setLoading(false);
+      });
   }, [activeDoc, sections]);
 
   useEffect(() => {
