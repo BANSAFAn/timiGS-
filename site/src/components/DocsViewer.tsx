@@ -21,7 +21,9 @@ import {
   List,
   FileText,
   Globe,
-  CaretDown
+  CaretDown,
+  MagnifyingGlass,
+  X
 } from "@phosphor-icons/react";
 
 interface DocSection {
@@ -52,14 +54,25 @@ const languages = [
   { code: "de", name: "Deutsch", flag: "🇩🇪" },
   { code: "fr", name: "Français", flag: "🇫🇷" },
   { code: "es", name: "Español", flag: "🇪🇸" },
+  { code: "it", name: "Italiano", flag: "🇮🇹" },
   { code: "pl", name: "Polski", flag: "🇵🇱" },
   { code: "pt", name: "Português", flag: "🇵🇹" },
-  { code: "zh-CN", name: "中文", flag: "🇨🇳" },
+  { code: "nl", name: "Nederlands", flag: "🇳🇱" },
+  { code: "ro", name: "Română", flag: "🇷🇴" },
+  { code: "cs", name: "Čeština", flag: "🇨🇿" },
+  { code: "sk", name: "Slovenčina", flag: "🇸🇰" },
+  { code: "hu", name: "Magyar", flag: "🇭🇺" },
+  { code: "bg", name: "Български", flag: "🇧🇬" },
+  { code: "hr", name: "Hrvatski", flag: "🇭🇷" },
+  { code: "el", name: "Ελληνικά", flag: "🇬🇷" },
+  { code: "tr", name: "Türkçe", flag: "🇹🇷" },
   { code: "ar", name: "العربية", flag: "🇸🇦" },
-  { code: "it", name: "Italiano", flag: "🇮🇹" },
+  { code: "he", name: "עברית", flag: "🇮🇱" },
+  { code: "hi", name: "हिन्दी", flag: "🇮🇳" },
+  { code: "zh-CN", name: "中文 (简体)", flag: "🇨🇳" },
   { code: "ja", name: "日本語", flag: "🇯🇵" },
   { code: "ko", name: "한국어", flag: "🇰🇷" },
-  { code: "tr", name: "Türkçe", flag: "🇹🇷" }
+  { code: "vi", name: "Tiếng Việt", flag: "🇻🇳" }
 ];
 
 export default function DocsViewer({ lang = "en" }: { lang?: string }) {
@@ -70,6 +83,8 @@ export default function DocsViewer({ lang = "en" }: { lang?: string }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [selectedLang, setSelectedLang] = useState("en");
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [docsData, setDocsData] = useState<Record<string, string>>({});
   const docsCache = useRef<Record<string, string>>({});
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -79,7 +94,7 @@ export default function DocsViewer({ lang = "en" }: { lang?: string }) {
     (window as any).googleTranslateElementInit = () => {
       new (window as any).google.translate.TranslateElement({
         pageLanguage: 'en',
-        includedLanguages: 'en,uk,de,fr,es,pl,pt,zh-CN,ar,it,ja,ko,tr',
+        includedLanguages: 'en,uk,de,fr,es,it,pl,pt,nl,ro,cs,sk,hu,bg,hr,el,tr,ar,he,hi,zh-CN,ja,ko,vi',
         layout: 0
       }, 'google_translate_element');
     };
@@ -215,11 +230,20 @@ export default function DocsViewer({ lang = "en" }: { lang?: string }) {
   useEffect(() => {
     fetch("/docs.json")
       .then((res) => res.json())
-      .then((data) => {
+      .then((data: DocSection[]) => {
         setSections(data);
         if (data.length > 0) {
           setActiveDoc(data[0].id);
         }
+        // Fetch all markdown files in the background for indexing/search
+        data.forEach((section: DocSection) => {
+          fetch(`/docx/${section.file}`)
+            .then((res) => res.text())
+            .then((text) => {
+              setDocsData((prev) => ({ ...prev, [section.id]: text }));
+            })
+            .catch((err) => console.error(`Failed to load ${section.file} for indexing`, err));
+        });
       })
       .catch((err) => console.error("Failed to load docs config", err));
   }, []);
@@ -266,6 +290,52 @@ export default function DocsViewer({ lang = "en" }: { lang?: string }) {
 
     return () => clearTimeout(timer);
   }, [content, loading]);
+
+  const getSearchResults = () => {
+    if (!searchQuery.trim()) return [];
+    const query = searchQuery.toLowerCase();
+    const results: Array<{ id: string; title: string; snippet: string; count: number }> = [];
+
+    sections.forEach((section) => {
+      const titleMatch = section.title.toLowerCase().includes(query);
+      const contentStr = docsData[section.id] || "";
+      const contentLower = contentStr.toLowerCase();
+      
+      let matchCount = 0;
+      let firstSnippet = "";
+      
+      if (titleMatch) {
+        matchCount += 5; // boost for title match
+      }
+
+      let pos = contentLower.indexOf(query);
+      while (pos !== -1) {
+        matchCount++;
+        if (!firstSnippet) {
+          const start = Math.max(0, pos - 30);
+          const end = Math.min(contentStr.length, pos + query.length + 45);
+          let snippetText = contentStr.slice(start, end).replace(/[\r\n#*`_-]+/g, " ");
+          if (start > 0) snippetText = "..." + snippetText;
+          if (end < contentStr.length) snippetText = snippetText + "...";
+          firstSnippet = snippetText;
+        }
+        pos = contentLower.indexOf(query, pos + 1);
+      }
+
+      if (titleMatch || matchCount > 0) {
+        results.push({
+          id: section.id,
+          title: section.title,
+          snippet: firstSnippet || "Matches found in title",
+          count: matchCount
+        });
+      }
+    });
+
+    return results.sort((a, b) => b.count - a.count);
+  };
+
+  const searchResults = getSearchResults();
 
   return (
     <div className="max-w-7xl mx-auto py-12">
@@ -319,27 +389,79 @@ export default function DocsViewer({ lang = "en" }: { lang?: string }) {
 
       <div className="grid lg:grid-cols-[280px_1fr] gap-8">
         <aside className="hidden lg:block notranslate">
-          <div className="sticky top-24 rounded-2xl border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4">
-            <div className="flex items-center gap-2 px-3 py-2 mb-3">
-              <List className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-              <span className="text-sm font-semibold text-gray-900 dark:text-white">Contents</span>
-            </div>
-            <nav className="space-y-1">
-              {sections.map((section) => (
+          <div className="sticky top-24 rounded-2xl border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 space-y-4">
+            {/* Desktop Search Input */}
+            <div className="relative">
+              <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search documentation..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-9 pr-8 py-2 text-sm rounded-xl border border-gray-200 dark:border-slate-800 bg-gray-50/50 dark:bg-slate-950/20 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-brand-500 focus:border-brand-500 transition-all"
+              />
+              {searchQuery && (
                 <button
-                  key={section.id}
-                  onClick={() => setActiveDoc(section.id)}
-                  className={`w-full text-left px-3 py-2.5 rounded-xl text-sm transition-all flex items-center gap-2.5 ${
-                    activeDoc === section.id
-                      ? 'bg-brand-500 text-white font-medium shadow-md shadow-brand-500/10'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800'
-                  }`}
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
                 >
-                  {sectionIcons[section.id] || <FileText className="w-4 h-4" weight="duotone" />}
-                  <span>{section.title}</span>
+                  <X className="w-3.5 h-3.5" />
                 </button>
-              ))}
-            </nav>
+              )}
+            </div>
+
+            <div>
+              <div className="flex items-center gap-2 px-3 py-2 mb-2">
+                <List className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                  {searchQuery.trim() ? "Search Results" : "Contents"}
+                </span>
+              </div>
+              <nav className="space-y-1 max-h-[55vh] overflow-y-auto pr-1">
+                {searchQuery.trim() ? (
+                  searchResults.length > 0 ? (
+                    searchResults.map((result) => (
+                      <button
+                        key={result.id}
+                        onClick={() => setActiveDoc(result.id)}
+                        className={`w-full text-left p-3 rounded-xl transition-all flex flex-col gap-1.5 border ${
+                          activeDoc === result.id
+                            ? 'bg-brand-500 border-brand-600 text-white shadow-md'
+                            : 'border-transparent text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800/80'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2 font-medium text-xs">
+                          {sectionIcons[result.id] || <FileText className="w-4 h-4" weight="duotone" />}
+                          <span className="truncate">{result.title}</span>
+                        </div>
+                        <p className={`text-[11px] leading-normal ${activeDoc === result.id ? 'text-brand-100' : 'text-gray-500 dark:text-gray-400'} line-clamp-2 italic font-normal`}>
+                          {result.snippet}
+                        </p>
+                      </button>
+                    ))
+                  ) : (
+                    <div className="text-center py-6 text-xs text-gray-500 dark:text-gray-400">
+                      No results found for "{searchQuery}"
+                    </div>
+                  )
+                ) : (
+                  sections.map((section) => (
+                    <button
+                      key={section.id}
+                      onClick={() => setActiveDoc(section.id)}
+                      className={`w-full text-left px-3 py-2.5 rounded-xl text-sm transition-all flex items-center gap-2.5 ${
+                        activeDoc === section.id
+                          ? 'bg-brand-500 text-white font-medium shadow-md shadow-brand-500/10'
+                          : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800'
+                      }`}
+                    >
+                      {sectionIcons[section.id] || <FileText className="w-4 h-4" weight="duotone" />}
+                      <span>{section.title}</span>
+                    </button>
+                  ))
+                )}
+              </nav>
+            </div>
           </div>
         </aside>
 
@@ -353,23 +475,79 @@ export default function DocsViewer({ lang = "en" }: { lang?: string }) {
 
         {mobileMenuOpen && (
           <div className="lg:hidden fixed inset-0 z-50 bg-black/50 notranslate" onClick={() => setMobileMenuOpen(false)}>
-            <div className="absolute right-0 top-0 bottom-0 w-80 bg-white dark:bg-slate-900 p-6 overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-              <nav className="space-y-2">
-                {sections.map((section) => (
+            <div className="absolute right-0 top-0 bottom-0 w-80 bg-white dark:bg-slate-900 p-6 overflow-y-auto flex flex-col gap-6" onClick={(e) => e.stopPropagation()}>
+              {/* Mobile Search Input */}
+              <div className="relative">
+                <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search documentation..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-9 pr-8 py-2 text-sm rounded-xl border border-gray-200 dark:border-slate-800 bg-gray-50/50 dark:bg-slate-950/20 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-brand-500 focus:border-brand-500 transition-all"
+                />
+                {searchQuery && (
                   <button
-                    key={section.id}
-                    onClick={() => { setActiveDoc(section.id); setMobileMenuOpen(false); }}
-                    className={`w-full text-left px-4 py-3.5 rounded-xl text-sm transition-all flex items-center gap-3 ${
-                      activeDoc === section.id
-                        ? 'bg-brand-500 text-white font-medium shadow-md shadow-brand-500/10'
-                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800'
-                    }`}
+                    onClick={() => setSearchQuery("")}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
                   >
-                    {sectionIcons[section.id] || <FileText className="w-4 h-4" weight="duotone" />}
-                    <span>{section.title}</span>
+                    <X className="w-3.5 h-3.5" />
                   </button>
-                ))}
-              </nav>
+                )}
+              </div>
+
+              <div>
+                <div className="flex items-center gap-2 px-1 py-1 mb-3">
+                  <List className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                  <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                    {searchQuery.trim() ? "Search Results" : "Contents"}
+                  </span>
+                </div>
+                <nav className="space-y-2">
+                  {searchQuery.trim() ? (
+                    searchResults.length > 0 ? (
+                      searchResults.map((result) => (
+                        <button
+                          key={result.id}
+                          onClick={() => { setActiveDoc(result.id); setMobileMenuOpen(false); }}
+                          className={`w-full text-left p-3.5 rounded-xl transition-all flex flex-col gap-1.5 border ${
+                            activeDoc === result.id
+                              ? 'bg-brand-500 border-brand-600 text-white shadow-md'
+                              : 'border-transparent text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-850'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2.5 font-medium text-sm">
+                            {sectionIcons[result.id] || <FileText className="w-4 h-4" weight="duotone" />}
+                            <span>{result.title}</span>
+                          </div>
+                          <p className={`text-xs ${activeDoc === result.id ? 'text-brand-100' : 'text-gray-500 dark:text-gray-400'} line-clamp-2 italic font-normal`}>
+                            {result.snippet}
+                          </p>
+                        </button>
+                      ))
+                    ) : (
+                      <div className="text-center py-8 text-sm text-gray-500 dark:text-gray-400">
+                        No results found for "{searchQuery}"
+                      </div>
+                    )
+                  ) : (
+                    sections.map((section) => (
+                      <button
+                        key={section.id}
+                        onClick={() => { setActiveDoc(section.id); setMobileMenuOpen(false); }}
+                        className={`w-full text-left px-4 py-3.5 rounded-xl text-sm transition-all flex items-center gap-3 ${
+                          activeDoc === section.id
+                            ? 'bg-brand-500 text-white font-medium shadow-md shadow-brand-500/10'
+                            : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800'
+                        }`}
+                      >
+                        {sectionIcons[section.id] || <FileText className="w-4 h-4" weight="duotone" />}
+                        <span>{section.title}</span>
+                      </button>
+                    ))
+                  )}
+                </nav>
+              </div>
             </div>
           </div>
         )}
