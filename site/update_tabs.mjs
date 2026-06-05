@@ -10,7 +10,7 @@ let docs = fs.readFileSync(docsPath, 'utf8');
 
 // Add Phosphor imports and update sectionIcons
 docs = docs.replace(/import 'highlight\.js\/styles\/atom-one-dark\.css';/, 
-`import 'highlight.js/styles/atom-one-dark.css';\nimport { BookOpen, DownloadSimple, Sparkle, CloudSun, Gear, GithubLogo, DockerLogo, FileText } from "@phosphor-icons/react";`);
+`import 'highlight.js/styles/atom-one-dark.css';\nimport { BookOpen, DownloadSimple, Sparkle, CloudSun, Gear, FileText } from "@phosphor-icons/react";`);
 
 docs = docs.replace(/const sectionIcons: Record<string, string> = \{[\s\S]*?\};/, 
 `const sectionIcons: Record<string, React.ReactNode> = {
@@ -18,9 +18,7 @@ docs = docs.replace(/const sectionIcons: Record<string, string> = \{[\s\S]*?\};/
   installation: <DownloadSimple weight="duotone" />,
   features: <Sparkle weight="duotone" />,
   weather: <CloudSun weight="duotone" />,
-  settings: <Gear weight="duotone" />,
-  "github-api": <GithubLogo weight="duotone" />,
-  docker: <DockerLogo weight="duotone" />
+  settings: <Gear weight="duotone" />
 };`);
 
 // Remove fallback emoji in JSX
