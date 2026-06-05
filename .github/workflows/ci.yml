@@ -146,6 +146,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RUSTFLAGS: ${{ matrix.container == 'alpine:latest' && '-C target-feature=-crt-static' || '' }}
           APPIMAGE_EXTRACT_AND_RUN: 1
+          NO_STRIP: true
         with:
           args: ${{ matrix.args }}
 
