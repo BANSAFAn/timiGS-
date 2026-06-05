@@ -43,6 +43,9 @@ DEPS=(
   binutils
   fuse2
   bzip2
+  squashfs-tools
+  zsync
+  desktop-file-utils
 )
 
 MISSING_DEPS=()
