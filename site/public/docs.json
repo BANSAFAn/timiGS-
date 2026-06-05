@@ -15,19 +15,29 @@
     "file": "features.md"
   },
   {
-    "id": "weather",
-    "title": "Weather Module",
-    "file": "weather.md"
-  },
-  {
-    "id": "settings",
-    "title": "Settings",
-    "file": "settings.md"
-  },
-  {
     "id": "tracking",
-    "title": "Activity Tracking",
+    "title": "Tracking Engine",
     "file": "tracking.md"
+  },
+  {
+    "id": "dashboard",
+    "title": "Dashboard",
+    "file": "dashboard.md"
+  },
+  {
+    "id": "timeline",
+    "title": "Timeline",
+    "file": "timeline.md"
+  },
+  {
+    "id": "analytics",
+    "title": "Analytics",
+    "file": "analytics.md"
+  },
+  {
+    "id": "coding",
+    "title": "Coding Workspace",
+    "file": "coding.md"
   },
   {
     "id": "team",
@@ -35,8 +45,23 @@
     "file": "team.md"
   },
   {
-    "id": "tabs",
-    "title": "Application Tabs",
-    "file": "tabs.md"
+    "id": "focus-mode",
+    "title": "Focus Mode",
+    "file": "focus-mode.md"
+  },
+  {
+    "id": "timeout",
+    "title": "Time Out Rest",
+    "file": "timeout.md"
+  },
+  {
+    "id": "doctor-mode",
+    "title": "Doctor Mode",
+    "file": "doctor-mode.md"
+  },
+  {
+    "id": "settings",
+    "title": "Settings",
+    "file": "settings.md"
   }
 ]

@@ -2,13 +2,47 @@ import { useState, useEffect, useRef } from "react";
 import { marked } from "marked";
 import hljs from "highlight.js";
 import 'highlight.js/styles/atom-one-dark.css';
-import { BookOpen, List } from "@phosphor-icons/react";
+import mermaid from "mermaid";
+import {
+  BookOpen,
+  DownloadSimple,
+  Sparkle,
+  Cpu,
+  Layout as LayoutIcon,
+  Clock,
+  ChartBar,
+  Code,
+  Users,
+  Target,
+  Hourglass,
+  Heartbeat,
+  CloudSun,
+  Gear,
+  List,
+  FileText
+} from "@phosphor-icons/react";
 
 interface DocSection {
   id: string;
   title: string;
   file: string;
 }
+
+const sectionIcons: Record<string, React.ReactNode> = {
+  intro: <BookOpen className="w-4 h-4" weight="duotone" />,
+  installation: <DownloadSimple className="w-4 h-4" weight="duotone" />,
+  features: <Sparkle className="w-4 h-4" weight="duotone" />,
+  tracking: <Cpu className="w-4 h-4" weight="duotone" />,
+  dashboard: <LayoutIcon className="w-4 h-4" weight="duotone" />,
+  timeline: <Clock className="w-4 h-4" weight="duotone" />,
+  analytics: <ChartBar className="w-4 h-4" weight="duotone" />,
+  coding: <Code className="w-4 h-4" weight="duotone" />,
+  team: <Users className="w-4 h-4" weight="duotone" />,
+  "focus-mode": <Target className="w-4 h-4" weight="duotone" />,
+  timeout: <Hourglass className="w-4 h-4" weight="duotone" />,
+  "doctor-mode": <Heartbeat className="w-4 h-4" weight="duotone" />,
+  settings: <Gear className="w-4 h-4" weight="duotone" />
+};
 
 export default function DocsViewer({ lang = "en" }: { lang?: string }) {
   const [sections, setSections] = useState<DocSection[]>([]);
@@ -19,12 +53,27 @@ export default function DocsViewer({ lang = "en" }: { lang?: string }) {
   const docsCache = useRef<Record<string, string>>({});
 
   useEffect(() => {
+    // Determine system scheme for mermaid theme
+    const isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: isDark ? 'dark' : 'default',
+      securityLevel: 'loose',
+    });
+
+    const renderer = new marked.Renderer();
+    renderer.code = function ({ text, lang }) {
+      if (lang === "mermaid") {
+        return `<div class="mermaid-container flex justify-center p-6 bg-slate-900/5 dark:bg-slate-950/20 rounded-2xl my-6 border border-gray-150 dark:border-slate-800/80"><div class="mermaid w-full flex justify-center">${text}</div></div>`;
+      }
+      const language = hljs.getLanguage(lang) ? lang : "plaintext";
+      const highlighted = hljs.highlight(text, { language }).value;
+      return `<pre><code class="hljs language-${language}">${highlighted}</code></pre>`;
+    };
+
     marked.setOptions({
-      highlight: function (code: string, lang: string) {
-        const language = hljs.getLanguage(lang) ? lang : "plaintext";
-        return hljs.highlight(code, { language }).value;
-      },
-    } as any);
+      renderer: renderer,
+    });
   }, []);
 
   useEffect(() => {
@@ -63,8 +112,23 @@ export default function DocsViewer({ lang = "en" }: { lang?: string }) {
       .catch((err) => {
         console.error("Failed to load doc", err);
         setLoading(false);
-      });
   }, [activeDoc, sections]);
+
+  useEffect(() => {
+    if (!content || loading) return;
+
+    const timer = setTimeout(() => {
+      try {
+        mermaid.run({
+          querySelector: '.mermaid',
+        });
+      } catch (err) {
+        console.error("Failed to render mermaid:", err);
+      }
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [content, loading]);
 
   return (
     <div className="max-w-7xl mx-auto py-12">
@@ -93,13 +157,14 @@ export default function DocsViewer({ lang = "en" }: { lang?: string }) {
                 <button
                   key={section.id}
                   onClick={() => setActiveDoc(section.id)}
-                  className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-all ${
+                  className={`w-full text-left px-3 py-2.5 rounded-xl text-sm transition-all flex items-center gap-2.5 ${
                     activeDoc === section.id
-                      ? 'bg-brand-500 text-white font-medium'
+                      ? 'bg-brand-500 text-white font-medium shadow-md shadow-brand-500/10'
                       : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800'
                   }`}
                 >
-                  {section.title}
+                  {sectionIcons[section.id] || <FileText className="w-4 h-4" weight="duotone" />}
+                  <span>{section.title}</span>
                 </button>
               ))}
             </nav>
@@ -122,13 +187,14 @@ export default function DocsViewer({ lang = "en" }: { lang?: string }) {
                   <button
                     key={section.id}
                     onClick={() => { setActiveDoc(section.id); setMobileMenuOpen(false); }}
-                    className={`w-full text-left px-4 py-3 rounded-lg text-sm transition-all ${
+                    className={`w-full text-left px-4 py-3.5 rounded-xl text-sm transition-all flex items-center gap-3 ${
                       activeDoc === section.id
-                        ? 'bg-brand-500 text-white font-medium'
+                        ? 'bg-brand-500 text-white font-medium shadow-md shadow-brand-500/10'
                         : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800'
                     }`}
                   >
-                    {section.title}
+                    {sectionIcons[section.id] || <FileText className="w-4 h-4" weight="duotone" />}
+                    <span>{section.title}</span>
                   </button>
                 ))}
               </nav>

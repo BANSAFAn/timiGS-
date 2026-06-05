@@ -113,9 +113,42 @@ function getRankingBarWidth(seconds: number): number {
 }
 ```
 
-## Handling Disconnections
+## Connection Resiliency & Heartbeats
 
-Since WebRTC connections can abruptly drop if a user closes their laptop or experiences a network failure, TimiGS implements a **Heartbeat System**. 
-- Every connected client sends a lightweight "Ping" every 30 seconds. 
-- If a Peer fails to respond after 3 consecutive pings, `teams.ts` marks their status as `Offline` and ceases rendering them on the active dashboard. 
-- The offline data is safely cached in localStorage, ensuring they can be re-synced painlessly if they reconnect within the same session.
+Since WebRTC connections can abruptly drop if a user closes their laptop or experiences a network failure, TimiGS implements a robust **Heartbeat System**:
+- **Pings**: Every connected client sends a lightweight "Ping" packet every 30 seconds.
+- **Failures**: If a peer fails to respond after 3 consecutive pings, the `teams.ts` store marks their status as `Offline` and stops rendering their active cards on the dashboard.
+- **Caching**: The offline state is temporarily cached in the local state, allowing rapid reconnect handshakes if they return within the same session.
+
+---
+
+## 🔒 Security, Privacy & Safety Architecture
+
+The Team subsystem is engineered with a strict **privacy-first** approach. Unlike traditional corporate trackers that collect your detailed logs into central servers, TimiGS uses decentralized Peer-to-Peer protocols.
+
+### 1. Peer-to-Peer Data Transmission (No Central Cloud)
+- **Direct Link**: All sharing of active window statuses occurs directly between you and your team members. There is **no central backend database** storing your workspace logs or tracking records.
+- **Temporary State**: Data sent (such as your current active app and session time) is kept solely in the active memory of your teammates' clients. Once you close the app or disconnect from the room, your live data vanishes from their screens and is not persisted.
+
+### 2. End-to-End Encryption (E2EE)
+- **Encryption Standards**: All WebRTC data channels are encrypted end-to-end using industry-standard protocols: **DTLS (Datagram Transport Layer Security)** and **SRTP (Secure Real-time Transport Protocol)**.
+- **Eavesdropping Protection**: No third party (including your ISP, network routers, or hackers on public Wi-Fi) can intercept or read the process packets flowing between room members.
+
+### 3. The Role of the PeerJS Signaling Server
+To connect directly, two computers must first locate each other on the internet. This is called **Signaling**.
+- **The Broker**: The PeerJS signaling server is only used to exchange connection metadata (ICE Candidates and SDP handshakes).
+- **Data Blindness**: The signaling server **never** sees or processes your actual activity payload. It only introduces the peers, after which the connection becomes 100% direct (P2P), and the signaling server is completely bypassed.
+
+### 4. What is Shared (and What is NOT)
+To ensure safety while working in a team, the data shared is highly restricted:
+
+| Shared Data | Private (NEVER Shared) |
+| :--- | :--- |
+| ✅ Current active application name (e.g. `VS Code`) | ❌ Raw keystrokes or mouse clicks |
+| ✅ Current window title (e.g. `index.js`) | ❌ Files, directory structures, or source code |
+| ✅ Cumulative focus time today | ❌ Full historical SQLite database logs |
+| ✅ Custom display profile name and color | ❌ Detailed browser history or search logs |
+
+> [!IMPORTANT]
+> Because team rooms are fully ephemeral, you don't even need an account to join. You simply share a random room code, type a local display name, and start collaborating anonymously.
+
