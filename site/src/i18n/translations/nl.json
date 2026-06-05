@@ -1,0 +1,234 @@
+{
+  "nav": {
+    "home": "Home",
+    "releases": "Versies",
+    "download": "Downloaden",
+    "features": "Functies",
+    "terms": "Voorwaarden",
+    "docs": "Docs",
+    "notes": "Notities",
+    "testing": "Testen",
+    "music": "Muziek"
+  },
+  "hero": {
+    "badge": "v2.0 Nu Beschikbaar",
+    "badge_new": "Nieuw",
+    "tagline1": "Tijd bijhouden.",
+    "tagline2": "Focus beheersen.",
+    "subtext": "Privacy-gerichte activiteitentracking. Begrijp hoe u uw tijd besteedt met gedetailleerde analyses en alleen lokale gegevensopslag.",
+    "cta_download": "Download Nu",
+    "cta_github": "Bekijk Broncode",
+    "stats_downloads": "Downloads",
+    "stats_stars": "GitHub-sterren",
+    "stats_platforms": "Platformen",
+    "stats_privacy": "Gegevens privacy"
+  },
+  "whyTimiGS": {
+    "title": "Waarom kiezen voor TimiGS",
+    "subtitle": "Ontdek de functies die van TimiGS de beste keuze maken voor tijdregistratie en productiviteit",
+    "features": {
+      "privacy": {
+        "badge": "🔒",
+        "title": "100% Privacy",
+        "description": "Alle data wordt lokaal opgeslagen in SQLite. Geen telemetrie, geen cloud-uploads. U bezit elke byte van uw data."
+      },
+      "focus": {
+        "badge": "🎯",
+        "title": "Focus Modus",
+        "description": "Zet uzelf aan tot productief werken. Blokkeer app-switching met een wachtwoordbeveiligde Focus Modus."
+      },
+      "timeout": {
+        "badge": "⏰",
+        "title": "Intelligente Pauzes",
+        "description": "De Time OUT-functie herinnert u eraan om pauzes te nemen. Stel aangepaste intervallen in en bescherm uw gezondheid."
+      },
+      "analytics": {
+        "badge": "📊",
+        "title": "Rijke Analytics",
+        "description": "Prachtige ring-, cirkel- en staafdiagrammen. Tijdlijn weergave per dag. Begrijp precies waar uw tijd heengaat."
+      },
+      "crossplatform": {
+        "badge": "💻",
+        "title": "Cross-platform",
+        "description": "Gebouwd met Tauri v2 voor hoge prestaties op Windows, Linux en macOS."
+      },
+      "opensource": {
+        "badge": "🌟",
+        "title": "Open Source",
+        "description": "Voor altijd gratis en open source. Gebouwd met transparantie en gemeenschapsvertrouwen als basis."
+      }
+    }
+  },
+  "features": {
+    "title": "Krachtige Functies",
+    "subtitle": "Alles wat u nodig heeft om uw tijd te beheren en de productiviteit te verhogen",
+    "sections": {
+      "tracking": {
+        "icon": "⚡",
+        "title": "Real-time Tracking",
+        "description": "Detecteert automatisch actieve vensters en houdt de gebruiksduur bij zonder handmatige invoer.",
+        "highlights": [
+          "Automatische detectie",
+          "Achtergrondbewaking",
+          "Slimme categorisering",
+          "Inactieve tijd detecteren"
+        ]
+      },
+      "timeline": {
+        "icon": "📅",
+        "title": "Tijdlijn Weergave",
+        "description": "Bekijk uw activiteitsgeschiedenis dag per dag met granulaire details. Zoek en filter uw hele geschiedenis.",
+        "highlights": [
+          "Dagoverzicht",
+          "Zoekgeschiedenis",
+          "Categorie uitsplitsing",
+          "Gegevens exporteren"
+        ]
+      },
+      "focus": {
+        "icon": "🎯",
+        "title": "Focus Modus",
+        "description": "Elimineer afleidingen met onze krachtige focusmodus. Blokkeer afleidende apps en blijf op het goede spoor.",
+        "highlights": [
+          "App-blokkering",
+          "Aangepaste sessies",
+          "Wachtwoordbeveiliging",
+          "Pauze-herinneringen"
+        ]
+      },
+      "weather": {
+        "icon": "🌦️",
+        "title": "Ingebouwd Weer",
+        "description": "Weer-widget direct in uw tracker. Automatisch locatie detecteren of handmatig instellen — plan uw dag zonder de app te verlaten.",
+        "highlights": [
+          "Auto locatie",
+          "5-daagse voorspelling",
+          "Temperatuur & omstandigheden",
+          "Aangepaste locaties"
+        ]
+      }
+    }
+  },
+  "animations": {
+    "title": "Vloeiend & Mooi",
+    "subtitle": "Gemaakt met aandacht voor elk detail",
+    "cards": {
+      "live": {
+        "title": "Live Activiteit",
+        "description": "Bekijk uw activiteit in realtime met vloeiende animaties"
+      },
+      "transitions": {
+        "title": "Vloeiende Overgangen",
+        "description": "Elke interactie voelt natuurlijk aan met vloeiende animaties"
+      },
+      "visual": {
+        "title": "Visuele Feedback",
+        "description": "Krijg direct visuele feedback voor elke actie die u onderneemt"
+      }
+    }
+  },
+  "comparison": {
+    "title": "Vergelijk TimiGS",
+    "subtitle": "Bekijk hoe TimiGS presteert in vergelijking met andere populaire tijdregistratiesoftware",
+    "features": {
+      "free": "Voor Altijd Gratis",
+      "opensource": "Open Source",
+      "focus": "Focus Modus",
+      "local": "Lokale Data",
+      "telemetry": "Geen Telemetrie",
+      "desktop": "Desktop App",
+      "breaks": "Pauze-herinneringen",
+      "weather": "Weer-widget"
+    },
+    "products": {
+      "timigs": "TimiGS",
+      "rescuetime": "RescueTime",
+      "toggl": "Toggl",
+      "wakatime": "WakaTime"
+    },
+    "labels": {
+      "yes": "Ja",
+      "no": "Nee",
+      "partial": "Gedeeltelijk",
+      "unavailable": "Niet beschikbaar"
+    }
+  },
+  "platforms": {
+    "title": "Gebouwd voor Prestaties",
+    "subtitle": "Aangedreven door moderne technologieën voor de beste ervaring",
+    "tech": "Gebouwd met Tauri v2, Rust & Vue 3",
+    "platforms": {
+      "windows": {
+        "name": "Windows",
+        "description": "Native 64-bit installers voor Windows 10 en 11"
+      },
+      "macos": {
+        "name": "macOS",
+        "description": "Geoptimaliseerd voor macOS. Ondersteunt Intel en Apple Silicon"
+      },
+      "linux": {
+        "name": "Linux",
+        "description": "AppImage, RPM en DEB pakketten beschikbaar"
+      }
+    }
+  },
+  "cta": {
+    "title": "Klaar om de controle te nemen?",
+    "subtitle": "Begin vandaag nog met het bijhouden van uw tijd en ontgrendel uw productiviteit",
+    "primary": "Downloaden",
+    "secondary": "Bekijk op GitHub"
+  },
+  "footer": {
+    "rights": "Alle rechten voorbehouden.",
+    "created_by": "Gemaakt door",
+    "built_with": "Gebouwd met Tauri, Rust & Vue 3"
+  },
+  "downloads": {
+    "title": "TimiGS Downloaden",
+    "subtitle": "Kies de versie voor uw besturingssysteem.",
+    "latest_version": "Laatste Versie: {version}",
+    "windows": "Windows",
+    "windows_desc": "Native 64-bit installers voor Windows 10 en 11. Kies .exe voor standaard installatie.",
+    "mac": "macOS",
+    "mac_desc": "Geoptimaliseerd voor macOS. Ondersteunt Intel en Apple Silicon chips.",
+    "linux": "Linux",
+    "linux_desc": "Pakketten voor grote distributies. AppImage voor universele compatibiliteit, RPM voor Fedora, DEB voor Ubuntu.",
+    "source": "Broncode",
+    "source_title": "Broncode & Andere",
+    "source_desc": "Toegang nodig tot broncode of oudere versies? BesUnique GitHub.",
+    "installer_label": "Installer ({ext})",
+    "no_assets": "Geen bestanden gevonden.",
+    "loading": "Versies laden...",
+    "error": "Fout bij laden.",
+    "no_assets_platform": "Geen bestanden voor dit platform",
+    "cta_download": "Downloaden"
+  },
+  "releases": {
+    "title": "Release Notes",
+    "subtitle": "Ontdek de evolutie van TimiGS.",
+    "published_on": "Gepubliceerd op",
+    "view_on_github": "Bekijk op GitHub",
+    "assets": "Bestanden",
+    "latest_badge": "LAATSTE VERSIE",
+    "prerelease_badge": "Pre-release"
+  },
+  "terms": {
+    "title": "Voorwaarden & Privacy",
+    "privacy_title": "Privacybeleid",
+    "privacy_content": "TimiGS is ontworpen met privacy als kernwaarde. Alle verzamelde gegevens worden lokaal op uw apparaat opgeslagen met behulp van een SQLite-database. We sturen geen persoonlijke gegevens naar externe servers.",
+    "data_title": "Gegevensbezit",
+    "data_content": "U bezit uw gegevens. U heeft volledige controle om uw lokale database op elk moment te exporteren, verwijderen of wijzigen.",
+    "license_title": "Licentie",
+    "license_content": "TimiGS is beschermd onder de TimiGS Public License (TPL) v1.0. Gratis gebruik, wijziging en distributie met juiste toeschrijving aan BANSAFAn."
+  },
+  "testing": {
+    "title": "Test-builds",
+    "subtitle": "Nieuwste ontwikkelingsbuilds en commitgeschiedenis.",
+    "latest_commit": "Laatste commit",
+    "recent_changes": "Recente wijzigingen",
+    "test_builds": "Test-builds",
+    "commit_by": "door",
+    "no_commits": "Geen commits gevonden.",
+    "alpha_warning": "Deze builds zijn instabiel. Gebruik op eigen risico."
+  }
+}

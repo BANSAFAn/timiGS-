@@ -40,14 +40,14 @@ const Home: React.FC<HomeProps> = ({ lang, t }) => {
         <div className="max-w-5xl mx-auto text-center space-y-12">
           <div className="space-y-6">
             <h1 className="text-6xl md:text-8xl font-black text-gray-900 dark:text-white tracking-tight leading-none">
-              Track Your Time,<br/>
+              {t.hero.tagline1}<br/>
               <span className="text-blue-600 dark:text-blue-400">
-                Own Your Data
+                {t.hero.tagline2}
               </span>
             </h1>
             
             <p className="text-2xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto font-light">
-              Privacy-first activity tracker. All data stays on your device. No cloud, no tracking, no BS.
+              {t.hero.subtext}
             </p>
           </div>
 
@@ -58,7 +58,7 @@ const Home: React.FC<HomeProps> = ({ lang, t }) => {
             >
               <span className="flex items-center gap-3">
                 <DownloadIcon className="w-7 h-7" />
-                Download Free
+                {t.hero.cta_download}
                 <ArrowRight className="w-6 h-6 group-hover:translate-x-2 transition-transform" />
               </span>
             </a>
@@ -71,7 +71,7 @@ const Home: React.FC<HomeProps> = ({ lang, t }) => {
             >
               <span className="flex items-center gap-3">
                 <Star className="w-7 h-7" />
-                {ghStats.stars > 0 ? ghStats.stars.toLocaleString() : '...'} Stars
+                {ghStats.stars > 0 ? ghStats.stars.toLocaleString() : '...'} {t.hero.stats_stars}
               </span>
             </a>
           </div>
@@ -79,7 +79,7 @@ const Home: React.FC<HomeProps> = ({ lang, t }) => {
           {ghStats.downloads > 0 && (
             <div className="pt-8 text-gray-500 dark:text-gray-500">
               <span className="text-3xl font-bold text-gray-900 dark:text-white">{ghStats.downloads.toLocaleString()}+</span>
-              <span className="ml-2 text-lg">downloads worldwide</span>
+              <span className="ml-2 text-lg">{t.hero.stats_downloads.toLowerCase()} {lang === 'en' ? 'worldwide' : ''}</span>
             </div>
           )}
         </div>
@@ -93,10 +93,10 @@ const Home: React.FC<HomeProps> = ({ lang, t }) => {
                 <Shield className="w-10 h-10" />
               </div>
               <h3 className="text-3xl font-bold text-gray-900 dark:text-white">
-                100% Private
+                {t.whyTimiGS.features.privacy.title}
               </h3>
               <p className="text-lg text-gray-600 dark:text-gray-400">
-                Your data never leaves your computer. No servers, no cloud, no tracking.
+                {t.whyTimiGS.features.privacy.description}
               </p>
             </div>
 
@@ -105,10 +105,10 @@ const Home: React.FC<HomeProps> = ({ lang, t }) => {
                 <Lightning className="w-10 h-10" />
               </div>
               <h3 className="text-3xl font-bold text-gray-900 dark:text-white">
-                Super Fast
+                {t.whyTimiGS.features.crossplatform.title}
               </h3>
               <p className="text-lg text-gray-600 dark:text-gray-400">
-                Built with Rust and Tauri. Lightweight and blazing fast performance.
+                {t.whyTimiGS.features.crossplatform.description}
               </p>
             </div>
 
@@ -117,10 +117,10 @@ const Home: React.FC<HomeProps> = ({ lang, t }) => {
                 <Clock className="w-10 h-10" />
               </div>
               <h3 className="text-3xl font-bold text-gray-900 dark:text-white">
-                Auto Tracking
+                {t.features.sections.tracking.title}
               </h3>
               <p className="text-lg text-gray-600 dark:text-gray-400">
-                Automatically tracks your active windows and apps in real-time.
+                {t.features.sections.tracking.description}
               </p>
             </div>
           </div>
@@ -131,17 +131,17 @@ const Home: React.FC<HomeProps> = ({ lang, t }) => {
         <div className="max-w-4xl mx-auto text-center space-y-12">
           <div className="inline-block p-16 rounded-[3rem] bg-blue-600 text-white shadow-2xl transform hover:scale-105 transition-transform">
             <h2 className="text-5xl font-black mb-6">
-              Ready to take control?
+              {t.cta.title}
             </h2>
             <p className="text-2xl opacity-90 mb-10 font-light">
-              Join thousands of users tracking their productivity
+              {t.cta.subtitle}
             </p>
             <a 
               href={`/${lang}/download`}
               className="inline-flex items-center gap-4 px-12 py-6 bg-white text-gray-900 rounded-full font-bold text-2xl hover:scale-110 transition-transform shadow-xl"
             >
               <DownloadIcon className="w-8 h-8" />
-              Download Now
+              {t.cta.primary}
             </a>
           </div>
         </div>
