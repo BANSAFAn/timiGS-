@@ -186,79 +186,200 @@ fn get_foreground_window_info() -> Option<ActiveWindow> {
 }
 
 #[cfg(target_os = "linux")]
-fn get_foreground_window_info() -> Option<ActiveWindow> {
+fn get_hyprland_active_window() -> Option<ActiveWindow> {
     use std::process::Command;
-    // meni shche zaiibalosia perekladaty komyenty na anhliisku, bo yakshcho khtos zakhochche dopomohchy ne iz UKR, to todi krashche na anhliisku
-    // Try to get active window using xdotool (most reliable)
-    if let Ok(output) = Command::new("xdotool")
-        .args(["getactivewindow", "getwindowname"])
+    let output = Command::new("hyprctl")
+        .args(["activewindow", "-j"])
         .output()
-    {
-        if output.status.success() {
-            if let Ok(title) = String::from_utf8(output.stdout) {
-                let title = title.trim().to_string();
-                if !title.is_empty() {
-                    // Try to get the window class/application name
-                    let app_name = Command::new("xdotool")
-                        .args(["getactivewindow", "getwindowclassname"])
-                        .output()
-                        .ok()
-                        .and_then(|o| String::from_utf8(o.stdout).ok())
-                        .map(|s| s.trim().to_string())
-                        .unwrap_or_else(|| "Unknown".to_string());
+        .ok()?;
+    if output.status.success() {
+        let json_str = String::from_utf8_lossy(&output.stdout);
+        if let Ok(val) = serde_json::from_str::<serde_json::Value>(&json_str) {
+            let app_name = val["class"].as_str()?.to_string();
+            let window_title = val["title"].as_str()?.to_string();
+            if app_name.is_empty() {
+                return None;
+            }
+            let pid = val["pid"].as_i64().unwrap_or(0);
+            let exe_path = if pid > 0 {
+                std::fs::read_link(format!("/proc/{}/exe", pid))
+                    .ok()
+                    .and_then(|p| p.into_os_string().into_string().ok())
+                    .unwrap_or_else(|| "unknown".to_string())
+            } else {
+                "unknown".to_string()
+            };
+            return Some(ActiveWindow {
+                app_name,
+                window_title,
+                exe_path,
+            });
+        }
+    }
+    None
+}
 
-                    // Get executable path from /proc if possible
-                    let exe_path = Command::new("xdotool")
-                        .args(["getactivewindow", "getwindowpid"])
-                        .output()
-                        .ok()
-                        .and_then(|o| String::from_utf8(o.stdout).ok())
-                        .and_then(|pid_str| {
-                            let pid = pid_str.trim();
-                            let proc_path = format!("/proc/{}/exe", pid);
-                            std::fs::read_link(&proc_path).ok()
-                        })
-                        .and_then(|p| p.into_os_string().into_string().ok())
-                        .unwrap_or_else(|| "unknown".to_string());
+#[cfg(target_os = "linux")]
+fn find_focused_node(val: &serde_json::Value) -> Option<ActiveWindow> {
+    if val["focused"].as_bool().unwrap_or(false) {
+        let app_name = val["app_id"]
+            .as_str()
+            .or_else(|| val["window_properties"]["class"].as_str())?
+            .to_string();
+        let window_title = val["name"].as_str()?.to_string();
+        let pid = val["pid"].as_i64().unwrap_or(0);
+        let exe_path = if pid > 0 {
+            std::fs::read_link(format!("/proc/{}/exe", pid))
+                .ok()
+                .and_then(|p| p.into_os_string().into_string().ok())
+                .unwrap_or_else(|| "unknown".to_string())
+        } else {
+            "unknown".to_string()
+        };
+        return Some(ActiveWindow {
+            app_name,
+            window_title,
+            exe_path,
+        });
+    }
+    if let Some(nodes) = val["nodes"].as_array() {
+        for node in nodes {
+            if let Some(res) = find_focused_node(node) {
+                return Some(res);
+            }
+        }
+    }
+    if let Some(floating_nodes) = val["floating_nodes"].as_array() {
+        for node in floating_nodes {
+            if let Some(res) = find_focused_node(node) {
+                return Some(res);
+            }
+        }
+    }
+    None
+}
 
-                    // Filter ignored apps
-                    if app_name.eq_ignore_ascii_case("explorer")
-                        || app_name.eq_ignore_ascii_case("LockApp")
-                        || app_name.eq_ignore_ascii_case("timigs")
-                        || app_name.eq_ignore_ascii_case("antigravity")
-                        || app_name.is_empty()
-                    {
-                        return None;
-                    }
+#[cfg(target_os = "linux")]
+fn get_sway_active_window() -> Option<ActiveWindow> {
+    use std::process::Command;
+    let output = Command::new("swaymsg")
+        .args(["-t", "get_tree"])
+        .output()
+        .ok()?;
+    if output.status.success() {
+        let json_str = String::from_utf8_lossy(&output.stdout);
+        if let Ok(val) = serde_json::from_str::<serde_json::Value>(&json_str) {
+            return find_focused_node(&val);
+        }
+    }
+    None
+}
 
+#[cfg(target_os = "linux")]
+fn get_gnome_active_window() -> Option<ActiveWindow> {
+    use std::process::Command;
+    let output = Command::new("gdbus")
+        .args([
+            "call",
+            "--session",
+            "--dest",
+            "org.gnome.Shell.Extensions.FocusedWindow",
+            "--object-path",
+            "/org/gnome/Shell/Extensions/FocusedWindow",
+            "--method",
+            "org.gnome.Shell.Extensions.FocusedWindow.Get"
+        ])
+        .output()
+        .ok()?;
+    if output.status.success() {
+        let reply = String::from_utf8_lossy(&output.stdout);
+        if let Some(start) = reply.find('{') {
+            if let Some(end) = reply.rfind('}') {
+                let json_str = &reply[start..=end];
+                if let Ok(val) = serde_json::from_str::<serde_json::Value>(json_str) {
+                    let app_name = val["wm_class"].as_str()?.to_string();
+                    let window_title = val["title"].as_str()?.to_string();
+                    let pid = val["pid"].as_i64().unwrap_or(0);
+                    let exe_path = if pid > 0 {
+                        std::fs::read_link(format!("/proc/{}/exe", pid))
+                            .ok()
+                            .and_then(|p| p.into_os_string().into_string().ok())
+                            .unwrap_or_else(|| "unknown".to_string())
+                    } else {
+                        "unknown".to_string()
+                    };
                     return Some(ActiveWindow {
                         app_name,
-                        window_title: title,
+                        window_title,
                         exe_path,
                     });
                 }
             }
         }
     }
+    None
+}
 
-    // Fallback: try wmctrl
-    if let Ok(output) = Command::new("wmctrl")
-        .arg("-lp")
-        .output()
-    {
-        if output.status.success() {
-            if let Ok(output_str) = String::from_utf8(output.stdout) {
-                // Get the last line (active window)
-                if let Some(line) = output_str.lines().last() {
-                    let parts: Vec<&str> = line.split_whitespace().collect();
-                    if parts.len() >= 3 {
-                        let app_name = parts[2].to_string();
-                        let title = parts[3..].join(" ");
+#[cfg(target_os = "linux")]
+fn get_foreground_window_info() -> Option<ActiveWindow> {
+    use std::process::Command;
+    
+    let mut active_window = None;
 
-                        return Some(ActiveWindow {
+    // Check if we are running under Wayland
+    let is_wayland = std::env::var("XDG_SESSION_TYPE")
+        .map(|s| s.to_lowercase() == "wayland")
+        .unwrap_or(false);
+
+    if is_wayland {
+        let desktop = std::env::var("XDG_CURRENT_DESKTOP")
+            .unwrap_or_default()
+            .to_lowercase();
+
+        if desktop.contains("hyprland") {
+            active_window = get_hyprland_active_window();
+        } else if desktop.contains("sway") {
+            active_window = get_sway_active_window();
+        } else if desktop.contains("gnome") {
+            active_window = get_gnome_active_window();
+        }
+    }
+
+    if active_window.is_none() {
+        // Fallback to X11 xdotool
+        if let Ok(output) = Command::new("xdotool")
+            .args(["getactivewindow", "getwindowname"])
+            .output()
+        {
+            if output.status.success() {
+                if let Ok(title) = String::from_utf8(output.stdout) {
+                    let title = title.trim().to_string();
+                    if !title.is_empty() {
+                        let app_name = Command::new("xdotool")
+                            .args(["getactivewindow", "getwindowclassname"])
+                            .output()
+                            .ok()
+                            .and_then(|o| String::from_utf8(o.stdout).ok())
+                            .map(|s| s.trim().to_string())
+                            .unwrap_or_else(|| "Unknown".to_string());
+
+                        let exe_path = Command::new("xdotool")
+                            .args(["getactivewindow", "getwindowpid"])
+                            .output()
+                            .ok()
+                            .and_then(|o| String::from_utf8(o.stdout).ok())
+                            .and_then(|pid_str| {
+                                let pid = pid_str.trim();
+                                let proc_path = format!("/proc/{}/exe", pid);
+                                std::fs::read_link(&proc_path).ok()
+                            })
+                            .and_then(|p| p.into_os_string().into_string().ok())
+                            .unwrap_or_else(|| "unknown".to_string());
+
+                        active_window = Some(ActiveWindow {
                             app_name,
                             window_title: title,
-                            exe_path: "unknown".to_string(),
+                            exe_path,
                         });
                     }
                 }
@@ -266,27 +387,49 @@ fn get_foreground_window_info() -> Option<ActiveWindow> {
         }
     }
 
-    // Fallback: try reading from /proc directly for Wayland/X11
-    // This works when xdotool/wmctrl are not available
-    if let Ok(output) = Command::new("sh")
-        .args(["-c", "cat /proc/$(ls /proc | grep -E '^[0-9]+$' | head -1)/comm 2>/dev/null"])
-        .output()
-    {
-        if output.status.success() {
-            if let Ok(app_name) = String::from_utf8(output.stdout) {
-                let app_name = app_name.trim().to_string();
-                if !app_name.is_empty() && app_name != "sh" {
-                    return Some(ActiveWindow {
-                        app_name: app_name.clone(),
-                        window_title: format!("{} Window", app_name),
-                        exe_path: format!("/usr/bin/{}", app_name),
-                    });
+    if active_window.is_none() {
+        // Fallback: try wmctrl
+        if let Ok(output) = Command::new("wmctrl")
+            .arg("-lp")
+            .output()
+        {
+            if output.status.success() {
+                if let Ok(output_str) = String::from_utf8(output.stdout) {
+                    // Get the last line (active window)
+                    if let Some(line) = output_str.lines().last() {
+                        let parts: Vec<&str> = line.split_whitespace().collect();
+                        if parts.len() >= 3 {
+                            let app_name = parts[2].to_string();
+                            let title = parts[3..].join(" ");
+
+                            active_window = Some(ActiveWindow {
+                                app_name,
+                                window_title: title,
+                                exe_path: "unknown".to_string(),
+                            });
+                        }
+                    }
                 }
             }
         }
     }
 
-    None
+    // Filter ignored apps consistently
+    if let Some(aw) = active_window {
+        let name_lower = aw.app_name.to_lowercase();
+        if name_lower == "explorer"
+            || name_lower == "lockapp"
+            || name_lower == "timigs"
+            || name_lower == "antigravity"
+            || name_lower.is_empty()
+        {
+            None
+        } else {
+            Some(aw)
+        }
+    } else {
+        None
+    }
 }
 
 #[cfg(not(any(windows, target_os = "linux")))]

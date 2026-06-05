@@ -86,6 +86,10 @@ jobs:
             container: alpine:latest
             args: "--bundles deb,rpm"
             name: Linux (Alpine)
+          - platform: ubuntu-latest
+            container: archlinux:latest
+            args: "--bundles appimage"
+            name: Linux (Arch)
           - platform: windows-latest
             args: ""
             name: Windows
@@ -100,6 +104,11 @@ jobs:
         run: |
           apk add --no-cache nodejs npm curl rust cargo git make musl-dev openssl-dev clang llvm webkit2gtk-4.1-dev gtk+3.0-dev libayatana-appindicator-dev librsvg-dev patchelf alsa-lib-dev
 
+      - name: Install dependencies (Arch Linux)
+        if: matrix.container == 'archlinux:latest'
+        run: |
+          pacman -Syu --needed --noconfirm nodejs npm rust cargo git make gcc pkgconf webkit2gtk-4.1 gtk3 libappindicator-gtk3 librsvg patchelf alsa-lib clang llvm curl openssl
+
       - name: Install dependencies (Ubuntu)
         if: matrix.platform == 'ubuntu-22.04'
         run: |
@@ -107,13 +116,13 @@ jobs:
           sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf libasound2-dev
 
       - name: Setup Node.js
-        if: matrix.container != 'alpine:latest'
+        if: matrix.container != 'alpine:latest' && matrix.container != 'archlinux:latest'
         uses: actions/setup-node@v4
         with:
           node-version: lts/*
 
       - name: Setup Rust
-        if: matrix.container != 'alpine:latest'
+        if: matrix.container != 'alpine:latest' && matrix.container != 'archlinux:latest'
         uses: dtolnay/rust-toolchain@stable
         with:
           targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
