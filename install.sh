@@ -17,7 +17,7 @@ fi
 
 # 2. Install dependencies via pacman
 echo -e "${BLUE}Checking and installing system dependencies...${NC}"
-DEPS=(webkit2gtk-4.1 gtk3 libappindicator-gtk3 librsvg alsa-lib xdotool wmctrl curl)
+DEPS=(webkit2gtk-4.1 gtk3 libappindicator-gtk3 librsvg alsa-lib xdotool wmctrl curl xdg-utils)
 MISSING_DEPS=()
 
 for dep in "${DEPS[@]}"; do

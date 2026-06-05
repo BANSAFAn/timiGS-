@@ -38,6 +38,7 @@ DEPS=(
   openssl
   xdotool
   wmctrl
+  xdg-utils
 )
 
 MISSING_DEPS=()
