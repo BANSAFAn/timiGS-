@@ -56,6 +56,23 @@ sudo dpkg -i timigs.deb
 sudo apt-get install -f # Fixes any missing dependencies
 ```
 
+### Arch Linux (One-Line Installer)
+For Arch Linux and Arch-based distributions (such as Manjaro or EndeavourOS), you can download, install, and configure TimiGS with a single command:
+
+```bash
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/BANSAFAn/timiGS-/main/install.sh)"
+```
+
+This installer automatically:
+- Checks system compatibility and installs required dependencies (e.g. `webkit2gtk-4.1`, `xdotool`, `wmctrl`, `xdg-utils`, `alsa-lib`) via `pacman`.
+- Downloads the latest compiled `AppImage` binary from GitHub Releases and installs it to `~/.local/bin/timigs`.
+- Configures the desktop integration, including application icons and a launcher shortcut at `~/.local/share/applications/timigs.desktop`.
+
+Alternatively, if you have already cloned the repository and wish to build and install from source, you can run:
+```bash
+./install_arch.sh
+```
+
 ---
 
 ## macOS Configuration
