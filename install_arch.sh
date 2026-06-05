@@ -53,6 +53,7 @@ DEPS=(
   xcb-util-keysyms
   xcb-util-renderutil
   xcb-util-wm
+  imagemagick
 )
 
 MISSING_DEPS=()
@@ -74,10 +75,13 @@ npm install
 
 echo -e "${BLUE}Building TimiGS client and backend...${NC}"
 npm run build
+gdk-pixbuf-query-loaders --update-cache || true
 export APPIMAGE_EXTRACT_AND_RUN=1
 export NO_STRIP=true
 export LINUXDEPLOY_PLUGIN_GTK_SKIP_GLIB_SCHEMAS=1
 export LINUXDEPLOY_PLUGIN_GTK_SKIP_PIXBUF=1
+export LINUXDEPLOY_PLUGIN_GTK_ALLOW_INSECURE=1
+export QT_QPA_PLATFORM=offscreen
 npm run tauri build -- --bundles appimage
 
 # Find the AppImage

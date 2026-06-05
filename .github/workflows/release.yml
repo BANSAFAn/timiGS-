@@ -68,7 +68,8 @@ jobs:
       - name: Install dependencies (Arch Linux)
         if: matrix.container == 'archlinux:latest'
         run: |
-          pacman -Syu --needed --noconfirm nodejs npm rust cargo git make gcc pkgconf webkit2gtk-4.1 gtk3 libappindicator-gtk3 librsvg patchelf alsa-lib clang llvm curl openssl xdg-utils file binutils fuse2 bzip2 squashfs-tools zsync desktop-file-utils gdk-pixbuf2 libxcb xcb-util xcb-util-image xcb-util-keysyms xcb-util-renderutil xcb-util-wm
+          pacman -Syu --needed --noconfirm nodejs npm rust cargo git make gcc pkgconf webkit2gtk-4.1 gtk3 libappindicator-gtk3 librsvg patchelf alsa-lib clang llvm curl openssl xdg-utils file binutils fuse2 bzip2 squashfs-tools zsync desktop-file-utils gdk-pixbuf2 libxcb xcb-util xcb-util-image xcb-util-keysyms xcb-util-renderutil xcb-util-wm imagemagick
+          gdk-pixbuf-query-loaders --update-cache || true
 
       - name: Setup Node.js
         if: matrix.container != 'alpine:latest' && matrix.container != 'archlinux:latest'
@@ -126,6 +127,8 @@ jobs:
           NO_STRIP: true
           LINUXDEPLOY_PLUGIN_GTK_SKIP_GLIB_SCHEMAS: "1"
           LINUXDEPLOY_PLUGIN_GTK_SKIP_PIXBUF: "1"
+          LINUXDEPLOY_PLUGIN_GTK_ALLOW_INSECURE: "1"
+          QT_QPA_PLATFORM: offscreen
         with:
           tagName: ${{ needs.release-please.outputs.tag_name }}
           releaseName: "TimiGS ${{ needs.release-please.outputs.tag_name }}"
@@ -148,6 +151,8 @@ jobs:
           NO_STRIP: true
           LINUXDEPLOY_PLUGIN_GTK_SKIP_GLIB_SCHEMAS: "1"
           LINUXDEPLOY_PLUGIN_GTK_SKIP_PIXBUF: "1"
+          LINUXDEPLOY_PLUGIN_GTK_ALLOW_INSECURE: "1"
+          QT_QPA_PLATFORM: offscreen
         with:
           tagName: dev-${{ github.sha }}
           releaseName: "TimiGS Development Build (${{ github.sha }})"
