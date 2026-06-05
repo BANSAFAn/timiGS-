@@ -107,7 +107,7 @@ jobs:
       - name: Install dependencies (Arch Linux)
         if: matrix.container == 'archlinux:latest'
         run: |
-          pacman -Syu --needed --noconfirm nodejs npm rust cargo git make gcc pkgconf webkit2gtk-4.1 gtk3 libappindicator-gtk3 librsvg patchelf alsa-lib clang llvm curl openssl xdg-utils
+          pacman -Syu --needed --noconfirm nodejs npm rust cargo git make gcc pkgconf webkit2gtk-4.1 gtk3 libappindicator-gtk3 librsvg patchelf alsa-lib clang llvm curl openssl xdg-utils file binutils
 
       - name: Install dependencies (Ubuntu)
         if: matrix.platform == 'ubuntu-22.04'

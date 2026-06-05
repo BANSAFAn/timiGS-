@@ -39,6 +39,8 @@ DEPS=(
   xdotool
   wmctrl
   xdg-utils
+  file
+  binutils
 )
 
 MISSING_DEPS=()
