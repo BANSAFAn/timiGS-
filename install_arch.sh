@@ -60,6 +60,7 @@ npm install
 
 echo -e "${BLUE}Building TimiGS client and backend...${NC}"
 npm run build
+export APPIMAGE_EXTRACT_AND_RUN=1
 npm run tauri build -- --bundles appimage
 
 # Find the AppImage

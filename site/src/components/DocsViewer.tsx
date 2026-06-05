@@ -115,6 +115,57 @@ export default function DocsViewer({ lang = "en" }: { lang?: string }) {
     }
   }, []);
 
+  // MutationObserver to hide Google Translate banner iframe and restore body/html styles
+  useEffect(() => {
+    const cleanTranslateUI = () => {
+      // Hide all Google Translate default widgets and banners
+      const banners = document.querySelectorAll(
+        'iframe.goog-te-banner-frame, iframe[class*="goog-te-banner"], .goog-te-banner-frame, #goog-gt-tt, .goog-te-balloon-frame, body > .skiptranslate'
+      );
+      banners.forEach((el) => {
+        const htmlEl = el as HTMLElement;
+        if (htmlEl.style.display !== 'none') {
+          htmlEl.style.setProperty('display', 'none', 'important');
+        }
+      });
+
+      // Clear inline body styles injected by Google Translate
+      if (document.body.style.top !== '0px' && document.body.style.top !== '') {
+        document.body.style.setProperty('top', '0px', 'important');
+      }
+      if (document.body.style.position === 'relative') {
+        document.body.style.removeProperty('position');
+      }
+      
+      // Clear inline html styles
+      if (document.documentElement.style.top !== '0px' && document.documentElement.style.top !== '') {
+        document.documentElement.style.setProperty('top', '0px', 'important');
+      }
+    };
+
+    // Run clean once initially
+    cleanTranslateUI();
+
+    const observer = new MutationObserver(() => {
+      cleanTranslateUI();
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['style', 'class'],
+      childList: true,
+      subtree: true,
+    });
+
+    // Run cleanup periodically as a fallback
+    const interval = setInterval(cleanTranslateUI, 250);
+
+    return () => {
+      observer.disconnect();
+      clearInterval(interval);
+    };
+  }, []);
+
   // Handle clicking outside of dropdown to close it
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {

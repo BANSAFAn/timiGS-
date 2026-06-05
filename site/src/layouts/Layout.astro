@@ -283,14 +283,26 @@ const dir = currentLang === Language.AR ? 'rtl' : 'ltr';
             }
 
             /* ── Google Translate Branding Cleanup ── */
-            .goog-te-banner-frame.skiptranslate,
+            iframe.goog-te-banner-frame,
+            iframe[class*="goog-te-banner"],
             .goog-te-banner-frame,
             #goog-gt-tt,
-            .goog-te-balloon-frame {
+            .goog-te-balloon-frame,
+            body > .skiptranslate {
                 display: none !important;
+                visibility: hidden !important;
+                opacity: 0 !important;
+                height: 0 !important;
+                width: 0 !important;
             }
             body {
                 top: 0 !important;
+                position: static !important;
+            }
+            html {
+                padding-top: 0 !important;
+                top: 0 !important;
+                margin-top: 0 !important;
             }
             .goog-text-highlight {
                 background: transparent !important;
