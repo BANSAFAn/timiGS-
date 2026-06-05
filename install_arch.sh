@@ -41,6 +41,8 @@ DEPS=(
   xdg-utils
   file
   binutils
+  fuse2
+  bzip2
 )
 
 MISSING_DEPS=()

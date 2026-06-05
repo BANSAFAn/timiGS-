@@ -88,7 +88,7 @@ jobs:
             name: Linux (Alpine)
           - platform: ubuntu-latest
             container: archlinux:latest
-            args: "--bundles appimage"
+            args: "--bundles appimage --verbose"
             name: Linux (Arch)
           - platform: windows-latest
             args: ""
@@ -107,7 +107,7 @@ jobs:
       - name: Install dependencies (Arch Linux)
         if: matrix.container == 'archlinux:latest'
         run: |
-          pacman -Syu --needed --noconfirm nodejs npm rust cargo git make gcc pkgconf webkit2gtk-4.1 gtk3 libappindicator-gtk3 librsvg patchelf alsa-lib clang llvm curl openssl xdg-utils file binutils
+          pacman -Syu --needed --noconfirm nodejs npm rust cargo git make gcc pkgconf webkit2gtk-4.1 gtk3 libappindicator-gtk3 librsvg patchelf alsa-lib clang llvm curl openssl xdg-utils file binutils fuse2 bzip2
 
       - name: Install dependencies (Ubuntu)
         if: matrix.platform == 'ubuntu-22.04'
@@ -145,7 +145,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RUSTFLAGS: ${{ matrix.container == 'alpine:latest' && '-C target-feature=-crt-static' || '' }}
-          APPIMAGE_EXTRACT_AND_RUN: 1
+          APPIMAGE_EXTRACT_AND_RUN: "1"
           NO_STRIP: true
         with:
           args: ${{ matrix.args }}
