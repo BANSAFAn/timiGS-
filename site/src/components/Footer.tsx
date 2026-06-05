@@ -40,7 +40,7 @@ const Footer: React.FC<FooterProps> = ({ t }) => {
   }, []);
 
   return (
-    <footer ref={ref} className="w-full mt-auto border-t border-border bg-bg-secondary relative z-20 overflow-hidden">
+    <footer ref={ref} className="w-full mt-auto border-t border-border bg-bg-secondary relative z-20 overflow-hidden notranslate">
       <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-16 relative z-10 transition-all duration-700 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
         
         {/* Top CTA Banner */}

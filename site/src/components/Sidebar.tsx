@@ -67,7 +67,7 @@ const Sidebar: React.FC<SidebarProps> = ({ lang, t, pathname }) => {
 
   return (
     <>
-      <nav className="fixed w-full z-50 top-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-b border-gray-200 dark:border-slate-800 transition-colors">
+      <nav className="fixed w-full z-50 top-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-b border-gray-200 dark:border-slate-800 transition-colors notranslate">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <a href={`/${lang}/`} className="flex items-center gap-3 group">
@@ -140,7 +140,7 @@ const Sidebar: React.FC<SidebarProps> = ({ lang, t, pathname }) => {
       </nav>
 
       {isOpen && (
-        <div className="fixed inset-0 z-40 md:hidden">
+        <div className="fixed inset-0 z-40 md:hidden notranslate">
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setIsOpen(false)} />
           
           <div className="absolute top-16 right-0 bottom-0 w-80 bg-white dark:bg-slate-900 border-l border-gray-200 dark:border-slate-800 shadow-2xl overflow-y-auto">

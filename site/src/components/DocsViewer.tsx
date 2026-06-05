@@ -284,7 +284,7 @@ export default function DocsViewer({ lang = "en" }: { lang?: string }) {
         </div>
 
         {/* Dynamic Translator Selector */}
-        <div className="relative" ref={dropdownRef}>
+        <div className="relative notranslate" ref={dropdownRef}>
           <button
             onClick={() => setDropdownOpen(!dropdownOpen)}
             className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-sm font-medium text-gray-700 dark:text-gray-200 hover:border-brand-500 dark:hover:border-brand-500 transition-all shadow-sm"
@@ -318,7 +318,7 @@ export default function DocsViewer({ lang = "en" }: { lang?: string }) {
       </div>
 
       <div className="grid lg:grid-cols-[280px_1fr] gap-8">
-        <aside className="hidden lg:block">
+        <aside className="hidden lg:block notranslate">
           <div className="sticky top-24 rounded-2xl border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4">
             <div className="flex items-center gap-2 px-3 py-2 mb-3">
               <List className="w-4 h-4 text-gray-600 dark:text-gray-400" />
@@ -345,14 +345,14 @@ export default function DocsViewer({ lang = "en" }: { lang?: string }) {
 
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="lg:hidden flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-300 mb-6"
+          className="lg:hidden flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-300 mb-6 notranslate"
         >
           <List className="w-5 h-5" />
           <span className="text-sm font-medium">Menu</span>
         </button>
 
         {mobileMenuOpen && (
-          <div className="lg:hidden fixed inset-0 z-50 bg-black/50" onClick={() => setMobileMenuOpen(false)}>
+          <div className="lg:hidden fixed inset-0 z-50 bg-black/50 notranslate" onClick={() => setMobileMenuOpen(false)}>
             <div className="absolute right-0 top-0 bottom-0 w-80 bg-white dark:bg-slate-900 p-6 overflow-y-auto" onClick={(e) => e.stopPropagation()}>
               <nav className="space-y-2">
                 {sections.map((section) => (
