@@ -23,6 +23,7 @@ const dir = currentLang === Language.AR ? 'rtl' : 'ltr';
         <SEOHead title={title} />
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
         <meta name="theme-color" content="#0ea5e9" />
+        <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -281,8 +282,20 @@ const dir = currentLang === Language.AR ? 'rtl' : 'ltr';
                 }
             }
 
-            /* ── Smooth scroll ── */
-            html { scroll-behavior: smooth; }
+            /* ── Google Translate Branding Cleanup ── */
+            .goog-te-banner-frame.skiptranslate,
+            .goog-te-banner-frame,
+            #goog-gt-tt,
+            .goog-te-balloon-frame {
+                display: none !important;
+            }
+            body {
+                top: 0 !important;
+            }
+            .goog-text-highlight {
+                background: transparent !important;
+                box-shadow: none !important;
+            }
         </style>
 	</head>
 	<body class="min-h-screen flex flex-col relative">

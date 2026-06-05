@@ -19,7 +19,9 @@ import {
   CloudSun,
   Gear,
   List,
-  FileText
+  FileText,
+  Globe,
+  CaretDown
 } from "@phosphor-icons/react";
 
 interface DocSection {
@@ -44,13 +46,96 @@ const sectionIcons: Record<string, React.ReactNode> = {
   settings: <Gear className="w-4 h-4" weight="duotone" />
 };
 
+const languages = [
+  { code: "en", name: "English", flag: "🇺🇸" },
+  { code: "uk", name: "Українська", flag: "🇺🇦" },
+  { code: "de", name: "Deutsch", flag: "🇩🇪" },
+  { code: "fr", name: "Français", flag: "🇫🇷" },
+  { code: "es", name: "Español", flag: "🇪🇸" },
+  { code: "pl", name: "Polski", flag: "🇵🇱" },
+  { code: "pt", name: "Português", flag: "🇵🇹" },
+  { code: "zh-CN", name: "中文", flag: "🇨🇳" },
+  { code: "ar", name: "العربية", flag: "🇸🇦" },
+  { code: "it", name: "Italiano", flag: "🇮🇹" },
+  { code: "ja", name: "日本語", flag: "🇯🇵" },
+  { code: "ko", name: "한국어", flag: "🇰🇷" },
+  { code: "tr", name: "Türkçe", flag: "🇹🇷" }
+];
+
 export default function DocsViewer({ lang = "en" }: { lang?: string }) {
   const [sections, setSections] = useState<DocSection[]>([]);
   const [activeDoc, setActiveDoc] = useState<string | null>(null);
   const [content, setContent] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [selectedLang, setSelectedLang] = useState("en");
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const docsCache = useRef<Record<string, string>>({});
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Load Google Translate script dynamically
+  useEffect(() => {
+    // 1. Add google translate init function to window
+    (window as any).googleTranslateElementInit = () => {
+      new (window as any).google.translate.TranslateElement({
+        pageLanguage: 'en',
+        includedLanguages: 'en,uk,de,fr,es,pl,pt,zh-CN,ar,it,ja,ko,tr',
+        layout: 0
+      }, 'google_translate_element');
+    };
+
+    // 2. Insert the google_translate_element div in body if not already present
+    if (!document.getElementById('google_translate_element')) {
+      const gdiv = document.createElement('div');
+      gdiv.id = 'google_translate_element';
+      gdiv.style.display = 'none';
+      document.body.appendChild(gdiv);
+    }
+
+    // 3. Load the Google Translate script
+    if (!document.querySelector('script[src*="translate.google.com"]')) {
+      const script = document.createElement('script');
+      script.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+      script.async = true;
+      document.body.appendChild(script);
+    }
+
+    // 4. Read initial lang from googtrans cookie if present
+    const getCookie = (name: string) => {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop()?.split(';').shift();
+    };
+    const googtrans = getCookie('googtrans');
+    if (googtrans) {
+      const code = googtrans.split('/').pop();
+      if (code && languages.some(l => l.code === code)) {
+        setSelectedLang(code);
+      }
+    }
+  }, []);
+
+  // Handle clicking outside of dropdown to close it
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleTranslate = (code: string) => {
+    setSelectedLang(code);
+    setDropdownOpen(false);
+    
+    const selectEl = document.querySelector('.goog-te-combo') as HTMLSelectElement;
+    if (selectEl) {
+      selectEl.value = code;
+      selectEl.dispatchEvent(new Event('change'));
+    }
+  };
 
   useEffect(() => {
     // Determine system scheme for mermaid theme
@@ -133,17 +218,52 @@ export default function DocsViewer({ lang = "en" }: { lang?: string }) {
 
   return (
     <div className="max-w-7xl mx-auto py-12">
-      <div className="mb-12">
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-50 dark:bg-brand-900/20 text-brand-600 dark:text-brand-400 text-sm font-semibold mb-6">
-          <BookOpen className="w-4 h-4" />
-          Documentation
+      <div className="flex flex-col md:flex-row md:justify-between md:items-end gap-6 mb-12">
+        <div>
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-50 dark:bg-brand-900/20 text-brand-600 dark:text-brand-400 text-sm font-semibold mb-6">
+            <BookOpen className="w-4 h-4" />
+            Documentation
+          </div>
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+            Documentation
+          </h1>
+          <p className="text-lg text-gray-600 dark:text-gray-400">
+            Complete guide to using TimiGS
+          </p>
         </div>
-        <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
-          Documentation
-        </h1>
-        <p className="text-lg text-gray-600 dark:text-gray-400">
-          Complete guide to using TimiGS
-        </p>
+
+        {/* Dynamic Translator Selector */}
+        <div className="relative" ref={dropdownRef}>
+          <button
+            onClick={() => setDropdownOpen(!dropdownOpen)}
+            className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-sm font-medium text-gray-700 dark:text-gray-200 hover:border-brand-500 dark:hover:border-brand-500 transition-all shadow-sm"
+          >
+            <Globe className="w-4 h-4 text-brand-500" weight="duotone" />
+            <span>{languages.find(l => l.code === selectedLang)?.flag} {languages.find(l => l.code === selectedLang)?.name}</span>
+            <CaretDown className={`w-3 h-3 text-gray-400 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} />
+          </button>
+
+          {dropdownOpen && (
+            <div className="absolute right-0 mt-2 z-50 w-56 max-h-80 overflow-y-auto rounded-2xl border border-gray-100 dark:border-slate-800/80 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md p-2 shadow-xl shadow-slate-200/50 dark:shadow-black/40">
+              <div className="space-y-0.5">
+                {languages.map((lang) => (
+                  <button
+                    key={lang.code}
+                    onClick={() => handleTranslate(lang.code)}
+                    className={`w-full text-left px-3 py-2 rounded-xl text-sm transition-all flex items-center gap-3 ${
+                      selectedLang === lang.code
+                        ? 'bg-brand-50 dark:bg-brand-950/20 text-brand-600 dark:text-brand-400 font-semibold'
+                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800/50'
+                    }`}
+                  >
+                    <span>{lang.flag}</span>
+                    <span>{lang.name}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="grid lg:grid-cols-[280px_1fr] gap-8">
