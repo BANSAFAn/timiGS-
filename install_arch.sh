@@ -47,6 +47,12 @@ DEPS=(
   zsync
   desktop-file-utils
   gdk-pixbuf2
+  libxcb
+  xcb-util
+  xcb-util-image
+  xcb-util-keysyms
+  xcb-util-renderutil
+  xcb-util-wm
 )
 
 MISSING_DEPS=()
@@ -71,6 +77,7 @@ npm run build
 export APPIMAGE_EXTRACT_AND_RUN=1
 export NO_STRIP=true
 export LINUXDEPLOY_PLUGIN_GTK_SKIP_GLIB_SCHEMAS=1
+export LINUXDEPLOY_PLUGIN_GTK_SKIP_PIXBUF=1
 npm run tauri build -- --bundles appimage
 
 # Find the AppImage
