@@ -46,6 +46,7 @@ DEPS=(
   squashfs-tools
   zsync
   desktop-file-utils
+  gdk-pixbuf2
 )
 
 MISSING_DEPS=()
@@ -69,6 +70,7 @@ echo -e "${BLUE}Building TimiGS client and backend...${NC}"
 npm run build
 export APPIMAGE_EXTRACT_AND_RUN=1
 export NO_STRIP=true
+export LINUXDEPLOY_PLUGIN_GTK_SKIP_GLIB_SCHEMAS=1
 npm run tauri build -- --bundles appimage
 
 # Find the AppImage

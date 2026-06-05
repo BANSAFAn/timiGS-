@@ -68,7 +68,7 @@ jobs:
       - name: Install dependencies (Arch Linux)
         if: matrix.container == 'archlinux:latest'
         run: |
-          pacman -Syu --needed --noconfirm nodejs npm rust cargo git make gcc pkgconf webkit2gtk-4.1 gtk3 libappindicator-gtk3 librsvg patchelf alsa-lib clang llvm curl openssl xdg-utils file binutils fuse2 bzip2 squashfs-tools zsync desktop-file-utils
+          pacman -Syu --needed --noconfirm nodejs npm rust cargo git make gcc pkgconf webkit2gtk-4.1 gtk3 libappindicator-gtk3 librsvg patchelf alsa-lib clang llvm curl openssl xdg-utils file binutils fuse2 bzip2 squashfs-tools zsync desktop-file-utils gdk-pixbuf2
 
       - name: Setup Node.js
         if: matrix.container != 'alpine:latest' && matrix.container != 'archlinux:latest'
@@ -124,6 +124,7 @@ jobs:
           RUSTFLAGS: ${{ matrix.container == 'alpine:latest' && '-C target-feature=-crt-static' || '' }}
           APPIMAGE_EXTRACT_AND_RUN: "1"
           NO_STRIP: true
+          LINUXDEPLOY_PLUGIN_GTK_SKIP_GLIB_SCHEMAS: "1"
         with:
           tagName: ${{ needs.release-please.outputs.tag_name }}
           releaseName: "TimiGS ${{ needs.release-please.outputs.tag_name }}"
@@ -144,6 +145,7 @@ jobs:
           RUSTFLAGS: ${{ matrix.container == 'alpine:latest' && '-C target-feature=-crt-static' || '' }}
           APPIMAGE_EXTRACT_AND_RUN: "1"
           NO_STRIP: true
+          LINUXDEPLOY_PLUGIN_GTK_SKIP_GLIB_SCHEMAS: "1"
         with:
           tagName: dev-${{ github.sha }}
           releaseName: "TimiGS Development Build (${{ github.sha }})"
