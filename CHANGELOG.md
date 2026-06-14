@@ -1,5 +1,58 @@
 # Changelog
 
+## [1.9.0](https://github.com/BANSAFAn/timiGS-/compare/v1.8.1...v1.9.0) (2026-06-14)
+
+
+### Features
+
+* **activity:** add affinity, krita, and clip studio to Creative program keywords ([dde2f3a](https://github.com/BANSAFAn/timiGS-/commit/dde2f3a127ff8ddb375dacbb8a549ef669d0a18b))
+* **activity:** add new program tags, premium compact sidebar, and code simplifications ([2485795](https://github.com/BANSAFAn/timiGS-/commit/2485795a802d8a7ff675b47c05c5ea272bf4ea48))
+* **activity:** classify browser sessions into specialized tags using window title website mapping ([301e5ba](https://github.com/BANSAFAn/timiGS-/commit/301e5ba26f23a8dd9363dc6189d8cc567c24f330))
+* add install_arch.sh script and enforce LF for shell scripts ([38b1909](https://github.com/BANSAFAn/timiGS-/commit/38b190952d1078a427f59b4c123cc0bef098005d))
+* add one-liner install.sh binary installer for Arch Linux ([61f18c7](https://github.com/BANSAFAn/timiGS-/commit/61f18c784363518a8388a6993efd5f60d4713fb4))
+* add premium custom Google Translate language selector to documentation page ([61adf76](https://github.com/BANSAFAn/timiGS-/commit/61adf76672bd534da137da72f5b74da988b2e49e))
+* **dashboard:** show TimiGS active state and previous activity when focused ([66a7b0e](https://github.com/BANSAFAn/timiGS-/commit/66a7b0ea2d8c4529907fd73b0ae1746a27d8e01f))
+* **docs:** add interactive client-side search engine and expand language translation options to 24 languages ([909ad69](https://github.com/BANSAFAn/timiGS-/commit/909ad69201704fe278bc2cc41168c52f30ee817e))
+* enrich documentation with detailed subsystem pages, code highlighting, modern navigation design, and mermaid rendering support ([f7b0e8d](https://github.com/BANSAFAn/timiGS-/commit/f7b0e8d34e70d26f420b42673dbf781a84cec7a4))
+
+
+### Bug Fixes
+
+* add xdg-utils to Arch Linux dependencies in CI and installer scripts ([141fb2b](https://github.com/BANSAFAn/timiGS-/commit/141fb2b77f097fb6da49fce9e397b2f4e0a5ec8f))
+* **ci:** add gdk-pixbuf2 package and skip GDK schema checks in GTK plugin ([5cf76b1](https://github.com/BANSAFAn/timiGS-/commit/5cf76b11ea583ebc1c1dc66ba83c81ac794ae4b0))
+* **ci:** add X11/XCB dependencies and set LINUXDEPLOY_PLUGIN_GTK_SKIP_PIXBUF=1 ([e9ae44a](https://github.com/BANSAFAn/timiGS-/commit/e9ae44a1caa39e3aa29ee13eb61506fe7b59075f))
+* **ci:** disable binary stripping for AppImage bundling on Linux ([b4e9eba](https://github.com/BANSAFAn/timiGS-/commit/b4e9ebafd877692fb38c05b763192bbfcfc25ac1))
+* **ci:** install file and binutils packages in Arch Linux builds ([d517982](https://github.com/BANSAFAn/timiGS-/commit/d51798204a6c50b445d2054441f7bba943a7746b))
+* **ci:** install fuse2 and bzip2 in Arch container, run tauri build with verbose flag ([4f19832](https://github.com/BANSAFAn/timiGS-/commit/4f1983281e59ed3e2b4a6541d8574c87b163b888))
+* **ci:** install squashfs-tools, zsync, and desktop-file-utils on Arch Linux ([3111dbd](https://github.com/BANSAFAn/timiGS-/commit/3111dbd03b931d3f74fe88a4fe59d6deece2272f))
+* **ci:** run gdk-pixbuf-query-loaders and add LINUXDEPLOY_PLUGIN_GTK_ALLOW_INSECURE and QT_QPA_PLATFORM env vars ([07d0790](https://github.com/BANSAFAn/timiGS-/commit/07d0790787fb0405d7f6437acad9ffafc1ca7255))
+* prevent multiple instances of TimiGS using single-instance plugin ([b7de98a](https://github.com/BANSAFAn/timiGS-/commit/b7de98a39b2af8d19e28170382df617a0e4960a7))
+* resolve syntax error in DocsViewer.tsx ([59a56b0](https://github.com/BANSAFAn/timiGS-/commit/59a56b0fad5c0c974464639abda9d40113c9917d))
+* resolve unclosed delimiter in tracker.rs and add Arch Linux support to CI ([43809cc](https://github.com/BANSAFAn/timiGS-/commit/43809ccc1f14efb59c54672e2f1aa6469da036c3))
+* **site:** link missing translation files for ar, be, nl, zh-TW and localize home page ([8a85722](https://github.com/BANSAFAn/timiGS-/commit/8a8572296c55e3e49f7978e4012de59a0287b67d))
+* **translate, ci:** suppress Google Translate banner and fix Arch Linux AppImage bundling ([d742e47](https://github.com/BANSAFAn/timiGS-/commit/d742e4747e4d436a7c7ed8976fa94cb75352c5d0))
+* **translate:** add notranslate class to website header, sidebar, menus, and footer to isolate documentation translations ([573b2af](https://github.com/BANSAFAn/timiGS-/commit/573b2af66ceabedd861e2bab2852873fee0086d0))
+* **windows:** resolve installer text readability issues by utilizing native modern light layout ([4323086](https://github.com/BANSAFAn/timiGS-/commit/43230866c942337cd65ce543c0488990c3661985))
+
+
+### Documentation
+
+* add Arch Linux installation guide to documentation page ([d2947f9](https://github.com/BANSAFAn/timiGS-/commit/d2947f9f6dabd1be6d05231c105dfd8aff6adf12))
+* remove non-existent features (GitHub Integration and Docker Deployment) from documentation ([e4a4a3c](https://github.com/BANSAFAn/timiGS-/commit/e4a4a3c58463bb5f1e8c2222c960670b6d111e44))
+
+
+### Styles
+
+* **dashboard:** replace brand letter with animated sleeping cat SVG ([6a610da](https://github.com/BANSAFAn/timiGS-/commit/6a610da8162639c1aad1a6180481b5b51d3409c1))
+* **sidebar:** animate clock logo once for exactly 5 seconds on load/collapse ([2ab41c2](https://github.com/BANSAFAn/timiGS-/commit/2ab41c2038ec4d748e1586e07f1bdceb644b35f3))
+* **sidebar:** replace collapsed T logo with an animated clock SVG ([bdafdc5](https://github.com/BANSAFAn/timiGS-/commit/bdafdc596ee87d362ae661b164b19ea4ffc6a4ec))
+* **windows:** improve installer design with Segoe UI typography and premium spacious layout ([fbc1105](https://github.com/BANSAFAn/timiGS-/commit/fbc1105bcfa9ed5659f4b504af89473480f26bf8))
+
+
+### Code Refactoring
+
+* **backend:** silence dead_code warnings in backend crate ([d76c0f6](https://github.com/BANSAFAn/timiGS-/commit/d76c0f66895547c0d59831f0f7ca72844fcb77bd))
+
 ## [1.8.1](https://github.com/BANSAFAn/timiGS-/compare/v1.8.0...v1.8.1) (2026-05-30)
 
 
