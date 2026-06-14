@@ -11,7 +11,7 @@
         <div class="join-card-header">
           <div class="join-icon" v-html="Icons.team"></div>
           <h3>{{ $t('team.joinOrCreate') || 'Join or Create a Group' }}</h3>
-          <p class="join-desc">Connect with your team via P2P and see real-time activity</p>
+          <p class="join-desc">{{ $t('team.connectP2PDesc', 'Connect with your team via P2P and see real-time activity') }}</p>
         </div>
 
         <div class="join-actions">
@@ -145,21 +145,21 @@
           <div class="voice-card-header">
             <div class="voice-header-left">
               <span class="voice-icon" v-html="voiceActive ? Icons.doctorMode : Icons.team"></span>
-              <h3>Voice Chat Channel</h3>
+              <h3>{{ $t('team.voiceChatChannel', 'Voice Chat Channel') }}</h3>
               <span v-if="voiceActive" class="voice-live-badge animate-pulse-slow">LIVE</span>
             </div>
             <div class="voice-users-count" v-if="voiceActive">
-              {{ voiceActiveUsersCount }} in call
+              {{ voiceActiveUsersCount }} {{ $t('team.inCall', 'in call') }}
             </div>
           </div>
           
           <div class="voice-card-body">
             <!-- NOT JOINED STATE -->
             <div v-if="!voiceActive" class="voice-not-joined">
-              <p>Join the real-time team voice room to speak with connected members.</p>
+              <p>{{ $t('team.voiceChatDesc', 'Join the real-time team voice room to speak with connected members.') }}</p>
               <button class="btn btn-primary btn-voice-join" @click="handleJoinVoice">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
-                Join Voice Chat
+                {{ $t('team.joinVoiceChat', 'Join Voice Chat') }}
               </button>
             </div>
 
@@ -171,7 +171,7 @@
                   <div class="vp-avatar" :style="{ background: memberColor(participant.id) }">
                     {{ participant.name.charAt(0).toUpperCase() }}
                   </div>
-                  <span class="vp-name">{{ participant.name }} {{ participant.id === myProfile.id ? '(You)' : '' }}</span>
+                  <span class="vp-name">{{ participant.name }} {{ participant.id === myProfile.id ? '(' + $t('common.you', 'You') + ')' : '' }}</span>
                   <span class="vp-mic-status" v-if="participant.id === myProfile.id && isMuted">
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-danger"><line x1="1" x2="23" y1="1" y2="23"/><path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V5a3 3 0 0 0-5.94-.6"/><path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
                   </span>
@@ -180,11 +180,11 @@
 
               <!-- Controls bar -->
               <div class="voice-controls-row">
-                <button class="btn-voice-control" :class="{ 'is-active': isMuted }" @click="handleToggleMute" :title="isMuted ? 'Unmute Mic' : 'Mute Mic'">
+                <button class="btn-voice-control" :class="{ 'is-active': isMuted }" @click="handleToggleMute" :title="isMuted ? $t('team.unmuteMic', 'Unmute Mic') : $t('team.muteMic', 'Mute Mic')">
                   <svg v-if="!isMuted" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
                   <svg v-else xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-danger"><line x1="1" x2="23" y1="1" y2="23"/><path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V5a3 3 0 0 0-5.94-.6"/><path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
                 </button>
-                <button class="btn-voice-control btn-voice-leave" @click="handleLeaveVoice" title="Leave Voice Chat">
+                <button class="btn-voice-control btn-voice-leave" @click="handleLeaveVoice" :title="$t('team.leaveVoiceChat', 'Leave Voice Chat')">
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.68 13.31a16 16 0 0 0 3.41 2.6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7 2 2 0 0 1 1.72 2v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.42 19.42 0 0 1-5.3-5.3A19.79 19.79 0 0 1 2 5.18 2 2 0 0 1 4 3h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8 10.91"/><line x1="22" x2="2" y1="2" y2="22"/></svg>
                 </button>
               </div>
@@ -245,7 +245,7 @@
                       </div>
                       <div class="popover-track-info">
                         <div class="popover-title">{{ currentUserMember.currentMusicTitle }}</div>
-                        <div class="popover-artist">{{ currentUserMember.currentMusicArtist || 'Unknown Artist' }}</div>
+                        <div class="popover-artist">{{ currentUserMember.currentMusicArtist || $t('team.unknownArtist', 'Unknown Artist') }}</div>
                       </div>
                     </div>
                   </span>
@@ -342,7 +342,7 @@
                       </div>
                       <div class="popover-track-info">
                         <div class="popover-title">{{ member.currentMusicTitle }}</div>
-                        <div class="popover-artist">{{ member.currentMusicArtist || 'Unknown Artist' }}</div>
+                        <div class="popover-artist">{{ member.currentMusicArtist || $t('team.unknownArtist', 'Unknown Artist') }}</div>
                       </div>
                     </div>
                   </span>
@@ -469,19 +469,19 @@
                   <div class="msc-avatar" :style="{ background: memberColor(member.id) }">
                     {{ member.name.charAt(0).toUpperCase() }}
                   </div>
-                  <div class="msc-name">{{ member.name }} <span v-if="member.isLeader">(Leader)</span></div>
+                  <div class="msc-name">{{ member.name }} <span v-if="member.isLeader">{{ t('team.leaderSuffix') }}</span></div>
                 </div>
                 <div class="msc-stats">
                   <div class="msc-stat">
-                    <span class="msc-label">Online</span>
+                    <span class="msc-label">{{ t('team.online') }}</span>
                     <span class="msc-value">{{ formatDuration(member.totalOnlineSeconds) }}</span>
                   </div>
                   <div class="msc-stat">
-                    <span class="msc-label">Top App</span>
+                    <span class="msc-label">{{ t('team.topApp') }}</span>
                     <span class="msc-value">{{ getMemberTopApp(member.id) }}</span>
                   </div>
                   <div class="msc-stat">
-                    <span class="msc-label">Sessions</span>
+                    <span class="msc-label">{{ t('team.sessions') }}</span>
                     <span class="msc-value">{{ member.activityHistory.length }}</span>
                   </div>
                 </div>
@@ -579,15 +579,15 @@
           <div v-if="statsMemberData" class="stats-detail">
             <div class="stats-overview">
               <div class="so-item">
-                <span class="so-label">Total Online</span>
+                <span class="so-label">{{ $t('team.totalOnline', 'Total Online') }}</span>
                 <span class="so-value">{{ formatDuration(statsMemberData.totalOnlineSeconds) }}</span>
               </div>
               <div class="so-item">
-                <span class="so-label">Active Duration</span>
+                <span class="so-label">{{ $t('team.activeDuration', 'Active Duration') }}</span>
                 <span class="so-value">{{ formatDuration(statsMemberData.activeDuration / 1000) }}</span>
               </div>
             </div>
-            <h4>Top Applications</h4>
+            <h4>{{ $t('dashboard.topApps', 'Top Applications') }}</h4>
             <div class="top-apps-list">
               <div v-for="(app, i) in statsMemberData.topApps" :key="app.appName" class="top-app-row">
                 <span class="ta-rank">#{{ i + 1 }}</span>
@@ -598,7 +598,7 @@
                 <span class="ta-time">{{ formatDuration(app.totalSeconds) }}</span>
               </div>
             </div>
-            <h4>Category Breakdown</h4>
+            <h4>{{ $t('team.categoryBreakdown', 'Category Breakdown') }}</h4>
             <div class="category-pie">
               <div v-for="cat in statsMemberData.categoryBreakdown" :key="cat.category" class="cat-row">
                 <span class="cat-dot" :style="{ background: cat.color }"></span>
@@ -773,11 +773,13 @@ function playRemoteStream(el: any, stream: MediaStream) {
 
 
 function formatDuration(seconds: number): string {
-  if (!seconds || seconds <= 0) return '0m';
+  const hSymbol = t ? t('common.h_symbol') : 'h';
+  const mSymbol = t ? t('common.m_symbol') : 'm';
+  if (!seconds || seconds <= 0) return `0${mSymbol}`;
   const h = Math.floor(seconds / 3600);
   const m = Math.floor((seconds % 3600) / 60);
-  if (h > 0) return `${h}h ${m}m`;
-  return `${m}m`;
+  if (h > 0) return `${h}${hSymbol} ${m}${mSymbol}`;
+  return `${m}${mSymbol}`;
 }
 
 function formatTimestamp(ts: number): string {
@@ -806,7 +808,7 @@ function getCategoryColor(category: string): string {
 
 function getMemberTopApp(memberId: string): string {
   const stats = teamsStore.getMemberStats(memberId);
-  if (!stats || stats.topApps.length === 0) return '—';
+  if (!stats || stats.topApps.length === 0) return t('team.none');
   return stats.topApps[0].appName;
 }
 
@@ -1124,19 +1126,19 @@ function generateHTMLTemplate(report: any): string {
   const membersHtml = report.members.map((member: any) => {
     const avatarLetter = member.memberName.charAt(0).toUpperCase();
     const avatarBg = getAvatarColor(member.memberName);
-    const roleBadge = member.isLeader ? `<span class="leader-badge">Leader</span>` : `<span class="member-badge">Member</span>`;
+    const roleBadge = member.isLeader ? `<span class="leader-badge">${t('team.leader')}</span>` : `<span class="member-badge">${t('team.member')}</span>`;
     
     let statusBadge = '';
     if (member.focusModeActive) {
-      statusBadge = `<span class="status-badge focusing"> Focusing</span>`;
+      statusBadge = `<span class="status-badge focusing"> ${t('team.focusing')}</span>`;
     } else if (member.inTimeout) {
-      statusBadge = `<span class="status-badge on-break"> On Break</span>`;
+      statusBadge = `<span class="status-badge on-break"> ${t('team.onBreak')}</span>`;
     } else {
-      statusBadge = `<span class="status-badge online">● Online</span>`;
+      statusBadge = `<span class="status-badge online">${t('team.onlineBadge')}</span>`;
     }
     
     const totalTime = formatSecs(member.totalOnlineSeconds);
-    const topApp = member.stats?.topApps?.[0]?.appName || '—';
+    const topApp = member.stats?.topApps?.[0]?.appName || t('team.none');
     
     const tasksList = member.tasks && member.tasks.length > 0
       ? `<ul class="task-list">${member.tasks.map((t: string) => `<li>${t}</li>`).join('')}</ul>`
@@ -1182,7 +1184,7 @@ function generateHTMLTemplate(report: any): string {
             </div>
           `;
         }).join('')
-      : `<div class="no-data">No applications recorded</div>`;
+      : `<div class="no-data">${t('team.noHistory', 'No activity recorded yet')}</div>`;
       
     const categoryHtml = member.stats?.categoryBreakdown && member.stats.categoryBreakdown.length > 0
       ? member.stats.categoryBreakdown.map((cat: any) => {
@@ -1199,7 +1201,7 @@ function generateHTMLTemplate(report: any): string {
             </div>
           `;
         }).join('')
-      : `<div class="no-data">No category data</div>`;
+      : `<div class="no-data">${t('analytics.noDataAvailable', 'No Data')}</div>`;
 
     return `
       <div class="member-detail-card">
@@ -1211,12 +1213,12 @@ function generateHTMLTemplate(report: any): string {
           <span class="online-time">${formatSecs(member.totalOnlineSeconds)}</span>
         </div>
         
-        <div class="detail-section-title">Applications Usage</div>
+        <div class="detail-section-title">${t('team.appsUsage', 'Applications Usage')}</div>
         <div class="app-bars-list">
           ${topAppsHtml}
         </div>
         
-        <div class="detail-section-title" style="margin-top: 25px;">Category Breakdown</div>
+        <div class="detail-section-title" style="margin-top: 25px;">${t('team.categoryBreakdown', 'Category Breakdown')}</div>
         <div class="app-bars-list">
           ${categoryHtml}
         </div>
@@ -1561,35 +1563,35 @@ function generateHTMLTemplate(report: any): string {
 <body>
   <div class="container">
     <header>
-      <h1>${report.groupName || 'Team'} Activity Report</h1>
+      <h1>\${report.groupName || t('team.title', 'Team')} \${t('team.activityReport', 'Activity Report')}</h1>
       <div class="meta">
-        Group Code: <span class="group-code-badge">${report.groupCode || '—'}</span>
+        \${t('team.groupCode', 'Group Code')}: <span class="group-code-badge">\${report.groupCode || '—'}</span>
         &nbsp;&bull;&nbsp;
-        Generated: <span>${new Date(report.generatedAt).toLocaleString()}</span>
+        \${t('team.generated', 'Generated')}: <span>\${new Date(report.generatedAt).toLocaleString()}</span>
       </div>
     </header>
 
     <div class="stats-grid">
       <div class="stat-card">
-        <div class="label">Total Members</div>
-        <div class="value">${report.members.length}</div>
+        <div class="label">\${t('team.totalMembers', 'Total Members')}</div>
+        <div class="value">\${report.members.length}</div>
       </div>
       <div class="stat-card">
-        <div class="label">Total Team Time</div>
+        <div class="label">\${t('team.totalTime', 'Total Team Time')}</div>
         <div class="value">${formatSecs(report.members.reduce((acc: number, m: any) => acc + m.totalOnlineSeconds, 0))}</div>
       </div>
     </div>
 
-    <div class="section-title">Members Activity Summary</div>
+    <div class="section-title">\${t('team.membersActivitySummary', 'Members Activity Summary')}</div>
     <div class="table-container">
       <table>
         <thead>
           <tr>
-            <th>Member</th>
-            <th>Status</th>
-            <th>Total Time</th>
-            <th>Top Program</th>
-            <th>Tasks Checklist</th>
+            <th>\${t('team.member', 'Member')}</th>
+            <th>\${t('projects.status', 'Status')}</th>
+            <th>\${t('team.totalTime', 'Total Time')}</th>
+            <th>\${t('team.topApp', 'Top Program')}</th>
+            <th>\${t('team.tasksTitle', 'Tasks Checklist')}</th>
           </tr>
         </thead>
         <tbody>
@@ -1598,7 +1600,7 @@ function generateHTMLTemplate(report: any): string {
       </table>
     </div>
 
-    <div class="section-title">Detailed Applications & Categories</div>
+    <div class="section-title">\${t('team.detailedAppsCategories', 'Detailed Applications & Categories')}</div>
     <div class="details-grid">
       ${detailsHtml}
     </div>

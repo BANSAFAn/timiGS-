@@ -103,7 +103,12 @@
     "musicListening": "الاستماع إلى الموسيقى",
     "sessions": "جلسات",
     "nowPlaying": "يعمل الآن",
-    "live": "مباشر"
+    "live": "مباشر",
+    "sites": "مواقع",
+    "basedOn7Days": "بناءً على 7 أيام",
+    "unknownTrack": "مسار غير معروف",
+    "unknownPage": "صفحة غير معروفة",
+    "startUsingAppsHint": "ابدأ في استخدام تطبيقاتك لرؤية التحليلات هنا."
   },
   "settings": {
     "title": "الإعدادات",
@@ -172,7 +177,29 @@
     "doctorModeAlertMessage": "لقد كنت أمام الكمبيوتر لفترة طويلة. يرجى أخذ استراحة، اذهب للتنزه أو أرح عينيك لمدة ساعة!",
     "doctorModeRepeatMessage": "ما زلت تتجاهل استراحتك. أرح عينيك!",
     "clearData": "مسح جميع البيانات",
-    "noUpdates": "أنت تستخدم أحدث إصدار."
+    "noUpdates": "أنت تستخدم أحدث إصدار.",
+    "personalizeSubtitle": "تخصيص الواجهة الخاصة بك",
+    "chooseLangDesc": "اختر لغتك المفضلة",
+    "manageBehaviorSubtitle": "إدارة سلوك التطبيق",
+    "active": "نشط",
+    "paused": "متوقف مؤقتًا",
+    "updatesDesc": "التحقق من وجود أحدث الميزات والتحسينات.",
+    "dataManagementDesc": "تصدير بياناتك أو إعادة تعيينها",
+    "importDataDesc": "استيراد نشاطك المتعقب من ملف",
+    "importFile": "استيراد ملف",
+    "autoExport": "تصدير تلقائي",
+    "autoExportDesc": "تصدير البيانات تلقائيًا على فترات منتظمة",
+    "selectFolder": "اختر المجلد",
+    "everyHour": "كل ساعة",
+    "every6Hours": "كل 6 ساعات",
+    "every12Hours": "كل 12 ساعة",
+    "daily": "يومياً",
+    "every2Days": "كل يومين",
+    "aboutLicense": "حول البرنامج والترخيص",
+    "softwareInfo": "معلومات البرنامج",
+    "originalDevelopedBy": "البرنامج الأصلي تم تطويره بواسطة",
+    "licensedUnder": "مرخص بموجب",
+    "copyrightReserved": "محمي بموجب حقوق الطبع والنشر (c) 2026. الاسم \"TimiGS\" محفوظ."
   },
   "tools": {
     "title": "الأدوات",
@@ -186,7 +213,8 @@
     "newNote": "ملاحظة جديدة",
     "deleteNote": "حذف",
     "noNotes": "لا توجد ملاحظات بعد",
-    "untitled": "بدون عنوان"
+    "untitled": "بدون عنوان",
+    "selectNoteHint": "اختر ملاحظة لعرضها أو أنشئ واحدة جديدة"
   },
   "tasks": {
     "title": "المهام والأهداف",
@@ -197,7 +225,13 @@
     "hours": "ساعات",
     "create": "إنشاء",
     "cancel": "إلغاء",
-    "goal": "الهدف"
+    "goal": "الهدف",
+    "viewHistory": "عرض السجل",
+    "viewActive": "عرض النشط",
+    "exportCsv": "تصدير CSV",
+    "noCompletedTasks": "لم يتم العثور على مهام مكتملة.",
+    "websiteTitleKeyword": "الموقع / الكلمة المفتاحية للعنوان",
+    "optional": "اختياري"
   },
   "weather": {
     "title": "الطقس والنشاط"
@@ -236,7 +270,23 @@
     "wrongPassword": "كلمة مرور خاطئة",
     "focusedApp": "التطبيق المركّز عليه",
     "strictMode": "الوضع الصارم",
-    "strictHint": "الوضع الصارم يمنع: التبديل بين التطبيقات، إغلاق النوافذ، إيقاف التشغيل/إعادة التشغيل. لا يمكنك الخروج مبكراً بدون كلمة المرور!"
+    "strictHint": "الوضع الصارم يمنع: التبديل بين التطبيقات، إغلاق النوافذ، إيقاف التشغيل/إعادة التشغيل. لا يمكنك الخروج مبكراً بدون كلمة المرور!",
+    "passwordHint": "ستحتاج إلى كلمة المرور هذه لإلغاء وضع التركيز مبكرًا",
+    "backgroundMusic": "موسيقى خلفية (اختياري)",
+    "noMusic": "بلا موسيقى",
+    "chooseAppPlaceholder": "اختر تطبيقًا للتركيز عليه...",
+    "stopPreview": "إيقاف المعاينة",
+    "preview": "معاينة",
+    "enterPasswordPlaceholder": "أدخل كلمة مرور للقفل...",
+    "noTrackSelected": "لم يتم اختيار مسار",
+    "prevTrack": "المسار السابق",
+    "pause": "إيقاف مؤقت",
+    "play": "تشغيل",
+    "nextTrack": "المسار التالي",
+    "toggleLoop": "تكرار",
+    "selectTrackPlaceholder": "اختر مسارًا...",
+    "otherAppsBlocked": "سيتم حظر التطبيقات الأخرى",
+    "enterPasswordCancel": "أدخل كلمة المرور للإلغاء..."
   },
   "timeout": {
     "title": "وقت الراحة",
@@ -287,7 +337,8 @@
     "breakFrom": "من",
     "breakTo": "إلى",
     "simpleBreaks": "فترات راحة بسيطة",
-    "scheduleMode": "وضع الجدول الزمني"
+    "scheduleMode": "وضع الجدول الزمني",
+    "allAppsBlocked": "يتم حظر جميع التطبيقات أثناء الاستراحة"
   },
   "common": {
     "loading": "جار التحميل...",
@@ -310,7 +361,28 @@
     "connecting": "جاري الاتصال...",
     "done": "تم",
     "on": "تشغيل",
-    "off": "إيقاف"
+    "off": "إيقاف",
+    "application": "التطبيق",
+    "time": "الوقت",
+    "unknown": "غير معروف",
+    "you": "أنت",
+    "duration": "المدة",
+    "h_symbol": "س",
+    "m_symbol": "د",
+    "s_symbol": "ث",
+    "active": "نشط",
+    "paused": "متوقف مؤقتًا",
+    "quit": "إغلاق",
+    "openApp": "فتح التطبيق",
+    "now": "الآن",
+    "total": "إجمالي",
+    "delete": "حذف",
+    "seconds_word": "ثواني",
+    "minutes_word": "دقائق",
+    "hours_word": "ساعات",
+    "na": "غير متوفر",
+    "none": "—",
+    "ai": "ذكاء اصطناعي"
   },
   "team": {
     "title": "Team",
@@ -362,7 +434,32 @@
     "shareMusicTitle": "Share Music",
     "shareMusicDesc": "Show currently playing music during Focus Mode",
     "disconnectedOnRestartTitle": "Disconnected",
-    "disconnectedOnRestartMessage": "You have been disconnected from the group because the application was restarted. Please ask for the code again or try to join the room again."
+    "disconnectedOnRestartMessage": "You have been disconnected from the group because the application was restarted. Please ask for the code again or try to join the room again.",
+    "connectP2PDesc": "اتصل بفريقك عبر P2P وشاهد النشاط في الوقت الفعلي",
+    "voiceChatDesc": "انضم إلى غرفة الصوت الجماعية للتحدث مع الأعضاء المتصلين.",
+    "voiceChatChannel": "قناة الدردشة الصوتية",
+    "joinVoiceChat": "الانضمام إلى الدردشة الصوتية",
+    "unknownArtist": "فنان غير معروف",
+    "inCall": "في المكالمة",
+    "unmuteMic": "إلغاء كتم الصوت",
+    "muteMic": "كتم الميكروفون",
+    "leaveVoiceChat": "مغادرة المحادثة الصوتية",
+    "totalOnline": "إجمالي الوقت متصل",
+    "activeDuration": "مدة النشاط",
+    "categoryBreakdown": "تقسيم الفئات",
+    "appsUsage": "استخدام التطبيقات",
+    "detailedAppsCategories": "التطبيقات والفئات التفصيلية",
+    "activityReport": "تقرير النشاط",
+    "generated": "تم الإنشاء",
+    "totalMembers": "إجمالي الأعضاء",
+    "membersActivitySummary": "ملخص نشاط الأعضاء",
+    "member": "عضو",
+    "leader": "القائد",
+    "leaderSuffix": "(القائد)",
+    "onlineBadge": "● متصل",
+    "sessions": "الجلسات",
+    "na": "غير متوفر",
+    "none": "—"
   },
   "excludeProcesses": {
     "title": "Manage Process Tracking",
@@ -473,7 +570,10 @@
     "hide_files": "Hide File Breakdown",
     "timeline_view": "Timeline View",
     "grouped_view": "Files Summary",
-    "timeline_title": "Sessions & File Activity"
+    "timeline_title": "Sessions & File Activity",
+    "workspaceGeneral": "مساحة العمل / عام",
+    "unknownCoding": "غير معروف (برمجة)",
+    "noProject": "بدون مشروع"
   },
   "calendar": {
     "clear": "مسح",

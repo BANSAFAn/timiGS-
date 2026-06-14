@@ -259,6 +259,7 @@ pub fn run() {
             commands::stop_timeout_cmd,
             commands::get_timeout_status_cmd,
             commands::save_timeout_schedule_cmd,
+            commands::set_doctor_mode_locked_cmd,
             // Project Boards
             commands::create_project_board,
             commands::get_project_boards,

@@ -7,7 +7,7 @@
       </div>
       <span class="status-badge" :class="{ active: isTracking }">
         <span class="status-indicator-dot"></span>
-        <span>{{ isTracking ? "Tracking" : "Idle" }}</span>
+        <span>{{ isTracking ? t('settings.trackingActive', 'Tracking') : t('dashboard.idle', 'Idle') }}</span>
       </span>
     </div>
 
@@ -29,7 +29,7 @@
         <line x1="8" y1="21" x2="16" y2="21" />
         <line x1="12" y1="17" x2="12" y2="21" />
       </svg>
-      <span>Open App</span>
+      <span>{{ t('common.openApp', 'Open App') }}</span>
     </button>
 
     <button class="tray-btn quit-btn" @click="quitApp">
@@ -48,16 +48,19 @@
         <polyline points="16 17 21 12 16 7" />
         <line x1="21" y1="12" x2="9" y2="12" />
       </svg>
-      <span>Quit</span>
+      <span>{{ t('common.quit', 'Quit') }}</span>
     </button>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
+import { useI18n } from "vue-i18n";
 import { getCurrentWindow, Window } from "@tauri-apps/api/window";
 import { exit } from "@tauri-apps/plugin-process";
 import { invoke } from "@tauri-apps/api/core";
+
+const { t } = useI18n();
 
 const trayWindow = getCurrentWindow();
 const isTracking = ref(false);

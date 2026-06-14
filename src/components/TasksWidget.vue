@@ -6,7 +6,7 @@
         <button
           @click="viewMode = viewMode === 'active' ? 'history' : 'active'"
           class="btn-icon header-btn"
-          :title="viewMode === 'active' ? 'View History' : 'View Active'"
+          :title="viewMode === 'active' ? t('tasks.viewHistory', 'View History') : t('tasks.viewActive', 'View Active')"
         >
           <span v-html="viewMode === 'active' ? Icons.tasksHistory : Icons.tasksActive"></span>
         </button>
@@ -14,7 +14,7 @@
             v-if="viewMode === 'history'"
             @click="exportCsv"
             class="btn-icon header-btn"
-            title="Export CSV"
+            :title="t('tasks.exportCsv', 'Export CSV')"
         >
           <span v-html="Icons.tasksExport"></span>
         </button>
@@ -28,7 +28,7 @@
       </div>
       
       <div v-else-if="filteredTasks.length === 0" class="state-message empty-state">
-        <p>{{ viewMode === 'active' ? $t('tasks.noTasks', 'No active tasks. Start by adding one!') : 'No completed tasks found.' }}</p>
+        <p>{{ viewMode === 'active' ? $t('tasks.noTasks', 'No active tasks. Start by adding one!') : t('tasks.noCompletedTasks', 'No completed tasks found.') }}</p>
       </div>
       
       <div v-for="task in filteredTasks" :key="task.id" class="task-card" :class="{ completed: task.status === 'completed' }">
@@ -39,13 +39,13 @@
                 <span v-if="task.title_filter" class="filter-tag">{{ task.title_filter }}</span>
             </h4>
             <p v-if="task.description" class="task-desc">{{ task.description }}</p>
-            <p class="task-date">{{ new Date(task.created_at).toLocaleDateString() }}</p>
+            <p class="task-date">{{ new Date(task.created_at).toLocaleDateString(locale.value) }}</p>
           </div>
           <div class="task-actions">
              <span class="status-badge" :class="task.status">
                {{ task.status }}
              </span>
-             <button @click="deleteTask(task.id)" class="btn-icon delete-btn" title="Delete">
+             <button @click="deleteTask(task.id)" class="btn-icon delete-btn" :title="t('common.delete', 'Delete')">
                <span v-html="Icons.tasksDelete"></span>
              </button>
           </div>
@@ -62,7 +62,7 @@
           </div>
         </div>
         <div v-else class="completion-info">
-            <span>Goal: {{ formatDuration(task.goal_seconds) }}</span>
+             <span>{{ t('tasks.goal', 'Goal') }}: {{ formatDuration(task.goal_seconds) }}</span>
         </div>
       </div>
     </div>
@@ -103,7 +103,7 @@
 
         
         <div v-if="isBrowser(newTask.app_name)" class="form-group mb-2">
-            <label class="input-label">Website / Title Keyword</label>
+             <label class="input-label">{{ t('tasks.websiteTitleKeyword', 'Website / Title Keyword') }}</label>
             <input 
             v-model="newTask.title_filter" 
             placeholder="e.g. YouTube, GitHub" 
@@ -115,34 +115,34 @@
             <label class="input-label">{{ $t('tasks.description', 'Description') }}</label>
             <input 
             v-model="newTask.description" 
-            placeholder="Optional" 
+             :placeholder="t('tasks.optional', 'Optional')" 
             class="input-field"
             />
         </div>
         
         
         <div class="form-row mb-3">
-             <div class="input-wrapper flex-1">
-                <label class="input-label">Hours</label>
-                <input 
-                v-model.number="newTask.hours" 
-                type="number"
-                min="0"
-                class="input-field"
-                />
-            </div>
-            <div class="input-wrapper flex-1">
-                <label class="input-label">Minutes</label>
+              <div class="input-wrapper flex-1">
+                 <label class="input-label">{{ t('common.hours', 'Hours') }}</label>
                  <input 
-                v-model.number="newTask.minutes" 
-                type="number"
-                min="0"
-                max="59"
-                class="input-field"
-                />
-            </div>
+                 v-model.number="newTask.hours" 
+                 type="number"
+                 min="0"
+                 class="input-field"
+                 />
+             </div>
              <div class="input-wrapper flex-1">
-                <label class="input-label">Seconds</label>
+                 <label class="input-label">{{ t('common.minutes', 'Minutes') }}</label>
+                  <input 
+                 v-model.number="newTask.minutes" 
+                 type="number"
+                 min="0"
+                 max="59"
+                 class="input-field"
+                 />
+             </div>
+              <div class="input-wrapper flex-1">
+                 <label class="input-label">{{ t('common.seconds', 'Seconds') }}</label>
                  <input 
                 v-model.number="newTask.seconds" 
                 type="number"
@@ -168,9 +168,12 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { invoke } from '@tauri-apps/api/core';
 import { listen } from '@tauri-apps/api/event';
 import { Icons } from './icons/IconMap';
+
+const { t, locale } = useI18n();
 
 interface Task {
   id: number;
@@ -392,12 +395,15 @@ function getProgress(task: Task) {
 }
 
 function formatDuration(seconds: number) {
+    const h_sym = t('common.h_symbol', 'h');
+    const m_sym = t('common.m_symbol', 'm');
+    const s_sym = t('common.s_symbol', 's');
     const h = Math.floor(seconds / 3600);
     const m = Math.floor((seconds % 3600) / 60);
     const s = seconds % 60;
-    if (h > 0) return `${h}h ${m}m`;
-    if (m > 0) return `${m}m ${s}s`;
-    return `${s}s`;
+    if (h > 0) return `${h}${h_sym} ${m}${m_sym}`;
+    if (m > 0) return `${m}${m_sym} ${s}${s_sym}`;
+    return `${s}${s_sym}`;
 }
 
 onMounted(async () => {

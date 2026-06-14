@@ -10,7 +10,7 @@
         <div class="header-right">
           <div class="tracking-pill" :class="{ active: store.isTracking }">
             <span class="tracking-dot"></span>
-            <span>{{ store.isTracking ? "Tracking" : "Paused" }}</span>
+             <span>{{ store.isTracking ? $t("settings.active", "Active") : $t("settings.paused", "Paused") }}</span>
           </div>
         </div>
       </div>
@@ -372,6 +372,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from "vue";
+import { useI18n } from "vue-i18n";
 import { invoke } from "@tauri-apps/api/core";
 import { useActivityStore, getProgramTag } from "../stores/activity";
 import ProcessExcludeModal from "../components/ProcessExcludeModal.vue";
@@ -388,6 +389,7 @@ import {
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement);
 
+const { t, locale } = useI18n();
 const store = useActivityStore();
 const currentActivity = computed(() => store.currentActivity);
 const selectedChartType = ref("doughnut");
@@ -404,10 +406,12 @@ function handleBlur() {
   isAppFocused.value = false;
 }
 
-const currentDate = new Date().toLocaleDateString(undefined, {
-  weekday: "long",
-  month: "long",
-  day: "numeric",
+const currentDate = computed(() => {
+  return new Date().toLocaleDateString(locale.value, {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+  });
 });
 
 let intervalId: number | null = null;
@@ -424,11 +428,14 @@ const chartColors = [
 
 function formatDuration(seconds: number): string {
   if (!seconds || seconds < 0) seconds = 0;
-  if (seconds < 60) return `${seconds}s`;
-  if (seconds < 3600) return `${Math.floor(seconds / 60)}m`;
+  const s_sym = t('common.s_symbol', 's');
+  const m_sym = t('common.m_symbol', 'm');
+  const h_sym = t('common.h_symbol', 'h');
+  if (seconds < 60) return `${seconds}${s_sym}`;
+  if (seconds < 3600) return `${Math.floor(seconds / 60)}${m_sym}`;
   const h = Math.floor(seconds / 3600);
   const m = Math.floor((seconds % 3600) / 60);
-  return `${h}h ${m}m`;
+  return `${h}${h_sym} ${m}${m_sym}`;
 }
 
 function getProgressWidth(seconds: number): number {
@@ -544,21 +551,26 @@ async function loadIcon(appName: string, path: string) {
 }
 
 async function refreshData() {
-  await store.fetchCurrentActivity();
-  await store.fetchTrackingStatus();
+  await Promise.all([
+    store.fetchCurrentActivity(),
+    store.fetchTrackingStatus(),
+    store.fetchTodayData()
+  ]);
+
   if (store.currentActivity?.exe_path) {
     loadIcon(store.currentActivity.app_name, store.currentActivity.exe_path);
   }
   if (store.currentSession?.exe_path) {
     loadIcon(store.currentSession.app_name, store.currentSession.exe_path);
   }
-  await store.fetchTodayData();
   store.topApps.forEach((app) => loadIcon(app.app_name, app.exe_path));
 }
 
 onMounted(async () => {
-  await store.fetchExcludedProcesses();
-  refreshData();
+  await Promise.all([
+    store.fetchExcludedProcesses(),
+    refreshData()
+  ]);
   intervalId = window.setInterval(refreshData, 5000);
   window.addEventListener("focus", handleFocus);
   window.addEventListener("blur", handleBlur);

@@ -93,11 +93,23 @@ const emit = defineEmits<{
   'update:modelValue': [date: Date];
 }>();
 
-const weekDays = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
-const monthNames = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December'
-];
+import { useI18n } from 'vue-i18n';
+
+const { locale } = useI18n();
+
+const weekDays = computed(() => {
+  return Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(2006, 0, 1 + i); // 2006-01-01 is a Sunday
+    return d.toLocaleDateString(locale.value, { weekday: 'short' });
+  });
+});
+
+const monthNames = computed(() => {
+  return Array.from({ length: 12 }, (_, i) => {
+    const d = new Date(2000, i, 1);
+    return d.toLocaleDateString(locale.value, { month: 'long' });
+  });
+});
 
 const currentDate = ref(new Date(props.modelValue));
 const currentMonth = ref(currentDate.value.getMonth());

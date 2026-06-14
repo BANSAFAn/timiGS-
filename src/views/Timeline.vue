@@ -81,9 +81,9 @@
                 </span>
               </div>
               <div class="group-meta">
-                <span class="group-sessions-count">{{ group.sessions.length }} {{ group.sessions.length === 1 ? 'session' : 'sessions' }}</span>
+                <span class="group-sessions-count">{{ group.sessions.length }} {{ $t('dashboard.sessions', 'Sessions') }}</span>
                 <span class="group-separator">•</span>
-                <span class="group-total-time">{{ formatDuration(group.totalTime) }} total</span>
+                <span class="group-total-time">{{ formatDuration(group.totalTime) }} {{ t('common.total', 'total') }}</span>
               </div>
             </div>
             <div class="group-duration">
@@ -94,7 +94,7 @@
           <div v-show="expandedGroups.has(group.appName)" class="timeline-group-sessions">
             <div v-for="session in group.sessions" :key="session.id" class="timeline-item" @click="handleSessionClick(session)">
               <div class="timeline-time">
-                {{ formatTime(session.start_time) }} - {{ session.end_time ? formatTime(session.end_time) : 'Now' }}
+                {{ formatTime(session.start_time) }} - {{ session.end_time ? formatTime(session.end_time) : t('common.now', 'Now') }}
               </div>
               <div class="timeline-content">
                 <div class="timeline-app" :class="{ 'is-clickable': isBrowser(session.app_name) }">
@@ -163,7 +163,7 @@ import { invoke } from '@tauri-apps/api/core';
 import { useActivityStore, getProgramTag, type ActivitySession } from '../stores/activity';
 import CustomCalendar from '../components/CustomCalendar.vue';
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const store = useActivityStore();
 
 const selectedDate = ref(new Date());
@@ -356,7 +356,7 @@ function getDateLabel(): string {
 }
 
 function formatDate(date: Date): string {
-  return date.toLocaleDateString(undefined, {
+  return date.toLocaleDateString(locale.value, {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
@@ -369,18 +369,21 @@ function formatDateForInput(date: Date): string {
 }
 
 function formatTime(timeStr: string): string {
-  return new Date(timeStr).toLocaleTimeString(undefined, {
+  return new Date(timeStr).toLocaleTimeString(locale.value, {
     hour: '2-digit',
     minute: '2-digit'
   });
 }
 
 function formatDuration(seconds: number): string {
-  if (seconds < 60) return `${seconds}s`;
+  const h_sym = t('common.h_symbol', 'h');
+  const m_sym = t('common.m_symbol', 'm');
+  const s_sym = t('common.s_symbol', 's');
+  if (seconds < 60) return `${seconds}${s_sym}`;
   const hrs = Math.floor(seconds / 3600);
   const mins = Math.floor((seconds % 3600) / 60);
-  if (hrs > 0) return `${hrs}h ${mins}m`;
-  return `${mins}m`;
+  if (hrs > 0) return `${hrs}${h_sym} ${mins}${m_sym}`;
+  return `${mins}${m_sym}`;
 }
 
 
@@ -425,13 +428,18 @@ watch(sessions, (newSessions) => {
 watch(selectedDate, fetchSessions);
 
 onMounted(async () => {
-  await store.fetchExcludedProcesses();
   if (isToday.value) {
-    await store.fetchTodayData();
-    sessions.value = store.todaySessions;
-
+    await Promise.all([
+      store.fetchExcludedProcesses(),
+      store.fetchTodayData().then(() => {
+        sessions.value = store.todaySessions;
+      })
+    ]);
   } else {
-    await fetchSessions();
+    await Promise.all([
+      store.fetchExcludedProcesses(),
+      fetchSessions()
+    ]);
   }
 });
 </script>

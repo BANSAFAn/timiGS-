@@ -146,7 +146,9 @@ fn enforce_focus(target_exe_lower: &str) {
         // Check if the foreground app is allowed
         let is_allowed = fg_exe_lower.contains(target_exe_lower)
             || fg_exe_lower.contains("explorer.exe")
-            || fg_exe_lower.contains("timigs");
+            || fg_exe_lower.contains("timigs")
+            || fg_exe_lower.contains("msedgewebview2")
+            || fg_exe_lower.contains("webview2");
 
         if !is_allowed {
             // Minimize the non-allowed window

@@ -40,7 +40,7 @@
             <div class="card-icon" v-html="Icons.appearance"></div>
             <div>
               <h3 class="card-title-modern">{{ $t("settings.appearance") }}</h3>
-              <p class="card-subtitle">Personalize your interface</p>
+              <p class="card-subtitle">{{ $t("settings.personalizeSubtitle", "Personalize your interface") }}</p>
             </div>
           </div>
 
@@ -53,7 +53,7 @@
                     $t("settings.language")
                   }}</label>
                   <p class="setting-description">
-                    Choose your preferred language
+                    {{ $t("settings.chooseLangDesc", "Choose your preferred language") }}
                   </p>
                 </div>
               </div>
@@ -123,7 +123,7 @@
             <div class="card-icon" v-html="Icons.system"></div>
             <div>
               <h3 class="card-title-modern">{{ $t("settings.system") }}</h3>
-              <p class="card-subtitle">Manage app behavior</p>
+              <p class="card-subtitle">{{ $t("settings.manageBehaviorSubtitle", "Manage app behavior") }}</p>
             </div>
           </div>
 
@@ -136,7 +136,7 @@
                     $t("settings.tracking")
                   }}</label>
                   <p class="setting-description">
-                    {{ store.isTracking ? "Active" : "Paused" }}
+                    {{ store.isTracking ? $t("settings.active", "Active") : $t("settings.paused", "Paused") }}
                   </p>
                 </div>
               </div>
@@ -219,6 +219,30 @@
               />
             </div>
 
+            <div class="doctor-mode-status-card animate-enter" v-if="doctorModeStore.enabled">
+              <div class="status-header">
+                <span class="status-dot-pulse"></span>
+                <strong>{{ $t("settings.doctorModeActiveSession") || 'Active Session' }}</strong>
+              </div>
+              <div class="status-grid-mini">
+                <div class="status-item-mini">
+                  <span class="label">{{ $t("settings.doctorModeElapsedTime") || 'Elapsed Time' }}:</span>
+                  <span class="value font-mono">{{ formatElapsedDuration(doctorModeStore.elapsedSeconds) }}</span>
+                </div>
+                <div class="status-item-mini">
+                  <span class="label">{{ $t("settings.doctorModeReminders") || 'Reminders' }}:</span>
+                  <span class="value">{{ doctorModeStore.reminderCount }} / {{ doctorModeStore.maxReminders }}</span>
+                </div>
+                <div class="status-item-mini">
+                  <span class="label">{{ $t("settings.doctorModeTimeUntilLock") || 'Time Until Lock' }}:</span>
+                  <span class="value font-mono">{{ formatElapsedDuration(doctorModeStore.secondsUntilLock) }}</span>
+                </div>
+              </div>
+              <button class="btn btn-secondary btn-small" style="margin-top: 12px; width: 100%;" @click="doctorModeStore.resetSession">
+                {{ $t("settings.resetSession") || 'Reset Session' }}
+              </button>
+            </div>
+
             <div class="setting-item" v-if="doctorModeStore.enabled">
               <div class="setting-left">
                 <div class="setting-icon" v-html="Icons.clock"></div>
@@ -297,7 +321,7 @@
             </div>
           </div>
           <p class="text-muted sm" style="margin-bottom: 16px">
-            Check for the latest features and improvements.
+            {{ $t("settings.updatesDesc") }}
           </p>
           <button class="btn btn-primary full-width" @click="checkForUpdates">
             {{ $t("settings.checkForUpdates") }}
@@ -312,7 +336,7 @@
               <h3 class="card-title-modern">
                 {{ $t("settings.dataManagement") }}
               </h3>
-              <p class="card-subtitle">Export or reset your data</p>
+              <p class="card-subtitle">{{ $t("settings.dataManagementDesc") }}</p>
             </div>
           </div>
 
@@ -454,10 +478,10 @@
                 <div class="setting-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="24" height="24" fill="currentColor"><path d="M224,144v64a8,8,0,0,1-8,8H40a8,8,0,0,1-8-8V144a8,8,0,0,1,16,0v56H208V144a8,8,0,0,1,16,0Zm-87.16,33.16a8.13,8.13,0,0,0,11.32,0l40-40a8,8,0,0,0-11.32-11.32L136,166.69V32a8,8,0,0,0-16,0V166.69L79.16,125.84a8,8,0,0,0-11.32,11.32Z"></path></svg></div>
                 <div class="setting-content">
                   <label class="setting-label">{{
-                    $te("settings.importData") ? $t("settings.importData") : "Import Data"
+                    $t("settings.importData")
                   }}</label>
                   <p class="setting-description">
-                    {{ $te("settings.importDataDesc") ? $t("settings.importDataDesc") : "Import your tracked activity from a file" }}
+                    {{ $t("settings.importDataDesc") }}
                   </p>
                 </div>
               </div>
@@ -467,7 +491,7 @@
                 :disabled="isImporting"
               >
                 <span v-if="isImporting" class="updating-spinner"></span>
-                <span>{{ $te("settings.importFile") ? $t("settings.importFile") : "Import File" }}</span>
+                <span>{{ $t("settings.importFile") }}</span>
               </button>
             </div>
 
@@ -475,9 +499,9 @@
               <div class="setting-left">
                 <div class="setting-icon" v-html="Icons.update"></div>
                 <div class="setting-content">
-                  <label class="setting-label">Auto-Export</label>
+                  <label class="setting-label">{{ $t("settings.autoExport") }}</label>
                   <p class="setting-description">
-                    Automatically export data at regular intervals
+                    {{ $t("settings.autoExportDesc") }}
                   </p>
                 </div>
               </div>
@@ -504,11 +528,11 @@
                   @change="saveAutoExportSettings"
                   class="interval-select"
                 >
-                  <option :value="1">Every hour</option>
-                  <option :value="6">Every 6 hours</option>
-                  <option :value="12">Every 12 hours</option>
-                  <option :value="24">Daily</option>
-                  <option :value="48">Every 2 days</option>
+                  <option :value="1">{{ $t("settings.everyHour") }}</option>
+                  <option :value="6">{{ $t("settings.every6Hours") }}</option>
+                  <option :value="12">{{ $t("settings.every12Hours") }}</option>
+                  <option :value="24">{{ $t("settings.daily") }}</option>
+                  <option :value="48">{{ $t("settings.every2Days") }}</option>
                 </select>
               </div>
               <span
@@ -525,7 +549,7 @@
                   style="margin-right: 4px"
                   v-html="Icons.folder"
                 ></span>
-                Select Folder
+                {{ $t("settings.selectFolder") }}
               </button>
             </div>
 
@@ -556,8 +580,8 @@
           <div class="card-header-modern">
             <div class="card-icon" v-html="Icons.about"></div>
             <div>
-              <h3 class="card-title-modern">About & License</h3>
-              <p class="card-subtitle">Software information</p>
+              <h3 class="card-title-modern">{{ $t("settings.aboutLicense") }}</h3>
+              <p class="card-subtitle">{{ $t("settings.softwareInfo") }}</p>
             </div>
           </div>
           <div class="setting-info" style="text-align: center; padding: 10px 0">
@@ -565,7 +589,7 @@
               class="setting-desc"
               style="font-size: 0.9rem; color: var(--text-color)"
             >
-              Original Software developed by
+              {{ $t("settings.originalDevelopedBy") }}
               <a
                 href="https://github.com/BANSAFAn"
                 target="_blank"
@@ -574,13 +598,13 @@
               >
             </p>
             <p class="setting-desc" style="font-size: 0.8rem; margin-top: 5px">
-              Licensed under TimiGS Public License.
+              {{ $t("settings.licensedUnder") }} TimiGS Public License.
             </p>
             <p
               class="setting-desc"
               style="font-size: 0.75rem; margin-top: 10px; opacity: 0.7"
             >
-              Protected by Copyright (c) 2026. The name "TimiGS" is reserved.
+              {{ $t("settings.copyrightReserved") }}
             </p>
           </div>
         </div>
@@ -755,6 +779,19 @@ function updateDoctorModeMaxReminders() {
   doctorModeStore.setMaxReminders(doctorModeMaxReminders.value);
 }
 
+function formatElapsedDuration(seconds: number): string {
+  const hrs = Math.floor(seconds / 3600);
+  const mins = Math.floor((seconds % 3600) / 60);
+  const secs = seconds % 60;
+  
+  const parts = [];
+  if (hrs > 0) parts.push(`${hrs}h`);
+  if (mins > 0 || hrs > 0) parts.push(`${mins}m`);
+  parts.push(`${secs}s`);
+  
+  return parts.join(' ');
+}
+
 
 const langOpen = ref(false);
 const availableLanguages = [
@@ -763,7 +800,7 @@ const availableLanguages = [
   { code: "de", name: "Deutsch", flag: "🇩🇪", flagImg: "https://flagcdn.com/w40/de.png" },
   { code: "fr", name: "Français", flag: "🇫🇷", flagImg: "https://flagcdn.com/w40/fr.png" },
   { code: "es", name: "Español", flag: "🇪🇸", flagImg: "https://flagcdn.com/w40/es.png" },
-  { code: "zh-CN", name: "中文 (简体)", flag: "🇨🇳", flagImg: "https://flagcdn.com/w40/cn.png" },
+  { code: "zh", name: "中文 (简体)", flag: "🇨🇳", flagImg: "https://flagcdn.com/w40/cn.png" },
   { code: "ar", name: "العربية", flag: "🇸🇦", flagImg: "https://flagcdn.com/w40/sa.png" },
   { code: "pt", name: "Português", flag: "🇵🇹", flagImg: "https://flagcdn.com/w40/pt.png" },
   { code: "pl", name: "Polski", flag: "🇵🇱", flagImg: "https://flagcdn.com/w40/pl.png" },
@@ -892,12 +929,6 @@ async function toggleTracking() {
   } else {
     await store.startTracking();
   }
-}
-
-
-
-
-
 const isUpdating = ref(false);
 const showUpdateModal = ref(false);
 const updateVersion = ref("");
@@ -1215,6 +1246,64 @@ async function confirmResetData() {
 </script>
 
 <style scoped>
+.doctor-mode-status-card {
+  background: rgba(91, 110, 225, 0.05);
+  border: 1px solid rgba(91, 110, 225, 0.15);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  margin: 12px 16px;
+}
+
+.doctor-mode-status-card .status-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  color: var(--color-primary);
+  font-size: 0.95rem;
+}
+
+.doctor-mode-status-card .status-dot-pulse {
+  width: 8px;
+  height: 8px;
+  background-color: var(--color-primary);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--color-primary);
+  animation: pulse-dot 1.5s infinite;
+}
+
+@keyframes pulse-dot {
+  0% { transform: scale(0.95); opacity: 0.5; }
+  50% { transform: scale(1.1); opacity: 1; }
+  100% { transform: scale(0.95); opacity: 0.5; }
+}
+
+.doctor-mode-status-card .status-grid-mini {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+
+.doctor-mode-status-card .status-item-mini {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.88rem;
+}
+
+.doctor-mode-status-card .status-item-mini .label {
+  color: var(--text-muted);
+}
+
+.doctor-mode-status-card .status-item-mini .value {
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.font-mono {
+  font-family: 'Consolas', monospace;
+}
+
 .page-shell {
   padding-bottom: 80px;
 }

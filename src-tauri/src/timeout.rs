@@ -29,7 +29,7 @@ static mut KBD_HOOK: HHOOK = HHOOK(std::ptr::null_mut());
 #[cfg(target_os = "windows")]
 unsafe extern "system" fn keyboard_hook_proc(code: i32, wparam: WPARAM, lparam: LPARAM) -> LRESULT {
     if code >= 0 {
-        let is_break = BREAK_ACTIVE.load(Ordering::SeqCst);
+        let is_break = BREAK_ACTIVE.load(Ordering::SeqCst) || DOCTOR_MODE_LOCKED.load(Ordering::SeqCst);
         let kb = &*(lparam.0 as *const KBDLLHOOKSTRUCT);
         let vk_code = kb.vkCode;
         let flags = kb.flags.0;
@@ -96,6 +96,7 @@ pub fn init_keyboard_hook() {
 static TIMEOUT_STATE: Lazy<Mutex<Option<TimeoutSession>>> = Lazy::new(|| Mutex::new(None));
 static TIMEOUT_RUNNING: AtomicBool = AtomicBool::new(false);
 static BREAK_ACTIVE: AtomicBool = AtomicBool::new(false);
+pub static DOCTOR_MODE_LOCKED: AtomicBool = AtomicBool::new(false);
 static SCHEDULE_ENABLED: AtomicBool = AtomicBool::new(false);
 static SCHEDULE_START_HOUR: AtomicU64 = AtomicU64::new(9);
 static SCHEDULE_START_MINUTE: AtomicU64 = AtomicU64::new(0);
@@ -598,7 +599,10 @@ fn enforce_break_focus() {
         let fg_exe_lower = fg_exe.to_lowercase();
 
         // Allow TimiGS and explorer only
-        let is_allowed = fg_exe_lower.contains("explorer.exe") || fg_exe_lower.contains("timigs");
+        let is_allowed = fg_exe_lower.contains("explorer.exe")
+            || fg_exe_lower.contains("timigs")
+            || fg_exe_lower.contains("msedgewebview2")
+            || fg_exe_lower.contains("webview2");
 
         if !is_allowed {
             let _ = ShowWindow(hwnd, SW_MINIMIZE);
@@ -877,7 +881,11 @@ fn enforce_all_windows_minimized() {
             let exe_lower = exe.to_lowercase();
 
             // Allow TimiGS and Explorer windows
-            if exe_lower.contains("timigs") || exe_lower.contains("explorer.exe") {
+            if exe_lower.contains("timigs")
+                || exe_lower.contains("explorer.exe")
+                || exe_lower.contains("msedgewebview2")
+                || exe_lower.contains("webview2")
+            {
                 return BOOL(1);
             }
 
@@ -919,3 +927,34 @@ fn get_process_exe(process_id: u32) -> String {
         String::new()
     }
 }
+
+pub fn set_doctor_mode_locked(app_handle: tauri::AppHandle, locked: bool) -> Result<(), String> {
+    DOCTOR_MODE_LOCKED.store(locked, Ordering::SeqCst);
+
+    let app_clone = app_handle.clone();
+    if locked {
+        set_break_window_state(&app_handle, true);
+
+        thread::spawn(move || {
+            let mut loop_counter: u64 = 0;
+            while DOCTOR_MODE_LOCKED.load(Ordering::SeqCst) {
+                #[cfg(target_os = "windows")]
+                enforce_break_focus();
+
+                #[cfg(target_os = "windows")]
+                if loop_counter % 2 == 0 {
+                    enforce_all_windows_minimized();
+                }
+
+                thread::sleep(Duration::from_secs(1));
+                loop_counter = loop_counter.wrapping_add(1);
+            }
+            set_break_window_state(&app_clone, false);
+        });
+    } else {
+        set_break_window_state(&app_handle, false);
+    }
+
+    Ok(())
+}
+

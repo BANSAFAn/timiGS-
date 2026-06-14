@@ -103,7 +103,12 @@
     "musicListening": "Słuchanie muzyki",
     "sessions": "sesji",
     "nowPlaying": "Teraz odtwarzane",
-    "live": "NA ŻYWO"
+    "live": "NA ŻYWO",
+    "sites": "stron",
+    "basedOn7Days": "Na podstawie 7 dni",
+    "unknownTrack": "Nieznany utwór",
+    "unknownPage": "Nieznana strona",
+    "startUsingAppsHint": "Zacznij korzystać z aplikacji, aby zobaczyć statystyki."
   },
   "settings": {
     "title": "Ustawienia",
@@ -171,7 +176,29 @@
     "resetSession": "Resetuj aktywną sesję",
     "doctorModeAlertMessage": "Jesteś przy swoim PC od dłuższego czasu. Proszę, zrób przerwę, idź na spacer lub odpocznij oczami przez godzinę!",
     "doctorModeRepeatMessage": "Nadal ignorujesz swoją przerwę. Daj odpocząć oczom!",
-    "noUpdates": "Używasz najnowszej wersji."
+    "noUpdates": "Używasz najnowszej wersji.",
+    "personalizeSubtitle": "Spersonalizuj swój interfejs",
+    "chooseLangDesc": "Wybierz preferowany język",
+    "manageBehaviorSubtitle": "Zarządzaj zachowaniem aplikacji",
+    "active": "Aktywny",
+    "paused": "Wstrzymany",
+    "updatesDesc": "Sprawdź najnowsze funkcje i ulepszenia.",
+    "dataManagementDesc": "Eksportuj lub zresetuj swoje dane",
+    "importDataDesc": "Importuj zarejestrowaną aktywność z pliku",
+    "importFile": "Importuj plik",
+    "autoExport": "Auto-eksport",
+    "autoExportDesc": "Automatycznie eksportuj dane w regularnych odstępach czasu",
+    "selectFolder": "Wybierz folder",
+    "everyHour": "Co godzinę",
+    "every6Hours": "Co 6 godzin",
+    "every12Hours": "Co 12 godzin",
+    "daily": "Codziennie",
+    "every2Days": "Co 2 dni",
+    "aboutLicense": "O programie i licencja",
+    "softwareInfo": "Informacje o oprogramowaniu",
+    "originalDevelopedBy": "Oryginalne oprogramowanie opracowane przez",
+    "licensedUnder": "Licencjonowane na warunkach",
+    "copyrightReserved": "Chronione prawem autorskim (c) 2026. Nazwa „TimiGS” jest zastrzeżona."
   },
   "tools": {
     "title": "Narzędzia",
@@ -185,7 +212,8 @@
     "newNote": "Nowa Notatka",
     "deleteNote": "Usuń",
     "noNotes": "Brak notatek",
-    "untitled": "Notatka Bez Tytułu"
+    "untitled": "Notatka Bez Tytułu",
+    "selectNoteHint": "Wybierz notatkę do wyświetlenia lub utwórz nową"
   },
   "tasks": {
     "title": "Zadania i Cele",
@@ -196,7 +224,13 @@
     "hours": "Godzin",
     "create": "Utwórz",
     "cancel": "Anuluj",
-    "goal": "Cel"
+    "goal": "Cel",
+    "viewHistory": "Pokaż historię",
+    "viewActive": "Pokaż aktywne",
+    "exportCsv": "Eksportuj do CSV",
+    "noCompletedTasks": "Brak ukończonych zadań.",
+    "websiteTitleKeyword": "Strona / Słowo kluczowe",
+    "optional": "Opcjonalnie"
   },
   "weather": {
     "title": "Pogoda i Aktywność"
@@ -235,7 +269,23 @@
     "wrongPassword": "Nieprawidłowe hasło",
     "focusedApp": "Aplikacja w Skupieniu",
     "strictMode": "Strict Mode",
-    "strictHint": "Strict Mode blocks: switching apps, closing windows, shutdown/restart. You CANNOT exit early without password!"
+    "strictHint": "Strict Mode blocks: switching apps, closing windows, shutdown/restart. You CANNOT exit early without password!",
+    "passwordHint": "Będziesz potrzebować tego hasła, aby anulować tryb skupienia wcześniej",
+    "backgroundMusic": "Muzyka w tle (opcjonalnie)",
+    "noMusic": "Brak muzyki",
+    "chooseAppPlaceholder": "Wybierz aplikację do skupienia...",
+    "stopPreview": "Zatrzymaj podgląd",
+    "preview": "Podgląd",
+    "enterPasswordPlaceholder": "Wpisz hasło do zablokowania...",
+    "noTrackSelected": "Nie wybrano utworu",
+    "prevTrack": "Poprzedni utwór",
+    "pause": "Pauza",
+    "play": "Odtwarzaj",
+    "nextTrack": "Następny utwór",
+    "toggleLoop": "Włącz pętlę",
+    "selectTrackPlaceholder": "Wybierz utwór...",
+    "otherAppsBlocked": "Inne aplikacje zostaną zablokowane",
+    "enterPasswordCancel": "Wpisz hasło, aby anulować..."
   },
   "timeout": {
     "title": "Time OUT",
@@ -286,7 +336,8 @@
     "breakFrom": "Od",
     "breakTo": "Do",
     "simpleBreaks": "Proste Przerwy",
-    "scheduleMode": "Tryb Harmonogramu"
+    "scheduleMode": "Tryb Harmonogramu",
+    "allAppsBlocked": "Wszystkie aplikacje są zablokowane podczas przerwy"
   },
   "common": {
     "loading": "Ładowanie...",
@@ -309,7 +360,28 @@
     "connecting": "Łączenie...",
     "done": "Gotowe",
     "on": "ON",
-    "off": "OFF"
+    "off": "OFF",
+    "application": "Aplikacja",
+    "time": "Czas",
+    "unknown": "Nieznany",
+    "you": "Ty",
+    "duration": "Czas trwania",
+    "h_symbol": "g",
+    "m_symbol": "m",
+    "s_symbol": "s",
+    "active": "Aktywny",
+    "paused": "Wstrzymany",
+    "quit": "Wyjdź",
+    "openApp": "Otwórz aplikację",
+    "now": "Teraz",
+    "total": "łącznie",
+    "delete": "Usuń",
+    "seconds_word": "sekund",
+    "minutes_word": "minut",
+    "hours_word": "godzin",
+    "na": "N/D",
+    "none": "—",
+    "ai": "AI"
   },
   "team": {
     "title": "Team",
@@ -361,7 +433,32 @@
     "shareMusicTitle": "Share Music",
     "shareMusicDesc": "Show currently playing music during Focus Mode",
     "disconnectedOnRestartTitle": "Disconnected",
-    "disconnectedOnRestartMessage": "You have been disconnected from the group because the application was restarted. Please ask for the code again or try to join the room again."
+    "disconnectedOnRestartMessage": "You have been disconnected from the group because the application was restarted. Please ask for the code again or try to join the room again.",
+    "connectP2PDesc": "Połącz się ze swoim zespołem przez P2P i śledź aktywność w czasie rzeczywistym",
+    "voiceChatDesc": "Dołącz do pokoju głosowego zespołu, aby rozmawiać z połączonymi członkami.",
+    "voiceChatChannel": "Kanał czatu głosowego",
+    "joinVoiceChat": "Dołącz do czatu głosowego",
+    "unknownArtist": "Nieznany wykonawca",
+    "inCall": "w rozmowie",
+    "unmuteMic": "Wyłącz wyciszenie",
+    "muteMic": "Wycisz mikrofon",
+    "leaveVoiceChat": "Opuść czat głosowy",
+    "totalOnline": "Łącznie online",
+    "activeDuration": "Czas aktywności",
+    "categoryBreakdown": "Podział kategorii",
+    "appsUsage": "Użycie aplikacji",
+    "detailedAppsCategories": "Szczegółowe aplikacje i kategorie",
+    "activityReport": "Raport aktywności",
+    "generated": "Wygenerowano",
+    "totalMembers": "Razem członków",
+    "membersActivitySummary": "Podsumowanie aktywności członków",
+    "member": "Członek",
+    "leader": "Lider",
+    "leaderSuffix": "(Lider)",
+    "onlineBadge": "● W sieci",
+    "sessions": "Sesje",
+    "na": "N/D",
+    "none": "—"
   },
   "excludeProcesses": {
     "title": "Zarządzaj Śledzeniem Procesów",
@@ -472,7 +569,10 @@
     "hide_files": "Hide File Breakdown",
     "timeline_view": "Timeline View",
     "grouped_view": "Files Summary",
-    "timeline_title": "Sessions & File Activity"
+    "timeline_title": "Sessions & File Activity",
+    "workspaceGeneral": "Obszar roboczy / Ogólne",
+    "unknownCoding": "Nieznany(Programowanie)",
+    "noProject": "Brak projektu"
   },
   "calendar": {
     "clear": "Wyczyść",

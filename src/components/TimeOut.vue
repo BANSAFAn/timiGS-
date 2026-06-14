@@ -413,8 +413,8 @@
       
       <div v-if="status.break_active" class="break-overlay">
         <div class="break-emoji" v-html="Icons.timeoutBreak"></div>
-        <h3 class="break-title">Time to relax!</h3>
-        <p class="break-subtitle">Take a break, drink some tea, stretch!</p>
+        <h3 class="break-title">{{ t('timeout.breakTitle', 'Time to relax!') }}</h3>
+        <p class="break-subtitle">{{ t('timeout.breakMessage', 'Take a break, drink some tea, stretch!') }}</p>
 
         <div class="circular-progress break-progress">
           <svg viewBox="0 0 100 100">
@@ -431,29 +431,29 @@
           <div class="time-display">{{ breakFormattedTime }}</div>
         </div>
 
-        <p class="break-note">All applications are blocked during break</p>
+        <p class="break-note">{{ t('timeout.allAppsBlocked', 'All applications are blocked during break') }}</p>
       </div>
 
       
       <div v-else class="working-state">
         <div class="status-badge working">
           <span class="status-dot"></span>
-          Working
+          {{ t('timeout.working', 'Working') }}
         </div>
 
         <div class="next-break-info">
-          <span class="next-label">Next break in</span>
+          <span class="next-label">{{ t('timeout.nextBreak', 'Next break in') }}</span>
           <span class="next-time">{{ workFormattedTime }}</span>
         </div>
 
         <div class="schedule-info">
           <div class="schedule-item">
             <span class="schedule-icon" v-html="Icons.timeoutWork"></span>
-            <span>Work: {{ status.interval_secs / 60 }}min</span>
+            <span>{{ t('timeout.workInterval', 'Work Interval') }}: {{ status.interval_secs / 60 }}{{ t('common.m_symbol', 'm') }}</span>
           </div>
           <div class="schedule-item">
             <span class="schedule-icon" v-html="Icons.timeoutBreak"></span>
-            <span>Break: {{ status.break_duration_secs / 60 }}min</span>
+            <span>{{ t('timeout.breakDuration', 'Break Duration') }}: {{ status.break_duration_secs / 60 }}{{ t('common.m_symbol', 'm') }}</span>
           </div>
         </div>
       </div>
@@ -464,10 +464,10 @@
           type="password"
           v-model="cancelPassword"
           class="password-input small"
-          placeholder="Password to cancel..."
+          :placeholder="t('timeout.passwordPlaceholder', 'Enter password...')"
         />
         <button @click="stopTimeout" class="btn-cancel">
-          <span class="btn-icon" v-html="Icons.timeoutStop"></span> Cancel Time OUT
+          <span class="btn-icon" v-html="Icons.timeoutStop"></span> {{ t('timeout.cancel', 'Cancel Time OUT') }}
         </button>
       </div>
     </div>

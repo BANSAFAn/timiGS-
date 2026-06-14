@@ -566,6 +566,11 @@ pub fn get_timeout_status_cmd() -> Option<crate::timeout::TimeoutStatus> {
     crate::timeout::get_timeout_status()
 }
 
+#[command]
+pub fn set_doctor_mode_locked_cmd(app: tauri::AppHandle, locked: bool) -> Result<(), String> {
+    crate::timeout::set_doctor_mode_locked(app, locked)
+}
+
 // ── Project Boards ──
 
 #[command]

@@ -14,14 +14,14 @@
           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 256 256" fill="currentColor" style="display:inline;vertical-align:middle;margin-right:4px;">
             <path d="M240,96a15.89,15.89,0,0,0-20.17-15.11l-34,11.33L149.2,36a16,16,0,0,0-30.4,0L82.16,92.22l-34-11.33a16,16,0,0,0-20.3,20.3l24,72A16,16,0,0,0,67.35,184H188.65a16,16,0,0,0,15.52-10.81l24-72A15.9,15.9,0,0,0,240,96ZM188.65,168H67.35l-21.33-64,36.56,12.19a16,16,0,0,0,19.38-9.45L128,45.25l26,59.54a16,16,0,0,0,19.38,9.45l36.56-12.19ZM200,208a8,8,0,0,1-8,8H64a8,8,0,0,1,0-16H192A8,8,0,0,1,200,208Z"/>
           </svg>
-          {{ t('coding.most_active_lang') }}: {{ mostActiveLanguage.language }} ({{ mostActiveLanguage.pct }}%)
+          {{ t('coding.most_active_lang') }}: {{ mostActiveLanguage.language === 'Unknown' ? t('coding.unknown') : mostActiveLanguage.language }} ({{ mostActiveLanguage.pct }}%)
         </span>
         <span class="header-badge coding-badge">{{ formatDuration(store.totalCodingTime) }}</span>
         <span class="header-badge ai-badge" v-if="store.totalAiCodingTime > 0">
           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 256 256" fill="currentColor" style="display:inline;vertical-align:middle;margin-right:4px;">
             <path d="M200,112a8,8,0,0,1-8,8H152a8,8,0,0,1,0-16h40A8,8,0,0,1,200,112Zm-8,24H152a8,8,0,0,0,0,16h40a8,8,0,0,0,0-16Zm-32,32H152a8,8,0,0,0,0,16h8a8,8,0,0,0,0-16ZM96,208H72a8,8,0,0,1-8-8V160a8,8,0,0,1,16,0v32H96a8,8,0,0,1,0,16Zm0-96H80V80a8,8,0,0,0-16,0v40a8,8,0,0,0,8,8H96a8,8,0,0,0,0-16ZM232,56V200a16,16,0,0,1-16,16H40a16,16,0,0,1-16-16V56A16,16,0,0,1,40,40H216A16,16,0,0,1,232,56Zm-16,0H40V200H216V56Z"/>
           </svg>
-          {{ store.aiCodingPercent }}% AI
+          {{ store.aiCodingPercent }}% {{ t('coding.ai', 'AI') }}
         </span>
       </div>
     </div>
@@ -34,7 +34,7 @@
         </svg>
         <span>{{ t('coding.now_coding') }}</span>
         <span class="live-badge">
-          <span class="live-dot"></span>LIVE
+          <span class="live-dot"></span>{{ t('analytics.live', 'LIVE') }}
         </span>
       </div>
       <div class="now-coding-content">
@@ -44,16 +44,16 @@
         <div class="coding-file-info">
           <div class="coding-file" v-if="store.currentCodingSession.file_path">
             <span class="lang-dot" :style="{ background: getLangColor(store.currentCodingSession.language) }"></span>
-            <span class="file-name">{{ store.currentCodingSession.file_path }}</span>
+            <span class="file-name">{{ store.currentCodingSession.file_path === 'Workspace / General' ? t('coding.workspaceGeneral') : store.currentCodingSession.file_path }}</span>
             <span class="lang-tag" v-if="store.currentCodingSession.language">
-              {{ store.currentCodingSession.language }}
+              {{ store.currentCodingSession.language === 'Unknown' ? t('coding.unknown') : store.currentCodingSession.language }}
             </span>
           </div>
           <div class="coding-project" v-if="store.currentCodingSession.project_dir">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 256 256" fill="currentColor" style="display:inline;vertical-align:middle;margin-right:4px;">
               <path d="M216,72H131.31L104,44.69A15.86,15.86,0,0,0,92.69,40H40A16,16,0,0,0,24,56V200.62A15.4,15.4,0,0,0,39.38,216H216.89A15.13,15.13,0,0,0,232,200.89V88A16,16,0,0,0,216,72ZM40,56H92.69l16,16H40ZM216,200H40V88H216Z"/>
             </svg>
-            {{ store.currentCodingSession.project_dir }}
+            {{ store.currentCodingSession.project_dir === 'No Project' ? t('coding.noProject') : store.currentCodingSession.project_dir }}
           </div>
         </div>
         <div class="ai-indicator" v-if="store.currentCodingSession.is_ai_assisted">
@@ -105,7 +105,7 @@
         <div v-for="lang in store.topCodingLanguages" :key="lang.language" class="lang-card">
           <div class="lang-header">
             <span class="lang-color-dot" :style="{ background: getLangColor(lang.language) }"></span>
-            <span class="lang-name">{{ lang.language }}</span>
+            <span class="lang-name">{{ lang.language === 'Unknown' ? t('coding.unknown') : lang.language }}</span>
             <span class="lang-sessions">{{ lang.session_count }} {{ t('coding.sessions') }}</span>
           </div>
           <div class="lang-time-row">
@@ -182,14 +182,14 @@
           <div class="file-main-info">
             <div class="file-meta">
               <span class="lang-color-dot" :style="{ background: getLangColor(file.language) }"></span>
-              <span class="file-name" :title="file.filePath">{{ file.filePath }}</span>
-              <span class="lang-tag" v-if="file.language">{{ file.language }}</span>
+              <span class="file-name" :title="file.filePath">{{ file.filePath === 'Workspace / General' ? t('coding.workspaceGeneral') : file.filePath }}</span>
+              <span class="lang-tag" v-if="file.language">{{ file.language === 'Unknown' ? t('coding.unknown') : file.language }}</span>
             </div>
             <div class="file-project" :title="file.projectDir">
               <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 256 256" fill="currentColor" style="display:inline;vertical-align:middle;margin-right:4px;">
                 <path d="M216,72H131.31L104,44.69A15.86,15.86,0,0,0,92.69,40H40A16,16,0,0,0,24,56V200.62A15.4,15.4,0,0,0,39.38,216H216.89A15.13,15.13,0,0,0,232,200.89V88A16,16,0,0,0,216,72ZM40,56H92.69l16,16H40ZM216,200H40V88H216Z"/>
               </svg>
-              {{ file.projectDir }}
+              {{ file.projectDir === 'No Project' ? t('coding.noProject') : file.projectDir }}
             </div>
           </div>
 
@@ -201,7 +201,7 @@
                   {{ formatDuration(file.manualSeconds) }}
                 </span>
                 <span class="mini-ai" v-if="file.aiSeconds > 0">
-                  {{ formatDuration(file.aiSeconds) }} AI
+                  {{ formatDuration(file.aiSeconds) }} {{ t('coding.ai', 'AI') }}
                 </span>
               </div>
             </div>
@@ -287,12 +287,15 @@ const fileStats = computed(() => {
 });
 
 function formatDuration(seconds: number): string {
-  if (seconds < 60) return `${seconds}s`;
+  const h_sym = t('common.h_symbol', 'h');
+  const m_sym = t('common.m_symbol', 'm');
+  const s_sym = t('common.s_symbol', 's');
+  if (seconds < 60) return `${seconds}${s_sym}`;
   const mins = Math.floor(seconds / 60);
-  if (mins < 60) return `${mins}m`;
+  if (mins < 60) return `${mins}${m_sym}`;
   const hrs = Math.floor(mins / 60);
   const rem = mins % 60;
-  return rem > 0 ? `${hrs}h ${rem}m` : `${hrs}h`;
+  return rem > 0 ? `${hrs}${h_sym} ${rem}${m_sym}` : `${hrs}${h_sym}`;
 }
 
 function getEditorClass(editor: string): string {

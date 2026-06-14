@@ -48,7 +48,7 @@
               <span class="stat-value">{{ formatDuration(dailyAverage) }}</span>
             </div>
             <div class="stat-trend">
-               <span>Based on 7 days</span>
+               <span>{{ $t('analytics.basedOn7Days', 'Based on 7 days') }}</span>
             </div>
           </div>
           <div class="stat-card premium-card orange">
@@ -106,8 +106,8 @@
               
               <div class="app-breakdown-list">
                 <div class="app-list-header">
-                  <span>Application</span>
-                  <span>Time</span>
+                  <span>{{ $t('common.application', 'Application') }}</span>
+                  <span>{{ $t('common.time', 'Time') }}</span>
                 </div>
                 <div class="app-list-items custom-scrollbar">
                   <div v-for="(app, i) in store.topApps" :key="app.app_name" class="app-list-item" @click="showDetailModal = true">
@@ -139,7 +139,7 @@
                </svg>
                {{ $t('analytics.topWebsites') }}
              </h3>
-             <span class="header-badge websites-badge">{{ store.websiteUsage.length }} sites</span>
+             <span class="header-badge websites-badge">{{ store.websiteUsage.length }} {{ $t('analytics.sites', 'sites') }}</span>
            </div>
 
            <div class="website-grid">
@@ -156,7 +156,7 @@
                </div>
                <div class="website-time">
                  <span class="time-value" :title="formatDurationFull(site.seconds)">{{ formatTimeReadable(site.seconds) }}</span>
-                 <span class="time-label">today</span>
+                 <span class="time-label">{{ $t('common.today', 'today') }}</span>
                </div>
                <div class="website-view-history">
                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -245,7 +245,7 @@
                  </svg>
                </div>
                <div class="now-playing-info">
-                 <div class="now-playing-track" :title="currentMusicSession.window_title || 'Unknown Track'">{{ currentMusicSession.window_title || 'Unknown Track' }}</div>
+                 <div class="now-playing-track" :title="currentMusicSession.window_title || $t('analytics.unknownTrack', 'Unknown Track')">{{ currentMusicSession.window_title || $t('analytics.unknownTrack', 'Unknown Track') }}</div>
                  <div class="now-playing-app">{{ currentMusicSession.app_name }}</div>
                </div>
              </div>
@@ -255,8 +255,8 @@
         
         <div v-if="weeklyStats.length === 0 && store.topApps.length === 0 && !store.isLoading" class="empty-state animate-enter">
           <div class="empty-icon" v-html="Icons.analytics" style="width:48px;height:48px;opacity:0.5;margin:0 auto 12px auto;color:var(--text-muted)"></div>
-          <h3>No Data Available Yet</h3>
-          <p>Start using your applications to see analytics here.</p>
+          <h3>{{ t('analytics.noDataAvailable', 'No Data Available Yet') }}</h3>
+          <p>{{ t('analytics.startUsingAppsHint', 'Start using your applications to see analytics here.') }}</p>
         </div>
 
 
@@ -321,13 +321,13 @@
               </div>
               <div>
                 <h3>{{ musicHistoryApp }}</h3>
-                <span class="music-history-total">{{ formatDuration(musicHistoryTotalTime) }} total</span>
+                <span class="music-history-total">{{ formatDuration(musicHistoryTotalTime) }} {{ t('common.total', 'total') }}</span>
               </div>
             </div>
             <button class="close-btn" @click="showMusicHistory = false">×</button>
           </div>
           <div class="modal-body custom-scrollbar" style="max-height: 60vh;">
-            <div v-if="musicHistorySessions.length === 0" class="empty-day">No music sessions recorded</div>
+            <div v-if="musicHistorySessions.length === 0" class="empty-day">{{ t('analytics.noMusicSessions', 'No music sessions recorded') }}</div>
             <div v-else class="music-sessions-list">
               <div v-for="session in musicHistorySessions" :key="session.id" class="music-session-item">
                 <div class="music-session-icon">
@@ -338,12 +338,12 @@
                   </svg>
                 </div>
                 <div class="music-session-info">
-                  <div class="music-session-track">{{ session.window_title || 'Unknown Track' }}</div>
+                  <div class="music-session-track">{{ session.window_title || $t('analytics.unknownTrack', 'Unknown Track') }}</div>
                   <div class="music-session-date">{{ formatDate(session.start_time) }}</div>
                 </div>
                 <div class="music-session-time">
                   <div class="music-session-dur">{{ formatDuration(session.duration_seconds) }}</div>
-                  <div class="music-session-range">{{ formatTimeShort(session.start_time) }} – {{ session.end_time ? formatTimeShort(session.end_time) : 'Now' }}</div>
+                  <div class="music-session-range">{{ formatTimeShort(session.start_time) }} – {{ session.end_time ? formatTimeShort(session.end_time) : t('common.now', 'Now') }}</div>
                 </div>
               </div>
             </div>
@@ -363,7 +363,7 @@
               </div>
               <div>
                 <h3>{{ websiteHistoryName }}</h3>
-                <span class="website-history-total">{{ formatDuration(websiteHistoryTotalTime) }} total</span>
+                <span class="website-history-total">{{ formatDuration(websiteHistoryTotalTime) }} {{ t('common.total', 'total') }}</span>
               </div>
             </div>
             <button class="close-btn" @click="showWebsiteHistory = false">×</button>
@@ -373,11 +373,11 @@
               <input 
                 v-model="websiteSearchQuery" 
                 type="text" 
-                placeholder="Search by title or link..." 
+                :placeholder="t('analytics.searchPlaceholder', 'Search by title or link...')" 
                 class="website-search-input"
               />
             </div>
-            <div v-if="filteredWebsiteHistorySessions.length === 0" class="empty-day">No browsing sessions recorded</div>
+            <div v-if="filteredWebsiteHistorySessions.length === 0" class="empty-day">{{ t('analytics.noBrowsingSessions', 'No browsing sessions recorded') }}</div>
             <div v-else class="website-sessions-list">
               <div v-for="session in filteredWebsiteHistorySessions" :key="session.id" class="website-session-item">
                 <div class="website-session-icon">
@@ -388,12 +388,12 @@
                   </svg>
                 </div>
                 <div class="website-session-info">
-                  <div class="website-session-title">{{ session.window_title || 'Unknown Page' }}</div>
+                  <div class="website-session-title">{{ session.window_title || $t('analytics.unknownPage', 'Unknown Page') }}</div>
                   <div 
                     v-if="isValidUrl(extractUrl(session.window_title))"
                     class="website-session-url" 
                     :class="{ 'copied': copiedSessions[session.id] }"
-                    :title="copiedSessions[session.id] ? 'Copied!' : 'Click to copy link'" 
+                    :title="copiedSessions[session.id] ? t('team.copied', 'Copied!') : t('analytics.clickToCopy', 'Click to copy link')" 
                     @click="copyLink(extractUrl(session.window_title), session.id)"
                     style="cursor:pointer;"
                   >
@@ -404,12 +404,12 @@
                       <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
                       <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
                     </svg>
-                    {{ copiedSessions[session.id] ? 'Copied!' : extractUrl(session.window_title) }}
+                    {{ copiedSessions[session.id] ? t('team.copied', 'Copied!') : extractUrl(session.window_title) }}
                   </div>
                 </div>
                 <div class="website-session-time">
                   <div class="website-session-dur">{{ formatDuration(session.duration_seconds) }}</div>
-                  <div class="website-session-range">{{ formatTimeShort(session.start_time) }} – {{ session.end_time ? formatTimeShort(session.end_time) : 'Now' }}</div>
+                  <div class="website-session-range">{{ formatTimeShort(session.start_time) }} – {{ session.end_time ? formatTimeShort(session.end_time) : t('common.now', 'Now') }}</div>
                 </div>
               </div>
             </div>
@@ -432,7 +432,7 @@ import { invoke } from '@tauri-apps/api/core';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, PointElement, LineElement, Tooltip, Legend, Filler);
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const store = useActivityStore();
 const showDetailModal = ref(false);
 
@@ -846,7 +846,7 @@ function extractUrl(windowTitle: string): string {
 
 function formatDate(dateStr: string): string {
   const date = new Date(dateStr);
-  return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+  return date.toLocaleDateString(locale.value, { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
 
@@ -897,7 +897,7 @@ function getDayRange(offset: number): { from: string; to: string } {
 const weekRangeLabel = computed(() => {
   if (weekOffset.value === 0) return t('analytics.last7Days') || 'This Week';
   const { from, to } = getWeekRange(weekOffset.value);
-  const fmt = (d: string) => new Date(d).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  const fmt = (d: string) => new Date(d).toLocaleDateString(locale.value, { month: 'short', day: 'numeric' });
   return `${fmt(from)} – ${fmt(to)}`;
 });
 
@@ -905,13 +905,13 @@ const periodLabel = computed(() => {
   if (selectedRange.value === 'day') {
     const date = new Date();
     date.setDate(date.getDate() + dayOffset.value);
-    return date.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+    return date.toLocaleDateString(locale.value, { weekday: 'short', month: 'short', day: 'numeric' });
   } else if (selectedRange.value === 'week') {
     return weekRangeLabel.value;
   } else {
     const now = new Date();
     const month = new Date(now.getFullYear(), now.getMonth() + monthOffset.value, 1);
-    return month.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
+    return month.toLocaleDateString(locale.value, { month: 'long', year: 'numeric' });
   }
 });
 
@@ -955,8 +955,10 @@ async function fetchPeriodData() {
     toStr = to;
   } else if (selectedRange.value === 'week') {
     if (weekOffset.value === 0) {
-      await store.fetchTodayData();
-      await store.fetchWeeklyStats();
+      await Promise.all([
+        store.fetchTodayData(),
+        store.fetchWeeklyStats()
+      ]);
       return; // Uses store default
     }
     const { from, to } = getWeekRange(weekOffset.value);
@@ -1028,37 +1030,46 @@ function formatTimeShort(timeStr: string): string {
 }
 
 function formatDuration(seconds: number): string {
-  if (!seconds) return '0s';
-  if (seconds < 60) return `${seconds}s`;
-  if (seconds < 3600) return `${Math.floor(seconds / 60)}m`;
+  const s_sym = t('common.s_symbol', 's');
+  const m_sym = t('common.m_symbol', 'm');
+  const h_sym = t('common.h_symbol', 'h');
+  if (!seconds) return `0${s_sym}`;
+  if (seconds < 60) return `${seconds}${s_sym}`;
+  if (seconds < 3600) return `${Math.floor(seconds / 60)}${m_sym}`;
   const hours = Math.floor(seconds / 3600);
-  return `${hours}h ${Math.floor((seconds % 3600) / 60)}m`;
+  return `${hours}${h_sym} ${Math.floor((seconds % 3600) / 60)}${m_sym}`;
 }
 
 function formatTimeReadable(seconds: number): string {
-  if (!seconds) return '0s';
-  if (seconds < 60) return `${seconds}s`;
+  const s_sym = t('common.s_symbol', 's');
+  const m_sym = t('common.m_symbol', 'm');
+  const h_sym = t('common.h_symbol', 'h');
+  if (!seconds) return `0${s_sym}`;
+  if (seconds < 60) return `${seconds}${s_sym}`;
   if (seconds < 3600) {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return secs > 0 ? `${mins}m ${secs}s` : `${mins}m`;
+    return secs > 0 ? `${mins}${m_sym} ${secs}${s_sym}` : `${mins}${m_sym}`;
   }
   const hours = Math.floor(seconds / 3600);
   const mins = Math.floor((seconds % 3600) / 60);
-  return mins > 0 ? `${hours}h ${mins}m` : `${hours}h`;
+  return mins > 0 ? `${hours}${h_sym} ${mins}${m_sym}` : `${hours}${h_sym}`;
 }
 
 function formatDurationFull(seconds: number): string {
-  if (!seconds) return '0 seconds';
-  if (seconds < 60) return `${seconds} seconds`;
-  if (seconds < 3600) {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins} minute${mins > 1 ? 's' : ''}${secs > 0 ? ` ${secs} second${secs > 1 ? 's' : ''}` : ''}`;
-  }
-  const hours = Math.floor(seconds / 3600);
+  const sec_word = t('common.seconds_word', 'seconds');
+  const min_word = t('common.minutes_word', 'minutes');
+  const hr_word = t('common.hours_word', 'hours');
+  if (!seconds) return `0 ${sec_word}`;
+  const hrs = Math.floor(seconds / 3600);
   const mins = Math.floor((seconds % 3600) / 60);
-  return `${hours} hour${hours > 1 ? 's' : ''}${mins > 0 ? ` ${mins} minute${mins > 1 ? 's' : ''}` : ''}`;
+  const secs = seconds % 60;
+  
+  const parts = [];
+  if (hrs > 0) parts.push(`${hrs} ${hr_word}`);
+  if (mins > 0) parts.push(`${mins} ${min_word}`);
+  if (secs > 0 || parts.length === 0) parts.push(`${secs} ${sec_word}`);
+  return parts.join(' ');
 }
 
 function calculatePercentage(seconds: number): string {
@@ -1072,7 +1083,7 @@ const dailyAverage = computed(() => weeklyStats.value.length ? Math.round(totalW
 
 
 const lineChartData = computed(() => ({
-  labels: weeklyStats.value.map(d => new Date(d.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })).reverse(),
+  labels: weeklyStats.value.map(d => new Date(d.date).toLocaleDateString(locale.value, { month: 'short', day: 'numeric' })).reverse(),
   datasets: [{
     label: 'Activity (hours)',
     data: weeklyStats.value.map(d => Number((d.total_seconds / 3600).toFixed(1))).reverse(),
@@ -1179,6 +1190,8 @@ watch(selectedRange, async () => {
   filter: blur(80px);
   opacity: 0.15;
   animation: float 20s infinite ease-in-out alternate;
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 .orb-1 {
@@ -1375,6 +1388,9 @@ watch(selectedRange, async () => {
   grid-template-columns: repeat(5, 1fr);
   gap: 24px;
   margin-bottom: 36px;
+}
+.stats-row .stat-card {
+  grid-column: span 1;
 }
 
 .stat-card.premium-card {
@@ -2335,14 +2351,23 @@ watch(selectedRange, async () => {
 }
 
 
-@media (max-width: 1024px) {
+@media (max-width: 1200px) {
   .page-container {
     max-width: 90%;
   }
 
   .stats-row {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(6, 1fr);
     gap: 16px;
+  }
+  .stats-row .stat-card:nth-child(1),
+  .stats-row .stat-card:nth-child(2),
+  .stats-row .stat-card:nth-child(3) {
+    grid-column: span 2;
+  }
+  .stats-row .stat-card:nth-child(4),
+  .stats-row .stat-card:nth-child(5) {
+    grid-column: span 3;
   }
 
   .stat-card {
@@ -2365,8 +2390,17 @@ watch(selectedRange, async () => {
 
 @media (max-width: 900px) {
   .stats-row {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
     gap: 16px;
+  }
+  .stats-row .stat-card:nth-child(1),
+  .stats-row .stat-card:nth-child(2),
+  .stats-row .stat-card:nth-child(3),
+  .stats-row .stat-card:nth-child(4) {
+    grid-column: span 1;
+  }
+  .stats-row .stat-card:nth-child(5) {
+    grid-column: span 2;
   }
 
   .charts-grid {
@@ -2545,7 +2579,11 @@ watch(selectedRange, async () => {
   }
 
   .stats-row {
+    grid-template-columns: 1fr;
     gap: 10px;
+  }
+  .stats-row .stat-card {
+    grid-column: span 1;
   }
 
   .stat-card {

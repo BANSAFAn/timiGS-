@@ -673,9 +673,14 @@ export const useActivityStore = defineStore('activity', {
   actions: {
     async fetchCurrentActivity() {
       try {
-        this.currentActivity = await invoke<ActiveWindow | null>('get_current_activity');
-        this.currentSession = await invoke<CurrentSession | null>('get_current_session');
-        this.currentCodingSession = await invoke<CurrentCodingSession | null>('get_current_coding_session');
+        const [currentActivity, currentSession, currentCodingSession] = await Promise.all([
+          invoke<ActiveWindow | null>('get_current_activity'),
+          invoke<CurrentSession | null>('get_current_session'),
+          invoke<CurrentCodingSession | null>('get_current_coding_session')
+        ]);
+        this.currentActivity = currentActivity;
+        this.currentSession = currentSession;
+        this.currentCodingSession = currentCodingSession;
       } catch (error) {
         console.error('Failed to fetch current activity:', error);
       }
@@ -684,13 +689,30 @@ export const useActivityStore = defineStore('activity', {
     async fetchTodayData() {
       this.isLoading = true;
       try {
-        this.todaySummary = await invoke<AppUsageSummary[]>('get_today_summary');
-        this.todaySessions = await invoke<ActivitySession[]>('get_today_activity');
-        this.musicSummary = await invoke<MusicAppUsage[]>('get_music_today_summary');
-        this.totalMusicTime = await invoke<number>('get_total_music_time_today');
-        this.currentMusicSession = await invoke<MusicSession | null>('get_current_music_session');
-        await this.fetchCodingData();
-        await this.fetchAppCategories();
+        const [
+          todaySummary,
+          todaySessions,
+          musicSummary,
+          totalMusicTime,
+          currentMusicSession
+        ] = await Promise.all([
+          invoke<AppUsageSummary[]>('get_today_summary'),
+          invoke<ActivitySession[]>('get_today_activity'),
+          invoke<MusicAppUsage[]>('get_music_today_summary'),
+          invoke<number>('get_total_music_time_today'),
+          invoke<MusicSession | null>('get_current_music_session')
+        ]);
+
+        this.todaySummary = todaySummary;
+        this.todaySessions = todaySessions;
+        this.musicSummary = musicSummary;
+        this.totalMusicTime = totalMusicTime;
+        this.currentMusicSession = currentMusicSession;
+
+        await Promise.all([
+          this.fetchCodingData(),
+          this.fetchAppCategories()
+        ]);
       } catch (error) {
         console.error('Failed to fetch today data:', error);
       } finally {
@@ -700,11 +722,25 @@ export const useActivityStore = defineStore('activity', {
 
     async fetchCodingData() {
       try {
-        this.todayCodingSessions = await invoke<CodingSession[]>('get_today_coding_sessions');
-        this.codingStats = await invoke<CodingStats[]>('get_coding_stats_today');
-        this.codingProjectStats = await invoke<CodingProjectStats[]>('get_coding_project_stats_today');
-        this.totalCodingTime = await invoke<number>('get_total_coding_time_today');
-        this.totalAiCodingTime = await invoke<number>('get_total_ai_coding_time_today');
+        const [
+          todayCodingSessions,
+          codingStats,
+          codingProjectStats,
+          totalCodingTime,
+          totalAiCodingTime
+        ] = await Promise.all([
+          invoke<CodingSession[]>('get_today_coding_sessions'),
+          invoke<CodingStats[]>('get_coding_stats_today'),
+          invoke<CodingProjectStats[]>('get_coding_project_stats_today'),
+          invoke<number>('get_total_coding_time_today'),
+          invoke<number>('get_total_ai_coding_time_today')
+        ]);
+
+        this.todayCodingSessions = todayCodingSessions;
+        this.codingStats = codingStats;
+        this.codingProjectStats = codingProjectStats;
+        this.totalCodingTime = totalCodingTime;
+        this.totalAiCodingTime = totalAiCodingTime;
       } catch (error) {
         console.error('Failed to fetch coding data:', error);
       }

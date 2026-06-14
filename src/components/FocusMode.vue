@@ -5,10 +5,10 @@
       <div class="setup-section">
         <label class="section-label">
           <span class="icon" v-html="Icons.focusTarget"></span>
-          Select Application
+          {{ t('focus.selectApp', 'Select Application') }}
         </label>
         <select v-model="selectedApp" class="app-select">
-          <option value="" disabled>Choose an app to focus on...</option>
+          <option value="" disabled>{{ t('focus.chooseAppPlaceholder', 'Choose an app to focus on...') }}</option>
           <option v-for="app in recentApps" :key="app.app_name" :value="app">
             {{ app.app_name }} ({{ formatDuration(app.total_seconds) }})
           </option>
@@ -18,7 +18,7 @@
       <div class="setup-section">
         <label class="section-label">
           <span class="icon" v-html="Icons.timeoutPause"></span>
-          Duration
+          {{ t('focus.duration', 'Duration') }}
         </label>
         <div class="time-inputs">
           <div class="input-group">
@@ -41,11 +41,11 @@
       <div class="setup-section">
         <label class="section-label">
           <span class="icon" v-html="Icons.focusMusic"></span>
-          Background Music (Optional)
+          {{ t('focus.backgroundMusic', 'Background Music (Optional)') }}
         </label>
         <div class="music-selection">
           <select v-model="selectedMusic" class="music-select">
-            <option value="">No music</option>
+            <option value="">{{ t('focus.noMusic', 'No music') }}</option>
             <option v-for="track in musicFiles" :key="track.filename" :value="track.filename">
               {{ track.filename }}
             </option>
@@ -61,7 +61,7 @@
         </div>
         <div v-if="selectedMusic" class="music-preview">
           <button @click="previewMusic" class="btn-preview" :disabled="isPreviewing">
-            {{ isPreviewing ? 'Stop Preview' : 'Preview' }}
+            {{ isPreviewing ? t('focus.stopPreview', 'Stop Preview') : t('focus.preview', 'Preview') }}
           </button>
         </div>
       </div>
@@ -69,16 +69,16 @@
       <div class="setup-section">
         <label class="section-label">
           <span class="icon" v-html="Icons.focusLock"></span>
-          Lock Password
+          {{ t('focus.password', 'Lock Password') }}
         </label>
-        <input type="password" v-model="password" class="password-input" placeholder="Enter a password to lock..." />
-        <p class="hint">You'll need this password to cancel focus mode early</p>
+        <input type="password" v-model="password" class="password-input" :placeholder="t('focus.enterPasswordPlaceholder', 'Enter a password to lock...')" />
+        <p class="hint">{{ t('focus.passwordHint', "You'll need this password to cancel focus mode early") }}</p>
       </div>
 
 
 
       <button @click="startFocus" class="btn-start" :disabled="!canStart">
-        Start Focus Mode
+        {{ t('focus.start', 'Start Focus Mode') }}
       </button>
     </div>
 
@@ -88,7 +88,7 @@
         <div class="target-badge" v-html="Icons.focusTarget"></div>
         <div class="target-info">
           <span class="target-name">{{ status.app_name }}</span>
-          <span class="target-label">Focused Application</span>
+          <span class="target-label">{{ t('focus.focusedApp', 'Focused Application') }}</span>
         </div>
       </div>
 
@@ -104,19 +104,19 @@
       <div v-if="musicFiles.length > 0" class="music-player">
         <div class="now-playing">
           <span class="music-icon" v-html="Icons.focusMusic"></span>
-          <span class="track-name">{{ musicStatus.current_track || 'No track selected' }}</span>
+          <span class="track-name">{{ musicStatus.current_track || t('focus.noTrackSelected', 'No track selected') }}</span>
         </div>
         <div class="player-controls">
-          <button @click="prevTrack" class="control-btn" title="Previous track">
+          <button @click="prevTrack" class="control-btn" :title="t('focus.prevTrack', 'Previous track')">
             <span v-html="Icons.musicPrev"></span>
           </button>
-          <button @click="togglePlayPause" class="control-btn play-btn" :title="musicStatus.is_playing ? 'Pause' : 'Play'">
+          <button @click="togglePlayPause" class="control-btn play-btn" :title="musicStatus.is_playing ? t('focus.pause', 'Pause') : t('focus.play', 'Play')">
             <span v-html="musicStatus.is_playing ? Icons.musicPause : Icons.musicPlay"></span>
           </button>
-          <button @click="nextTrack" class="control-btn" title="Next track">
+          <button @click="nextTrack" class="control-btn" :title="t('focus.nextTrack', 'Next track')">
             <span v-html="Icons.musicNext"></span>
           </button>
-          <button @click="toggleLoop" class="control-btn" :class="{ active: isLooping }" title="Toggle loop">
+          <button @click="toggleLoop" class="control-btn" :class="{ active: isLooping }" :title="t('focus.toggleLoop', 'Toggle loop')">
             <span v-html="Icons.musicLoop"></span>
           </button>
         </div>
@@ -126,20 +126,20 @@
           <span class="volume-value">{{ volume }}%</span>
         </div>
         <select v-model="selectedTrack" @change="changeTrack" class="track-select">
-          <option value="" disabled>Select a track...</option>
+          <option value="" disabled>{{ t('focus.selectTrackPlaceholder', 'Select a track...') }}</option>
           <option v-for="track in musicFiles" :key="track.filename" :value="track.filename">
             {{ track.filename }}
           </option>
         </select>
       </div>
 
-      <p class="focus-message">Other apps will be blocked</p>
+      <p class="focus-message">{{ t('focus.otherAppsBlocked', 'Other apps will be blocked') }}</p>
 
       <div class="cancel-section">
-        <input type="password" v-model="cancelPassword" class="password-input small" placeholder="Enter password to cancel..." />
+        <input type="password" v-model="cancelPassword" class="password-input small" :placeholder="t('focus.enterPasswordCancel', 'Enter password to cancel...')" />
         <button @click="stopFocus" class="btn-cancel">
           <span v-html="Icons.cancelFocus"></span>
-          Cancel Focus
+          {{ t('focus.cancel', 'Cancel Focus') }}
         </button>
         <p v-if="cancelError" class="error-text">{{ cancelError }}</p>
       </div>
@@ -224,8 +224,10 @@ const progressOffset = computed(() => {
 function formatDuration(totalSeconds: number): string {
   const h = Math.floor(totalSeconds / 3600);
   const m = Math.floor((totalSeconds % 3600) / 60);
-  if (h > 0) return `${h}h ${m}m`;
-  return `${m}m`;
+  const h_sym = t('common.h_symbol', 'h');
+  const m_sym = t('common.m_symbol', 'm');
+  if (h > 0) return `${h}${h_sym} ${m}${m_sym}`;
+  return `${m}${m_sym}`;
 }
 
 async function loadApps() {

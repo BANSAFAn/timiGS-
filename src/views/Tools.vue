@@ -243,7 +243,7 @@
               <div v-else class="empty-editor">
                 <div class="empty-state-content">
                   <span class="select-icon" v-html="Icons.chevronLeft"></span>
-                  <p>Select a note to view or create a new one</p>
+                  <p>{{ $t('tools.selectNoteHint', 'Select a note to view or create a new one') }}</p>
                 </div>
               </div>
             </div>
@@ -256,6 +256,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
+import { useI18n } from "vue-i18n";
 import { invoke } from "@tauri-apps/api/core";
 import ShutdownTimer from "../components/ShutdownTimer.vue";
 import TasksWidget from "../components/TasksWidget.vue";
@@ -263,6 +264,8 @@ import FocusMode from "../components/FocusMode.vue";
 import TimeOut from "../components/TimeOut.vue";
 import { Icons } from "../components/icons/IconMap";
 import { useDebounceFn } from "@vueuse/core";
+
+const { locale } = useI18n();
 
 const activeTab = ref("timeout");
 const tabs = [
@@ -298,7 +301,7 @@ function generateId(): string {
 }
 
 function formatDate(ts: number) {
-  return new Date(ts).toLocaleDateString(undefined, {
+  return new Date(ts).toLocaleDateString(locale.value, {
     month: "short",
     day: "numeric",
   });
@@ -425,6 +428,10 @@ onMounted(async () => {
   border-radius: 16px;
   margin-bottom: 24px;
   overflow-x: auto;
+  overflow-y: hidden;
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
   border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
@@ -1090,7 +1097,7 @@ onMounted(async () => {
   }
 
   .tools-tabs {
-    max-width: 900px;
+    max-width: 100%;
   }
 }
 
@@ -1101,7 +1108,7 @@ onMounted(async () => {
   }
 
   .tools-tabs {
-    max-width: 800px;
+    max-width: 100%;
   }
 
   .tool-content-card {

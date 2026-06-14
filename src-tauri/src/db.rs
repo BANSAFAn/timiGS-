@@ -355,6 +355,28 @@ pub fn end_session(id: i64) -> Result<()> {
     Ok(())
 }
 
+pub fn end_session_retroactive(id: i64, end_time: DateTime<Local>) -> Result<()> {
+    let guard = DB.lock();
+    let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
+
+    let start_time: String = conn.query_row(
+        "SELECT start_time FROM activity_sessions WHERE id = ?1",
+        [id],
+        |row| row.get(0),
+    )?;
+
+    if let Ok(start) = DateTime::parse_from_rfc3339(&start_time) {
+        let duration = (end_time - start.with_timezone(&Local)).num_seconds();
+        let duration = std::cmp::max(0, duration);
+        conn.execute(
+            "UPDATE activity_sessions SET end_time = ?1, duration_seconds = ?2 WHERE id = ?3",
+            params![end_time.to_rfc3339(), duration, id],
+        )?;
+    }
+
+    Ok(())
+}
+
 pub fn get_today_sessions() -> Result<Vec<ActivitySession>> {
     let guard = DB.lock();
     let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
@@ -514,23 +536,140 @@ pub fn get_weekly_stats() -> Result<Vec<DailyStats>> {
     let guard = DB.lock();
     let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
 
+    // Retrieve sessions from the last 10 days to cover timezone boundaries
     let mut stmt = conn.prepare(
-        "SELECT date(start_time) as day, SUM(duration_seconds) as total, COUNT(DISTINCT app_name) as apps
+        "SELECT id, app_name, start_time, end_time, duration_seconds
          FROM activity_sessions
-         WHERE start_time >= datetime('now', '-7 days')
-         GROUP BY day
-         ORDER BY day DESC"
+         WHERE start_time >= datetime('now', '-10 days')"
     )?;
 
-    let stats = stmt
+    struct RawSession {
+        id: i64,
+        app_name: String,
+        start_time: String,
+        end_time: Option<String>,
+        duration_seconds: i64,
+    }
+
+    let raw_sessions = stmt
         .query_map([], |row| {
-            Ok(DailyStats {
-                date: row.get(0)?,
-                total_seconds: row.get(1)?,
-                app_count: row.get(2)?,
+            Ok(RawSession {
+                id: row.get(0)?,
+                app_name: row.get(1)?,
+                start_time: row.get(2)?,
+                end_time: row.get(3)?,
+                duration_seconds: row.get(4)?,
             })
         })?
-        .collect::<Result<Vec<_>>>()?;
+        .collect::<std::result::Result<Vec<_>, rusqlite::Error>>()?;
+
+    use chrono::TimeZone;
+    use std::collections::HashSet;
+
+    let current_session_id = crate::tracker::get_current_session().map(|s| s.id);
+
+    let today = Local::now().date_naive();
+    let mut stats = Vec::new();
+
+    // Compute stats for today and the preceding 7 days (8 days total)
+    for i in 0..8 {
+        let day = today - chrono::Duration::days(i);
+        let day_str = day.format("%Y-%m-%d").to_string();
+
+        let day_start = match Local.from_local_datetime(&day.and_hms_opt(0, 0, 0).unwrap()) {
+            chrono::LocalResult::Single(dt) => dt,
+            chrono::LocalResult::Ambiguous(dt1, _) => dt1,
+            chrono::LocalResult::None => {
+                // Fallback using UTC conversion
+                Local.from_utc_datetime(&day.and_hms_opt(0, 0, 0).unwrap())
+            }
+        };
+
+        let day_end = match Local.from_local_datetime(&(day + chrono::Duration::days(1)).and_hms_opt(0, 0, 0).unwrap()) {
+            chrono::LocalResult::Single(dt) => dt,
+            chrono::LocalResult::Ambiguous(dt1, _) => dt1,
+            chrono::LocalResult::None => {
+                Local.from_utc_datetime(&(day + chrono::Duration::days(1)).and_hms_opt(0, 0, 0).unwrap())
+            }
+        };
+
+        let mut intervals = Vec::new();
+        let mut apps_for_day = HashSet::new();
+
+        for s in &raw_sessions {
+            let start = match DateTime::parse_from_rfc3339(&s.start_time) {
+                Ok(dt) => dt.with_timezone(&Local),
+                Err(_) => continue,
+            };
+
+            let mut end = if let Some(ref end_str) = s.end_time {
+                match DateTime::parse_from_rfc3339(end_str) {
+                    Ok(dt) => dt.with_timezone(&Local),
+                    Err(_) => {
+                        if s.duration_seconds > 0 {
+                            start + chrono::Duration::seconds(s.duration_seconds)
+                        } else {
+                            start
+                        }
+                    }
+                }
+            } else {
+                // end_time is NULL in the database
+                if Some(s.id) == current_session_id {
+                    // It is the currently active regular session
+                    Local::now()
+                } else if s.duration_seconds > 0 {
+                    // It is a dangling session but has some recorded duration
+                    start + chrono::Duration::seconds(s.duration_seconds)
+                } else {
+                    // Dangling session without recorded duration (e.g. from crash)
+                    start
+                }
+            };
+
+            if end < start {
+                end = start;
+            }
+
+            let overlap_start = if start > day_start { start } else { day_start };
+            let overlap_end = if end < day_end { end } else { day_end };
+
+            if overlap_start < overlap_end {
+                intervals.push((overlap_start, overlap_end));
+                apps_for_day.insert(s.app_name.clone());
+            }
+        }
+
+        let total_seconds = if intervals.is_empty() {
+            0
+        } else {
+            intervals.sort_by_key(|k| k.0);
+            let mut merged = Vec::new();
+            let mut current = intervals[0];
+
+            for next in intervals.into_iter().skip(1) {
+                if next.0 <= current.1 {
+                    if next.1 > current.1 {
+                        current.1 = next.1;
+                    }
+                } else {
+                    merged.push(current);
+                    current = next;
+                }
+            }
+            merged.push(current);
+
+            merged.iter()
+                .map(|(s, e)| (*e - *s).num_seconds())
+                .sum::<i64>()
+        };
+
+        stats.push(DailyStats {
+            date: day_str,
+            total_seconds,
+            app_count: apps_for_day.len() as i64,
+        });
+    }
 
     Ok(stats)
 }
@@ -1819,6 +1958,28 @@ pub fn end_music_session(id: i64) -> Result<()> {
     Ok(())
 }
 
+pub fn end_music_session_retroactive(id: i64, end_time: DateTime<Local>) -> Result<()> {
+    let guard = DB.lock();
+    let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
+
+    let start_time: String = conn.query_row(
+        "SELECT start_time FROM music_sessions WHERE id = ?1",
+        [id],
+        |row| row.get(0),
+    )?;
+
+    if let Ok(start) = DateTime::parse_from_rfc3339(&start_time) {
+        let duration = (end_time - start.with_timezone(&Local)).num_seconds();
+        let duration = std::cmp::max(0, duration);
+        conn.execute(
+            "UPDATE music_sessions SET end_time = ?1, duration_seconds = ?2 WHERE id = ?3",
+            params![end_time.to_rfc3339(), duration, id],
+        )?;
+    }
+
+    Ok(())
+}
+
 pub fn get_today_music_summary() -> Result<Vec<MusicAppUsage>> {
     let guard = DB.lock();
     let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
@@ -1998,6 +2159,28 @@ pub fn end_coding_session(id: i64) -> Result<()> {
     Ok(())
 }
 
+pub fn end_coding_session_retroactive(id: i64, end_time: DateTime<Local>) -> Result<()> {
+    let guard = DB.lock();
+    let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
+
+    let start_time: String = conn.query_row(
+        "SELECT start_time FROM coding_sessions WHERE id = ?1",
+        [id],
+        |row| row.get(0),
+    )?;
+
+    if let Ok(start) = DateTime::parse_from_rfc3339(&start_time) {
+        let duration = (end_time - start.with_timezone(&Local)).num_seconds();
+        let duration = std::cmp::max(0, duration);
+        conn.execute(
+            "UPDATE coding_sessions SET end_time = ?1, duration_seconds = ?2 WHERE id = ?3",
+            params![end_time.to_rfc3339(), duration, id],
+        )?;
+    }
+
+    Ok(())
+}
+
 pub fn get_today_coding_sessions() -> Result<Vec<CodingSession>> {
     let guard = DB.lock();
     let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
@@ -2165,3 +2348,51 @@ pub fn get_total_ai_coding_time_today() -> Result<i64> {
 
     Ok(total.unwrap_or(0))
 }
+
+#[test]
+fn test_inspect_db() {
+    let db_path = get_db_path();
+    println!("Database path: {:?}", db_path);
+    let conn = Connection::open(&db_path).unwrap();
+    
+    // Daily totals
+    println!("\n--- Daily Totals ---");
+    let mut stmt = conn.prepare("
+        SELECT date(start_time) as day, SUM(duration_seconds) as total_sec, COUNT(*) as session_count
+        FROM activity_sessions
+        GROUP BY day
+        ORDER BY day DESC
+        LIMIT 15
+    ").unwrap();
+    let mut rows = stmt.query([]).unwrap();
+    while let Some(row) = rows.next().unwrap() {
+        let day: String = row.get(0).unwrap();
+        let total_sec: Option<i64> = row.get(1).unwrap();
+        let count: i64 = row.get(2).unwrap();
+        let total_sec = total_sec.unwrap_or(0);
+        println!("Date: {} | Total Hours: {:.2} | Sessions: {}", day, total_sec as f64 / 3600.0, count);
+    }
+    
+    // Check GetLastInputInfo
+    #[cfg(target_os = "windows")]
+    {
+        use windows::Win32::UI::Input::KeyboardAndMouse::{GetLastInputInfo, LASTINPUTINFO};
+        #[link(name = "kernel32")]
+        extern "system" {
+            fn GetTickCount() -> u32;
+        }
+
+        let mut lii = LASTINPUTINFO::default();
+        lii.cbSize = std::mem::size_of::<LASTINPUTINFO>() as u32;
+        unsafe {
+            if GetLastInputInfo(&mut lii).as_bool() {
+                let tick_count = GetTickCount();
+                let idle_millis = tick_count.wrapping_sub(lii.dwTime);
+                println!("GetLastInputInfo succeeded! dwTime: {}, current tick: {}, idle ms: {}", lii.dwTime, tick_count, idle_millis);
+            } else {
+                println!("GetLastInputInfo failed!");
+            }
+        }
+    }
+}
+

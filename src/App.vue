@@ -188,8 +188,10 @@ let pollInterval: number | null = null;
 let unlistenTick: (() => void) | null = null;
 
 onMounted(async () => {
-  await store.checkPlatform();
-  await store.fetchSettings();
+  await Promise.all([
+    store.checkPlatform(),
+    store.fetchSettings()
+  ]);
   document.documentElement.setAttribute("data-theme", store.settings.theme);
   const lang = store.settings.language || "en";
   locale.value = lang;
@@ -197,18 +199,25 @@ onMounted(async () => {
 
   const { listen } = await import("@tauri-apps/api/event");
 
-  await listen("navigate", (event: any) => {
+  const listenPromise = listen("navigate", (event: any) => {
     console.log(" Navigation event received:", event.payload);
     router.push(event.payload).catch((err) => {
       console.error("Navigation failed:", err);
     });
   });
 
-  await store.fetchTrackingStatus();
-  if (!store.isTracking) {
-    console.log("Starting activity tracking...");
-    await store.startTracking();
-  }
+  await Promise.all([
+    listenPromise,
+    store.fetchTrackingStatus().then(async () => {
+      if (!store.isTracking) {
+        console.log("Starting activity tracking...");
+        await store.startTracking();
+      }
+    }),
+    store.fetchTodayData(),
+    store.fetchCurrentActivity(),
+    teamsStore.restoreGroupState()
+  ]);
 
   if (doctorModeStore.enabled) {
     doctorModeStore.startTracking();
@@ -221,21 +230,21 @@ onMounted(async () => {
     }
   });
 
-  await store.fetchTodayData();
-  await store.fetchCurrentActivity();
-  await teamsStore.restoreGroupState();
-
   pollInterval = window.setInterval(async () => {
     if (store.isTracking) {
-      await store.fetchCurrentActivity();
-      await store.fetchTodayData();
+      await Promise.all([
+        store.fetchCurrentActivity(),
+        store.fetchTodayData()
+      ]);
     }
   }, 5000);
 
   unlistenTick = await listen("activity-tracker-tick", async () => {
     if (store.isTracking) {
-      await store.fetchCurrentActivity();
-      await store.fetchTodayData();
+      await Promise.all([
+        store.fetchCurrentActivity(),
+        store.fetchTodayData()
+      ]);
     }
   });
 

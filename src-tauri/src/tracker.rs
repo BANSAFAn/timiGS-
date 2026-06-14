@@ -19,6 +19,7 @@ use windows::Win32::{
 };
 
 static RUNNING: AtomicBool = AtomicBool::new(false);
+static THREAD_GENERATION: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
 static APP_HANDLE: once_cell::sync::OnceCell<tauri::AppHandle> = once_cell::sync::OnceCell::new();
 static CURRENT_SESSION: Lazy<Mutex<Option<CurrentSession>>> = Lazy::new(|| Mutex::new(None));
 static CURRENT_MUSIC_SESSION: Lazy<Mutex<Option<CurrentMusicSession>>> = Lazy::new(|| Mutex::new(None));
@@ -96,6 +97,32 @@ pub struct ActiveWindow {
 }
 
 #[cfg(windows)]
+fn get_system_idle_time() -> std::time::Duration {
+    use windows::Win32::UI::Input::KeyboardAndMouse::{GetLastInputInfo, LASTINPUTINFO};
+    #[link(name = "kernel32")]
+    extern "system" {
+        fn GetTickCount() -> u32;
+    }
+
+    let mut lii = LASTINPUTINFO::default();
+    lii.cbSize = std::mem::size_of::<LASTINPUTINFO>() as u32;
+    unsafe {
+        if GetLastInputInfo(&mut lii).as_bool() {
+            let tick_count = GetTickCount();
+            let idle_millis = tick_count.wrapping_sub(lii.dwTime);
+            std::time::Duration::from_millis(idle_millis as u64)
+        } else {
+            std::time::Duration::from_secs(0)
+        }
+    }
+}
+
+#[cfg(not(windows))]
+fn get_system_idle_time() -> std::time::Duration {
+    std::time::Duration::from_secs(0)
+}
+
+#[cfg(windows)]
 fn get_foreground_window_info() -> Option<ActiveWindow> {
     unsafe {
         let hwnd: HWND = GetForegroundWindow();
@@ -145,11 +172,17 @@ fn get_foreground_window_info() -> Option<ActiveWindow> {
                     .unwrap_or("unknown.exe")
                     .to_string();
 
-                let name_only = path
+                let mut name_only = path
                     .file_stem()
                     .and_then(|n| n.to_str())
                     .unwrap_or("Unknown")
                     .to_string();
+
+                if name_only.eq_ignore_ascii_case("msedgewebview2") || name_only.eq_ignore_ascii_case("webview2") {
+                    if window_title.contains("TimiGS") {
+                        name_only = "TimiGS".to_string();
+                    }
+                }
 
                 // Filter ignored apps
                 if name_only.eq_ignore_ascii_case("explorer")
@@ -457,18 +490,38 @@ pub fn start_tracking_with_app_handle(app_handle: tauri::AppHandle) {
 
     let _ = APP_HANDLE.set(app_handle);
     RUNNING.store(true, Ordering::SeqCst);
+    let gen = THREAD_GENERATION.fetch_add(1, Ordering::SeqCst) + 1;
 
-    let _ = thread::spawn(|| {
+    let _ = thread::spawn(move || {
         let mut last_app = String::new();
         let mut last_title = String::new();
         let mut last_music_app = String::new();
         let mut last_coding_key = String::new();
         let mut ticker = 0;
 
-        while RUNNING.load(Ordering::SeqCst) {
+        while RUNNING.load(Ordering::SeqCst) && THREAD_GENERATION.load(Ordering::SeqCst) == gen {
             // Use catch_unwind to prevent panics from crashing the thread
             let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-                if let Some(active) = get_foreground_window_info() {
+                let idle_time = get_system_idle_time();
+                if idle_time.as_secs() >= 300 {
+                    let end_time = chrono::Local::now() - chrono::Duration::seconds(300);
+
+                    if let Some(session) = CURRENT_SESSION.lock().take() {
+                        let _ = db::end_session_retroactive(session.id, end_time);
+                    }
+                    last_app = String::new();
+                    last_title = String::new();
+
+                    if let Some(session) = CURRENT_CODING_SESSION.lock().take() {
+                        let _ = db::end_coding_session_retroactive(session.id, end_time);
+                    }
+                    last_coding_key.clear();
+
+                    if let Some(session) = CURRENT_MUSIC_SESSION.lock().take() {
+                        let _ = db::end_music_session_retroactive(session.id, end_time);
+                    }
+                    last_music_app = String::new();
+                } else if let Some(active) = get_foreground_window_info() {
                     // Check if this is YouTube Music in browser
                     let is_yt_music = is_youtube_music_title(&active.window_title);
 
@@ -536,8 +589,6 @@ pub fn start_tracking_with_app_handle(app_handle: tauri::AppHandle) {
                                     window_title: active.window_title.clone(),
                                     exe_path: active.exe_path.clone(),
                                 });
-
-
                             }
 
                             last_app = active.exe_path.clone();
@@ -556,7 +607,6 @@ pub fn start_tracking_with_app_handle(app_handle: tauri::AppHandle) {
                             };
                             let coding_key = format!("{}|{}", active.exe_path, active.window_title);
                             if coding_key != last_coding_key {
-
                                 if let Some(session) = CURRENT_CODING_SESSION.lock().take() {
                                     let _ = db::end_coding_session(session.id);
                                 }
@@ -598,6 +648,24 @@ pub fn start_tracking_with_app_handle(app_handle: tauri::AppHandle) {
                             last_coding_key.clear();
                         }
                     }
+                } else {
+                    // No active window (locked screen, desktop focused, etc.)
+                    // End active sessions immediately at current time
+                    if let Some(session) = CURRENT_SESSION.lock().take() {
+                        let _ = db::end_session(session.id);
+                    }
+                    last_app = String::new();
+                    last_title = String::new();
+
+                    if let Some(session) = CURRENT_CODING_SESSION.lock().take() {
+                        let _ = db::end_coding_session(session.id);
+                    }
+                    last_coding_key.clear();
+
+                    if let Some(session) = CURRENT_MUSIC_SESSION.lock().take() {
+                        let _ = db::end_music_session(session.id);
+                    }
+                    last_music_app = String::new();
                 }
             }));
 
@@ -624,15 +692,17 @@ pub fn start_tracking_with_app_handle(app_handle: tauri::AppHandle) {
             }
         }
 
-        // End final sessions when stopping
-        if let Some(session) = CURRENT_SESSION.lock().take() {
-            let _ = db::end_session(session.id);
-        }
-        if let Some(session) = CURRENT_MUSIC_SESSION.lock().take() {
-            let _ = db::end_music_session(session.id);
-        }
-        if let Some(session) = CURRENT_CODING_SESSION.lock().take() {
-            let _ = db::end_coding_session(session.id);
+        // End final sessions when stopping, but ONLY if we are the current active generation
+        if THREAD_GENERATION.load(Ordering::SeqCst) == gen {
+            if let Some(session) = CURRENT_SESSION.lock().take() {
+                let _ = db::end_session(session.id);
+            }
+            if let Some(session) = CURRENT_MUSIC_SESSION.lock().take() {
+                let _ = db::end_music_session(session.id);
+            }
+            if let Some(session) = CURRENT_CODING_SESSION.lock().take() {
+                let _ = db::end_coding_session(session.id);
+            }
         }
     });
 }
@@ -643,18 +713,38 @@ pub fn start_tracking() {
     }
 
     RUNNING.store(true, Ordering::SeqCst);
+    let gen = THREAD_GENERATION.fetch_add(1, Ordering::SeqCst) + 1;
 
-    let _ = thread::spawn(|| {
+    let _ = thread::spawn(move || {
         let mut last_app = String::new();
         let mut last_title = String::new();
         let mut last_music_app = String::new();
         let mut last_coding_key = String::new();
         let mut ticker = 0;
 
-        while RUNNING.load(Ordering::SeqCst) {
+        while RUNNING.load(Ordering::SeqCst) && THREAD_GENERATION.load(Ordering::SeqCst) == gen {
             // Use catch_unwind to prevent panics from crashing the thread
             let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-                if let Some(active) = get_foreground_window_info() {
+                let idle_time = get_system_idle_time();
+                if idle_time.as_secs() >= 300 {
+                    let end_time = chrono::Local::now() - chrono::Duration::seconds(300);
+
+                    if let Some(session) = CURRENT_SESSION.lock().take() {
+                        let _ = db::end_session_retroactive(session.id, end_time);
+                    }
+                    last_app = String::new();
+                    last_title = String::new();
+
+                    if let Some(session) = CURRENT_CODING_SESSION.lock().take() {
+                        let _ = db::end_coding_session_retroactive(session.id, end_time);
+                    }
+                    last_coding_key.clear();
+
+                    if let Some(session) = CURRENT_MUSIC_SESSION.lock().take() {
+                        let _ = db::end_music_session_retroactive(session.id, end_time);
+                    }
+                    last_music_app = String::new();
+                } else if let Some(active) = get_foreground_window_info() {
                     // Check if this is YouTube Music in browser
                     let is_yt_music = is_youtube_music_title(&active.window_title);
 
@@ -662,7 +752,6 @@ pub fn start_tracking() {
                     let is_music = is_music_app(&active.app_name, &active.exe_path) || is_yt_music;
 
                     if is_music {
-
                         let app_name = if is_yt_music {
                             "YouTube Music".to_string()
                         } else {
@@ -742,7 +831,7 @@ pub fn start_tracking() {
                             } else {
                                 editor_opt.unwrap()
                             };
-                            // Ось тут нахуй лізете, тут нічого цікавого немає чи рукожоп тут !
+                            // Generic comment
                             let coding_key = format!("{}|{}", active.exe_path, active.window_title);
                             if coding_key != last_coding_key {
                                 // End previous coding session
@@ -787,6 +876,24 @@ pub fn start_tracking() {
                             last_coding_key.clear();
                         }
                     }
+                } else {
+                    // No active window (locked screen, desktop focused, etc.)
+                    // End active sessions immediately at current time
+                    if let Some(session) = CURRENT_SESSION.lock().take() {
+                        let _ = db::end_session(session.id);
+                    }
+                    last_app = String::new();
+                    last_title = String::new();
+
+                    if let Some(session) = CURRENT_CODING_SESSION.lock().take() {
+                        let _ = db::end_coding_session(session.id);
+                    }
+                    last_coding_key.clear();
+
+                    if let Some(session) = CURRENT_MUSIC_SESSION.lock().take() {
+                        let _ = db::end_music_session(session.id);
+                    }
+                    last_music_app = String::new();
                 }
             }));
 
@@ -813,15 +920,17 @@ pub fn start_tracking() {
             }
         }
 
-        // End final sessions when stopping
-        if let Some(session) = CURRENT_SESSION.lock().take() {
-            let _ = db::end_session(session.id);
-        }
-        if let Some(session) = CURRENT_MUSIC_SESSION.lock().take() {
-            let _ = db::end_music_session(session.id);
-        }
-        if let Some(session) = CURRENT_CODING_SESSION.lock().take() {
-            let _ = db::end_coding_session(session.id);
+        // End final sessions when stopping, but ONLY if we are the current active generation
+        if THREAD_GENERATION.load(Ordering::SeqCst) == gen {
+            if let Some(session) = CURRENT_SESSION.lock().take() {
+                let _ = db::end_session(session.id);
+            }
+            if let Some(session) = CURRENT_MUSIC_SESSION.lock().take() {
+                let _ = db::end_music_session(session.id);
+            }
+            if let Some(session) = CURRENT_CODING_SESSION.lock().take() {
+                let _ = db::end_coding_session(session.id);
+            }
         }
     });
 }

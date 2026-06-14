@@ -103,7 +103,12 @@
     "musicListening": "Écoute de musique",
     "sessions": "sessions",
     "nowPlaying": "Lecture en cours",
-    "live": "EN DIRECT"
+    "live": "EN DIRECT",
+    "sites": "sites",
+    "basedOn7Days": "Basé sur 7 jours",
+    "unknownTrack": "Piste inconnue",
+    "unknownPage": "Page inconnue",
+    "startUsingAppsHint": "Commencez à utiliser vos applications pour voir les analyses ici."
   },
   "settings": {
     "title": "Paramètres",
@@ -172,7 +177,29 @@
     "doctorModeAlertMessage": "Vous êtes devant votre PC depuis longtemps. Veuillez faire une pause, vous promener ou reposer vos yeux pendant une heure !",
     "doctorModeRepeatMessage": "Vous ignorez toujours votre pause. Reposez vos yeux !",
     "clearData": "Effacer toutes les données",
-    "noUpdates": "Vous utilisez la dernière version."
+    "noUpdates": "Vous utilisez la dernière version.",
+    "personalizeSubtitle": "Personnalisez votre interface",
+    "chooseLangDesc": "Choisissez votre langue préférée",
+    "manageBehaviorSubtitle": "Gérer le comportement de l'application",
+    "active": "Actif",
+    "paused": "En pause",
+    "updatesDesc": "Vérifiez les dernières fonctionnalités et améliorations.",
+    "dataManagementDesc": "Exporter ou réinitialiser vos données",
+    "importDataDesc": "Importez votre activité suivie à partir d'un fichier",
+    "importFile": "Importer le fichier",
+    "autoExport": "Exportation automatique",
+    "autoExportDesc": "Exporter automatiquement les données à intervalles réguliers",
+    "selectFolder": "Sélectionner le dossier",
+    "everyHour": "Chaque heure",
+    "every6Hours": "Toutes les 6 heures",
+    "every12Hours": "Toutes les 12 heures",
+    "daily": "Tous les jours",
+    "every2Days": "Tous les 2 jours",
+    "aboutLicense": "À propos & Licence",
+    "softwareInfo": "Informations sur le logiciel",
+    "originalDevelopedBy": "Logiciel original développé par",
+    "licensedUnder": "Sous licence",
+    "copyrightReserved": "Protégé par le droit d'auteur (c) 2026. Le nom \"TimiGS\" est réservé."
   },
   "tools": {
     "title": "Outils",
@@ -186,7 +213,8 @@
     "newNote": "Nouvelle note",
     "deleteNote": "Supprimer",
     "noNotes": "Aucune note pour le moment",
-    "untitled": "Sans titre"
+    "untitled": "Sans titre",
+    "selectNoteHint": "Sélectionnez une note à afficher ou créez-en une nouvelle"
   },
   "tasks": {
     "title": "Tâches et objectifs",
@@ -197,7 +225,13 @@
     "hours": "Heures",
     "create": "Créer",
     "cancel": "Annuler",
-    "goal": "Objectif"
+    "goal": "Objectif",
+    "viewHistory": "Voir l'historique",
+    "viewActive": "Voir les tâches actives",
+    "exportCsv": "Exporter en CSV",
+    "noCompletedTasks": "Aucune tâche complétée trouvée.",
+    "websiteTitleKeyword": "Site Web / Mot-clé du titre",
+    "optional": "Optionnel"
   },
   "weather": {
     "title": "Météo et activité"
@@ -236,7 +270,23 @@
     "wrongPassword": "Mot de passe incorrect",
     "focusedApp": "Application en cours de concentration",
     "strictMode": "Mode Strict",
-    "strictHint": "Le mode strict bloque : changer d'application, fermer les fenêtres, arrêt/redémarrage. Vous NE POUVEZ PAS quitter sans mot de passe !"
+    "strictHint": "Le mode strict bloque : changer d'application, fermer les fenêtres, arrêt/redémarrage. Vous NE POUVEZ PAS quitter sans mot de passe !",
+    "passwordHint": "Vous aurez besoin de ce mot de passe pour annuler le mode focus plus tôt",
+    "backgroundMusic": "Musique de fond (Optionnelle)",
+    "noMusic": "Pas de musique",
+    "chooseAppPlaceholder": "Choisissez une application sur laquelle vous concentrer...",
+    "stopPreview": "Arrêter l'aperçu",
+    "preview": "Aperçu",
+    "enterPasswordPlaceholder": "Entrez un mot de passe pour verrouiller...",
+    "noTrackSelected": "Aucune piste sélectionnée",
+    "prevTrack": "Piste précédente",
+    "pause": "Pause",
+    "play": "Lire",
+    "nextTrack": "Piste suivante",
+    "toggleLoop": "Activer la boucle",
+    "selectTrackPlaceholder": "Sélectionner une piste...",
+    "otherAppsBlocked": "Les autres applications seront bloquées",
+    "enterPasswordCancel": "Entrez le mot de passe pour annuler..."
   },
   "timeout": {
     "title": "Time OUT",
@@ -287,7 +337,8 @@
     "breakFrom": "De",
     "breakTo": "À",
     "simpleBreaks": "Pauses Simples",
-    "scheduleMode": "Mode Planifié"
+    "scheduleMode": "Mode Planifié",
+    "allAppsBlocked": "Toutes les applications sont bloquées pendant la pause"
   },
   "common": {
     "loading": "Chargement...",
@@ -310,7 +361,28 @@
     "connecting": "Connexion...",
     "done": "Terminé",
     "on": "ACTIVÉ",
-    "off": "DÉSACTIVÉ"
+    "off": "DÉSACTIVÉ",
+    "application": "Application",
+    "time": "Temps",
+    "unknown": "Inconnu",
+    "you": "Vous",
+    "duration": "Durée",
+    "h_symbol": "h",
+    "m_symbol": "m",
+    "s_symbol": "s",
+    "active": "Actif",
+    "paused": "En pause",
+    "quit": "Quitter",
+    "openApp": "Ouvrir l'app",
+    "now": "Maintenant",
+    "total": "au total",
+    "delete": "Supprimer",
+    "seconds_word": "secondes",
+    "minutes_word": "minutes",
+    "hours_word": "heures",
+    "na": "N/A",
+    "none": "—",
+    "ai": "IA"
   },
   "team": {
     "title": "Team",
@@ -362,7 +434,32 @@
     "shareMusicTitle": "Share Music",
     "shareMusicDesc": "Show currently playing music during Focus Mode",
     "disconnectedOnRestartTitle": "Disconnected",
-    "disconnectedOnRestartMessage": "You have been disconnected from the group because the application was restarted. Please ask for the code again or try to join the room again."
+    "disconnectedOnRestartMessage": "You have been disconnected from the group because the application was restarted. Please ask for the code again or try to join the room again.",
+    "connectP2PDesc": "Connectez-vous avec votre équipe via P2P et voyez l'activité en temps réel",
+    "voiceChatDesc": "Rejoignez le salon vocal de l'équipe pour parler avec les membres connectés.",
+    "voiceChatChannel": "Canal de discussion vocale",
+    "joinVoiceChat": "Rejoindre le chat vocal",
+    "unknownArtist": "Artiste inconnu",
+    "inCall": "en appel",
+    "unmuteMic": "Réactiver le micro",
+    "muteMic": "Couper le micro",
+    "leaveVoiceChat": "Quitter le chat vocal",
+    "totalOnline": "Total en ligne",
+    "activeDuration": "Durée active",
+    "categoryBreakdown": "Répartition par catégorie",
+    "appsUsage": "Utilisation des applications",
+    "detailedAppsCategories": "Applications & Catégories détaillées",
+    "activityReport": "Rapport d'activité",
+    "generated": "Généré le",
+    "totalMembers": "Nombre de membres",
+    "membersActivitySummary": "Résumé de l'activité des membres",
+    "member": "Membre",
+    "leader": "Chef",
+    "leaderSuffix": "(Chef)",
+    "onlineBadge": "● En ligne",
+    "sessions": "Sessions",
+    "na": "N/A",
+    "none": "—"
   },
   "excludeProcesses": {
     "title": "Manage Process Tracking",
@@ -473,7 +570,10 @@
     "hide_files": "Hide File Breakdown",
     "timeline_view": "Timeline View",
     "grouped_view": "Files Summary",
-    "timeline_title": "Sessions & File Activity"
+    "timeline_title": "Sessions & File Activity",
+    "workspaceGeneral": "Espace de travail / Général",
+    "unknownCoding": "Inconnu(Codage)",
+    "noProject": "Aucun projet"
   },
   "calendar": {
     "clear": "Effacer",

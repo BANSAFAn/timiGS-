@@ -103,7 +103,12 @@
     "musicListening": "听音乐",
     "sessions": "次会话",
     "nowPlaying": "正在播放",
-    "live": "直播"
+    "live": "直播",
+    "sites": "个网站",
+    "basedOn7Days": "基于过去 7 天",
+    "unknownTrack": "未知曲目",
+    "unknownPage": "未知页面",
+    "startUsingAppsHint": "开始使用您的应用以在此处查看分析。"
   },
   "settings": {
     "title": "设置",
@@ -172,7 +177,29 @@
     "doctorModeAlertMessage": "您已经在电脑前很长时间了。请休息一下，去散步或让眼睛休息一小时！",
     "doctorModeRepeatMessage": "您仍然在忽略休息。让您的眼睛休息一下！",
     "clearData": "清除所有数据",
-    "noUpdates": "您正在使用最新版本。"
+    "noUpdates": "您正在使用最新版本。",
+    "personalizeSubtitle": "个性化您的界面",
+    "chooseLangDesc": "选择您偏好的语言",
+    "manageBehaviorSubtitle": "管理应用行为",
+    "active": "活跃",
+    "paused": "已暂停",
+    "updatesDesc": "检查最新功能和改进。",
+    "dataManagementDesc": "导出或重置您的数据",
+    "importDataDesc": "从文件导入您的跟踪活动",
+    "importFile": "导入文件",
+    "autoExport": "自动导出",
+    "autoExportDesc": "定期自动导出数据",
+    "selectFolder": "选择文件夹",
+    "everyHour": "每小时",
+    "every6Hours": "每6小时",
+    "every12Hours": "每12小时",
+    "daily": "每天",
+    "every2Days": "每2天",
+    "aboutLicense": "关于与许可",
+    "softwareInfo": "软件信息",
+    "originalDevelopedBy": "原版软件开发自",
+    "licensedUnder": "许可协议为",
+    "copyrightReserved": "受版权保护 (c) 2026. 保留 \"TimiGS\" 名称。"
   },
   "tools": {
     "title": "工具",
@@ -186,7 +213,8 @@
     "newNote": "新建笔记",
     "deleteNote": "删除",
     "noNotes": "暂无笔记",
-    "untitled": "无标题"
+    "untitled": "无标题",
+    "selectNoteHint": "选择一条便签以查看或创建新便签"
   },
   "tasks": {
     "title": "任务与目标",
@@ -197,7 +225,13 @@
     "hours": "小时",
     "create": "创建",
     "cancel": "取消",
-    "goal": "目标"
+    "goal": "目标",
+    "viewHistory": "查看历史",
+    "viewActive": "查看进行中",
+    "exportCsv": "导出为 CSV",
+    "noCompletedTasks": "未找到已完成的任务。",
+    "websiteTitleKeyword": "网站/标题关键字",
+    "optional": "可选"
   },
   "weather": {
     "title": "天气与活动"
@@ -236,7 +270,23 @@
     "wrongPassword": "密码错误",
     "focusedApp": "专注的应用",
     "strictMode": "严格模式",
-    "strictHint": "严格模式阻止：切换应用、关闭窗口、关机/重启。没有密码您无法提前退出！"
+    "strictHint": "严格模式阻止：切换应用、关闭窗口、关机/重启。没有密码您无法提前退出！",
+    "passwordHint": "您需要此密码才能提前取消专注模式",
+    "backgroundMusic": "背景音乐 (可选)",
+    "noMusic": "无音乐",
+    "chooseAppPlaceholder": "选择一个要专注的应用...",
+    "stopPreview": "停止预览",
+    "preview": "预览",
+    "enterPasswordPlaceholder": "输入密码以锁定...",
+    "noTrackSelected": "未选择音轨",
+    "prevTrack": "上一首",
+    "pause": "暂停",
+    "play": "播放",
+    "nextTrack": "下一首",
+    "toggleLoop": "循环播放",
+    "selectTrackPlaceholder": "选择音轨...",
+    "otherAppsBlocked": "其他应用将被屏蔽",
+    "enterPasswordCancel": "输入密码以取消..."
   },
   "timeout": {
     "title": "休息时间",
@@ -287,7 +337,8 @@
     "breakFrom": "从",
     "breakTo": "到",
     "simpleBreaks": "简单休息",
-    "scheduleMode": "计划模式"
+    "scheduleMode": "计划模式",
+    "allAppsBlocked": "休息期间所有应用将被屏蔽"
   },
   "common": {
     "loading": "加载中...",
@@ -310,7 +361,28 @@
     "connecting": "连接中...",
     "done": "完成",
     "on": "开启",
-    "off": "关闭"
+    "off": "关闭",
+    "application": "应用",
+    "time": "时间",
+    "unknown": "未知",
+    "you": "你",
+    "duration": "时长",
+    "h_symbol": "时",
+    "m_symbol": "分",
+    "s_symbol": "秒",
+    "active": "活跃",
+    "paused": "已暂停",
+    "quit": "退出",
+    "openApp": "打开应用",
+    "now": "现在",
+    "total": "总计",
+    "delete": "删除",
+    "seconds_word": "秒",
+    "minutes_word": "分钟",
+    "hours_word": "小时",
+    "na": "无",
+    "none": "—",
+    "ai": "AI"
   },
   "team": {
     "title": "Team",
@@ -362,7 +434,32 @@
     "shareMusicTitle": "Share Music",
     "shareMusicDesc": "Show currently playing music during Focus Mode",
     "disconnectedOnRestartTitle": "Disconnected",
-    "disconnectedOnRestartMessage": "You have been disconnected from the group because the application was restarted. Please ask for the code again or try to join the room again."
+    "disconnectedOnRestartMessage": "You have been disconnected from the group because the application was restarted. Please ask for the code again or try to join the room again.",
+    "connectP2PDesc": "通过 P2P 与您的团队连接并查看实时活动",
+    "voiceChatDesc": "加入实时团队语音室与在线成员交谈。",
+    "voiceChatChannel": "语音聊天频道",
+    "joinVoiceChat": "加入语音聊天",
+    "unknownArtist": "未知艺术家",
+    "inCall": "通话中",
+    "unmuteMic": "取消静音",
+    "muteMic": "静音麦克风",
+    "leaveVoiceChat": "离开语音聊天",
+    "totalOnline": "团队总在线时间",
+    "activeDuration": "活跃时长",
+    "categoryBreakdown": "分类占比",
+    "appsUsage": "应用使用情况",
+    "detailedAppsCategories": "详细应用与分类",
+    "activityReport": "活动报告",
+    "generated": "生成时间",
+    "totalMembers": "成员总数",
+    "membersActivitySummary": "成员活动摘要",
+    "member": "成员",
+    "leader": "组长",
+    "leaderSuffix": "(组长)",
+    "onlineBadge": "● 在线",
+    "sessions": "会话",
+    "na": "无",
+    "none": "—"
   },
   "excludeProcesses": {
     "title": "Manage Process Tracking",
@@ -473,7 +570,10 @@
     "hide_files": "Hide File Breakdown",
     "timeline_view": "Timeline View",
     "grouped_view": "Files Summary",
-    "timeline_title": "Sessions & File Activity"
+    "timeline_title": "Sessions & File Activity",
+    "workspaceGeneral": "工作区 / 常规",
+    "unknownCoding": "未知(编程)",
+    "noProject": "无项目"
   },
   "calendar": {
     "clear": "清除",

@@ -13,13 +13,13 @@
         </svg>
       </div>
       
-      <h1 class="lock-title">Computer Locked</h1>
-      <p class="lock-subtitle">For Your Health</p>
+      <h1 class="lock-title">{{ $t("settings.lockScreenTitle") || 'Computer Locked' }}</h1>
+      <p class="lock-subtitle">{{ $t("settings.lockScreenSubtitle") || 'For Your Health' }}</p>
       
       <div class="lock-message">
-        <p>You've been at your PC for too long without taking breaks.</p>
-        <p class="highlight">Please go for a walk, drink some tea, or rest your eyes.</p>
-        <p class="highlight">Your health is more important than any task!</p>
+        <p>{{ $t("settings.lockScreenMessage1") || "You've been at your PC for too long without taking breaks." }}</p>
+        <p class="highlight">{{ $t("settings.lockScreenMessage2") || "Please go for a walk, drink some tea, or rest your eyes." }}</p>
+        <p class="highlight">{{ $t("settings.lockScreenMessage3") || "Your health is more important than any task!" }}</p>
       </div>
       
       <div class="lock-timer">
@@ -48,17 +48,17 @@
             <span class="timer-seconds">{{ formatTime(doctorModeStore.lockTimeRemainingSeconds).seconds }}</span>
           </div>
         </div>
-        <p class="timer-label">Time remaining</p>
+        <p class="timer-label">{{ $t("settings.lockScreenTimeRemaining") || 'Time remaining' }}</p>
       </div>
       
       <div class="lock-tips">
-        <h3> Healthy Break Ideas:</h3>
+        <h3>{{ $t("settings.lockScreenTipsTitle") || 'Healthy Break Ideas:' }}</h3>
         <ul>
-          <li> Take a 10-minute walk outside</li>
-          <li> Do some stretching exercises</li>
-          <li>️ Rest your eyes - look at distant objects</li>
-          <li> Drink a glass of water or tea</li>
-          <li> Get some fresh air</li>
+          <li>{{ $t("settings.lockScreenTip1") || 'Take a 10-minute walk outside' }}</li>
+          <li>{{ $t("settings.lockScreenTip2") || 'Do some stretching exercises' }}</li>
+          <li>{{ $t("settings.lockScreenTip3") || 'Rest your eyes - look at distant objects' }}</li>
+          <li>{{ $t("settings.lockScreenTip4") || 'Drink a glass of water or tea' }}</li>
+          <li>{{ $t("settings.lockScreenTip5") || 'Get some fresh air' }}</li>
         </ul>
       </div>
       
@@ -72,7 +72,7 @@
           <line x1="12" y1="9" x2="12" y2="13"></line>
           <line x1="12" y1="17" x2="12.01" y2="17"></line>
         </svg>
-        Emergency Unlock
+        {{ $t("settings.lockScreenEmergencyUnlock") || 'Emergency Unlock' }}
       </button>
     </div>
   </div>
@@ -80,8 +80,10 @@
 
 <script setup lang="ts">
 import { computed, ref, onMounted, onUnmounted } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useDoctorModeStore } from '../stores/doctorMode';
 
+const { t } = useI18n();
 const doctorModeStore = useDoctorModeStore();
 const showEmergencyUnlock = ref(false);
 
@@ -104,24 +106,31 @@ function formatTime(totalSeconds: number) {
 }
 
 function handleEmergencyUnlock() {
-  if (confirm('Are you sure you want to unlock? This should only be used in emergencies.')) {
+  const confirmMsg = t("settings.lockScreenEmergencyConfirm") || 'Are you sure you want to unlock? This should only be used in emergencies.';
+  if (confirm(confirmMsg)) {
     doctorModeStore.emergencyUnlock();
   }
 }
 
-
 let timerInterval: any = null;
+let emergencyTimeout: any = null;
 
 onMounted(() => {
-
   timerInterval = setInterval(() => {
     doctorModeStore.currentTime = Date.now();
   }, 1000);
+
+  emergencyTimeout = setTimeout(() => {
+    showEmergencyUnlock.value = true;
+  }, 10000); // Show emergency unlock button after 10 seconds
 });
 
 onUnmounted(() => {
   if (timerInterval) {
     clearInterval(timerInterval);
+  }
+  if (emergencyTimeout) {
+    clearTimeout(emergencyTimeout);
   }
 });
 </script>

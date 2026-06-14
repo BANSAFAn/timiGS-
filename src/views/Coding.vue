@@ -76,14 +76,14 @@
               <div class="cs-info">
                 <div class="cs-file" v-if="session.file_path">
                   <span class="cs-lang-dot" :style="{ background: getLangColor(session.language) }"></span>
-                  <span class="cs-filename" :title="session.file_path || undefined">{{ session.file_path }}</span>
-                  <span class="cs-lang" v-if="session.language">{{ session.language }}</span>
+                  <span class="cs-filename" :title="session.file_path || undefined">{{ session.file_path === 'Workspace / General' ? t('coding.workspaceGeneral') : session.file_path }}</span>
+                  <span class="cs-lang" v-if="session.language">{{ session.language === 'Unknown' ? t('coding.unknown') : session.language }}</span>
                 </div>
                 <div class="cs-project" v-if="session.project_dir">
                   <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 256 256" fill="currentColor" style="display:inline;vertical-align:middle;margin-right:3px;">
                     <path d="M216,72H131.31L104,44.69A15.86,15.86,0,0,0,92.69,40H40A16,16,0,0,0,24,56V200.62A15.4,15.4,0,0,0,39.38,216H216.89A15.13,15.13,0,0,0,232,200.89V88A16,16,0,0,0,216,72ZM40,56H92.69l16,16H40ZM216,200H40V88H216Z"/>
                   </svg>
-                  {{ session.project_dir }}
+                  {{ session.project_dir === 'No Project' ? t('coding.noProject') : session.project_dir }}
                 </div>
               </div>
               <div class="cs-right">
@@ -108,14 +108,14 @@
               <div class="file-info-col">
                 <div class="file-meta-header">
                   <span class="lang-color-dot" :style="{ background: getLangColor(file.language) }"></span>
-                  <span class="file-name" :title="file.filePath">{{ file.filePath }}</span>
-                  <span class="lang-tag" v-if="file.language">{{ file.language }}</span>
+                  <span class="file-name" :title="file.filePath">{{ file.filePath === 'Workspace / General' ? t('coding.workspaceGeneral') : file.filePath }}</span>
+                  <span class="lang-tag" v-if="file.language">{{ file.language === 'Unknown' ? t('coding.unknown') : file.language }}</span>
                 </div>
                 <div class="file-project-sub">
                   <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 256 256" fill="currentColor" style="display:inline;vertical-align:middle;margin-right:4px;">
                     <path d="M216,72H131.31L104,44.69A15.86,15.86,0,0,0,92.69,40H40A16,16,0,0,0,24,56V200.62A15.4,15.4,0,0,0,39.38,216H216.89A15.13,15.13,0,0,0,232,200.89V88A16,16,0,0,0,216,72ZM40,56H92.69l16,16H40ZM216,200H40V88H216Z"/>
                   </svg>
-                  {{ file.projectDir }}
+                  {{ file.projectDir === 'No Project' ? t('coding.noProject') : file.projectDir }}
                 </div>
               </div>
 
@@ -127,7 +127,7 @@
                   </div>
                   <div class="file-progress-labels">
                     <span class="label-manual">{{ formatDuration(file.manualSeconds) }}</span>
-                    <span class="label-ai" v-if="file.aiSeconds > 0">{{ formatDuration(file.aiSeconds) }} AI</span>
+                    <span class="label-ai" v-if="file.aiSeconds > 0">{{ formatDuration(file.aiSeconds) }} {{ t('coding.ai', 'AI') }}</span>
                   </div>
                 </div>
               </div>
@@ -140,16 +140,16 @@
             <div v-show="expandedTimelineFiles.has(file.key)" class="file-sessions-drawer">
               <div v-for="sess in file.sessions" :key="sess.id" class="sub-session-item">
                 <span class="sub-sess-time">
-                  {{ formatTime(sess.start_time) }} - {{ sess.end_time ? formatTime(sess.end_time) : 'Now' }}
+                  {{ formatTime(sess.start_time) }} - {{ sess.end_time ? formatTime(sess.end_time) : t('common.now', 'Now') }}
                 </span>
                 <span class="sub-sess-editor" :class="getEditorBadgeClass(sess.editor_name)">
                   {{ sess.editor_name }}
                 </span>
-                <span class="sub-sess-path" :title="sess.file_path || undefined">{{ sess.file_path || 'Workspace / General' }}</span>
+                <span class="sub-sess-path" :title="sess.file_path || undefined">{{ sess.file_path === 'Workspace / General' ? t('coding.workspaceGeneral') : (sess.file_path || t('coding.workspaceGeneral')) }}</span>
                 <div class="sub-sess-right">
                   <span class="sub-sess-duration">{{ formatDuration(sess.duration_seconds) }}</span>
                   <span class="sub-sess-type" :class="sess.is_ai_assisted ? 'type-ai' : 'type-manual'">
-                    {{ sess.is_ai_assisted ? 'AI' : 'Manual' }}
+                    {{ sess.is_ai_assisted ? t('coding.ai', 'AI') : t('coding.manual', 'Manual') }}
                   </span>
                 </div>
               </div>
@@ -343,11 +343,14 @@ function formatTime(timeStr: string): string {
 }
 
 function formatDuration(seconds: number): string {
-  if (seconds < 60) return `${seconds}s`;
+  const h_sym = t('common.h_symbol', 'h');
+  const m_sym = t('common.m_symbol', 'm');
+  const s_sym = t('common.s_symbol', 's');
+  if (seconds < 60) return `${seconds}${s_sym}`;
   const hrs = Math.floor(seconds / 3600);
   const mins = Math.floor((seconds % 3600) / 60);
-  if (hrs > 0) return `${hrs}h ${mins}m`;
-  return `${mins}m`;
+  if (hrs > 0) return `${hrs}${h_sym} ${mins}${m_sym}`;
+  return `${mins}${m_sym}`;
 }
 
 function getEditorBadgeClass(editor: string): string {

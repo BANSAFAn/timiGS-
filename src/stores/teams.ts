@@ -5,6 +5,7 @@ import { invoke } from "@tauri-apps/api/core";
 import { save } from "@tauri-apps/plugin-dialog";
 import { writeTextFile, readTextFile, remove } from "@tauri-apps/plugin-fs";
 import { useActivityStore, detectCategory, CATEGORY_STYLES } from "./activity";
+import { i18n } from "../i18n";
 
 export interface TeamMember {
   id: string;
@@ -1286,7 +1287,7 @@ export const useTeamsStore = defineStore("teams", () => {
     });
 
     const topApp = Array.from(appMap.entries())
-      .sort((a, b) => b[1] - a[1])[0]?.[0] || 'N/A';
+      .sort((a, b) => b[1] - a[1])[0]?.[0] || i18n.global.t('team.na');
 
     return {
       totalMembers,
