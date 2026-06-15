@@ -111,7 +111,8 @@
     "basedOn7Days": "Based on 7 days",
     "unknownTrack": "Unknown Track",
     "unknownPage": "Unknown Page",
-    "startUsingAppsHint": "Start using your applications to see analytics here."
+    "startUsingAppsHint": "Start using your applications to see analytics here.",
+    "activity": "Activity"
   },
   "settings": {
     "title": "Settings",

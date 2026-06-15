@@ -108,7 +108,8 @@
     "basedOn7Days": "Basierend auf 7 Tagen",
     "unknownTrack": "Unbekannter Titel",
     "unknownPage": "Unbekannte Seite",
-    "startUsingAppsHint": "Verwenden Sie Ihre Apps, um hier Analysen zu sehen."
+    "startUsingAppsHint": "Verwenden Sie Ihre Apps, um hier Analysen zu sehen.",
+    "activity": "Aktivität"
   },
   "settings": {
     "title": "Einstellungen",

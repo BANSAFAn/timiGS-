@@ -1085,7 +1085,7 @@ const dailyAverage = computed(() => weeklyStats.value.length ? Math.round(totalW
 const lineChartData = computed(() => ({
   labels: weeklyStats.value.map(d => new Date(d.date).toLocaleDateString(locale.value, { month: 'short', day: 'numeric' })).reverse(),
   datasets: [{
-    label: 'Activity (hours)',
+    label: t('analytics.activity'),
     data: weeklyStats.value.map(d => Number((d.total_seconds / 3600).toFixed(1))).reverse(),
     borderColor: '#10b981',
     borderWidth: 3,
@@ -1127,7 +1127,25 @@ const commonOptions = {
   }
 };
 
-const lineChartOptions = { ...commonOptions };
+const lineChartOptions = computed(() => ({
+  ...commonOptions,
+  plugins: {
+    ...commonOptions.plugins,
+    tooltip: {
+      ...commonOptions.plugins.tooltip,
+      callbacks: {
+        label: (tooltipItem: any) => {
+          const dataIndex = tooltipItem.dataIndex;
+          const originalIndex = weeklyStats.value.length - 1 - dataIndex;
+          const statsEntry = weeklyStats.value[originalIndex];
+          const seconds = statsEntry ? statsEntry.total_seconds : 0;
+          const label = t('analytics.activity') || 'Activity';
+          return ` ${label}: ${formatDuration(seconds)}`;
+        }
+      }
+    }
+  }
+}));
 
 const pieChartOptions = {
   responsive: true,

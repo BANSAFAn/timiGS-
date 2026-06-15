@@ -108,7 +108,8 @@
     "basedOn7Days": "Na podstawie 7 dni",
     "unknownTrack": "Nieznany utwór",
     "unknownPage": "Nieznana strona",
-    "startUsingAppsHint": "Zacznij korzystać z aplikacji, aby zobaczyć statystyki."
+    "startUsingAppsHint": "Zacznij korzystać z aplikacji, aby zobaczyć statystyki.",
+    "activity": "Aktywność"
   },
   "settings": {
     "title": "Ustawienia",

@@ -108,7 +108,8 @@
     "basedOn7Days": "基于过去 7 天",
     "unknownTrack": "未知曲目",
     "unknownPage": "未知页面",
-    "startUsingAppsHint": "开始使用您的应用以在此处查看分析。"
+    "startUsingAppsHint": "开始使用您的应用以在此处查看分析。",
+    "activity": "活动"
   },
   "settings": {
     "title": "设置",

@@ -929,6 +929,7 @@ async function toggleTracking() {
   } else {
     await store.startTracking();
   }
+}
 const isUpdating = ref(false);
 const showUpdateModal = ref(false);
 const updateVersion = ref("");

@@ -108,7 +108,8 @@
     "basedOn7Days": "Com base em 7 dias",
     "unknownTrack": "Faixa desconhecida",
     "unknownPage": "Página desconhecida",
-    "startUsingAppsHint": "Comece a usar seus aplicativos para ver as análises aqui."
+    "startUsingAppsHint": "Comece a usar seus aplicativos para ver as análises aqui.",
+    "activity": "Atividade"
   },
   "settings": {
     "title": "Configurações",

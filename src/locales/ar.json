@@ -108,7 +108,8 @@
     "basedOn7Days": "بناءً على 7 أيام",
     "unknownTrack": "مسار غير معروف",
     "unknownPage": "صفحة غير معروفة",
-    "startUsingAppsHint": "ابدأ في استخدام تطبيقاتك لرؤية التحليلات هنا."
+    "startUsingAppsHint": "ابدأ في استخدام تطبيقاتك لرؤية التحليلات هنا.",
+    "activity": "النشاط"
   },
   "settings": {
     "title": "الإعدادات",
