@@ -39,7 +39,7 @@
                 <span v-if="task.title_filter" class="filter-tag">{{ task.title_filter }}</span>
             </h4>
             <p v-if="task.description" class="task-desc">{{ task.description }}</p>
-            <p class="task-date">{{ new Date(task.created_at).toLocaleDateString(locale.value) }}</p>
+            <p class="task-date">{{ new Date(task.created_at).toLocaleDateString(locale) }}</p>
           </div>
           <div class="task-actions">
              <span class="status-badge" :class="task.status">
