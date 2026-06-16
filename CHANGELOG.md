@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.10.1](https://github.com/BANSAFAn/timiGS-/compare/v1.10.0...v1.10.1) (2026-06-16)
+
+
+### Bug Fixes
+
+* p2p transfer & db reg ([64ad8a4](https://github.com/BANSAFAn/timiGS-/commit/64ad8a42e176f81f03a9a0fc5a1586d0fb5e1c61))
+
 ## [1.10.0](https://github.com/BANSAFAn/timiGS-/compare/v1.9.0...v1.10.0) (2026-06-15)
 
 
