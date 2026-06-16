@@ -250,6 +250,7 @@ pub fn run() {
             commands::stop_p2p_server,
             commands::get_local_ip,
             commands::send_p2p_file,
+            commands::save_local_file,
             // Focus Mode
             commands::start_focus_cmd,
             commands::stop_focus_cmd,

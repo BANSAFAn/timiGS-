@@ -14,7 +14,7 @@
           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 256 256" fill="currentColor" style="display:inline;vertical-align:middle;margin-right:4px;">
             <path d="M240,96a15.89,15.89,0,0,0-20.17-15.11l-34,11.33L149.2,36a16,16,0,0,0-30.4,0L82.16,92.22l-34-11.33a16,16,0,0,0-20.3,20.3l24,72A16,16,0,0,0,67.35,184H188.65a16,16,0,0,0,15.52-10.81l24-72A15.9,15.9,0,0,0,240,96ZM188.65,168H67.35l-21.33-64,36.56,12.19a16,16,0,0,0,19.38-9.45L128,45.25l26,59.54a16,16,0,0,0,19.38,9.45l36.56-12.19ZM200,208a8,8,0,0,1-8,8H64a8,8,0,0,1,0-16H192A8,8,0,0,1,200,208Z"/>
           </svg>
-          {{ t('coding.most_active_lang') }}: {{ mostActiveLanguage.language === 'Unknown' ? t('coding.unknown') : mostActiveLanguage.language }} ({{ mostActiveLanguage.pct }}%)
+          {{ t('coding.most_active_lang') }}: {{ mostActiveLanguage.language === 'Unknown' ? t('coding.unknownCoding') : mostActiveLanguage.language }} ({{ mostActiveLanguage.pct }}%)
         </span>
         <span class="header-badge coding-badge">{{ formatDuration(store.totalCodingTime) }}</span>
         <span class="header-badge ai-badge" v-if="store.totalAiCodingTime > 0">
@@ -46,7 +46,7 @@
             <span class="lang-dot" :style="{ background: getLangColor(store.currentCodingSession.language) }"></span>
             <span class="file-name">{{ store.currentCodingSession.file_path === 'Workspace / General' ? t('coding.workspaceGeneral') : store.currentCodingSession.file_path }}</span>
             <span class="lang-tag" v-if="store.currentCodingSession.language">
-              {{ store.currentCodingSession.language === 'Unknown' ? t('coding.unknown') : store.currentCodingSession.language }}
+              {{ store.currentCodingSession.language === 'Unknown' ? t('coding.unknownCoding') : store.currentCodingSession.language }}
             </span>
           </div>
           <div class="coding-project" v-if="store.currentCodingSession.project_dir">
@@ -105,7 +105,7 @@
         <div v-for="lang in store.topCodingLanguages" :key="lang.language" class="lang-card">
           <div class="lang-header">
             <span class="lang-color-dot" :style="{ background: getLangColor(lang.language) }"></span>
-            <span class="lang-name">{{ lang.language === 'Unknown' ? t('coding.unknown') : lang.language }}</span>
+            <span class="lang-name">{{ lang.language === 'Unknown' ? t('coding.unknownCoding') : lang.language }}</span>
             <span class="lang-sessions">{{ lang.session_count }} {{ t('coding.sessions') }}</span>
           </div>
           <div class="lang-time-row">
@@ -183,7 +183,7 @@
             <div class="file-meta">
               <span class="lang-color-dot" :style="{ background: getLangColor(file.language) }"></span>
               <span class="file-name" :title="file.filePath">{{ file.filePath === 'Workspace / General' ? t('coding.workspaceGeneral') : file.filePath }}</span>
-              <span class="lang-tag" v-if="file.language">{{ file.language === 'Unknown' ? t('coding.unknown') : file.language }}</span>
+              <span class="lang-tag" v-if="file.language">{{ file.language === 'Unknown' ? t('coding.unknownCoding') : file.language }}</span>
             </div>
             <div class="file-project" :title="file.projectDir">
               <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 256 256" fill="currentColor" style="display:inline;vertical-align:middle;margin-right:4px;">

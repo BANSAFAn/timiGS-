@@ -106,21 +106,21 @@
                 </p>
 
                 <!-- Previous Activity Section -->
-                <div class="previous-activity-box animate-slide-up" v-if="store.currentSession">
+                <div class="previous-activity-box animate-slide-up" v-if="previousSession">
                   <span class="prev-label">{{ $t("dashboard.previousActivity") }}</span>
                   <div class="prev-session-info">
                     <img
-                      v-if="appIcons[store.currentSession.app_name]"
-                      :src="appIcons[store.currentSession.app_name]"
+                      v-if="appIcons[previousSession.app_name]"
+                      :src="appIcons[previousSession.app_name]"
                       class="prev-icon-img"
                     />
                     <div v-else class="prev-icon-fallback">
-                      {{ store.currentSession.app_name.charAt(0) }}
+                      {{ previousSession.app_name.charAt(0) }}
                     </div>
                     <div class="prev-text">
-                      <span class="prev-app-name">{{ store.currentSession.app_name }}</span>
-                      <span class="prev-window-title" v-if="store.currentSession.window_title">
-                        &mdash; {{ store.currentSession.window_title }}
+                      <span class="prev-app-name">{{ previousSession.app_name }}</span>
+                      <span class="prev-window-title" v-if="previousSession.window_title">
+                        &mdash; {{ previousSession.window_title }}
                       </span>
                     </div>
                   </div>
@@ -392,6 +392,15 @@ ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarEle
 const { t, locale } = useI18n();
 const store = useActivityStore();
 const currentActivity = computed(() => store.currentActivity);
+const previousSession = computed(() => {
+  if (store.currentSession) {
+    return store.currentSession;
+  }
+  if (store.todaySessions && store.todaySessions.length > 0) {
+    return store.todaySessions[0];
+  }
+  return null;
+});
 const selectedChartType = ref("doughnut");
 const appIcons = ref<Record<string, string>>({});
 const showExcludeModal = ref(false);
@@ -560,8 +569,8 @@ async function refreshData() {
   if (store.currentActivity?.exe_path) {
     loadIcon(store.currentActivity.app_name, store.currentActivity.exe_path);
   }
-  if (store.currentSession?.exe_path) {
-    loadIcon(store.currentSession.app_name, store.currentSession.exe_path);
+  if (previousSession.value?.exe_path) {
+    loadIcon(previousSession.value.app_name, previousSession.value.exe_path);
   }
   store.topApps.forEach((app) => loadIcon(app.app_name, app.exe_path));
 }

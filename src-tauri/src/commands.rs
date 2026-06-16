@@ -25,13 +25,13 @@ pub fn get_device_stats() -> Result<serde_json::Value, String> {
     let sessions = db::get_today_sessions()
         .map_err(|e| e.to_string())?
         .len() as i64;
-    
+
     let total_time = db::get_today_summary()
         .map_err(|e| e.to_string())?
         .iter()
         .map(|s| s.total_seconds)
         .sum::<i64>();
-    
+
     Ok(serde_json::json!({
         "sessions": sessions,
         "totalTime": total_time
@@ -45,8 +45,6 @@ pub fn get_db_path() -> String {
 
 #[command]
 pub async fn discover_devices() -> Result<Vec<serde_json::Value>, String> {
-    // Simple network discovery - scan local subnet for TimiGS instances
-    // This is a placeholder - real implementation would use mDNS or similar
     Ok(vec![])
 }
 
@@ -55,13 +53,13 @@ pub async fn connect_to_device(ip: String, port: u16) -> Result<String, String> 
     if !validate_local_ip(&ip) {
         return Err("Invalid or non-local IP address".to_string());
     }
-    
+
     let url = format!("http://{}:{}/ping", ip, port);
     let client = reqwest::Client::builder()
         .timeout(std::time::Duration::from_secs(5))
         .build()
         .map_err(|e| e.to_string())?;
-    
+
     match client.get(&url).send().await {
         Ok(resp) => {
             if resp.status().is_success() {
@@ -96,13 +94,13 @@ pub async fn get_device_info(ip: String) -> Result<serde_json::Value, String> {
     if !validate_local_ip(&ip) {
         return Err("Invalid or non-local IP address".to_string());
     }
-    
+
     let url = format!("http://{}:4444/info", ip);
     let client = reqwest::Client::builder()
         .timeout(std::time::Duration::from_secs(5))
         .build()
         .map_err(|e| e.to_string())?;
-    
+
     match client.get(&url).send().await {
         Ok(resp) => {
             if resp.status().is_success() {
@@ -128,13 +126,13 @@ pub async fn get_remote_processes(ip: String) -> Result<Vec<serde_json::Value>, 
     if !validate_local_ip(&ip) {
         return Err("Invalid or non-local IP address".to_string());
     }
-    
+
     let url = format!("http://{}:4444/processes", ip);
     let client = reqwest::Client::builder()
         .timeout(std::time::Duration::from_secs(5))
         .build()
         .map_err(|e| e.to_string())?;
-    
+
     match client.get(&url).send().await {
         Ok(resp) => {
             if resp.status().is_success() {
@@ -258,7 +256,7 @@ pub fn save_settings(app: tauri::AppHandle, settings: db::Settings) -> Result<()
         use tauri_plugin_autostart::ManagerExt;
         if settings.autostart {
             let _ = app.autolaunch().enable();
-            
+
             // On Windows, ensure registry entry includes --minimized flag
             #[cfg(target_os = "windows")]
             {
@@ -405,11 +403,56 @@ pub async fn send_p2p_file(target_ip: String, file_path: String) -> Result<Strin
     if !validate_local_ip(&target_ip) {
         return Err("Invalid or non-local IP address".to_string());
     }
-    
+
     tokio::task::spawn_blocking(move || crate::p2p::send_file_to_ip(&target_ip, &file_path))
         .await
         .map_err(|e| e.to_string())?
 }
+
+#[command]
+pub fn save_local_file(
+    filename: String,
+    data: Vec<u8>,
+    target_folder: Option<String>,
+) -> Result<String, String> {
+    use std::fs;
+    use std::path::PathBuf;
+
+    let sanitized_filename = filename
+        .chars()
+        .filter(|c| c.is_alphanumeric() || *c == '.' || *c == '_' || *c == '-')
+        .collect::<String>();
+
+    if sanitized_filename.is_empty() {
+        return Err("Invalid filename".to_string());
+    }
+
+    let base_dir = if let Some(ref folder) = target_folder {
+        if folder.is_empty() {
+            dirs::download_dir().unwrap_or_else(std::env::temp_dir)
+        } else {
+            PathBuf::from(folder)
+        }
+    } else {
+        if filename.starts_with("_p2p_send_") {
+            std::env::temp_dir()
+        } else {
+            dirs::download_dir().unwrap_or_else(std::env::temp_dir)
+        }
+    };
+
+    if !base_dir.exists() {
+        fs::create_dir_all(&base_dir).map_err(|e| format!("Failed to create directory: {}", e))?;
+    }
+
+    let save_path = base_dir.join(&sanitized_filename);
+
+    fs::write(&save_path, data)
+        .map_err(|e| format!("Failed to write file: {}", e))?;
+
+    Ok(save_path.to_string_lossy().to_string())
+}
+
 
 #[command]
 pub fn start_timer_cmd(app: tauri::AppHandle, duration_secs: u64) {
@@ -541,7 +584,7 @@ pub fn save_timeout_schedule_cmd(
             })
         })
         .collect();
-    
+
     crate::timeout::save_timeout_schedule(
         interval_secs,
         break_duration_secs,
@@ -879,7 +922,7 @@ pub async fn get_current_media_info() -> Option<MediaInfo> {
                 Ok(Some(MediaInfo { title, artist }))
             }
         })();
-        
+
         result.ok().flatten()
     }
     #[cfg(not(target_os = "windows"))]

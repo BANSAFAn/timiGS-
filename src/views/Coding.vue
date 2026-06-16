@@ -77,7 +77,7 @@
                 <div class="cs-file" v-if="session.file_path">
                   <span class="cs-lang-dot" :style="{ background: getLangColor(session.language) }"></span>
                   <span class="cs-filename" :title="session.file_path || undefined">{{ session.file_path === 'Workspace / General' ? t('coding.workspaceGeneral') : session.file_path }}</span>
-                  <span class="cs-lang" v-if="session.language">{{ session.language === 'Unknown' ? t('coding.unknown') : session.language }}</span>
+                  <span class="cs-lang" v-if="session.language">{{ session.language === 'Unknown' ? t('coding.unknownCoding') : session.language }}</span>
                 </div>
                 <div class="cs-project" v-if="session.project_dir">
                   <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 256 256" fill="currentColor" style="display:inline;vertical-align:middle;margin-right:3px;">

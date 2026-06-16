@@ -1383,10 +1383,132 @@ pub fn reset_all_data() -> Result<()> {
     Ok(())
 }
 
-pub fn export_sessions_csv(path: &str, start_date: &str, end_date: &str) -> Result<()> {
+pub struct EnrichedActivitySession {
+    pub app_name: String,
+    pub display_name: String,
+    pub window_title: String,
+    pub exe_path: String,
+    pub start_time: String,
+    pub end_time: Option<String>,
+    pub duration_seconds: i64,
+    pub website: Option<String>,
+    pub music_track: Option<String>,
+    pub editor_name: Option<String>,
+    pub file_path: Option<String>,
+    pub language: Option<String>,
+    pub project_dir: Option<String>,
+    pub is_ai_assisted: Option<bool>,
+}
+
+fn extract_website(app_name: &str, window_title: &str) -> Option<String> {
+    let app_lower = app_name.to_lowercase();
+    let is_browser = app_lower.contains("chrome")
+        || app_lower.contains("edge")
+        || app_lower.contains("firefox")
+        || app_lower.contains("opera")
+        || app_lower.contains("brave")
+        || app_lower.contains("vivaldi")
+        || app_lower.contains("safari")
+        || app_lower.contains("browser")
+        || app_lower.contains("explorer")
+        || app_lower.contains("webview");
+        
+    if !is_browser {
+        return None;
+    }
+
+    let clean_title = window_title
+        .replace(" - Google Chrome", "")
+        .replace(" - Microsoft Edge", "")
+        .replace(" - Mozilla Firefox", "")
+        .replace(" - Opera", "")
+        .replace(" - Brave", "")
+        .replace(" - Vivaldi", "")
+        .replace(" - Internet Explorer", "")
+        .replace(" - Tor Browser", "");
+
+    let parts: Vec<&str> = clean_title.split(" - ").collect();
+    let site = if parts.len() > 1 {
+        parts[parts.len() - 1].trim()
+    } else {
+        let parts2: Vec<&str> = clean_title.split(" | ").collect();
+        if parts2.len() > 1 {
+            parts2[parts2.len() - 1].trim()
+        } else {
+            clean_title.trim()
+        }
+    };
+
+    if site.is_empty() || site == "New Tab" || site == "Нова вкладка" || site == "Новая вкладка" {
+        None
+    } else {
+        Some(site.to_string())
+    }
+}
+
+fn detect_browser_ai(app_name: &str, window_title: &str) -> Option<String> {
+    let app_lower = app_name.to_lowercase();
+    let title_lower = window_title.to_lowercase();
+
+    let is_browser = app_lower.contains("chrome") ||
+                     app_lower.contains("firefox") ||
+                     app_lower.contains("msedge") ||
+                     app_lower.contains("brave") ||
+                     app_lower.contains("safari") ||
+                     app_lower.contains("opera") ||
+                     app_lower.contains("vivaldi") ||
+                     app_lower.contains("browser");
+
+    if is_browser {
+        const AI_SERVICES: &[(&str, &str)] = &[
+            ("chatgpt", "ChatGPT"),
+            ("claude", "Claude AI"),
+            ("deepseek", "DeepSeek"),
+            ("gemini", "Gemini"),
+            ("v0.dev", "v0.dev"),
+            ("v0", "v0.dev"),
+            ("copilot", "Copilot"),
+            ("poe.com", "Poe"),
+            ("poe", "Poe"),
+            ("ollama", "Ollama"),
+            ("grok", "Grok AI"),
+            ("perplexity", "Perplexity"),
+            ("phind", "Phind"),
+            ("mistral", "Mistral AI"),
+            ("qwen", "Qwen"),
+            ("huggingface", "Hugging Face"),
+            ("blackbox", "Blackbox AI"),
+            ("lm-studio", "LM Studio"),
+            ("lmstudio", "LM Studio"),
+            ("jan.ai", "Jan AI"),
+            ("bolt.new", "Bolt.new"),
+            ("bolt", "Bolt.new"),
+            ("devin", "Devin AI"),
+            ("lovable", "Lovable.dev"),
+            ("sider", "Sider AI"),
+            ("monica", "Monica AI"),
+            ("open-webui", "Open WebUI"),
+            ("openwebui", "Open WebUI"),
+            ("librechat", "LibreChat"),
+            ("codeium", "Codeium"),
+            ("tabnine", "Tabnine"),
+            ("replit", "Replit Agent"),
+        ];
+
+        for &(key, label) in AI_SERVICES {
+            if title_lower.contains(key) {
+                return Some(label.to_string());
+            }
+        }
+    }
+    None
+}
+
+pub fn get_enriched_sessions(start_date: &str, end_date: &str) -> Result<Vec<EnrichedActivitySession>> {
     let guard = DB.lock();
     let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
 
+    // 1. Fetch activity sessions
     let mut stmt = conn.prepare(
         "SELECT app_name, window_title, exe_path, start_time, end_time, duration_seconds
          FROM activity_sessions 
@@ -1394,46 +1516,237 @@ pub fn export_sessions_csv(path: &str, start_date: &str, end_date: &str) -> Resu
          ORDER BY start_time DESC",
     )?;
 
-    let mut csv_content =
-        String::from("App Name,Window Title,Exe Path,Start Time,End Time,Duration (seconds)\n");
-
-    let rows = stmt.query_map([start_date, end_date], |row| {
-        let app_name: String = row.get(0)?;
-        let window_title: String = row.get(1)?;
-        let exe_path: String = row.get(2)?;
-        let start_time: String = row.get(3)?;
-        let end_time: Option<String> = row.get(4)?;
-        let duration: i64 = row.get(5)?;
+    let activity_rows = stmt.query_map([start_date, end_date], |row| {
         Ok((
+            row.get::<_, String>(0)?,
+            row.get::<_, String>(1)?,
+            row.get::<_, String>(2)?,
+            row.get::<_, String>(3)?,
+            row.get::<_, Option<String>>(4)?,
+            row.get::<_, i64>(5)?,
+        ))
+    })?.collect::<Result<Vec<_>>>()?;
+
+    // 2. Fetch music sessions
+    let mut music_stmt = conn.prepare(
+        "SELECT app_name, window_title, start_time, end_time
+         FROM music_sessions
+         WHERE date(start_time) >= date(?) AND date(start_time) <= date(?)",
+    )?;
+    let music_rows = music_stmt.query_map([start_date, end_date], |row| {
+        Ok((
+            row.get::<_, String>(0)?,
+            row.get::<_, Option<String>>(1)?,
+            row.get::<_, String>(2)?,
+            row.get::<_, Option<String>>(3)?,
+        ))
+    })?.collect::<Result<Vec<_>>>()?;
+
+    // 3. Fetch coding sessions
+    let mut coding_stmt = conn.prepare(
+        "SELECT editor_name, file_path, language, project_dir, is_ai_assisted, start_time, end_time
+         FROM coding_sessions
+         WHERE date(start_time) >= date(?) AND date(start_time) <= date(?)",
+    )?;
+    let coding_rows = coding_stmt.query_map([start_date, end_date], |row| {
+        Ok((
+            row.get::<_, String>(0)?,
+            row.get::<_, Option<String>>(1)?,
+            row.get::<_, Option<String>>(2)?,
+            row.get::<_, Option<String>>(3)?,
+            row.get::<_, i64>(4)? != 0,
+            row.get::<_, String>(5)?,
+            row.get::<_, Option<String>>(6)?,
+        ))
+    })?.collect::<Result<Vec<_>>>()?;
+
+    // Helper to parse dates
+    let parse_dt = |s: &str| -> DateTime<Local> {
+        DateTime::parse_from_rfc3339(s)
+            .map(|dt| dt.with_timezone(&Local))
+            .unwrap_or_else(|_| Local::now())
+    };
+
+    let mut enriched = Vec::new();
+
+    for (app_name, window_title, exe_path, start_time, end_time, duration_seconds) in activity_rows {
+        let act_start = parse_dt(&start_time);
+        let act_end = end_time.as_ref().map(|s| parse_dt(s)).unwrap_or_else(Local::now);
+
+        // A. Extract website
+        let mut website = extract_website(&app_name, &window_title);
+        let mut display_name = app_name.clone();
+
+        if let Some(ai_label) = detect_browser_ai(&app_name, &window_title) {
+            display_name = format!("{} (AI)", app_name);
+            website = Some(ai_label);
+        }
+
+        // B. Find overlapping music tracks
+        let mut overlapping_tracks = Vec::new();
+        for (m_app, m_title, m_start_str, m_end_str) in &music_rows {
+            let m_start = parse_dt(m_start_str);
+            let m_end = m_end_str.as_ref().map(|s| parse_dt(s)).unwrap_or_else(Local::now);
+
+            // Overlap check
+            if act_start < m_end && m_start < act_end {
+                if let Some(t) = m_title {
+                    if !t.is_empty() {
+                        overlapping_tracks.push(format!("{} ({})", t, m_app));
+                    }
+                }
+            }
+        }
+        let music_track = if overlapping_tracks.is_empty() {
+            None
+        } else {
+            Some(overlapping_tracks.join("; "))
+        };
+
+        // C. Find overlapping coding sessions
+        let mut editor_name = None;
+        let mut file_path = None;
+        let mut language = None;
+        let mut project_dir = None;
+        let mut is_ai_assisted = None;
+
+        for (c_editor, c_file, c_lang, c_proj, c_ai, c_start_str, c_end_str) in &coding_rows {
+            let c_start = parse_dt(c_start_str);
+            let c_end = c_end_str.as_ref().map(|s| parse_dt(s)).unwrap_or_else(Local::now);
+
+            // Overlap check
+            if act_start < c_end && c_start < act_end {
+                editor_name = Some(c_editor.clone());
+                is_ai_assisted = Some(*c_ai);
+                
+                // Only write file path, language, and project if AI was NOT used!
+                if !*c_ai {
+                    file_path = c_file.clone();
+                    language = c_lang.clone();
+                    project_dir = c_proj.clone();
+                }
+                break; // Just match the first one for simplicity
+            }
+        }
+
+        if let Some(_) = editor_name {
+            if !display_name.ends_with(" (AI)") {
+                if let Some(ai) = is_ai_assisted {
+                    if ai {
+                        display_name = format!("{} (AI)", display_name);
+                    } else {
+                        display_name = format!("{} (No AI)", display_name);
+                    }
+                }
+            }
+        }
+
+        enriched.push(EnrichedActivitySession {
             app_name,
+            display_name,
             window_title,
             exe_path,
             start_time,
             end_time,
-            duration,
-        ))
-    })?;
+            duration_seconds,
+            website,
+            music_track,
+            editor_name,
+            file_path,
+            language,
+            project_dir,
+            is_ai_assisted,
+        });
+    }
 
-    for row in rows {
-        if let Ok((app, title, exe, start, end, dur)) = row {
-            // Escape CSV fields that may contain commas or quotes
-            let escape = |s: &str| -> String {
-                if s.contains(',') || s.contains('"') || s.contains('\n') {
-                    format!("\"{}\"", s.replace('"', "\"\""))
-                } else {
-                    s.to_string()
-                }
-            };
-            csv_content.push_str(&format!(
-                "{},{},{},{},{},{}\n",
-                escape(&app),
-                escape(&title),
-                escape(&exe),
-                escape(&start),
-                escape(&end.unwrap_or_default()),
-                dur
-            ));
-        }
+    Ok(enriched)
+}
+
+fn get_music_sessions_range_raw(start_date: &str, end_date: &str) -> Result<Vec<serde_json::Value>> {
+    let guard = DB.lock();
+    let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
+
+    let mut stmt = conn.prepare(
+        "SELECT app_name, window_title, exe_path, start_time, end_time, duration_seconds
+         FROM music_sessions
+         WHERE date(start_time) >= date(?1) AND date(start_time) <= date(?2)
+         ORDER BY start_time DESC",
+    )?;
+
+    let rows = stmt.query_map([start_date, end_date], |row| {
+        Ok(serde_json::json!({
+            "app_name": row.get::<_, String>(0)?,
+            "window_title": row.get::<_, Option<String>>(1)?,
+            "exe_path": row.get::<_, String>(2)?,
+            "start_time": row.get::<_, String>(3)?,
+            "end_time": row.get::<_, Option<String>>(4)?,
+            "duration_seconds": row.get::<_, i64>(5)?,
+        }))
+    })?.collect::<Result<Vec<_>>>()?;
+
+    Ok(rows)
+}
+
+fn get_coding_sessions_range_raw(start_date: &str, end_date: &str) -> Result<Vec<serde_json::Value>> {
+    let guard = DB.lock();
+    let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
+
+    let mut stmt = conn.prepare(
+        "SELECT app_name, editor_name, file_path, language, project_dir, is_ai_assisted, window_title, exe_path, start_time, end_time, duration_seconds
+         FROM coding_sessions
+         WHERE date(start_time) >= date(?1) AND date(start_time) <= date(?2)
+         ORDER BY start_time DESC",
+    )?;
+
+    let rows = stmt.query_map([start_date, end_date], |row| {
+        Ok(serde_json::json!({
+            "app_name": row.get::<_, String>(0)?,
+            "editor_name": row.get::<_, String>(1)?,
+            "file_path": row.get::<_, Option<String>>(2)?,
+            "language": row.get::<_, Option<String>>(3)?,
+            "project_dir": row.get::<_, Option<String>>(4)?,
+            "is_ai_assisted": row.get::<_, i64>(5)? != 0,
+            "window_title": row.get::<_, String>(6)?,
+            "exe_path": row.get::<_, String>(7)?,
+            "start_time": row.get::<_, String>(8)?,
+            "end_time": row.get::<_, Option<String>>(9)?,
+            "duration_seconds": row.get::<_, i64>(10)?,
+        }))
+    })?.collect::<Result<Vec<_>>>()?;
+
+    Ok(rows)
+}
+
+pub fn export_sessions_csv(path: &str, start_date: &str, end_date: &str) -> Result<()> {
+    let enriched = get_enriched_sessions(start_date, end_date)?;
+
+    let mut csv_content =
+        String::from("App Name,Window Title,Website,Music Track,Editor,File Path,Language,Project,AI Assisted,Exe Path,Start Time,End Time,Duration (seconds)\n");
+
+    for s in enriched {
+        let escape = |val: &str| -> String {
+            if val.contains(',') || val.contains('"') || val.contains('\n') {
+                format!("\"{}\"", val.replace('"', "\"\""))
+            } else {
+                val.to_string()
+            }
+        };
+        csv_content.push_str(&format!(
+            "{},{},{},{},{},{},{},{},{},{},{},{},{}\n",
+            escape(&s.display_name),
+            escape(&s.window_title),
+            escape(s.website.as_deref().unwrap_or("")),
+            escape(s.music_track.as_deref().unwrap_or("")),
+            escape(s.editor_name.as_deref().unwrap_or("")),
+            escape(s.file_path.as_deref().unwrap_or("")),
+            escape(s.language.as_deref().unwrap_or("")),
+            escape(s.project_dir.as_deref().unwrap_or("")),
+            s.is_ai_assisted.map(|b| if b { "Yes" } else { "No" }).unwrap_or(""),
+            escape(&s.exe_path),
+            escape(&s.start_time),
+            escape(s.end_time.as_deref().unwrap_or("")),
+            s.duration_seconds
+        ));
     }
 
     std::fs::write(path, csv_content)
@@ -1443,15 +1756,7 @@ pub fn export_sessions_csv(path: &str, start_date: &str, end_date: &str) -> Resu
 }
 
 pub fn export_sessions_html(path: &str, start_date: &str, end_date: &str) -> Result<()> {
-    let guard = DB.lock();
-    let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
-
-    let mut stmt = conn.prepare(
-        "SELECT app_name, window_title, start_time, end_time, duration_seconds
-         FROM activity_sessions 
-         WHERE date(start_time) >= date(?) AND date(start_time) <= date(?)
-         ORDER BY start_time DESC",
-    )?;
+    let enriched = get_enriched_sessions(start_date, end_date)?;
 
     let mut html_content = String::from(r#"<!DOCTYPE html>
 <html>
@@ -1460,71 +1765,84 @@ pub fn export_sessions_html(path: &str, start_date: &str, end_date: &str) -> Res
     <title>TimiGS Activity Report</title>
     <style>
         body { font-family: 'Segoe UI', Arial, sans-serif; background: #0f172a; color: #e2e8f0; padding: 20px; }
-        h2 { color: #8b5cf6; margin-bottom: 20px; }
-        table { border-collapse: collapse; width: 100%; background: #1e293b; border-radius: 8px; overflow: hidden; }
+        h2 { color: #8b5cf6; margin-top: 40px; margin-bottom: 20px; border-bottom: 2px solid #334155; padding-bottom: 10px; }
+        h2:first-of-type { margin-top: 20px; }
+        table { border-collapse: collapse; width: 100%; background: #1e293b; border-radius: 8px; overflow: hidden; margin-bottom: 30px; }
         th { background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: white; padding: 14px 12px; text-align: left; font-weight: 600; }
         td { padding: 12px; border-bottom: 1px solid #334155; }
         tr:hover td { background: #334155; }
         .duration { color: #60a5fa; font-weight: 600; }
         .timestamp { color: #94a3b8; font-size: 0.9em; }
+        .badge { background: rgba(139, 92, 246, 0.2); color: #c084fc; padding: 2px 6px; border-radius: 4px; font-size: 0.8em; font-weight: 600; }
     </style>
 </head>
 <body>
-    <h2>📊 TimiGS Activity Report</h2>
+    <h2>📊 General Activity & Applications</h2>
     <table>
         <thead>
             <tr>
-                <th>Application</th>
-                <th>Window Title</th>
-                <th>Start Time</th>
-                <th>End Time</th>
-                <th>Duration</th>
+                <th style="width: 25%;">Application</th>
+                <th style="width: 45%;">Details</th>
+                <th style="width: 12%;">Start Time</th>
+                <th style="width: 12%;">End Time</th>
+                <th style="width: 6%;">Duration</th>
             </tr>
         </thead>
         <tbody>
 "#);
 
-    let rows = stmt.query_map([start_date, end_date], |row| {
-        let app_name: String = row.get(0)?;
-        let window_title: String = row.get(1)?;
-        let start_time: String = row.get(2)?;
-        let end_time: Option<String> = row.get(3)?;
-        let duration: i64 = row.get(4)?;
-        Ok((app_name, window_title, start_time, end_time, duration))
-    })?;
+    let escape = |s: &str| -> String {
+        s.replace('&', "&amp;").replace('<', "&lt;").replace('>', "&gt;").replace('"', "&quot;")
+    };
 
-    for row in rows {
-        if let Ok((app, title, start, end, dur)) = row {
-            let hrs = dur / 3600;
-            let mins = (dur % 3600) / 60;
-            let secs = dur % 60;
-            let duration_str = if hrs > 0 {
-                format!("{}h {}m {}s", hrs, mins, secs)
-            } else if mins > 0 {
-                format!("{}m {}s", mins, secs)
-            } else {
-                format!("{}s", secs)
-            };
-
-            let escape = |s: &str| -> String {
-                s.replace('&', "&amp;").replace('<', "&lt;").replace('>', "&gt;").replace('"', "&quot;")
-            };
-
-            html_content.push_str(&format!(
-                r#"<tr>
-                    <td><strong>{}</strong></td>
-                    <td>{}</td>
-                    <td class="timestamp">{}</td>
-                    <td class="timestamp">{}</td>
-                    <td class="duration">{}</td>
-                </tr>"#,
-                escape(&app),
-                escape(&title),
-                escape(&start),
-                escape(&end.unwrap_or_else(|| "Now".to_string())),
-                duration_str
-            ));
+    let format_duration_helper = |dur: i64| -> String {
+        let hrs = dur / 3600;
+        let mins = (dur % 3600) / 60;
+        let secs = dur % 60;
+        if hrs > 0 {
+            format!("{}h {}m {}s", hrs, mins, secs)
+        } else if mins > 0 {
+            format!("{}m {}s", mins, secs)
+        } else {
+            format!("{}s", secs)
         }
+    };
+
+    // Populate General Activity
+    for s in &enriched {
+        let mut details = escape(&s.window_title);
+        if let Some(ref web) = s.website {
+            details.push_str(&format!(r#"<div style="margin-top: 4px; color: #10b981; font-size: 0.9em;">🌐 <strong>Website</strong>: {}</div>"#, escape(web)));
+        }
+        if let Some(ref track) = s.music_track {
+            details.push_str(&format!(r#"<div style="margin-top: 4px; color: #f43f5e; font-size: 0.9em;">🎵 <strong>Music</strong>: {}</div>"#, escape(track)));
+        }
+        if let Some(ref editor) = s.editor_name {
+            if !s.is_ai_assisted.unwrap_or(false) {
+                let file_str = s.file_path.as_deref().unwrap_or("Workspace / General");
+                let lang_str = s.language.as_deref().unwrap_or("Unknown");
+                let proj_str = s.project_dir.as_deref().unwrap_or("Unknown");
+                details.push_str(&format!(
+                    r#"<div style="margin-top: 4px; color: #60a5fa; font-size: 0.9em;">💻 <strong>Coding</strong>: {} | <strong>File</strong>: {} | <strong>Lang</strong>: {} | <strong>Project</strong>: {}</div>"#,
+                    escape(editor), escape(file_str), escape(lang_str), escape(proj_str)
+                ));
+            }
+        }
+
+        html_content.push_str(&format!(
+            r#"<tr>
+                <td><strong>{}</strong></td>
+                <td>{}</td>
+                <td class="timestamp">{}</td>
+                <td class="timestamp">{}</td>
+                <td class="duration">{}</td>
+            </tr>"#,
+            escape(&s.display_name),
+            details,
+            escape(&s.start_time),
+            escape(s.end_time.as_deref().unwrap_or("Now")),
+            format_duration_helper(s.duration_seconds)
+        ));
     }
 
     html_content.push_str(r#"
@@ -1540,42 +1858,36 @@ pub fn export_sessions_html(path: &str, start_date: &str, end_date: &str) -> Res
 }
 
 pub fn export_sessions_json(path: &str, start_date: &str, end_date: &str) -> Result<()> {
-    let guard = DB.lock();
-    let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
-
-    let mut stmt = conn.prepare(
-        "SELECT app_name, window_title, exe_path, start_time, end_time, duration_seconds
-         FROM activity_sessions 
-         WHERE date(start_time) >= date(?) AND date(start_time) <= date(?)
-         ORDER BY start_time DESC",
-    )?;
-
-    let rows = stmt.query_map([start_date, end_date], |row| {
-        let app_name: String = row.get(0)?;
-        let window_title: String = row.get(1)?;
-        let exe_path: String = row.get(2)?;
-        let start_time: String = row.get(3)?;
-        let end_time: Option<String> = row.get(4)?;
-        let duration: i64 = row.get(5)?;
-        Ok(serde_json::json!({
-            "app_name": app_name,
-            "window_title": window_title,
-            "exe_path": exe_path,
-            "start_time": start_time,
-            "end_time": end_time,
-            "duration_seconds": duration,
-        }))
-    })?;
+    let enriched = get_enriched_sessions(start_date, end_date)?;
+    let raw_music = get_music_sessions_range_raw(start_date, end_date)?;
+    let raw_coding = get_coding_sessions_range_raw(start_date, end_date)?;
 
     let mut activities = Vec::new();
-    for row in rows {
-        if let Ok(val) = row {
-            activities.push(val);
-        }
+    for s in enriched {
+        activities.push(serde_json::json!({
+            "app_name": s.app_name,
+            "display_name": s.display_name,
+            "window_title": s.window_title,
+            "exe_path": s.exe_path,
+            "start_time": s.start_time,
+            "end_time": s.end_time,
+            "duration_seconds": s.duration_seconds,
+            "website": s.website,
+            "music_track": s.music_track,
+            "editor_name": s.editor_name,
+            "file_path": s.file_path,
+            "language": s.language,
+            "project_dir": s.project_dir,
+            "is_ai_assisted": s.is_ai_assisted,
+        }));
     }
 
-    let json_content = serde_json::to_string_pretty(&activities)
-        .map_err(|e| rusqlite::Error::ToSqlConversionFailure(Box::new(e)))?;
+    let json_content = serde_json::to_string_pretty(&serde_json::json!({
+        "activity_sessions": activities,
+        "music_sessions": raw_music,
+        "coding_sessions": raw_coding,
+    }))
+    .map_err(|e| rusqlite::Error::ToSqlConversionFailure(Box::new(e)))?;
 
     std::fs::write(path, json_content)
         .map_err(|e| rusqlite::Error::ToSqlConversionFailure(Box::new(e)))?;
@@ -1587,8 +1899,20 @@ pub fn import_sessions_json(path: &str) -> Result<usize> {
     let content = std::fs::read_to_string(path)
         .map_err(|e| rusqlite::Error::ToSqlConversionFailure(Box::new(e)))?;
 
-    let sessions: Vec<serde_json::Value> = serde_json::from_str(&content)
+    let parsed: serde_json::Value = serde_json::from_str(&content)
         .map_err(|e| rusqlite::Error::ToSqlConversionFailure(Box::new(e)))?;
+
+    let sessions = if let Some(arr) = parsed.as_array() {
+        arr.clone()
+    } else if let Some(obj) = parsed.as_object() {
+        if let Some(arr) = obj.get("activity_sessions").and_then(|v| v.as_array()) {
+            arr.clone()
+        } else {
+            Vec::new()
+        }
+    } else {
+        Vec::new()
+    };
 
     let guard = DB.lock();
     let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
@@ -1786,49 +2110,84 @@ pub fn import_sessions_html(path: &str) -> Result<usize> {
 }
 
 pub fn export_sessions_markdown(path: &str, start_date: &str, end_date: &str) -> Result<()> {
-    let guard = DB.lock();
-    let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
-
-    let mut stmt = conn.prepare(
-        "SELECT app_name, window_title, exe_path, start_time, end_time, duration_seconds
-         FROM activity_sessions 
-         WHERE date(start_time) >= date(?) AND date(start_time) <= date(?)
-         ORDER BY start_time DESC",
-    )?;
+    let enriched = get_enriched_sessions(start_date, end_date)?;
+    let raw_music = get_music_sessions_range_raw(start_date, end_date)?;
 
     let mut md_content = String::from("# TimiGS Activity Report\n\n");
-    md_content.push_str("| App Name | Window Title | Start Time | End Time | Duration (seconds) |\n");
+
+    // 1. General Activity
+    md_content.push_str("## 📊 General Activity & Applications\n\n");
+    md_content.push_str("| App Name | Activity Details | Start Time | End Time | Duration |\n");
     md_content.push_str("|---|---|---|---|---|\n");
 
-    let rows = stmt.query_map([start_date, end_date], |row| {
-        let app_name: String = row.get(0)?;
-        let window_title: String = row.get(1)?;
-        let exe_path: String = row.get(2)?;
-        let start_time: String = row.get(3)?;
-        let end_time: Option<String> = row.get(4)?;
-        let duration: i64 = row.get(5)?;
-        Ok((
-            app_name,
-            window_title,
-            exe_path,
-            start_time,
-            end_time,
-            duration,
-        ))
-    })?;
+    let format_duration_helper = |dur: i64| -> String {
+        let hrs = dur / 3600;
+        let mins = (dur % 3600) / 60;
+        let secs = dur % 60;
+        if hrs > 0 {
+            format!("{}h {}m {}s", hrs, mins, secs)
+        } else if mins > 0 {
+            format!("{}m {}s", mins, secs)
+        } else {
+            format!("{}s", secs)
+        }
+    };
 
-    for row in rows {
-        if let Ok((app, title, _exe, start, end, dur)) = row {
-            let escape = |s: &str| -> String {
-                s.replace('|', "\\|")
-            };
+    let escape = |s: &str| -> String {
+        s.replace('|', "\\|")
+    };
+
+    for s in &enriched {
+        let mut details = escape(&s.window_title);
+        if let Some(ref web) = s.website {
+            details.push_str(&format!(" <br>🌐 **Website**: {}", escape(web)));
+        }
+        if let Some(ref track) = s.music_track {
+            details.push_str(&format!(" <br>🎵 **Music**: {}", escape(track)));
+        }
+        if let Some(ref editor) = s.editor_name {
+            if !s.is_ai_assisted.unwrap_or(false) {
+                let file_str = s.file_path.as_deref().unwrap_or("Workspace / General");
+                let lang_str = s.language.as_deref().unwrap_or("Unknown");
+                let proj_str = s.project_dir.as_deref().unwrap_or("Unknown");
+                details.push_str(&format!(
+                    " <br>💻 **Coding**: {} | File: {} | Lang: {} | Project: {}",
+                    escape(editor), escape(file_str), escape(lang_str), escape(proj_str)
+                ));
+            }
+        }
+
+        md_content.push_str(&format!(
+            "| **{}** | {} | {} | {} | {} |\n",
+            escape(&s.display_name),
+            details,
+            escape(&s.start_time),
+            escape(s.end_time.as_deref().unwrap_or("Now")),
+            format_duration_helper(s.duration_seconds)
+        ));
+    }
+
+    // 2. Music History
+    md_content.push_str("\n## 🎵 Music Listening History\n\n");
+    md_content.push_str("| Song / Track Title | Player / Application | Start Time | End Time | Duration |\n");
+    md_content.push_str("|---|---|---|---|---|\n");
+
+    if raw_music.is_empty() {
+        md_content.push_str("| *No music history tracked* | | | | |\n");
+    } else {
+        for m in &raw_music {
+            let title = m["window_title"].as_str().unwrap_or("Unknown");
+            let app = m["app_name"].as_str().unwrap_or("Unknown");
+            let start = m["start_time"].as_str().unwrap_or("");
+            let end = m["end_time"].as_str().unwrap_or("Now");
+            let dur = m["duration_seconds"].as_i64().unwrap_or(0);
             md_content.push_str(&format!(
-                "| {} | {} | {} | {} | {} |\n",
-                escape(&app),
-                escape(&title),
-                escape(&start),
-                escape(&end.unwrap_or_default()),
-                dur
+                "| **{}** | {} | {} | {} | {} |\n",
+                escape(title),
+                escape(app),
+                escape(start),
+                escape(end),
+                format_duration_helper(dur)
             ));
         }
     }
