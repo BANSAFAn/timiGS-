@@ -1,6 +1,6 @@
 <template>
   <div class="app-shell">
-    
+
     <aside class="sidebar" :class="{ 'compact': isCompact }" v-if="shouldShowNav">
       <div class="sidebar-header">
         <h1 class="brand-text">TimiGS</h1>
@@ -24,9 +24,9 @@
           <div class="nav-icon" v-html="item.icon"></div>
           <span>{{ $t(item.label) }}</span>
         </router-link>
-        
+
         <div class="nav-divider"></div>
-        
+
         <router-link
           v-for="item in secondaryNavItems"
           :key="item.path"
@@ -49,7 +49,7 @@
       </nav>
     </aside>
 
-    
+
     <main class="main-content">
       <router-view v-slot="{ Component }">
         <transition name="page" mode="out-in">
@@ -58,7 +58,7 @@
       </router-view>
     </main>
 
-    
+
     <nav class="bottom-nav" v-if="shouldShowNav">
       <router-link
         v-for="item in mobileNavItems"
@@ -77,6 +77,31 @@
   <TimeOutGlobalOverlay />
   <ConfirmDialog ref="confirmDialogRef" />
   <TeamNotification ref="teamNotifRef" />
+
+  <div v-if="doctorModeStore.showBreakReminder" class="doctor-break-reminder-overlay">
+    <div class="doctor-break-reminder-card animate-slide-up">
+      <div class="reminder-content">
+        <div class="reminder-header">
+          <div class="reminder-icon-box">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+            </svg>
+          </div>
+          <h4>{{ $t("settings.notificationBreakReminderTitle") || 'Ergonomic Break Reminder' }}</h4>
+          <span class="countdown-badge font-mono">{{ doctorModeStore.breakReminderCountdown }}s</span>
+        </div>
+        <p class="reminder-message">{{ doctorModeStore.breakReminderMessage }}</p>
+        <div class="reminder-actions">
+          <button class="btn btn-primary step-away-btn" @click="doctorModeStore.stepAway()">
+            {{ $t("settings.doctorModeStepAwayBtn") || "Yes, I'll step away now" }}
+          </button>
+        </div>
+        <div class="countdown-bar-container">
+          <div class="countdown-bar-fill" :style="{ width: (doctorModeStore.breakReminderCountdown * 10) + '%' }"></div>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -325,7 +350,6 @@ onUnmounted(() => {
   }
 }
 
-/* Compact sidebar animated clock styles */
 .compact-logo {
   display: flex;
   align-items: center;
@@ -363,11 +387,11 @@ onUnmounted(() => {
 }
 
 @keyframes clock-pulse-once {
-  0% { 
+  0% {
     filter: drop-shadow(0 0 6px rgba(91, 110, 225, 0.5));
     opacity: 1;
   }
-  100% { 
+  100% {
     filter: drop-shadow(0 0 2px rgba(91, 110, 225, 0.15));
     opacity: 0.95;
   }
@@ -376,5 +400,128 @@ onUnmounted(() => {
 @keyframes fadeIn {
   from { opacity: 0; transform: scale(0.85); }
   to { opacity: 1; transform: scale(1); }
+}
+
+.doctor-break-reminder-overlay {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9998;
+  pointer-events: auto;
+}
+
+.doctor-break-reminder-card {
+  position: relative;
+  width: 380px;
+  background: rgba(30, 34, 48, 0.85);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(139, 92, 246, 0.25);
+  border-radius: 16px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(139, 92, 246, 0.1);
+  overflow: hidden;
+  padding: 18px;
+  transition: all 0.3s ease;
+}
+
+.doctor-break-reminder-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, #8b5cf6, #6d28d9);
+}
+
+.reminder-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.reminder-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.reminder-icon-box {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(139, 92, 246, 0.15);
+  color: #a78bfa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.reminder-header h4 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fff;
+  flex: 1;
+}
+
+.countdown-badge {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  color: #a78bfa;
+  font-weight: 600;
+}
+
+.reminder-message {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.4;
+  color: #cbd5e1;
+}
+
+.reminder-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 4px;
+}
+
+.step-away-btn {
+  width: 100%;
+  background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+  color: #fff;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  padding: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.25);
+}
+
+.step-away-btn:hover {
+  background: linear-gradient(135deg, #a78bfa, #7c3aed);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(139, 92, 246, 0.35);
+}
+
+.step-away-btn:active {
+  transform: translateY(0);
+}
+
+.countdown-bar-container {
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.countdown-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #8b5cf6, #ec4899);
+  transition: width 1s linear;
 }
 </style>

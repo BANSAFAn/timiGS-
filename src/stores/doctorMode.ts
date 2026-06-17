@@ -9,9 +9,12 @@ export const useDoctorModeStore = defineStore('doctorMode', {
     const savedStart = localStorage.getItem('doctorMode_sessionStart');
     const savedLocked = localStorage.getItem('doctorMode_isLocked') === 'true';
     const savedLockEndTime = parseInt(localStorage.getItem('doctorMode_lockEndTime') || '0', 10);
+    const savedPaused = localStorage.getItem('doctorMode_isPaused') === 'true';
+    const savedPauseEndTime = parseInt(localStorage.getItem('doctorMode_pauseEndTime') || '0', 10);
     
     // Check if the lock duration has already expired while the app was closed
     const isLocked = savedLocked && savedLockEndTime > Date.now();
+    const isPaused = savedPaused && savedPauseEndTime > Date.now();
     
     return {
       enabled: localStorage.getItem('doctorMode_enabled') === 'true',
@@ -25,6 +28,11 @@ export const useDoctorModeStore = defineStore('doctorMode', {
       maxReminders: parseInt(localStorage.getItem('doctorMode_maxReminders') || '4', 10),
       isLocked: isLocked,
       lockEndTime: isLocked ? savedLockEndTime : 0,
+      isPaused: isPaused,
+      pauseEndTime: isPaused ? savedPauseEndTime : 0,
+      showBreakReminder: false,
+      breakReminderMessage: '',
+      breakReminderCountdown: 10,
       lastReminderTime: 0,
       currentTime: Date.now(),
     };
@@ -56,6 +64,12 @@ export const useDoctorModeStore = defineStore('doctorMode', {
       if (!state.isLocked || !state.lockEndTime) return 0;
       const now = state.currentTime;
       return Math.max(0, Math.floor((state.lockEndTime - now) / 1000));
+    },
+
+    pauseTimeRemainingSeconds: (state) => {
+      if (!state.isPaused || !state.pauseEndTime) return 0;
+      const now = state.currentTime;
+      return Math.max(0, Math.floor((state.pauseEndTime - now) / 1000));
     },
   },
 
@@ -122,6 +136,15 @@ export const useDoctorModeStore = defineStore('doctorMode', {
         const currentNow = Date.now();
         this.currentTime = currentNow;
 
+        // If break reminder is active, tick its countdown down
+        if (this.showBreakReminder) {
+          this.breakReminderCountdown--;
+          if (this.breakReminderCountdown <= 0) {
+            this.showBreakReminder = false;
+            this.breakReminderMessage = '';
+          }
+        }
+
         if (this.isLocked) {
           // locked mode tick
           const remaining = this.lockTimeRemainingSeconds;
@@ -133,6 +156,17 @@ export const useDoctorModeStore = defineStore('doctorMode', {
               title: i18n.global.t('settings.notificationUnlockTitle'),
               body: i18n.global.t('settings.notificationUnlockBody')
             }).catch(err => console.error('Failed to send system notification:', err));
+          }
+        } else if (this.isPaused) {
+          // paused mode tick
+          const remaining = this.pauseTimeRemainingSeconds;
+          if (remaining <= 0) {
+            this.resumeFromPause();
+          } else {
+            // Keep session reset so it starts from 0 when we resume
+            this.sessionStartTimestamp = currentNow;
+            localStorage.setItem('doctorMode_sessionStart', currentNow.toString());
+            this.elapsedSeconds = 0;
           }
         } else {
           // active mode tick
@@ -205,6 +239,9 @@ export const useDoctorModeStore = defineStore('doctorMode', {
             title: i18n.global.t('settings.notificationBreakReminderTitle'),
             body: localizedBody
           }).catch(err => console.error('Failed to send native notification:', err));
+
+          // Trigger in-app break reminder popup
+          this.showBreakReminderPopup(localizedBody);
         } else {
           this.lockPC();
         }
@@ -261,6 +298,38 @@ export const useDoctorModeStore = defineStore('doctorMode', {
       invoke('set_doctor_mode_locked_cmd', { locked: false })
         .catch(err => console.error('Failed to force unlock doctor mode:', err));
 
+      this.resetSession();
+    },
+
+    showBreakReminderPopup(message: string) {
+      this.breakReminderMessage = message;
+      this.breakReminderCountdown = 10;
+      this.showBreakReminder = true;
+    },
+
+    stepAway() {
+      this.showBreakReminder = false;
+      this.breakReminderMessage = '';
+      this.pause(this.lockDurationMins);
+    },
+
+    pause(mins: number) {
+      this.isPaused = true;
+      this.pauseEndTime = Date.now() + (mins * 60000);
+      localStorage.setItem('doctorMode_isPaused', 'true');
+      localStorage.setItem('doctorMode_pauseEndTime', this.pauseEndTime.toString());
+      this.resetSession();
+      
+      if (this.isLocked) {
+        this.unlock();
+      }
+    },
+
+    resumeFromPause() {
+      this.isPaused = false;
+      this.pauseEndTime = 0;
+      localStorage.removeItem('doctorMode_isPaused');
+      localStorage.removeItem('doctorMode_pauseEndTime');
       this.resetSession();
     },
   }

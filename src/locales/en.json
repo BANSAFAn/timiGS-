@@ -232,7 +232,14 @@
     "softwareInfo": "Software information",
     "originalDevelopedBy": "Original Software developed by",
     "licensedUnder": "Licensed under",
-    "copyrightReserved": "Protected by Copyright (c) 2026. The name \"TimiGS\" is reserved."
+    "copyrightReserved": "Protected by Copyright (c) 2026. The name \"TimiGS\" is reserved.",
+    "doctorModeStepAwayBtn": "Yes, I'll step away now",
+    "doctorModePaused": "Doctor Mode Paused",
+    "doctorModePauseRemaining": "Pause Remaining",
+    "resumeTracking": "Resume Tracking",
+    "themeDesc": "Switch between dark and light mode",
+    "autostartDesc": "Launch TimiGS on system startup",
+    "minimizeToTrayDesc": "Keep running in background"
   },
   "tools": {
     "title": "Tools",

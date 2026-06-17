@@ -199,7 +199,14 @@
     "softwareInfo": "Informacje o oprogramowaniu",
     "originalDevelopedBy": "Oryginalne oprogramowanie opracowane przez",
     "licensedUnder": "Licencjonowane na warunkach",
-    "copyrightReserved": "Chronione prawem autorskim (c) 2026. Nazwa „TimiGS” jest zastrzeżona."
+    "copyrightReserved": "Chronione prawem autorskim (c) 2026. Nazwa „TimiGS” jest zastrzeżona.",
+    "doctorModeStepAwayBtn": "Tak, teraz odejdę",
+    "doctorModePaused": "Tryb lekarza wstrzymany",
+    "doctorModePauseRemaining": "Pozostała pauza",
+    "resumeTracking": "Wznów śledzenie",
+    "themeDesc": "Przełączaj między trybem ciemnym i jasnym",
+    "autostartDesc": "Uruchamiaj TimiGS przy starcie systemu",
+    "minimizeToTrayDesc": "Kontynuuj działanie w tle"
   },
   "tools": {
     "title": "Narzędzia",

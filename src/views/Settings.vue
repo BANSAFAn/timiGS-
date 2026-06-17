@@ -91,7 +91,7 @@
                     $t("settings.theme")
                   }}</label>
                   <p class="setting-description">
-                    Switch between dark and light mode
+                    {{ $t("settings.themeDesc") }}
                   </p>
                 </div>
               </div>
@@ -161,7 +161,7 @@
                     $t("settings.autostart")
                   }}</label>
                   <p class="setting-description">
-                    Launch TimiGS on system startup
+                    {{ $t("settings.autostartDesc") }}
                   </p>
                 </div>
               </div>
@@ -178,7 +178,9 @@
                   <label class="setting-label">{{
                     $t("settings.minimizeToTray")
                   }}</label>
-                  <p class="setting-description">Keep running in background</p>
+                  <p class="setting-description">
+                    {{ $t("settings.minimizeToTrayDesc") }}
+                  </p>
                 </div>
               </div>
               <ModernToggle 
@@ -220,27 +222,44 @@
             </div>
 
             <div class="doctor-mode-status-card animate-enter" v-if="doctorModeStore.enabled">
-              <div class="status-header">
-                <span class="status-dot-pulse"></span>
-                <strong>{{ $t("settings.doctorModeActiveSession") || 'Active Session' }}</strong>
-              </div>
-              <div class="status-grid-mini">
-                <div class="status-item-mini">
-                  <span class="label">{{ $t("settings.doctorModeElapsedTime") || 'Elapsed Time' }}:</span>
-                  <span class="value font-mono">{{ formatElapsedDuration(doctorModeStore.elapsedSeconds) }}</span>
+              <template v-if="doctorModeStore.isPaused">
+                <div class="status-header paused">
+                  <span class="status-dot-paused"></span>
+                  <strong>{{ $t("settings.doctorModePaused") || 'Doctor Mode Paused' }}</strong>
                 </div>
-                <div class="status-item-mini">
-                  <span class="label">{{ $t("settings.doctorModeReminders") || 'Reminders' }}:</span>
-                  <span class="value">{{ doctorModeStore.reminderCount }} / {{ doctorModeStore.maxReminders }}</span>
+                <div class="status-grid-mini">
+                  <div class="status-item-mini">
+                    <span class="label">{{ $t("settings.doctorModePauseRemaining") || 'Pause Remaining' }}:</span>
+                    <span class="value font-mono">{{ formatElapsedDuration(doctorModeStore.pauseTimeRemainingSeconds) }}</span>
+                  </div>
                 </div>
-                <div class="status-item-mini">
-                  <span class="label">{{ $t("settings.doctorModeTimeUntilLock") || 'Time Until Lock' }}:</span>
-                  <span class="value font-mono">{{ formatElapsedDuration(doctorModeStore.secondsUntilLock) }}</span>
+                <button class="btn btn-primary btn-small" style="margin-top: 12px; width: 100%;" @click="doctorModeStore.resumeFromPause">
+                  {{ $t("settings.resumeTracking") || 'Resume Tracking' }}
+                </button>
+              </template>
+              <template v-else>
+                <div class="status-header">
+                  <span class="status-dot-pulse"></span>
+                  <strong>{{ $t("settings.doctorModeActiveSession") || 'Active Session' }}</strong>
                 </div>
-              </div>
-              <button class="btn btn-secondary btn-small" style="margin-top: 12px; width: 100%;" @click="doctorModeStore.resetSession">
-                {{ $t("settings.resetSession") || 'Reset Session' }}
-              </button>
+                <div class="status-grid-mini">
+                  <div class="status-item-mini">
+                    <span class="label">{{ $t("settings.doctorModeElapsedTime") || 'Elapsed Time' }}:</span>
+                    <span class="value font-mono">{{ formatElapsedDuration(doctorModeStore.elapsedSeconds) }}</span>
+                  </div>
+                  <div class="status-item-mini">
+                    <span class="label">{{ $t("settings.doctorModeReminders") || 'Reminders' }}:</span>
+                    <span class="value">{{ doctorModeStore.reminderCount }} / {{ doctorModeStore.maxReminders }}</span>
+                  </div>
+                  <div class="status-item-mini">
+                    <span class="label">{{ $t("settings.doctorModeTimeUntilLock") || 'Time Until Lock' }}:</span>
+                    <span class="value font-mono">{{ formatElapsedDuration(doctorModeStore.secondsUntilLock) }}</span>
+                  </div>
+                </div>
+                <button class="btn btn-secondary btn-small" style="margin-top: 12px; width: 100%;" @click="doctorModeStore.resetSession">
+                  {{ $t("settings.resetSession") || 'Reset Session' }}
+                </button>
+              </template>
             </div>
 
             <div class="setting-item" v-if="doctorModeStore.enabled">
@@ -1277,6 +1296,18 @@ async function confirmResetData() {
   0% { transform: scale(0.95); opacity: 0.5; }
   50% { transform: scale(1.1); opacity: 1; }
   100% { transform: scale(0.95); opacity: 0.5; }
+}
+
+.doctor-mode-status-card .status-header.paused {
+  color: var(--color-warning, #f59e0b);
+}
+
+.doctor-mode-status-card .status-dot-paused {
+  width: 8px;
+  height: 8px;
+  background-color: var(--color-warning, #f59e0b);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--color-warning, #f59e0b);
 }
 
 .doctor-mode-status-card .status-grid-mini {

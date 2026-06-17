@@ -236,7 +236,14 @@
     "softwareInfo": "Інформація про програмне забезпечення",
     "originalDevelopedBy": "Оригінальне програмне забезпечення розроблено",
     "licensedUnder": "Ліцензовано під",
-    "copyrightReserved": "Охороняється авторським правом (c) 2026. Назва \"TimiGS\" зарезервована."
+    "copyrightReserved": "Охороняється авторським правом (c) 2026. Назва \"TimiGS\" зарезервована.",
+    "doctorModeStepAwayBtn": "Так, зараз відійду",
+    "doctorModePaused": "Режим лікаря призупинено",
+    "doctorModePauseRemaining": "Залишилося паузи",
+    "resumeTracking": "Відновити відстеження",
+    "themeDesc": "Перемикання між темним і світлим режимами",
+    "autostartDesc": "Запускати TimiGS під час запуску системи",
+    "minimizeToTrayDesc": "Продовжувати роботу у фоновому режимі"
   },
   "tools": {
     "title": "Інструменти",

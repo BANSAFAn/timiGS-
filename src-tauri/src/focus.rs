@@ -1,5 +1,5 @@
-//! Focus Mode module — locks the user to a specific application
-//! On Windows, blocks access to other apps by bringing the target app back to foreground.
+//! Фокус покус....
+
 
 use once_cell::sync::Lazy;
 use parking_lot::Mutex;
@@ -71,7 +71,6 @@ pub fn start_focus(
                 break;
             }
 
-            // Block access to other apps on Windows
             #[cfg(target_os = "windows")]
             enforce_focus(&_target_exe);
 
@@ -116,9 +115,6 @@ pub fn get_focus_status() -> Option<FocusStatus> {
     })
 }
 
-/// On Windows: if foreground window is NOT the target app or TimiGS,
-/// minimize it AND bring the target app window back to foreground.
-/// This effectively blocks the user from using any other application.
 #[cfg(target_os = "windows")]
 fn enforce_focus(target_exe_lower: &str) {
     use windows::Win32::Foundation::{BOOL, HWND, LPARAM};
@@ -138,12 +134,8 @@ fn enforce_focus(target_exe_lower: &str) {
         if process_id == 0 {
             return;
         }
-
-        // Get the exe path of the foreground window
         let fg_exe = get_process_exe(process_id);
         let fg_exe_lower = fg_exe.to_lowercase();
-
-        // Check if the foreground app is allowed
         let is_allowed = fg_exe_lower.contains(target_exe_lower)
             || fg_exe_lower.contains("explorer.exe")
             || fg_exe_lower.contains("timigs")

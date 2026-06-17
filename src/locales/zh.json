@@ -200,7 +200,14 @@
     "softwareInfo": "软件信息",
     "originalDevelopedBy": "原版软件开发自",
     "licensedUnder": "许可协议为",
-    "copyrightReserved": "受版权保护 (c) 2026. 保留 \"TimiGS\" 名称。"
+    "copyrightReserved": "受版权保护 (c) 2026. 保留 \"TimiGS\" 名称。",
+    "doctorModeStepAwayBtn": "是的，我现在就走开",
+    "doctorModePaused": "医生模式已暂停",
+    "doctorModePauseRemaining": "剩余暂停时间",
+    "resumeTracking": "恢复追踪",
+    "themeDesc": "在深色和浅色模式之间切换",
+    "autostartDesc": "系统启动时启动 TimiGS",
+    "minimizeToTrayDesc": "在后台继续运行"
   },
   "tools": {
     "title": "工具",

@@ -200,7 +200,14 @@
     "softwareInfo": "Información del software",
     "originalDevelopedBy": "Software original desarrollado por",
     "licensedUnder": "Licenciado bajo",
-    "copyrightReserved": "Protegido por derechos de autor (c) 2026. El nombre \"TimiGS\" está reservado."
+    "copyrightReserved": "Protegido por derechos de autor (c) 2026. El nombre \"TimiGS\" está reservado.",
+    "doctorModeStepAwayBtn": "Sí, me alejaré ahora",
+    "doctorModePaused": "Modo Doctor pausado",
+    "doctorModePauseRemaining": "Pausa restante",
+    "resumeTracking": "Reanudar seguimiento",
+    "themeDesc": "Cambiar entre los modos oscuro y claro",
+    "autostartDesc": "Iniciar TimiGS al arrancar el sistema",
+    "minimizeToTrayDesc": "Seguir ejecutándose en segundo plano"
   },
   "tools": {
     "title": "Herramientas",

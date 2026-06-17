@@ -200,7 +200,14 @@
     "softwareInfo": "معلومات البرنامج",
     "originalDevelopedBy": "البرنامج الأصلي تم تطويره بواسطة",
     "licensedUnder": "مرخص بموجب",
-    "copyrightReserved": "محمي بموجب حقوق الطبع والنشر (c) 2026. الاسم \"TimiGS\" محفوظ."
+    "copyrightReserved": "محمي بموجب حقوق الطبع والنشر (c) 2026. الاسم \"TimiGS\" محفوظ.",
+    "doctorModeStepAwayBtn": "نعم، سأبتعد الآن",
+    "doctorModePaused": "وضع الطبيب متوقف مؤقتًا",
+    "doctorModePauseRemaining": "الوقت المتبقي للتوقف",
+    "resumeTracking": "استئناف التتبع",
+    "themeDesc": "التبديل بين الوضعين الداكن والفاتح",
+    "autostartDesc": "تشغيل TimiGS عند بدء تشغيل النظام",
+    "minimizeToTrayDesc": "الاستمرار في التشغيل في الخلفية"
   },
   "tools": {
     "title": "الأدوات",

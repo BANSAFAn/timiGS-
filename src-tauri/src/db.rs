@@ -1,4 +1,4 @@
-//! Database module for storing and retrieving activity data
+//! Невелика база
 
 use chrono::{DateTime, Local, NaiveDate};
 use once_cell::sync::Lazy;
@@ -127,9 +127,9 @@ pub fn get_db_path() -> PathBuf {
                 .and_then(|p| p.parent().map(|p| p.to_path_buf()))
         })
         .unwrap_or_else(|| PathBuf::from("."));
-    
+
     let db_dir = app_data.join("TimiGS");
-    
+
     // Ensure directory exists with proper error handling
     if let Err(e) = std::fs::create_dir_all(&db_dir) {
         eprintln!("Failed to create database directory {:?}: {}", db_dir, e);
@@ -137,7 +137,7 @@ pub fn get_db_path() -> PathBuf {
         // Fallback to current directory
         return PathBuf::from("activity.db");
     }
-    
+
     let db_path = db_dir.join("activity.db");
     eprintln!("Database path: {:?}", db_path);
     db_path
@@ -860,30 +860,30 @@ pub fn get_excluded_processes() -> Result<Vec<String>> {
 
 pub fn add_excluded_process(exe_path: &str) -> Result<()> {
     let mut excluded = get_excluded_processes()?;
-    
+
     // Normalize path for comparison (lowercase)
     let exe_lower = exe_path.to_lowercase();
-    
+
     // Don't add if already exists
     if !excluded.iter().any(|p| p.to_lowercase() == exe_lower) {
         excluded.push(exe_path.to_string());
-        
+
         let excluded_json = serde_json::to_string(&excluded).unwrap_or_else(|_| "[]".to_string());
         save_setting("excluded_processes", &excluded_json)?;
     }
-    
+
     Ok(())
 }
 
 pub fn remove_excluded_process(exe_path: &str) -> Result<()> {
     let mut excluded = get_excluded_processes()?;
     let exe_lower = exe_path.to_lowercase();
-    
+
     excluded.retain(|p| p.to_lowercase() != exe_lower);
-    
+
     let excluded_json = serde_json::to_string(&excluded).unwrap_or_else(|_| "[]".to_string());
     save_setting("excluded_processes", &excluded_json)?;
-    
+
     Ok(())
 }
 
@@ -1412,7 +1412,7 @@ fn extract_website(app_name: &str, window_title: &str) -> Option<String> {
         || app_lower.contains("browser")
         || app_lower.contains("explorer")
         || app_lower.contains("webview");
-        
+
     if !is_browser {
         return None;
     }
@@ -1511,7 +1511,7 @@ pub fn get_enriched_sessions(start_date: &str, end_date: &str) -> Result<Vec<Enr
     // 1. Fetch activity sessions
     let mut stmt = conn.prepare(
         "SELECT app_name, window_title, exe_path, start_time, end_time, duration_seconds
-         FROM activity_sessions 
+         FROM activity_sessions
          WHERE date(start_time) >= date(?) AND date(start_time) <= date(?)
          ORDER BY start_time DESC",
     )?;
@@ -1618,7 +1618,7 @@ pub fn get_enriched_sessions(start_date: &str, end_date: &str) -> Result<Vec<Enr
             if act_start < c_end && c_start < act_end {
                 editor_name = Some(c_editor.clone());
                 is_ai_assisted = Some(*c_ai);
-                
+
                 // Only write file path, language, and project if AI was NOT used!
                 if !*c_ai {
                     file_path = c_file.clone();
@@ -2016,7 +2016,7 @@ pub fn import_sessions_markdown(path: &str) -> Result<usize> {
     let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
 
     let mut count = 0;
-    
+
     for line in content.lines() {
         let line = line.trim();
         if line.starts_with('|') && !line.contains("---|") && !line.contains("App Name | Window Title") {
@@ -2027,7 +2027,7 @@ pub fn import_sessions_markdown(path: &str) -> Result<usize> {
                 let start_time = parts[3];
                 let end_time_str = parts[4];
                 let duration: i64 = parts[5].parse().unwrap_or(0);
-                
+
                 let end_time = if end_time_str.is_empty() { None } else { Some(end_time_str) };
                 let exe_path = "imported_from_markdown";
 
@@ -2048,36 +2048,36 @@ pub fn import_sessions_markdown(path: &str) -> Result<usize> {
             }
         }
     }
-    
+
     Ok(count)
 }
 
 pub fn import_sessions_html(path: &str) -> Result<usize> {
     let content = std::fs::read_to_string(path)
         .map_err(|e| rusqlite::Error::ToSqlConversionFailure(Box::new(e)))?;
-        
+
     let guard = DB.lock();
     let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
 
     let mut count = 0;
-    
+
     for tr_block in content.split("<tr>").skip(2) {
         let td_parts: Vec<&str> = tr_block.split("</td>").collect();
         if td_parts.len() >= 5 {
             let app_name = td_parts[0].split("<strong>").nth(1).unwrap_or("").split("</strong>").next().unwrap_or("").trim()
                 .replace("&amp;", "&").replace("&lt;", "<").replace("&gt;", ">").replace("&quot;", "\"");
-            
+
             let window_title = td_parts[1].split("<td>").nth(1).unwrap_or("").trim()
                 .replace("&amp;", "&").replace("&lt;", "<").replace("&gt;", ">").replace("&quot;", "\"");
-            
+
             let start_time = td_parts[2].split("\">").nth(1).unwrap_or("").trim()
                 .replace("&amp;", "&").replace("&lt;", "<").replace("&gt;", ">").replace("&quot;", "\"");
-            
+
             let end_time_str = td_parts[3].split("\">").nth(1).unwrap_or("").trim()
                 .replace("&amp;", "&").replace("&lt;", "<").replace("&gt;", ">").replace("&quot;", "\"");
-            
+
             let end_time = if end_time_str == "Now" || end_time_str.is_empty() { None } else { Some(end_time_str.as_str()) };
-            
+
             let duration_str = td_parts[4].split("\">").nth(1).unwrap_or("").trim();
             let mut duration: i64 = 0;
             for part in duration_str.split_whitespace() {
@@ -2086,7 +2086,7 @@ pub fn import_sessions_html(path: &str) -> Result<usize> {
                  else if part.ends_with('m') { duration += num * 60; }
                  else if part.ends_with('s') { duration += num; }
             }
-            
+
             let exe_path = "imported_from_html";
 
             let exists: i64 = conn.query_row(
@@ -2105,7 +2105,7 @@ pub fn import_sessions_html(path: &str) -> Result<usize> {
             }
         }
     }
-    
+
     Ok(count)
 }
 
@@ -2713,7 +2713,7 @@ fn test_inspect_db() {
     let db_path = get_db_path();
     println!("Database path: {:?}", db_path);
     let conn = Connection::open(&db_path).unwrap();
-    
+
     // Daily totals
     println!("\n--- Daily Totals ---");
     let mut stmt = conn.prepare("
@@ -2731,7 +2731,7 @@ fn test_inspect_db() {
         let total_sec = total_sec.unwrap_or(0);
         println!("Date: {} | Total Hours: {:.2} | Sessions: {}", day, total_sec as f64 / 3600.0, count);
     }
-    
+
     // Check GetLastInputInfo
     #[cfg(target_os = "windows")]
     {
@@ -2754,4 +2754,3 @@ fn test_inspect_db() {
         }
     }
 }
-
