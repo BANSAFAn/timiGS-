@@ -227,7 +227,8 @@
     "preview": "Vista previa",
     "insertFormatName": "Nombre",
     "insertFormatLogo": "Logo",
-    "insertFormatBoth": "Ambos"
+    "insertFormatBoth": "Ambos",
+    "recentTrackedApps": "Aplicaciones rastreadas recientemente"
   },
   "tasks": {
     "title": "Tareas y objetivos",

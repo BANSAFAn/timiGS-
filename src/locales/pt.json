@@ -226,7 +226,8 @@
     "preview": "Pré-visualização",
     "insertFormatName": "Nome",
     "insertFormatLogo": "Logo",
-    "insertFormatBoth": "Ambos"
+    "insertFormatBoth": "Ambos",
+    "recentTrackedApps": "Aplicativos rastreados recentemente"
   },
   "tasks": {
     "title": "Tarefas e Metas",

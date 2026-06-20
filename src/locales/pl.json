@@ -226,7 +226,8 @@
     "preview": "Podgląd",
     "insertFormatName": "Nazwa",
     "insertFormatLogo": "Logo",
-    "insertFormatBoth": "Oba"
+    "insertFormatBoth": "Oba",
+    "recentTrackedApps": "Ostatnio śledzone aplikacje"
   },
   "tasks": {
     "title": "Zadania i Cele",

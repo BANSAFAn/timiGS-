@@ -227,7 +227,8 @@
     "preview": "معاينة",
     "insertFormatName": "الاسم",
     "insertFormatLogo": "الشعار",
-    "insertFormatBoth": "كلاهما"
+    "insertFormatBoth": "كلاهما",
+    "recentTrackedApps": "التطبيقات التي تم تتبعها مؤخراً"
   },
   "tasks": {
     "title": "المهام والأهداف",

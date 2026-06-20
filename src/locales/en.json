@@ -259,7 +259,8 @@
     "preview": "Preview",
     "insertFormatName": "Name",
     "insertFormatLogo": "Logo",
-    "insertFormatBoth": "Both"
+    "insertFormatBoth": "Both",
+    "recentTrackedApps": "Recent Tracked Apps"
   },
   "tasks": {
     "title": "Tasks & Goals",

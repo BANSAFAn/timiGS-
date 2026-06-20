@@ -227,7 +227,8 @@
     "preview": "预览",
     "insertFormatName": "名称",
     "insertFormatLogo": "标志",
-    "insertFormatBoth": "两者"
+    "insertFormatBoth": "两者",
+    "recentTrackedApps": "最近追踪的应用"
   },
   "tasks": {
     "title": "任务与目标",

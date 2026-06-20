@@ -263,7 +263,8 @@
     "preview": "Перегляд",
     "insertFormatName": "Назва",
     "insertFormatLogo": "Логотип",
-    "insertFormatBoth": "Обидва"
+    "insertFormatBoth": "Обидва",
+    "recentTrackedApps": "Нещодавні відстежувані програми"
   },
   "tasks": {
     "title": "Завдання та цілі",
