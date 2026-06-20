@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.10.2](https://github.com/BANSAFAn/timiGS-/compare/v1.10.1...v1.10.2) (2026-06-20)
+
+
+### Bug Fixes
+
+* codingtracker & i18n ([d78f17a](https://github.com/BANSAFAn/timiGS-/commit/d78f17ac1b059f679f5f0b9fc7a9cfb22b326ee4))
+
+
+### Translations
+
+* fix lang ([3ff3a84](https://github.com/BANSAFAn/timiGS-/commit/3ff3a848ae1685a137a383407cac99d2e74b148d))
+* new update ([cba1e0b](https://github.com/BANSAFAn/timiGS-/commit/cba1e0b2f9d29e2e419e01f3e638201fa305759c))
+
 ## [1.10.1](https://github.com/BANSAFAn/timiGS-/compare/v1.10.0...v1.10.1) (2026-06-16)
 
 
