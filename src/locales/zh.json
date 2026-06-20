@@ -222,7 +222,12 @@
     "deleteNote": "删除",
     "noNotes": "暂无笔记",
     "untitled": "无标题",
-    "selectNoteHint": "选择一条便签以查看或创建新便签"
+    "selectNoteHint": "选择一条便签以查看或创建新便签",
+    "edit": "编辑",
+    "preview": "预览",
+    "insertFormatName": "名称",
+    "insertFormatLogo": "标志",
+    "insertFormatBoth": "两者"
   },
   "tasks": {
     "title": "任务与目标",
@@ -239,7 +244,10 @@
     "exportCsv": "导出为 CSV",
     "noCompletedTasks": "未找到已完成的任务。",
     "websiteTitleKeyword": "网站/标题关键字",
-    "optional": "可选"
+    "optional": "可选",
+    "statusActive": "活跃",
+    "statusCompleted": "已完成",
+    "statusFailed": "失败"
   },
   "weather": {
     "title": "天气与活动"

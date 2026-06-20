@@ -222,7 +222,12 @@
     "deleteNote": "Löschen",
     "noNotes": "Noch keine Notizen",
     "untitled": "Ohne Titel",
-    "selectNoteHint": "Wählen Sie eine Notiz aus oder erstellen Sie eine neue"
+    "selectNoteHint": "Wählen Sie eine Notiz aus oder erstellen Sie eine neue",
+    "edit": "Bearbeiten",
+    "preview": "Vorschau",
+    "insertFormatName": "Name",
+    "insertFormatLogo": "Logo",
+    "insertFormatBoth": "Beide"
   },
   "tasks": {
     "title": "Aufgaben & Ziele",
@@ -239,7 +244,10 @@
     "exportCsv": "CSV exportieren",
     "noCompletedTasks": "Keine abgeschlossenen Aufgaben gefunden.",
     "websiteTitleKeyword": "Website / Titel-Schlüsselwort",
-    "optional": "Optional"
+    "optional": "Optional",
+    "statusActive": "Aktiv",
+    "statusCompleted": "Abgeschlossen",
+    "statusFailed": "Fehlgeschlagen"
   },
   "weather": {
     "title": "Wetter & Aktivität"

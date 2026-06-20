@@ -222,7 +222,12 @@
     "deleteNote": "حذف",
     "noNotes": "لا توجد ملاحظات بعد",
     "untitled": "بدون عنوان",
-    "selectNoteHint": "اختر ملاحظة لعرضها أو أنشئ واحدة جديدة"
+    "selectNoteHint": "اختر ملاحظة لعرضها أو أنشئ واحدة جديدة",
+    "edit": "تعديل",
+    "preview": "معاينة",
+    "insertFormatName": "الاسم",
+    "insertFormatLogo": "الشعار",
+    "insertFormatBoth": "كلاهما"
   },
   "tasks": {
     "title": "المهام والأهداف",
@@ -239,7 +244,10 @@
     "exportCsv": "تصدير CSV",
     "noCompletedTasks": "لم يتم العثور على مهام مكتملة.",
     "websiteTitleKeyword": "الموقع / الكلمة المفتاحية للعنوان",
-    "optional": "اختياري"
+    "optional": "اختياري",
+    "statusActive": "نشط",
+    "statusCompleted": "مكتمل",
+    "statusFailed": "فشل"
   },
   "weather": {
     "title": "الطقس والنشاط"

@@ -30,7 +30,7 @@
         </div>
       </header>
 
-      <CodingTracker :selectedDate="selectedDate" />
+      <CodingTracker :sessions="codingSessions" :isToday="isToday" />
 
       <div class="coding-timeline-section" v-if="codingSessions.length > 0">
         <div class="coding-timeline-header">
@@ -202,12 +202,12 @@ const isToday = computed(() => {
 });
 
 const displayDate = computed(() => {
-  if (isToday.value) return t('common.today') || 'Today';
+  if (isToday.value) return t('timeline.today') || 'Today';
   
   const yesterday = new Date();
   yesterday.setDate(yesterday.getDate() - 1);
   if (selectedDate.value.toDateString() === yesterday.toDateString()) {
-    return t('common.yesterday') || 'Yesterday';
+    return t('timeline.yesterday') || 'Yesterday';
   }
   
   return selectedDate.value.toLocaleDateString(locale.value, { 
@@ -299,6 +299,23 @@ function goToNextDay() {
   }
 }
 
+function toLocalISOString(date: Date): string {
+  const tzOffset = -date.getTimezoneOffset();
+  const diff = tzOffset >= 0 ? '+' : '-';
+  const pad = (num: number) => String(num).padStart(2, '0');
+  const pad3 = (num: number) => String(num).padStart(3, '0');
+  
+  return date.getFullYear() +
+    '-' + pad(date.getMonth() + 1) +
+    '-' + pad(date.getDate()) +
+    'T' + pad(date.getHours()) +
+    ':' + pad(date.getMinutes()) +
+    ':' + pad(date.getSeconds()) +
+    '.' + pad3(date.getMilliseconds()) +
+    diff + pad(Math.floor(Math.abs(tzOffset) / 60)) +
+    ':' + pad(Math.abs(tzOffset) % 60);
+}
+
 async function fetchCodingSessions() {
   try {
     if (isToday.value) {
@@ -310,8 +327,8 @@ async function fetchCodingSessions() {
       endOfDay.setHours(23, 59, 59, 999);
       
       codingSessions.value = await invoke<CodingSession[]>('get_coding_sessions_range_cmd', {
-        startTime: startOfDay.toISOString(),
-        endTime: endOfDay.toISOString()
+        startTime: toLocalISOString(startOfDay),
+        endTime: toLocalISOString(endOfDay)
       });
     }
   } catch (error) {

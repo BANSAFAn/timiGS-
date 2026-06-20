@@ -258,7 +258,12 @@
     "deleteNote": "Видалити",
     "noNotes": "Нотаток ще немає",
     "untitled": "Без назви",
-    "selectNoteHint": "Виберіть нотатку для перегляду або створіть нову"
+    "selectNoteHint": "Виберіть нотатку для перегляду або створіть нову",
+    "edit": "Редагувати",
+    "preview": "Перегляд",
+    "insertFormatName": "Назва",
+    "insertFormatLogo": "Логотип",
+    "insertFormatBoth": "Обидва"
   },
   "tasks": {
     "title": "Завдання та цілі",
@@ -275,7 +280,10 @@
     "exportCsv": "Експорт в CSV",
     "noCompletedTasks": "Завершених завдань не знайдено.",
     "websiteTitleKeyword": "Сайт / Ключове слово в назві",
-    "optional": "Необов'язково"
+    "optional": "Необов'язково",
+    "statusActive": "Активно",
+    "statusCompleted": "Виконано",
+    "statusFailed": "Не вдалося"
   },
   "weather": {
     "title": "Погода та активність"

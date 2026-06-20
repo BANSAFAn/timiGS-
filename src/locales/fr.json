@@ -222,7 +222,12 @@
     "deleteNote": "Supprimer",
     "noNotes": "Aucune note pour le moment",
     "untitled": "Sans titre",
-    "selectNoteHint": "Sélectionnez une note à afficher ou créez-en une nouvelle"
+    "selectNoteHint": "Sélectionnez une note à afficher ou créez-en une nouvelle",
+    "edit": "Modifier",
+    "preview": "Aperçu",
+    "insertFormatName": "Nom",
+    "insertFormatLogo": "Logo",
+    "insertFormatBoth": "Les deux"
   },
   "tasks": {
     "title": "Tâches et objectifs",
@@ -239,7 +244,10 @@
     "exportCsv": "Exporter en CSV",
     "noCompletedTasks": "Aucune tâche complétée trouvée.",
     "websiteTitleKeyword": "Site Web / Mot-clé du titre",
-    "optional": "Optionnel"
+    "optional": "Optionnel",
+    "statusActive": "Actif",
+    "statusCompleted": "Terminé",
+    "statusFailed": "Échoué"
   },
   "weather": {
     "title": "Météo et activité"

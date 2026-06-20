@@ -43,7 +43,7 @@
           </div>
           <div class="task-actions">
              <span class="status-badge" :class="task.status">
-               {{ task.status }}
+               {{ task.status === 'completed' ? t('tasks.statusCompleted', 'Completed') : task.status === 'failed' ? t('tasks.statusFailed', 'Failed') : t('tasks.statusActive', 'Active') }}
              </span>
              <button @click="deleteTask(task.id)" class="btn-icon delete-btn" :title="t('common.delete', 'Delete')">
                <span v-html="Icons.tasksDelete"></span>
@@ -172,8 +172,12 @@ import { useI18n } from 'vue-i18n';
 import { invoke } from '@tauri-apps/api/core';
 import { listen } from '@tauri-apps/api/event';
 import { Icons } from './icons/IconMap';
+import { save } from "@tauri-apps/plugin-dialog";
+import { writeTextFile } from "@tauri-apps/plugin-fs";
+import { useNotificationStore } from "../stores/notifications";
 
 const { t, locale } = useI18n();
+const notifications = useNotificationStore();
 
 interface Task {
   id: number;
@@ -303,87 +307,59 @@ async function deleteTask(id: number) {
     }
 }
 
-function exportCsv() {
-    const tableStyle = `
-        <style>
-            table {
-                border-collapse: collapse;
-                width: 100%;
-                font-family: 'Segoe UI', Arial, sans-serif;
-                font-size: 14px;
-            }
-            th {
-                background-color: #1e293b;
-                color: #f8fafc;
-                text-align: left;
-                padding: 12px 16px;
-                font-weight: 600;
-                border: 1px solid #334155;
-            }
-            td {
-                padding: 10px 16px;
-                border: 1px solid #334155;
-                color: #e2e8f0;
-                background-color: #0f172a;
-            }
-            .status-active { color: #60a5fa; font-weight: bold; }
-            .status-completed { color: #4ade80; font-weight: bold; background-color: rgba(34, 197, 94, 0.1); }
-            .status-failed { color: #f87171; font-weight: bold; }
-            tr:hover td { background-color: #1e293b; }
-        </style>
-    `;
+async function exportCsv() {
+    function escapeCsv(val: any): string {
+        if (val === null || val === undefined) return '';
+        const str = String(val);
+        if (str.includes('"') || str.includes(',') || str.includes('\n') || str.includes('\r')) {
+            return `"${str.replace(/"/g, '""')}"`;
+        }
+        return str;
+    }
 
-    const headers = `
-        <tr>
-            <th>ID</th>
-            <th>App</th>
-            <th>Target App/Site</th>
-            <th>Description</th>
-            <th>Goal (h)</th>
-            <th>Created At</th>
-            <th>Status</th>
-        </tr>
-    `;
+    const headers = [
+        t('tasks.id', 'ID'),
+        t('tasks.appName', 'App Name'),
+        t('tasks.targetAppSite', 'Target App/Site'),
+        t('tasks.description', 'Description'),
+        t('tasks.goalHours', 'Goal (h)'),
+        t('tasks.createdAt', 'Created At'),
+        t('tasks.status', 'Status')
+    ];
 
-    const rows = filteredTasks.value.map(t => `
-        <tr>
-            <td>${t.id}</td>
-            <td>${t.app_name}</td>
-            <td>${t.title_filter || 'Any'}</td>
-            <td>${t.description || ''}</td>
-            <td>${(t.goal_seconds / 3600).toFixed(2)}</td>
-            <td>${new Date(t.created_at).toLocaleString()}</td>
-            <td class="status-${t.status.toLowerCase()}">${t.status}</td>
-        </tr>
-    `).join('');
+    const csvRows = [headers.map(escapeCsv).join(',')];
 
-    const htmlContent = `
-        <html>
-        <head>
-            <meta charset="utf-8">
-            <title>TimiGS Tasks Report</title>
-            ${tableStyle}
-        </head>
-        <body style="background-color: #0f172a; color: white;">
-            <h2 style="font-family: sans-serif; padding: 20px;">TimiGS Tasks & Goals Report</h2>
-            <table>
-                <thead>${headers}</thead>
-                <tbody>${rows}</tbody>
-            </table>
-        </body>
-        </html>
-    `;
-    
+    for (const t of filteredTasks.value) {
+        const row = [
+            t.id,
+            t.app_name,
+            t.title_filter || 'Any',
+            t.description || '',
+            (t.goal_seconds / 3600).toFixed(2),
+            new Date(t.created_at).toLocaleString(locale.value),
+            t.status
+        ];
+        csvRows.push(row.map(escapeCsv).join(','));
+    }
 
-    const blob = new Blob([htmlContent], { type: 'application/vnd.ms-excel;charset=utf-8;' });
-    const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-    link.setAttribute('href', url);
-    link.setAttribute('download', 'TimiGS_Tasks_Report.xls');
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    const csvContent = '\ufeff' + csvRows.join('\r\n');
+
+    try {
+        const filePath = await save({
+            defaultPath: 'TimiGS_Tasks_Report.csv',
+            filters: [
+                { name: 'CSV File', extensions: ['csv'] }
+            ]
+        });
+
+        if (filePath) {
+            await writeTextFile(filePath, csvContent);
+            notifications.success(t("settings.exportSuccess", "Data exported successfully!"));
+        }
+    } catch (e: any) {
+        console.error("Export failed:", e);
+        notifications.error(t("settings.exportError", "Failed to export data") + ": " + e);
+    }
 }
 
 function getProgress(task: Task) {

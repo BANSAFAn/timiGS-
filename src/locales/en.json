@@ -254,7 +254,12 @@
     "deleteNote": "Delete",
     "noNotes": "No notes yet",
     "untitled": "Untitled Note",
-    "selectNoteHint": "Select a note to view or create a new one"
+    "selectNoteHint": "Select a note to view or create a new one",
+    "edit": "Edit",
+    "preview": "Preview",
+    "insertFormatName": "Name",
+    "insertFormatLogo": "Logo",
+    "insertFormatBoth": "Both"
   },
   "tasks": {
     "title": "Tasks & Goals",
@@ -271,7 +276,10 @@
     "exportCsv": "Export CSV",
     "noCompletedTasks": "No completed tasks found.",
     "websiteTitleKeyword": "Website / Title Keyword",
-    "optional": "Optional"
+    "optional": "Optional",
+    "statusActive": "Active",
+    "statusCompleted": "Completed",
+    "statusFailed": "Failed"
   },
   "weather": {
     "title": "Weather & Activity"

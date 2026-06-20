@@ -1,5 +1,5 @@
 <template>
-  <div class="coding-tracker-section" v-if="store.totalCodingTime > 0 || store.currentCodingSession">
+  <div class="coding-tracker-section" v-if="totalCodingTime > 0 || (props.isToday && store.currentCodingSession)">
     <div class="section-header">
       <h3>
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
@@ -16,17 +16,17 @@
           </svg>
           {{ t('coding.most_active_lang') }}: {{ mostActiveLanguage.language === 'Unknown' ? t('coding.unknownCoding') : mostActiveLanguage.language }} ({{ mostActiveLanguage.pct }}%)
         </span>
-        <span class="header-badge coding-badge">{{ formatDuration(store.totalCodingTime) }}</span>
-        <span class="header-badge ai-badge" v-if="store.totalAiCodingTime > 0">
+        <span class="header-badge coding-badge">{{ formatDuration(totalCodingTime) }}</span>
+        <span class="header-badge ai-badge" v-if="totalAiCodingTime > 0">
           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 256 256" fill="currentColor" style="display:inline;vertical-align:middle;margin-right:4px;">
             <path d="M200,112a8,8,0,0,1-8,8H152a8,8,0,0,1,0-16h40A8,8,0,0,1,200,112Zm-8,24H152a8,8,0,0,0,0,16h40a8,8,0,0,0,0-16Zm-32,32H152a8,8,0,0,0,0,16h8a8,8,0,0,0,0-16ZM96,208H72a8,8,0,0,1-8-8V160a8,8,0,0,1,16,0v32H96a8,8,0,0,1,0,16Zm0-96H80V80a8,8,0,0,0-16,0v40a8,8,0,0,0,8,8H96a8,8,0,0,0,0-16ZM232,56V200a16,16,0,0,1-16,16H40a16,16,0,0,1-16-16V56A16,16,0,0,1,40,40H216A16,16,0,0,1,232,56Zm-16,0H40V200H216V56Z"/>
           </svg>
-          {{ store.aiCodingPercent }}% {{ t('coding.ai', 'AI') }}
+          {{ aiCodingPercent }}% {{ t('coding.ai', 'AI') }}
         </span>
       </div>
     </div>
 
-    <div class="now-coding" v-if="store.currentCodingSession">
+    <div class="now-coding" v-if="props.isToday && store.currentCodingSession">
       <div class="now-coding-header">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="2">
@@ -65,7 +65,7 @@
       </div>
     </div>
 
-    <div class="coding-split-card" v-if="store.totalCodingTime > 0">
+    <div class="coding-split-card" v-if="totalCodingTime > 0">
       <div class="split-row">
         <div class="split-item manual">
           <div class="split-icon">
@@ -75,9 +75,9 @@
           </div>
           <div class="split-info">
             <span class="split-label">{{ t('coding.manual') }}</span>
-            <span class="split-time">{{ formatDuration(store.manualCodingTime) }}</span>
+            <span class="split-time">{{ formatDuration(manualCodingTime) }}</span>
           </div>
-          <div class="split-percent">{{ 100 - store.aiCodingPercent }}%</div>
+          <div class="split-percent">{{ 100 - aiCodingPercent }}%</div>
         </div>
         <div class="split-divider"></div>
         <div class="split-item ai">
@@ -88,26 +88,133 @@
           </div>
           <div class="split-info">
             <span class="split-label">{{ t('coding.ai') }}</span>
-            <span class="split-time">{{ formatDuration(store.totalAiCodingTime) }}</span>
+            <span class="split-time">{{ formatDuration(totalAiCodingTime) }}</span>
           </div>
-          <div class="split-percent">{{ store.aiCodingPercent }}%</div>
+          <div class="split-percent">{{ aiCodingPercent }}%</div>
         </div>
       </div>
       <div class="split-bar-bg">
-        <div class="split-bar-manual" :style="{ width: (100 - store.aiCodingPercent) + '%' }"></div>
-        <div class="split-bar-ai" :style="{ width: store.aiCodingPercent + '%' }"></div>
+        <div class="split-bar-manual" :style="{ width: (100 - aiCodingPercent) + '%' }"></div>
+        <div class="split-bar-ai" :style="{ width: aiCodingPercent + '%' }"></div>
       </div>
     </div>
 
-    <div class="coding-languages" v-if="store.topCodingLanguages.length > 0">
+    <div class="coding-languages" v-if="topCodingLanguages.length > 0">
       <div class="subsection-title">{{ t('coding.languages') }}</div>
       <div class="lang-grid">
-        <div v-for="lang in store.topCodingLanguages" :key="lang.language" class="lang-card">
+        <div v-for="lang in topCodingLanguages" :key="lang.language" class="lang-card">
           <div class="lang-header">
             <span class="lang-color-dot" :style="{ background: getLangColor(lang.language) }"></span>
             <span class="lang-name">{{ lang.language === 'Unknown' ? t('coding.unknownCoding') : lang.language }}</span>
             <span class="lang-sessions">{{ lang.session_count }} {{ t('coding.sessions') }}</span>
           </div>
+          <div class="lang-time-row">
+            <span class="lang-total">{{ formatDuration(lang.total_seconds) }}</span>
+            <div class="lang-split-mini" v-if="lang.ai_seconds > 0">
+              <span class="mini-manual">
+                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 256 256" fill="currentColor" style="display:inline;vertical-align:middle;margin-right:2px;">
+                  <path d="M223.51,48h-191A16.51,16.51,0,0,0,16,64.49v111A16.51,16.51,0,0,0,32.49,192h72.28l-8.21,24.62A8,8,0,0,0,104.15,224h47.7a8,8,0,0,0,7.59-10.38L151.23,192h72.28A16.51,16.51,0,0,0,240,175.51v-111A16.51,16.51,0,0,0,223.51,48ZM224,175.51a.49.49,0,0,1-.49.49H32.49a.49.49,0,0,1-.49-.49v-111a.49.49,0,0,1,.49-.49h191a.49.49,0,0,1,.49.49ZM72,112a8,8,0,0,1,8-8H96a8,8,0,0,1,0,16H80A8,8,0,0,1,72,112Zm96,0a8,8,0,0,1,8-8h16a8,8,0,0,1,0,16H176A8,8,0,0,1,168,112Zm-48-8h16a8,8,0,0,1,0,16H120a8,8,0,0,1,0-16Zm0,32h16a8,8,0,0,1,0,16H120a8,8,0,0,1,0-16Zm-40,0H96a8,8,0,0,1,0,16H80a8,8,0,0,1,0-16Zm96,0h16a8,8,0,0,1,0,16H176a8,8,0,0,1,0-16Z"/>
+                </svg>
+                {{ formatDuration(lang.manual_seconds) }}
+              </span>
+              <span class="mini-ai">
+                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 256 256" fill="currentColor" style="display:inline;vertical-align:middle;margin-right:2px;">
+                  <path d="M200,112a8,8,0,0,1-8,8H152a8,8,0,0,1,0-16h40A8,8,0,0,1,200,112Zm-8,24H152a8,8,0,0,0,0,16h40a8,8,0,0,0,0-16Zm-32,32H152a8,8,0,0,0,0,16h8a8,8,0,0,0,0-16ZM96,208H72a8,8,0,0,1-8-8V160a8,8,0,0,1,16,0v32H96a8,8,0,0,1,0,16Zm0-96H80V80a8,8,0,0,0-16,0v40a8,8,0,0,0,8,8H96a8,8,0,0,0,0-16ZM232,56V200a16,16,0,0,1-16,16H40a16,16,0,0,1-16-16V56A16,16,0,0,1,40,40H216A16,16,0,0,1,232,56Zm-16,0H40V200H216V56Z"/>
+                </svg>
+                {{ formatDuration(lang.ai_seconds) }}
+              </span>
+            </div>
+          </div>
+          <div class="lang-bar-bg">
+            <div class="lang-bar-manual" :style="{ width: getManualPct(lang) + '%' }"></div>
+            <div class="lang-bar-ai" :style="{ width: getAiPct(lang) + '%' }"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="coding-projects" v-if="topCodingProjects.length > 0">
+      <div class="subsection-title">{{ t('coding.projects') }}</div>
+      <div class="project-list">
+        <div v-for="(proj, idx) in topCodingProjects" :key="proj.project_dir" class="project-item">
+          <div class="project-rank" :class="getRankClass(idx)">{{ idx + 1 }}</div>
+          <div class="project-info">
+            <div class="project-name" :title="proj.project_dir">{{ proj.project_dir }}</div>
+            <div class="project-bar-bg">
+              <div class="project-bar-fill"
+                :style="{ width: getProjectPct(proj) + '%', background: getProjectGradient(idx) }">
+              </div>
+            </div>
+          </div>
+          <div class="project-meta">
+            <div class="project-time">{{ formatDuration(proj.total_seconds) }}</div>
+            <div class="project-ai" v-if="proj.ai_seconds > 0">
+              <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 256 256" fill="currentColor" style="display:inline;vertical-align:middle;margin-right:2px;">
+                <path d="M200,112a8,8,0,0,1-8,8H152a8,8,0,0,1,0-16h40A8,8,0,0,1,200,112Zm-8,24H152a8,8,0,0,0,0,16h40a8,8,0,0,0,0-16Zm-32,32H152a8,8,0,0,0,0,16h8a8,8,0,0,0,0-16ZM96,208H72a8,8,0,0,1-8-8V160a8,8,0,0,1,16,0v32H96a8,8,0,0,1,0,16Zm0-96H80V80a8,8,0,0,0-16,0v40a8,8,0,0,0,8,8H96a8,8,0,0,0,0-16ZM232,56V200a16,16,0,0,1-16,16H40a16,16,0,0,1-16-16V56A16,16,0,0,1,40,40H216A16,16,0,0,1,232,56Zm-16,0H40V200H216V56Z"/>
+              </svg>
+              {{ formatDuration(proj.ai_seconds) }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="coding-files" v-if="fileStats.length > 0">
+      <div class="subsection-header" @click="isFilesExpanded = !isFilesExpanded">
+        <span class="subsection-title">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" style="display:inline;vertical-align:middle;margin-right:6px;">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+          </svg>
+          {{ t('coding.files_worked') }}
+        </span>
+        <button class="expand-btn">
+          {{ isFilesExpanded ? t('coding.hide_files') : t('coding.show_files') }}
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" :class="{ rotated: isFilesExpanded }">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="files-list" v-if="isFilesExpanded">
+        <div v-for="file in fileStats" :key="file.filePath + file.language + file.projectDir" class="file-item-card">
+          <div class="file-main-info">
+            <div class="file-meta">
+              <span class="lang-color-dot" :style="{ background: getLangColor(file.language) }"></span>
+              <span class="file-name" :title="file.filePath">{{ file.filePath === 'Workspace / General' ? t('coding.workspaceGeneral') : file.filePath }}</span>
+              <span class="lang-tag" v-if="file.language">{{ file.language === 'Unknown' ? t('coding.unknownCoding') : file.language }}</span>
+            </div>
+            <div class="file-project" :title="file.projectDir">
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 256 256" fill="currentColor" style="display:inline;vertical-align:middle;margin-right:4px;">
+                <path d="M216,72H131.31L104,44.69A15.86,15.86,0,0,0,92.69,40H40A16,16,0,0,0,24,56V200.62A15.4,15.4,0,0,0,39.38,216H216.89A15.13,15.13,0,0,0,232,200.89V88A16,16,0,0,0,216,72ZM40,56H92.69l16,16H40ZM216,200H40V88H216Z"/>
+              </svg>
+              {{ file.projectDir === 'No Project' ? t('coding.noProject') : file.projectDir }}
+            </div>
+          </div>
+
+          <div class="file-split-section">
+            <div class="file-duration-container">
+              <span class="file-duration-total">{{ formatDuration(file.totalSeconds) }}</span>
+              <div class="file-split-mini">
+                <span class="mini-manual" v-if="file.manualSeconds > 0">
+                  {{ formatDuration(file.manualSeconds) }}
+                </span>
+                <span class="mini-ai" v-if="file.aiSeconds > 0">
+                  {{ formatDuration(file.aiSeconds) }} {{ t('coding.ai', 'AI') }}
+                </span>
+              </div>
+            </div>
+            <div class="file-split-bar" v-if="file.totalSeconds > 0">
+              <div class="file-bar-manual" :style="{ width: (100 - file.aiPercent) + '%' }"></div>
+              <div class="file-bar-ai" :style="{ width: file.aiPercent + '%' }"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
           <div class="lang-time-row">
             <span class="lang-total">{{ formatDuration(lang.total_seconds) }}</span>
             <div class="lang-split-mini" v-if="lang.ai_seconds > 0">
@@ -218,18 +325,99 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import { useActivityStore } from '../stores/activity';
+import { useActivityStore, type CodingSession } from '../stores/activity';
 import { useI18n } from 'vue-i18n';
+
+const props = defineProps<{
+  sessions: CodingSession[];
+  isToday: boolean;
+}>();
 
 const store = useActivityStore();
 const { t } = useI18n();
 
 const isFilesExpanded = ref(true);
 
+const totalCodingTime = computed(() => {
+  return props.sessions.reduce((acc, s) => acc + (s.duration_seconds || 0), 0);
+});
+
+const totalAiCodingTime = computed(() => {
+  return props.sessions.reduce((acc, s) => acc + (s.is_ai_assisted ? (s.duration_seconds || 0) : 0), 0);
+});
+
+const manualCodingTime = computed(() => {
+  return totalCodingTime.value - totalAiCodingTime.value;
+});
+
+const aiCodingPercent = computed(() => {
+  if (totalCodingTime.value === 0) return 0;
+  return Math.round((totalAiCodingTime.value / totalCodingTime.value) * 100);
+});
+
+const topCodingLanguages = computed(() => {
+  const langMap: Record<string, {
+    language: string;
+    total_seconds: number;
+    manual_seconds: number;
+    ai_seconds: number;
+    session_count: number;
+  }> = {};
+
+  props.sessions.forEach(s => {
+    const lang = s.language || 'Unknown';
+    if (!langMap[lang]) {
+      langMap[lang] = {
+        language: lang,
+        total_seconds: 0,
+        manual_seconds: 0,
+        ai_seconds: 0,
+        session_count: 0
+      };
+    }
+    const duration = s.duration_seconds || 0;
+    langMap[lang].total_seconds += duration;
+    langMap[lang].session_count += 1;
+    if (s.is_ai_assisted) {
+      langMap[lang].ai_seconds += duration;
+    } else {
+      langMap[lang].manual_seconds += duration;
+    }
+  });
+
+  return Object.values(langMap).sort((a, b) => b.total_seconds - a.total_seconds);
+});
+
+const topCodingProjects = computed(() => {
+  const projMap: Record<string, {
+    project_dir: string;
+    total_seconds: number;
+    ai_seconds: number;
+  }> = {};
+
+  props.sessions.forEach(s => {
+    const proj = s.project_dir || 'No Project';
+    if (!projMap[proj]) {
+      projMap[proj] = {
+        project_dir: proj,
+        total_seconds: 0,
+        ai_seconds: 0
+      };
+    }
+    const duration = s.duration_seconds || 0;
+    projMap[proj].total_seconds += duration;
+    if (s.is_ai_assisted) {
+      projMap[proj].ai_seconds += duration;
+    }
+  });
+
+  return Object.values(projMap).sort((a, b) => b.total_seconds - a.total_seconds);
+});
+
 const mostActiveLanguage = computed(() => {
-  if (store.topCodingLanguages.length === 0) return null;
-  const top = store.topCodingLanguages[0];
-  const pct = store.totalCodingTime > 0 ? Math.round((top.total_seconds / store.totalCodingTime) * 100) : 0;
+  if (topCodingLanguages.value.length === 0) return null;
+  const top = topCodingLanguages.value[0];
+  const pct = totalCodingTime.value > 0 ? Math.round((top.total_seconds / totalCodingTime.value) * 100) : 0;
   return { language: top.language, pct };
 });
 
@@ -243,7 +431,7 @@ const fileStats = computed(() => {
     manualSeconds: number;
   }> = {};
 
-  store.todayCodingSessions.forEach(session => {
+  props.sessions.forEach(session => {
     let file = session.file_path || 'Workspace / General';
     if (file.includes('/') || file.includes('\\')) {
       const parts = file.split(/[/\\]/);
@@ -362,7 +550,7 @@ function getAiPct(lang: { total_seconds: number; ai_seconds: number }): number {
 }
 
 function getProjectPct(proj: { total_seconds: number }): number {
-  const max = store.topCodingProjects[0]?.total_seconds || 1;
+  const max = topCodingProjects.value[0]?.total_seconds || 1;
   return Math.round((proj.total_seconds / max) * 100);
 }
 

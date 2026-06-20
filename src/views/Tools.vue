@@ -181,6 +181,24 @@
                     @input="handleInput"
                   />
                   <div class="editor-actions">
+                    <div class="mode-tabs">
+                      <button 
+                        class="mode-tab-btn" 
+                        :class="{ active: editorMode === 'edit' }" 
+                        @click="editorMode = 'edit'"
+                        :title="$t('tools.edit', 'Edit')"
+                      >
+                        {{ $t('tools.edit', 'Edit') }}
+                      </button>
+                      <button 
+                        class="mode-tab-btn" 
+                        :class="{ active: editorMode === 'preview' }" 
+                        @click="editorMode = 'preview'"
+                        :title="$t('tools.preview', 'Preview')"
+                      >
+                        {{ $t('tools.preview', 'Preview') }}
+                      </button>
+                    </div>
                     <button 
                       class="btn-insert-apps" 
                       @click="showAppsPanel = !showAppsPanel"
@@ -212,6 +230,26 @@
                       <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
                       Recent Tracked Apps
                     </span>
+                    <div class="insert-format-selector">
+                      <button 
+                        class="format-btn" 
+                        :class="{ active: insertFormat === 'name' }" 
+                        @click="insertFormat = 'name'"
+                        :title="$t('tools.insertFormatName', 'Name')"
+                      >{{ $t('tools.insertFormatName', 'Name') }}</button>
+                      <button 
+                        class="format-btn" 
+                        :class="{ active: insertFormat === 'logo' }" 
+                        @click="insertFormat = 'logo'"
+                        :title="$t('tools.insertFormatLogo', 'Logo')"
+                      >{{ $t('tools.insertFormatLogo', 'Logo') }}</button>
+                      <button 
+                        class="format-btn" 
+                        :class="{ active: insertFormat === 'both' }" 
+                        @click="insertFormat = 'both'"
+                        :title="$t('tools.insertFormatBoth', 'Both')"
+                      >{{ $t('tools.insertFormatBoth', 'Both') }}</button>
+                    </div>
                     <button class="btn-close-panel" @click="showAppsPanel = false">
                       <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                     </button>
@@ -224,6 +262,12 @@
                       @click="insertAppToNote(app.app_name)"
                       :style="{ background: getAppColor(app.app_name) }"
                     >
+                      <img 
+                        v-if="appIcons[app.app_name]" 
+                        :src="appIcons[app.app_name]" 
+                        class="app-chip-icon-img" 
+                        alt=""
+                      />
                       {{ app.app_name }}
                       <span class="app-time">{{ formatAppTime(app.total_seconds) }}</span>
                     </button>
@@ -231,6 +275,7 @@
                 </div>
 
                 <textarea
+                  v-if="editorMode === 'edit'"
                   v-model="selectedNote.content"
                   class="notepad-area custom-scrollbar"
                   :placeholder="
@@ -238,6 +283,11 @@
                   "
                   @input="handleInput"
                 ></textarea>
+                <div
+                  v-else
+                  class="notepad-preview markdown-body custom-scrollbar"
+                  v-html="previewHtml"
+                ></div>
               </div>
 
               <div v-else class="empty-editor">
@@ -255,15 +305,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { useI18n } from "vue-i18n";
 import { invoke } from "@tauri-apps/api/core";
 import ShutdownTimer from "../components/ShutdownTimer.vue";
-import TasksWidget from "../components/TasksWidget.vue";
 import FocusMode from "../components/FocusMode.vue";
 import TimeOut from "../components/TimeOut.vue";
+import TasksWidget from "../components/TasksWidget.vue";
 import { Icons } from "../components/icons/IconMap";
 import { useDebounceFn } from "@vueuse/core";
+import { marked } from "marked";
 
 const { locale } = useI18n();
 
@@ -285,6 +336,7 @@ interface Note {
 
 interface AppSummary {
   app_name: string;
+  exe_path: string;
   total_seconds: number;
 }
 
@@ -293,6 +345,9 @@ const selectedNote = ref<Note | null>(null);
 const isSaved = ref(true);
 const showAppsPanel = ref(false);
 const recentApps = ref<AppSummary[]>([]);
+const appIcons = ref<Record<string, string>>({});
+const editorMode = ref<'edit' | 'preview'>('edit');
+const insertFormat = ref<'name' | 'logo' | 'both'>('both');
 
 const STORAGE_KEY = "timigs_notes";
 
@@ -363,10 +418,37 @@ function deleteNote(id: string) {
   }
 }
 
+async function loadIcon(appName: string, path: string) {
+  if (appIcons.value[appName] || !path) return;
+  try {
+    const base64 = await invoke<string | null>("get_app_icon", { path });
+    if (base64) appIcons.value[appName] = `data:image/png;base64,${base64}`;
+  } catch {}
+}
+
 function insertAppToNote(appName: string) {
   if (!selectedNote.value) return;
   const timestamp = new Date().toLocaleTimeString();
-  const appendText = `\n[${timestamp}] ${appName}\n`;
+  
+  let appendText = '';
+  const iconBase64 = appIcons.value[appName];
+  
+  if (insertFormat.value === 'name') {
+    appendText = `\n[${timestamp}] ${appName}\n`;
+  } else if (insertFormat.value === 'logo') {
+    if (iconBase64) {
+      appendText = `\n![${appName}](${iconBase64})\n`;
+    } else {
+      appendText = `\n[${timestamp}] ${appName}\n`;
+    }
+  } else if (insertFormat.value === 'both') {
+    if (iconBase64) {
+      appendText = `\n[${timestamp}] ![${appName}](${iconBase64}) ${appName}\n`;
+    } else {
+      appendText = `\n[${timestamp}] ${appName}\n`;
+    }
+  }
+
   selectedNote.value.content += appendText;
   handleInput();
 }
@@ -394,10 +476,27 @@ async function loadRecentApps() {
       date: new Date().toISOString().split("T")[0],
     });
     recentApps.value = summary.sort((a, b) => b.total_seconds - a.total_seconds).slice(0, 20);
+    
+    // Load icons
+    recentApps.value.forEach((app) => {
+      if (app.exe_path) {
+        loadIcon(app.app_name, app.exe_path);
+      }
+    });
   } catch (e) {
     console.error("Failed to load recent apps", e);
   }
 }
+
+const previewHtml = computed(() => {
+  if (!selectedNote.value) return "";
+  try {
+    return marked.parse(selectedNote.value.content || "", { gfm: true, breaks: true });
+  } catch (e) {
+    console.error("Markdown parsing failed", e);
+    return selectedNote.value.content || "";
+  }
+});
 
 onMounted(async () => {
   loadNotes();
@@ -1620,5 +1719,191 @@ onMounted(async () => {
     grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
     max-height: 100px;
   }
+}
+
+/* App chip and icon styling */
+.app-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  color: #fff;
+  border: none;
+  font-weight: 500;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.1s ease;
+}
+
+.app-chip:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.app-chip-icon-img {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 1px;
+}
+
+/* Insert format selector inside apps-panel */
+.insert-format-selector {
+  display: flex;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 2px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  margin-right: 12px;
+  align-items: center;
+}
+
+.format-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.format-btn:hover {
+  color: #fff;
+}
+
+.format-btn.active {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+/* Mode tabs for Edit / Preview */
+.mode-tabs {
+  display: flex;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 2px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.mode-tab-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mode-tab-btn:hover {
+  color: #fff;
+}
+
+.mode-tab-btn.active {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+/* Markdown preview body styling */
+.notepad-preview {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  min-height: 250px;
+  text-align: left;
+}
+
+.markdown-body {
+  color: var(--text-normal);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  line-height: 1.6;
+}
+
+.markdown-body :deep(h1),
+.markdown-body :deep(h2),
+.markdown-body :deep(h3),
+.markdown-body :deep(h4) {
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+  font-weight: 600;
+  line-height: 1.25;
+  color: #fff;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 0.3em;
+}
+
+.markdown-body :deep(h1) { font-size: 1.5rem; }
+.markdown-body :deep(h2) { font-size: 1.3rem; }
+.markdown-body :deep(h3) { font-size: 1.15rem; }
+.markdown-body :deep(h4) { font-size: 1rem; }
+
+.markdown-body :deep(p) {
+  margin-top: 0;
+  margin-bottom: 12px;
+}
+
+.markdown-body :deep(ul),
+.markdown-body :deep(ol) {
+  margin-top: 0;
+  margin-bottom: 16px;
+  padding-left: 20px;
+}
+
+.markdown-body :deep(li) {
+  margin-top: 4px;
+}
+
+.markdown-body :deep(code) {
+  padding: 3px 6px;
+  margin: 0;
+  font-size: 85%;
+  background-color: rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  font-family: monospace;
+}
+
+.markdown-body :deep(pre) {
+  padding: 16px;
+  overflow: auto;
+  font-size: 85%;
+  line-height: 1.45;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  margin-bottom: 16px;
+}
+
+.markdown-body :deep(pre code) {
+  padding: 0;
+  margin: 0;
+  font-size: 100%;
+  background-color: transparent;
+  border: 0;
+}
+
+.markdown-body :deep(img[src^="data:image/"]) {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  vertical-align: middle;
+  display: inline-block;
+  margin-top: -3px;
+  margin-right: 6px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 2px;
+}
+
+.markdown-body :deep(img:not([src^="data:image/"])) {
+  max-width: 100%;
+  border-radius: 6px;
 }
 </style>

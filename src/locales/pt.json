@@ -221,7 +221,12 @@
     "deleteNote": "Excluir",
     "noNotes": "Nenhuma nota ainda",
     "untitled": "Nota Sem Título",
-    "selectNoteHint": "Selecione uma nota para visualizar ou crie uma nova"
+    "selectNoteHint": "Selecione uma nota para visualizar ou crie uma nova",
+    "edit": "Editar",
+    "preview": "Pré-visualização",
+    "insertFormatName": "Nome",
+    "insertFormatLogo": "Logo",
+    "insertFormatBoth": "Ambos"
   },
   "tasks": {
     "title": "Tarefas e Metas",
@@ -238,7 +243,10 @@
     "exportCsv": "Exportar CSV",
     "noCompletedTasks": "Nenhuma tarefa concluída encontrada.",
     "websiteTitleKeyword": "Website / Palavra-chave do título",
-    "optional": "Opcional"
+    "optional": "Opcional",
+    "statusActive": "Ativo",
+    "statusCompleted": "Concluído",
+    "statusFailed": "Falhou"
   },
   "weather": {
     "title": "Clima e Atividade"

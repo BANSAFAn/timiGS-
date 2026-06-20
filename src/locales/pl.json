@@ -221,7 +221,12 @@
     "deleteNote": "Usuń",
     "noNotes": "Brak notatek",
     "untitled": "Notatka Bez Tytułu",
-    "selectNoteHint": "Wybierz notatkę do wyświetlenia lub utwórz nową"
+    "selectNoteHint": "Wybierz notatkę do wyświetlenia lub utwórz nową",
+    "edit": "Edytuj",
+    "preview": "Podgląd",
+    "insertFormatName": "Nazwa",
+    "insertFormatLogo": "Logo",
+    "insertFormatBoth": "Oba"
   },
   "tasks": {
     "title": "Zadania i Cele",
@@ -238,7 +243,10 @@
     "exportCsv": "Eksportuj do CSV",
     "noCompletedTasks": "Brak ukończonych zadań.",
     "websiteTitleKeyword": "Strona / Słowo kluczowe",
-    "optional": "Opcjonalnie"
+    "optional": "Opcjonalnie",
+    "statusActive": "Aktywny",
+    "statusCompleted": "Ukończono",
+    "statusFailed": "Nie powiodło się"
   },
   "weather": {
     "title": "Pogoda i Aktywność"
