@@ -154,7 +154,10 @@ pub fn run() {
         }
 
         #[cfg(target_os = "windows")]
-        timeout::init_keyboard_hook();
+        {
+            *timeout::GLOBAL_APP_HANDLE.lock() = Some(app.handle().clone());
+            timeout::init_keyboard_hook();
+        }
 
         // Setup Tray Icon (desktop only)
         #[cfg(desktop)]
@@ -166,6 +169,7 @@ pub fn run() {
 
         let _ = music::init_music_dir(app.handle());
         music::load_music_paths(app.handle());
+        music::load_music_settings(app.handle());
 
         // Start auto-export timer
         std::thread::spawn(move || {
@@ -294,6 +298,8 @@ pub fn run() {
             commands::get_music_status_cmd,
             commands::set_music_volume_cmd,
             commands::toggle_music_loop_cmd,
+            commands::get_music_settings_cmd,
+            commands::set_music_settings_cmd,
             // Notifications
             notifications::send_notification_cmd,
             // Coding Tracker

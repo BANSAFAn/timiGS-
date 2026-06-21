@@ -302,7 +302,14 @@
     "toggleLoop": "Alternar repetição",
     "selectTrackPlaceholder": "Selecionar uma faixa...",
     "otherAppsBlocked": "Outros aplicativos serão bloqueados",
-    "enterPasswordCancel": "Digite a senha para cancelar..."
+    "enterPasswordCancel": "Digite a senha para cancelar...",
+    "musicFolder": "Pasta de música:",
+    "defaultFolder": "Pasta padrão do aplicativo",
+    "playbackMode": "Modo de reprodução:",
+    "playSingle": "Reproduzir faixa selecionada",
+    "playAll": "Reproduzir pasta",
+    "bypassTitle": "MANTENHA O FOCO! 🎯",
+    "bypassBody": "TRABALHE, POR QUE VOCÊ PRECISA DELAS, VOCÊ DEVE TRABALHAR! FOQUE-SE !!!!!!"
   },
   "timeout": {
     "title": "Time OUT",
@@ -354,7 +361,16 @@
     "breakTo": "Até",
     "simpleBreaks": "Pausas Simples",
     "scheduleMode": "Modo Agendado",
-    "allAppsBlocked": "Todos os aplicativos são bloqueados durante a pausa"
+    "allAppsBlocked": "Todos os aplicativos são bloqueados durante a pausa",
+    "musicFolder": "Pasta de música:",
+    "defaultFolder": "Pasta padrão do aplicativo",
+    "playbackMode": "Modo de reprodução:",
+    "playSingle": "Reproduzir uma faixa",
+    "playAll": "Reproduzir pasta (Tudo)",
+    "timeToRest": "Hora de descansar!",
+    "takeBreakRelax": "Faça uma pausa, tome um chá e relaxe.",
+    "bypassTitle": "POR FAVOR, FAÇA UMA PAUSA! ☕",
+    "bypassBody": "VÁ BEBER UM CHÁ, RELAXE, VOCÊ TEM TEMPO, RELAXE POR FAVOR !!!!!!!!"
   },
   "common": {
     "loading": "Carregando...",
@@ -398,7 +414,8 @@
     "hours_word": "horas",
     "na": "N/D",
     "none": "—",
-    "ai": "IA"
+    "ai": "IA",
+    "reset": "Redefinir"
   },
   "team": {
     "title": "Team",

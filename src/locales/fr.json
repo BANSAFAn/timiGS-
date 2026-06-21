@@ -303,7 +303,14 @@
     "toggleLoop": "Activer la boucle",
     "selectTrackPlaceholder": "Sélectionner une piste...",
     "otherAppsBlocked": "Les autres applications seront bloquées",
-    "enterPasswordCancel": "Entrez le mot de passe pour annuler..."
+    "enterPasswordCancel": "Entrez le mot de passe pour annuler...",
+    "musicFolder": "Dossier de musique :",
+    "defaultFolder": "Dossier par défaut",
+    "playbackMode": "Mode de lecture :",
+    "playSingle": "Lire la piste sélectionnée",
+    "playAll": "Lire le dossier",
+    "bypassTitle": "RESTE FOCALISÉ ! 🎯",
+    "bypassBody": "TRAVAILLE, POURQUOI EN AS-TU BESOIN, TU DOIS TRAVAILLER ! CONCENTRE-TOI !!!!!!"
   },
   "timeout": {
     "title": "Time OUT",
@@ -355,7 +362,16 @@
     "breakTo": "À",
     "simpleBreaks": "Pauses Simples",
     "scheduleMode": "Mode Planifié",
-    "allAppsBlocked": "Toutes les applications sont bloquées pendant la pause"
+    "allAppsBlocked": "Toutes les applications sont bloquées pendant la pause",
+    "musicFolder": "Dossier de musique :",
+    "defaultFolder": "Dossier par défaut",
+    "playbackMode": "Mode de lecture :",
+    "playSingle": "Lire une seule piste",
+    "playAll": "Lire le dossier (Tout)",
+    "timeToRest": "Temps de se reposer !",
+    "takeBreakRelax": "Faites une pause, buvez du thé et détendez-vous.",
+    "bypassTitle": "FAITES UNE PAUSE S'IL VOUS PLAÎT ! ☕",
+    "bypassBody": "VA BOIRE DU THÉ, DETENDS-TOI, TU AS LE TEMPS, DETENDS-TOI S'IL TE PLAÎT !!!!!!!!"
   },
   "common": {
     "loading": "Chargement...",
@@ -399,7 +415,8 @@
     "hours_word": "heures",
     "na": "N/A",
     "none": "—",
-    "ai": "IA"
+    "ai": "IA",
+    "reset": "Réinitialiser"
   },
   "team": {
     "title": "Team",

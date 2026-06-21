@@ -6,8 +6,11 @@
   >
     <div class="overlay-content">
       <div class="overlay-emoji" v-html="Icons.timeoutBreak"></div>
-      <h2>Time to Rest!</h2>
-      <p>Take a break, drink some tea, and relax.</p>
+      <h2>{{ t('timeout.timeToRest', 'Time to Rest!') }}</h2>
+      <p>{{ t('timeout.takeBreakRelax', 'Take a break, drink some tea, and relax.') }}</p>
+      <div v-if="bypassMessage" class="bypass-warning-banner">
+        {{ bypassMessage }}
+      </div>
       <div class="overlay-timer">{{ breakFormattedTime }}</div>
 
       
@@ -32,11 +35,11 @@
           type="password"
           v-model="overlayCancelPassword"
           class="overlay-input"
-          placeholder="Enter password to cancel..."
+          :placeholder="t('timeout.passwordPlaceholder', 'Enter password...')"
           @keydown.enter="stopTimeoutOverlay"
         />
         <button @click="stopTimeoutOverlay" class="overlay-btn">
-          Cancel
+          {{ t('common.cancel', 'Cancel') }}
         </button>
         <p v-if="overlayCancelError" class="error-text">
           {{ overlayCancelError }}
@@ -45,13 +48,14 @@
     </div>
   </div>
 </template>
-
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from "vue";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
-import { readFile } from "@tauri-apps/plugin-fs";
+import { useI18n } from "vue-i18n";
 import { Icons } from "./icons/IconMap";
+
+const { t } = useI18n();
 
 
 interface TimeoutStatus {
@@ -70,7 +74,7 @@ let pollInterval: number | null = null;
 
 
 const isPlaying = ref(false);
-const audio = ref<HTMLAudioElement | null>(null);
+const bypassMessage = ref("");
 const volume = ref(0.5);
 const musicFiles = ref<any[]>([]);
 const selectedMusic = ref<string>("");
@@ -116,46 +120,51 @@ async function loadStatus() {
 }
 
 async function manageAudio(breakActive: boolean) {
-  if (breakActive && !audio.value && playMusicDuringBreak.value) {
+  const savedPlayState = localStorage.getItem("timigs-timeout-play");
+  if (savedPlayState !== null) playMusicDuringBreak.value = savedPlayState === "true";
+  const savedMusic = localStorage.getItem("timigs-timeout-music");
+  if (savedMusic) selectedMusic.value = savedMusic;
+
+  if (breakActive && playMusicDuringBreak.value) {
     await loadMusicFiles();
     const selected = musicFiles.value.find(f => f.filename === selectedMusic.value);
 
     if (selected) {
       try {
-        const fileData = await readFile(selected.path);
-        const blob = new Blob([fileData], { type: 'audio/mpeg' });
-        const blobUrl = URL.createObjectURL(blob);
-        
-        audio.value = new Audio(blobUrl);
-        audio.value.loop = true;
-        audio.value.volume = volume.value;
-        await audio.value.play();
+        await invoke("play_music_cmd", { filename: selected.path });
+        await invoke("set_music_volume_cmd", { volume: volume.value });
         isPlaying.value = true;
       } catch (e) {
         console.error("Global overlay: Failed to play selected audio:", e);
         isPlaying.value = false;
       }
     }
-  } else if (!breakActive && audio.value) {
-    audio.value.pause();
-    audio.value = null;
+  } else {
+    try {
+      await invoke("stop_music_cmd");
+    } catch (e) {}
     isPlaying.value = false;
   }
 }
 
-function toggleMusic() {
-  if (!audio.value) return;
-  if (isPlaying.value) {
-    audio.value.pause();
-  } else {
-    audio.value.play().catch(e => console.error("Error playing audio on toggle:", e));
+async function toggleMusic() {
+  try {
+    if (isPlaying.value) {
+      await invoke("pause_music_cmd");
+    } else {
+      await invoke("resume_music_cmd");
+    }
+    isPlaying.value = !isPlaying.value;
+  } catch (e) {
+    console.error("Error toggling music playback:", e);
   }
-  isPlaying.value = !isPlaying.value;
 }
 
-function updateVolume() {
-  if (audio.value) {
-    audio.value.volume = volume.value;
+async function updateVolume() {
+  try {
+    await invoke("set_music_volume_cmd", { volume: volume.value });
+  } catch (e) {
+    console.error("Error updating music volume:", e);
   }
 }
 
@@ -165,7 +174,7 @@ async function stopTimeoutOverlay() {
     await invoke("stop_timeout_cmd", { password: overlayCancelPassword.value });
     overlayCancelPassword.value = "";
     status.value = null;
-    manageAudio(false);
+    await manageAudio(false);
     if (pollInterval) {
       clearInterval(pollInterval);
       pollInterval = null;
@@ -181,7 +190,7 @@ function startPolling() {
     const s = await invoke<TimeoutStatus | null>("get_timeout_status_cmd");
     if (!s || !s.active) {
       status.value = null;
-      manageAudio(false);
+      await manageAudio(false);
       if (pollInterval) {
         clearInterval(pollInterval);
         pollInterval = null;
@@ -190,16 +199,14 @@ function startPolling() {
       const wasBreakActive = status.value?.break_active || false;
       status.value = s;
       if (s.break_active !== wasBreakActive) {
-        manageAudio(s.break_active);
+        await manageAudio(s.break_active);
       }
     }
   }, 1000);
 }
 
 onMounted(async () => {
-
   await loadStatus();
-  
 
   const savedMusic = localStorage.getItem("timigs-timeout-music");
   if (savedMusic) selectedMusic.value = savedMusic;
@@ -209,25 +216,26 @@ onMounted(async () => {
   await listen("timeout-break-start", () => {
     loadStatus();
   });
-  await listen("timeout-break-end", () => {
-    if (audio.value) {
-      audio.value.pause();
-      audio.value = null;
-      isPlaying.value = false;
-    }
+  await listen("timeout-break-end", async () => {
+    await manageAudio(false);
     loadStatus();
   });
   await listen("timeout-schedule-triggered", () => {
     loadStatus();
   });
+  await listen("timeout-bypass-attempt", () => {
+    const title = t("timeout.bypassTitle", "PLEASE TAKE A BREAK! ☕");
+    const body = t("timeout.bypassBody", "GO DRINK TEA, RELAX, YOU HAVE TIME, RELAX PLEASE !!!!!!!! ");
+    bypassMessage.value = body;
+    setTimeout(() => {
+      bypassMessage.value = "";
+    }, 6000);
+    invoke("send_notification_cmd", { title, body }).catch(() => {});
+  });
 });
 
-onUnmounted(() => {
-  if (audio.value) {
-    audio.value.pause();
-    audio.value = null;
-    isPlaying.value = false;
-  }
+onUnmounted(async () => {
+  await manageAudio(false);
   if (pollInterval) {
     clearInterval(pollInterval);
   }
@@ -378,5 +386,24 @@ onUnmounted(() => {
     opacity: 1;
     transform: scale(1);
   }
+}
+.bypass-warning-banner {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  padding: 12px 24px;
+  border-radius: 10px;
+  font-weight: 800;
+  font-size: 1.05rem;
+  margin-top: 10px;
+  margin-bottom: 5px;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  animation: flash 1s infinite alternate;
+  text-align: center;
+  max-width: 90%;
+}
+
+@keyframes flash {
+  from { box-shadow: 0 0 10px rgba(239, 68, 68, 0.2); }
+  to { box-shadow: 0 0 20px rgba(239, 68, 68, 0.5); }
 }
 </style>

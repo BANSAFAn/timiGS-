@@ -303,7 +303,14 @@
     "toggleLoop": "循环播放",
     "selectTrackPlaceholder": "选择音轨...",
     "otherAppsBlocked": "其他应用将被屏蔽",
-    "enterPasswordCancel": "输入密码以取消..."
+    "enterPasswordCancel": "输入密码以取消...",
+    "musicFolder": "音乐文件夹：",
+    "defaultFolder": "默认应用文件夹",
+    "playbackMode": "播放模式：",
+    "playSingle": "播放选中音轨",
+    "playAll": "播放整个文件夹",
+    "bypassTitle": "保持专注！ 🎯",
+    "bypassBody": "工作吧，要那些干什么，你必须工作！专注点！！！"
   },
   "timeout": {
     "title": "休息时间",
@@ -355,7 +362,16 @@
     "breakTo": "到",
     "simpleBreaks": "简单休息",
     "scheduleMode": "计划模式",
-    "allAppsBlocked": "休息期间所有应用将被屏蔽"
+    "allAppsBlocked": "休息期间所有应用将被屏蔽",
+    "musicFolder": "音乐文件夹：",
+    "defaultFolder": "默认应用文件夹",
+    "playbackMode": "播放模式：",
+    "playSingle": "播放单首音轨",
+    "playAll": "播放整个文件夹（全部）",
+    "timeToRest": "休息时间！",
+    "takeBreakRelax": "休息一下，喝杯茶，放松放松。",
+    "bypassTitle": "请休息一下！ ☕",
+    "bypassBody": "去喝杯茶，休息一下，你有时间的，请务必休息休息！！！"
   },
   "common": {
     "loading": "加载中...",
@@ -399,7 +415,8 @@
     "hours_word": "小时",
     "na": "无",
     "none": "—",
-    "ai": "AI"
+    "ai": "AI",
+    "reset": "重置"
   },
   "team": {
     "title": "Team",

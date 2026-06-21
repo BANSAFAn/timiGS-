@@ -12,6 +12,10 @@ use std::time::Duration;
 static FOCUS_STATE: Lazy<Mutex<Option<FocusSession>>> = Lazy::new(|| Mutex::new(None));
 static FOCUS_RUNNING: AtomicBool = AtomicBool::new(false);
 
+use std::sync::atomic::AtomicU32;
+pub static GLOBAL_APP_HANDLE: Lazy<Mutex<Option<tauri::AppHandle>>> = Lazy::new(|| Mutex::new(None));
+pub static FOCUS_BYPASS_ATTEMPTS: AtomicU32 = AtomicU32::new(0);
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct FocusStatus {
     pub active: bool,
@@ -46,7 +50,7 @@ pub fn start_focus(
     if FOCUS_RUNNING.load(Ordering::SeqCst) {
         return Err("Focus mode is already active".to_string());
     }
-
+// виправити проблему що бере іноді не той шлях до файлу
     let remaining = Arc::new(std::sync::atomic::AtomicU64::new(duration_secs));
     let password_hash = simple_hash(password);
 
@@ -58,6 +62,7 @@ pub fn start_focus(
         total_secs: duration_secs,
     });
 
+    FOCUS_BYPASS_ATTEMPTS.store(0, Ordering::SeqCst);
     FOCUS_RUNNING.store(true, Ordering::SeqCst);
 
     let _target_exe = exe_path.to_lowercase();
@@ -120,7 +125,7 @@ fn enforce_focus(target_exe_lower: &str) {
     use windows::Win32::Foundation::{BOOL, HWND, LPARAM};
     use windows::Win32::UI::WindowsAndMessaging::{
         EnumWindows, GetForegroundWindow, GetWindowThreadProcessId, IsWindowVisible,
-        SetForegroundWindow, ShowWindow, SW_MINIMIZE, SW_RESTORE,
+        SetForegroundWindow, ShowWindow, SW_MINIMIZE, SW_RESTORE, GetWindowTextW, GetClassNameW,
     };
 
     unsafe {
@@ -136,20 +141,70 @@ fn enforce_focus(target_exe_lower: &str) {
         }
         let fg_exe = get_process_exe(process_id);
         let fg_exe_lower = fg_exe.to_lowercase();
-        let is_allowed = fg_exe_lower.contains(target_exe_lower)
-            || fg_exe_lower.contains("explorer.exe")
-            || fg_exe_lower.contains("timigs")
-            || fg_exe_lower.contains("msedgewebview2")
-            || fg_exe_lower.contains("webview2");
+
+        // Get window class name
+        let mut class_buf = [0u16; 256];
+        let class_len = GetClassNameW(hwnd, &mut class_buf);
+        let class_name = if class_len > 0 {
+            String::from_utf16_lossy(&class_buf[..class_len as usize])
+        } else {
+            String::new()
+        };
+        let class_name_lower = class_name.to_lowercase();
+
+        // Get window title
+        let mut title_buf = [0u16; 512];
+        let title_len = GetWindowTextW(hwnd, &mut title_buf);
+        let title_name = if title_len > 0 {
+            String::from_utf16_lossy(&title_buf[..title_len as usize])
+        } else {
+            String::new()
+        };
+        let title_name_lower = title_name.to_lowercase();
+
+        let mut is_allowed = fg_exe_lower.contains(target_exe_lower);
 
         if !is_allowed {
-            // Minimize the non-allowed window
+            // Check if it's the app itself (TimiGS), but not its DevTools
+            if (fg_exe_lower.contains("timigs")
+                || fg_exe_lower.contains("msedgewebview2")
+                || fg_exe_lower.contains("webview2"))
+                && !title_name_lower.contains("devtools")
+            {
+                is_allowed = true;
+            }
+        }
+
+        if !is_allowed {
+            // Check if it's explorer.exe, but only allowed parts (like taskbar/tray).
+            // Block desktop (Progman, WorkerW) and file explorer (CabinetWClass, ExploreWClass)
+            if fg_exe_lower.contains("explorer.exe") {
+                let is_blocked_class = class_name_lower.contains("progman")
+                    || class_name_lower.contains("workerw")
+                    || class_name_lower.contains("cabinetwclass")
+                    || class_name_lower.contains("explorewclass");
+                if !is_blocked_class {
+                    is_allowed = true;
+                }
+            }
+        }
+
+        if !is_allowed {
             let _ = ShowWindow(hwnd, SW_MINIMIZE);
+            
+            let attempts = FOCUS_BYPASS_ATTEMPTS.fetch_add(1, Ordering::SeqCst) + 1;
+            if attempts >= 5 {
+                FOCUS_BYPASS_ATTEMPTS.store(0, Ordering::SeqCst);
+                if let Some(app_handle) = GLOBAL_APP_HANDLE.lock().as_ref() {
+                    let app_handle_clone = app_handle.clone();
+                    thread::spawn(move || {
+                        use tauri::Emitter;
+                        let _ = app_handle_clone.emit("focus-bypass-attempt", ());
+                    });
+                }
+            }
 
-            // Find the target app's window and bring it to foreground
             let target_owned = target_exe_lower.to_string();
-
-            // Use a closure to enumerate windows and find the target
             struct EnumData {
                 target: String,
                 found: Option<HWND>,
@@ -196,7 +251,6 @@ fn enforce_focus(target_exe_lower: &str) {
     }
 }
 
-/// Helper: get the exe path for a given process ID on Windows.
 #[cfg(target_os = "windows")]
 fn get_process_exe(process_id: u32) -> String {
     use windows::Win32::System::Threading::{

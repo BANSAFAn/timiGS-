@@ -303,7 +303,14 @@
     "toggleLoop": "Wiederholung umschalten",
     "selectTrackPlaceholder": "Titel auswählen...",
     "otherAppsBlocked": "Andere Apps werden blockiert",
-    "enterPasswordCancel": "Passwort zum Abbrechen..."
+    "enterPasswordCancel": "Passwort zum Abbrechen...",
+    "musicFolder": "Musikordner:",
+    "defaultFolder": "Standard-App-Ordner",
+    "playbackMode": "Wiedergabemodus:",
+    "playSingle": "Ausgewählten Titel abspielen",
+    "playAll": "Ordner abspielen",
+    "bypassTitle": "BLEIB FOKUSSIERT! 🎯",
+    "bypassBody": "ARBEITE, WOZU BRAUCHST DU SIE, DU MUSST ARBEITEN! FOKUSSIERE DICH !!!!!!"
   },
   "timeout": {
     "title": "Time OUT",
@@ -355,7 +362,16 @@
     "breakTo": "Bis",
     "simpleBreaks": "Einfache Pausen",
     "scheduleMode": "Zeitplan-Modus",
-    "allAppsBlocked": "Alle Anwendungen sind während der Pause gesperrt"
+    "allAppsBlocked": "Alle Anwendungen sind während der Pause gesperrt",
+    "musicFolder": "Musikordner:",
+    "defaultFolder": "Standard-App-Ordner",
+    "playbackMode": "Wiedergabemodus:",
+    "playSingle": "Einzelnen Titel abspielen",
+    "playAll": "Ordner abspielen (Alle)",
+    "timeToRest": "Zeit zum Ausruhen!",
+    "takeBreakRelax": "Machen Sie eine Pause, trinken Sie etwas Tee und entspannen Sie sich.",
+    "bypassTitle": "BITTE MACH EINE PAUSE! ☕",
+    "bypassBody": "GEH TEE TRINKEN, ENTSPANN DICH, DU HAST ZEIT, BITTE ENTSPANN DICH ENTLICH !!!!!!!!"
   },
   "common": {
     "loading": "Wird geladen...",
@@ -399,7 +415,8 @@
     "hours_word": "Stunden",
     "na": "N/V",
     "none": "—",
-    "ai": "KI"
+    "ai": "KI",
+    "reset": "Zurücksetzen"
   },
   "team": {
     "title": "Team",

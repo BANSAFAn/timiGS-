@@ -505,11 +505,13 @@ pub fn emit_navigate_cmd(app: tauri::AppHandle, path: String) {
 
 #[command]
 pub fn start_focus_cmd(
+    app_handle: tauri::AppHandle,
     app_name: String,
     exe_path: String,
     duration_secs: u64,
     password: String,
 ) -> Result<(), String> {
+    *crate::focus::GLOBAL_APP_HANDLE.lock() = Some(app_handle);
     crate::focus::start_focus(&app_name, &exe_path, duration_secs, &password)
 }
 
@@ -693,7 +695,15 @@ pub fn add_music_file_cmd(
 
 #[tauri::command]
 pub fn delete_music_file_cmd(app_handle: tauri::AppHandle, path: String) -> Result<(), String> {
-    crate::music::remove_music_path(&app_handle, path)
+    let _ = crate::music::stop_music();
+    let _ = crate::music::remove_music_path(&app_handle, path.clone());
+    
+    let file_path = std::path::Path::new(&path);
+    if file_path.exists() && file_path.is_file() {
+        std::fs::remove_file(file_path)
+            .map_err(|e| format!("Failed to delete file from disk: {}", e))?;
+    }
+    Ok(())
 }
 
 #[tauri::command]
@@ -736,6 +746,21 @@ pub fn set_music_volume_cmd(volume: f32) -> Result<(), String> {
 #[tauri::command]
 pub fn toggle_music_loop_cmd() -> Result<bool, String> {
     crate::music::toggle_music_loop()
+}
+
+#[tauri::command]
+pub fn get_music_settings_cmd() -> Result<crate::music::MusicSettings, String> {
+    Ok(crate::music::get_music_settings())
+}
+
+#[tauri::command]
+pub fn set_music_settings_cmd(
+    app_handle: tauri::AppHandle,
+    custom_dir: Option<String>,
+    playlist_mode: String,
+    loop_enabled: bool,
+) -> Result<(), String> {
+    crate::music::set_music_settings(&app_handle, custom_dir, playlist_mode, loop_enabled)
 }
 
 // ── Data Management ──

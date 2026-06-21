@@ -43,7 +43,17 @@ static MUSIC_STATE: Lazy<Mutex<MusicState>> = Lazy::new(|| {
     })
 });
 
-static LOOP_ENABLED: AtomicBool = AtomicBool::new(false);
+pub static LOOP_ENABLED: AtomicBool = AtomicBool::new(false);
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct MusicSettings {
+    pub custom_dir: Option<String>,
+    pub playlist_mode: String,
+    pub loop_enabled: bool,
+}
+
+pub static PLAYLIST_MODE: Lazy<RwLock<String>> = Lazy::new(|| RwLock::new("single".to_string()));
+pub static CUSTOM_DIR: Lazy<RwLock<Option<String>>> = Lazy::new(|| RwLock::new(None));
 
 // Store custom music paths
 static MUSIC_PATHS: Lazy<RwLock<Vec<String>>> = Lazy::new(|| RwLock::new(Vec::new()));
@@ -76,6 +86,40 @@ pub fn save_music_paths(app_handle: &AppHandle) -> Result<(), String> {
     Ok(())
 }
 
+fn get_music_settings_file(app_handle: &AppHandle) -> PathBuf {
+    let app_data_dir = app_handle
+        .path()
+        .app_data_dir()
+        .expect("Failed to get app data dir");
+    app_data_dir.join("music_settings.json")
+}
+
+pub fn load_music_settings(app_handle: &AppHandle) {
+    let file = get_music_settings_file(app_handle);
+    if file.exists() {
+        if let Ok(content) = fs::read_to_string(&file) {
+            if let Ok(settings) = serde_json::from_str::<MusicSettings>(&content) {
+                *CUSTOM_DIR.write() = settings.custom_dir;
+                *PLAYLIST_MODE.write() = settings.playlist_mode;
+                LOOP_ENABLED.store(settings.loop_enabled, Ordering::SeqCst);
+            }
+        }
+    }
+}
+
+pub fn save_music_settings(app_handle: &AppHandle) -> Result<(), String> {
+    let file = get_music_settings_file(app_handle);
+    let settings = MusicSettings {
+        custom_dir: CUSTOM_DIR.read().clone(),
+        playlist_mode: PLAYLIST_MODE.read().clone(),
+        loop_enabled: LOOP_ENABLED.load(Ordering::SeqCst),
+    };
+    let json = serde_json::to_string_pretty(&settings).map_err(|e| e.to_string())?;
+    let mut f = fs::File::create(&file).map_err(|e| e.to_string())?;
+    f.write_all(json.as_bytes()).map_err(|e| e.to_string())?;
+    Ok(())
+}
+
 pub fn get_music_dir(app_handle: &AppHandle) -> Result<PathBuf, String> {
     let app_data_dir = app_handle
         .path()
@@ -102,19 +146,26 @@ pub fn get_music_files(app_handle: &AppHandle) -> Result<Vec<MusicFile>, String>
     let mut files = Vec::new();
     
     // Get files from music directory
-    let music_dir = get_music_dir(&app_handle)?;
-    if let Ok(entries) = fs::read_dir(music_dir) {
-        for entry in entries.flatten() {
-            let path = entry.path();
-            if path.is_file() {
-                if let Some(ext) = path.extension().and_then(|e| e.to_str()) {
-                    let ext = ext.to_lowercase();
-                    if ext == "mp3" || ext == "wav" || ext == "ogg" || ext == "flac" {
-                        if let Some(filename) = path.file_name().and_then(|n| n.to_str()) {
-                            files.push(MusicFile {
-                                filename: filename.to_string(),
-                                path: path.to_string_lossy().to_string(),
-                            });
+    let music_dir = if let Some(custom) = CUSTOM_DIR.read().as_ref() {
+        PathBuf::from(custom)
+    } else {
+        get_music_dir(&app_handle)?
+    };
+
+    if music_dir.exists() && music_dir.is_dir() {
+        if let Ok(entries) = fs::read_dir(music_dir) {
+            for entry in entries.flatten() {
+                let path = entry.path();
+                if path.is_file() {
+                    if let Some(ext) = path.extension().and_then(|e| e.to_str()) {
+                        let ext = ext.to_lowercase();
+                        if ext == "mp3" || ext == "wav" || ext == "ogg" || ext == "flac" {
+                            if let Some(filename) = path.file_name().and_then(|n| n.to_str()) {
+                                files.push(MusicFile {
+                                    filename: filename.to_string(),
+                                    path: path.to_string_lossy().to_string(),
+                                });
+                            }
                         }
                     }
                 }
@@ -235,14 +286,17 @@ pub fn open_music_folder(app_handle: &AppHandle) -> Result<(), String> {
 use std::time::Duration;
 
 pub fn play_music(app_handle: &AppHandle, file_path: &str) -> Result<(), String> {
-    // Try to open the file directly first (for custom paths)
+    let _ = stop_music();
     let path = Path::new(file_path);
     
-    // If file doesn't exist at given path, try music directory
-    let actual_path = if path.exists() {
+    let actual_path = if path.exists() && path.is_file() {
         path.to_path_buf()
     } else {
-        let music_dir = get_music_dir(app_handle)?;
+        let music_dir = if let Some(custom) = CUSTOM_DIR.read().as_ref() {
+            PathBuf::from(custom)
+        } else {
+            get_music_dir(app_handle)?
+        };
         let track_path = music_dir.join(file_path);
         if !track_path.exists() {
             return Err("Track file not found".to_string());
@@ -268,6 +322,11 @@ pub fn play_music(app_handle: &AppHandle, file_path: &str) -> Result<(), String>
         .unwrap_or(file_path)
         .to_string();
 
+    let current_vol = {
+        let state = MUSIC_STATE.lock();
+        state.volume
+    };
+
     {
         let mut state = MUSIC_STATE.lock();
         state.output_stream = Some(output_stream);
@@ -278,10 +337,9 @@ pub fn play_music(app_handle: &AppHandle, file_path: &str) -> Result<(), String>
 
     if let Some(sink) = MUSIC_STATE.lock().sink.as_ref() {
         sink.append(source);
-        sink.set_volume(0.5);
+        sink.set_volume(current_vol);
     }
 
-    let path_clone = actual_path.to_string_lossy().to_string();
     let app_handle_clone = app_handle.clone();
     thread::spawn(move || {
         loop {
@@ -292,13 +350,25 @@ pub fn play_music(app_handle: &AppHandle, file_path: &str) -> Result<(), String>
                 }
                 if let Some(sink) = state.sink.as_ref() {
                     if sink.empty() {
-                        if LOOP_ENABLED.load(Ordering::SeqCst) {
+                        let playlist_mode = PLAYLIST_MODE.read().clone();
+                        if playlist_mode == "all" {
                             drop(state);
-                            let _ = play_music(&app_handle_clone, &path_clone);
+                            let _ = play_next_track(&app_handle_clone);
                         } else {
-                            let mut state = MUSIC_STATE.lock();
-                            state.is_playing = false;
-                            state.current_track = None;
+                            if LOOP_ENABLED.load(Ordering::SeqCst) {
+                                drop(state);
+                                let track_filename = {
+                                    let mut s = MUSIC_STATE.lock();
+                                    s.current_track.clone()
+                                };
+                                if let Some(tf) = track_filename {
+                                    let _ = play_music(&app_handle_clone, &tf);
+                                }
+                            } else {
+                                let mut state = MUSIC_STATE.lock();
+                                state.is_playing = false;
+                                state.current_track = None;
+                            }
                         }
                         break;
                     }
@@ -311,6 +381,89 @@ pub fn play_music(app_handle: &AppHandle, file_path: &str) -> Result<(), String>
     });
 
     Ok(())
+}
+
+pub fn play_next_track(app_handle: &AppHandle) -> Result<(), String> {
+    let current_track = {
+        let state = MUSIC_STATE.lock();
+        state.current_track.clone()
+    };
+    
+    let files = get_music_files(app_handle)?;
+    if files.is_empty() {
+        let mut state = MUSIC_STATE.lock();
+        state.is_playing = false;
+        state.current_track = None;
+        return Ok(());
+    }
+    
+    let next_track = if let Some(current) = current_track {
+        if let Some(pos) = files.iter().position(|f| f.filename == current) {
+            let next_pos = pos + 1;
+            if next_pos < files.len() {
+                Some(files[next_pos].clone())
+            } else if LOOP_ENABLED.load(Ordering::SeqCst) {
+                Some(files[0].clone())
+            } else {
+                None
+            }
+        } else {
+            Some(files[0].clone())
+        }
+    } else {
+        Some(files[0].clone())
+    };
+    
+    if let Some(track) = next_track {
+        let _ = stop_music();
+        play_music(app_handle, &track.path)
+    } else {
+        let mut state = MUSIC_STATE.lock();
+        state.is_playing = false;
+        state.current_track = None;
+        Ok(())
+    }
+}
+
+pub fn play_prev_track(app_handle: &AppHandle) -> Result<(), String> {
+    let current_track = {
+        let state = MUSIC_STATE.lock();
+        state.current_track.clone()
+    };
+    
+    let files = get_music_files(app_handle)?;
+    if files.is_empty() {
+        let mut state = MUSIC_STATE.lock();
+        state.is_playing = false;
+        state.current_track = None;
+        return Ok(());
+    }
+    
+    let prev_track = if let Some(current) = current_track {
+        if let Some(pos) = files.iter().position(|f| f.filename == current) {
+            if pos > 0 {
+                Some(files[pos - 1].clone())
+            } else if LOOP_ENABLED.load(Ordering::SeqCst) {
+                Some(files[files.len() - 1].clone())
+            } else {
+                None
+            }
+        } else {
+            Some(files[0].clone())
+        }
+    } else {
+        Some(files[0].clone())
+    };
+    
+    if let Some(track) = prev_track {
+        let _ = stop_music();
+        play_music(app_handle, &track.path)
+    } else {
+        let mut state = MUSIC_STATE.lock();
+        state.is_playing = false;
+        state.current_track = None;
+        Ok(())
+    }
 }
 
 pub fn pause_music() -> Result<(), String> {
@@ -365,4 +518,20 @@ pub fn toggle_music_loop() -> Result<bool, String> {
     let new_state = !LOOP_ENABLED.load(Ordering::SeqCst);
     LOOP_ENABLED.store(new_state, Ordering::SeqCst);
     Ok(new_state)
+}
+
+pub fn get_music_settings() -> MusicSettings {
+    MusicSettings {
+        custom_dir: CUSTOM_DIR.read().clone(),
+        playlist_mode: PLAYLIST_MODE.read().clone(),
+        loop_enabled: LOOP_ENABLED.load(Ordering::SeqCst),
+    }
+}
+
+pub fn set_music_settings(app_handle: &AppHandle, custom_dir: Option<String>, playlist_mode: String, loop_enabled: bool) -> Result<(), String> {
+    *CUSTOM_DIR.write() = custom_dir;
+    *PLAYLIST_MODE.write() = playlist_mode;
+    LOOP_ENABLED.store(loop_enabled, Ordering::SeqCst);
+    save_music_settings(app_handle)?;
+    Ok(())
 }

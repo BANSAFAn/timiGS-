@@ -43,6 +43,48 @@
           <span class="icon" v-html="Icons.focusMusic"></span>
           {{ t('focus.backgroundMusic', 'Background Music (Optional)') }}
         </label>
+
+        <!-- Music Folder & Playback Mode Selection -->
+        <div class="music-config-modern">
+          <!-- Folder Selection Row -->
+          <div class="config-row">
+            <div class="config-text-group">
+              <span class="config-label">{{ t('focus.musicFolder', 'Music Folder') }}</span>
+              <span class="folder-path-display" :title="customDir || t('focus.defaultFolder', 'Default App Folder')">
+                {{ customDir ? customDir : t('focus.defaultFolder', 'Default App Folder') }}
+              </span>
+            </div>
+            <div class="folder-btn-row">
+              <button @click="selectMusicFolder" class="btn-folder-action">
+                <span v-html="Icons.musicFolder" style="display: flex; align-items: center;"></span>
+                {{ t('settings.selectFolder', 'Select Folder') }}
+              </button>
+              <button @click="resetMusicFolder" class="btn-folder-reset" v-if="customDir">
+                {{ t('common.reset', 'Reset') }}
+              </button>
+            </div>
+          </div>
+
+          <div class="config-divider"></div>
+
+          <!-- Playback Mode Row -->
+          <div class="config-row">
+            <span class="config-label">{{ t('focus.playbackMode', 'Playback Mode') }}</span>
+            <div class="mode-options">
+              <label class="radio-label-modern">
+                <input type="radio" v-model="playlistMode" value="single" @change="saveMusicSettings" />
+                <span class="radio-custom"></span>
+                <span class="radio-text">{{ t('focus.playSingle', 'Play Selected Track') }}</span>
+              </label>
+              <label class="radio-label-modern">
+                <input type="radio" v-model="playlistMode" value="all" @change="saveMusicSettings" />
+                <span class="radio-custom"></span>
+                <span class="radio-text">{{ t('focus.playAll', 'Play Folder') }}</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
         <div class="music-selection">
           <select v-model="selectedMusic" class="music-select">
             <option value="">{{ t('focus.noMusic', 'No music') }}</option>
@@ -59,11 +101,7 @@
             </button>
           </div>
         </div>
-        <div v-if="selectedMusic" class="music-preview">
-          <button @click="previewMusic" class="btn-preview" :disabled="isPreviewing">
-            {{ isPreviewing ? t('focus.stopPreview', 'Stop Preview') : t('focus.preview', 'Preview') }}
-          </button>
-        </div>
+
       </div>
 
       <div class="setup-section">
@@ -90,6 +128,10 @@
           <span class="target-name">{{ status.app_name }}</span>
           <span class="target-label">{{ t('focus.focusedApp', 'Focused Application') }}</span>
         </div>
+      </div>
+
+      <div v-if="bypassMessage" class="focus-bypass-warning">
+        {{ bypassMessage }}
       </div>
 
       <div class="circular-progress">
@@ -153,6 +195,7 @@ import { useI18n } from 'vue-i18n';
 import { invoke } from '@tauri-apps/api/core';
 import { Icons } from './icons/IconMap';
 import { open } from '@tauri-apps/plugin-dialog';
+import { listen } from '@tauri-apps/api/event';
 
 const { t } = useI18n();
 
@@ -203,7 +246,8 @@ const musicStatus = ref<MusicPlaybackStatus>({
 });
 const volume = ref<number>(50);
 const isLooping = ref<boolean>(false);
-const isPreviewing = ref<boolean>(false);
+const bypassMessage = ref<string>('');
+
 
 const canStart = computed(() => selectedApp.value && (hours.value > 0 || minutes.value > 0 || seconds.value > 0) && password.value.length >= 1);
 
@@ -302,6 +346,64 @@ function startPolling() {
 }
 
 
+const customDir = ref<string | null>(null);
+const playlistMode = ref<string>('single');
+
+async function loadMusicSettings() {
+  try {
+    const settings = await invoke<{ custom_dir: string | null; playlist_mode: string; loop_enabled: boolean }>('get_music_settings_cmd');
+    customDir.value = settings.custom_dir;
+    playlistMode.value = settings.playlist_mode;
+    isLooping.value = settings.loop_enabled;
+  } catch (e) {
+    console.error('Failed to load music settings:', e);
+  }
+}
+
+async function saveMusicSettings() {
+  try {
+    await invoke('set_music_settings_cmd', {
+      customDir: customDir.value,
+      playlistMode: playlistMode.value,
+      loopEnabled: isLooping.value,
+    });
+  } catch (e) {
+    console.error('Failed to save music settings:', e);
+  }
+}
+
+async function selectMusicFolder() {
+  try {
+    const selected = await open({
+      directory: true,
+      multiple: false,
+    });
+    if (selected) {
+      customDir.value = selected as string;
+      await saveMusicSettings();
+      await loadMusicFiles();
+      if (musicFiles.value.length > 0) {
+        selectedMusic.value = musicFiles.value[0].filename;
+      } else {
+        selectedMusic.value = '';
+      }
+    }
+  } catch (e) {
+    console.error('Failed to select music directory:', e);
+  }
+}
+
+async function resetMusicFolder() {
+  customDir.value = null;
+  await saveMusicSettings();
+  await loadMusicFiles();
+  if (musicFiles.value.length > 0) {
+    selectedMusic.value = musicFiles.value[0].filename;
+  } else {
+    selectedMusic.value = '';
+  }
+}
+
 async function loadMusicFiles() {
   try {
     musicFiles.value = await invoke<MusicFile[]>('get_music_files_cmd');
@@ -344,28 +446,6 @@ async function removeMusicFile() {
   }
 }
 
-async function previewMusic() {
-  if (!selectedMusic.value) return;
-
-  if (isPreviewing.value) {
-    await stopMusic();
-    isPreviewing.value = false;
-  } else {
-
-    await invoke('stop_music_cmd').catch(() => {});
-    
-    try {
-      const track = musicFiles.value.find(f => f.filename === selectedMusic.value);
-      if (track) {
-        await invoke('play_music_cmd', { filename: track.path });
-        isPreviewing.value = true;
-        await updateMusicStatus();
-      }
-    } catch (e) {
-      console.error('Failed to preview music:', e);
-    }
-  }
-}
 
 async function startMusicPlayback() {
   if (!selectedMusic.value) return;
@@ -394,7 +474,6 @@ async function startMusicPlayback() {
 async function stopMusic() {
   try {
     await invoke('stop_music_cmd');
-    isPreviewing.value = false;
     await updateMusicStatus();
   } catch (e) {
     console.error('Failed to stop music:', e);
@@ -497,24 +576,36 @@ function stopMusicStatusPolling() {
 }
 
 
-watch(status, async (newStatus) => {
-  if (newStatus && newStatus.active) {
+watch(status, async (newStatus, oldStatus) => {
+  const wasActive = oldStatus ? oldStatus.active : false;
+  const isActive = newStatus ? newStatus.active : false;
 
+  if (isActive && !wasActive) {
     if (selectedMusic.value) {
       await startMusicPlayback();
     }
     startMusicStatusPolling();
-  } else {
-
+  } else if (!isActive && wasActive) {
     stopMusicStatusPolling();
     await stopMusic();
   }
 }, { immediate: true });
 
-onMounted(() => {
+onMounted(async () => {
   loadApps();
   loadStatus();
-  loadMusicFiles();
+  await loadMusicSettings();
+  await loadMusicFiles();
+
+  await listen('focus-bypass-attempt', () => {
+    const title = t('focus.bypassTitle', 'STAY FOCUSED! 🎯');
+    const body = t('focus.bypassBody', 'WORK, WHY DO YOU NEED THEM, YOU MUST WORK! FOCUS !!!!!!');
+    bypassMessage.value = body;
+    setTimeout(() => {
+      bypassMessage.value = '';
+    }, 6000);
+    invoke('send_notification_cmd', { title, body }).catch(() => {});
+  });
 });
 
 onUnmounted(() => {
@@ -786,6 +877,157 @@ circle {
   margin: 0;
 }
 
+
+.music-config-modern {
+  margin: 12px 0;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.config-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.config-text-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.config-label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #fff;
+}
+
+.folder-path-display {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-family: monospace;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 320px;
+}
+
+.folder-btn-row {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-folder-action {
+  padding: 6px 12px;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  color: #fff;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-folder-action:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.btn-folder-action svg {
+  display: flex;
+  align-items: center;
+  width: 16px;
+  height: 16px;
+}
+
+.btn-folder-reset {
+  padding: 6px 12px;
+  font-size: 13px;
+  border-radius: 8px;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #f87171;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-folder-reset:hover {
+  background: rgba(239, 68, 68, 0.25);
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+.config-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.05);
+  width: 100%;
+}
+
+.mode-options {
+  display: flex;
+  gap: 20px;
+}
+
+/* Custom Radio Buttons */
+.radio-label-modern {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.radio-label-modern input[type="radio"] {
+  display: none;
+}
+
+.radio-custom {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.radio-label-modern input[type="radio"]:checked + .radio-custom {
+  border-color: #8b5cf6;
+}
+
+.radio-custom::after {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: transparent;
+  transition: all 0.2s ease;
+}
+
+.radio-label-modern input[type="radio"]:checked + .radio-custom::after {
+  background: #8b5cf6;
+}
+
+.radio-text {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  transition: color 0.2s ease;
+}
+
+.radio-label-modern input[type="radio"]:checked + .radio-custom + .radio-text {
+  color: #fff;
+}
 
 .music-selection {
   display: flex;
@@ -1062,5 +1304,22 @@ circle {
 .track-select option {
   background: #1a1a2e;
   color: white;
+}
+.focus-bypass-warning {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  font-weight: 700;
+  text-align: center;
+  margin-top: 12px;
+  animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+  20%, 40%, 60%, 80% { transform: translateX(5px); }
 }
 </style>

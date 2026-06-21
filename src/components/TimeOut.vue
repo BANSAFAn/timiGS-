@@ -148,6 +148,47 @@
             <p class="card-desc">{{ t('timeout.musicDesc', 'Optional music during breaks') }}</p>
           </div>
         </div>
+
+        <!-- Music Folder & Playback Mode Selection -->
+        <div class="music-config-modern">
+          <!-- Folder Selection Row -->
+          <div class="config-row">
+            <div class="config-text-group">
+              <span class="config-label">{{ t('timeout.musicFolder', 'Music Folder') }}</span>
+              <span class="folder-path-display" :title="customDir || t('timeout.defaultFolder', 'Default App Folder')">
+                {{ customDir ? customDir : t('timeout.defaultFolder', 'Default App Folder') }}
+              </span>
+            </div>
+            <div class="folder-btn-row">
+              <button @click="selectMusicFolder" class="btn-folder-action">
+                <span v-html="Icons.timeoutFolder" style="display: flex; align-items: center;"></span>
+                {{ t('settings.selectFolder', 'Select Folder') }}
+              </button>
+              <button @click="resetMusicFolder" class="btn-folder-reset" v-if="customDir">
+                {{ t('common.reset', 'Reset') }}
+              </button>
+            </div>
+          </div>
+
+          <div class="config-divider"></div>
+
+          <!-- Playback Mode Row -->
+          <div class="config-row">
+            <span class="config-label">{{ t('timeout.playbackMode', 'Playback Mode') }}</span>
+            <div class="mode-options">
+              <label class="radio-label-modern">
+                <input type="radio" v-model="playlistMode" value="single" @change="saveMusicSettings" />
+                <span class="radio-custom"></span>
+                <span class="radio-text">{{ t('timeout.playSingle', 'Play Selected Track') }}</span>
+              </label>
+              <label class="radio-label-modern">
+                <input type="radio" v-model="playlistMode" value="all" @change="saveMusicSettings" />
+                <span class="radio-custom"></span>
+                <span class="radio-text">{{ t('timeout.playAll', 'Play Folder') }}</span>
+              </label>
+            </div>
+          </div>
+        </div>
         
         <div class="music-manager-modern">
           <div class="music-actions">
@@ -556,6 +597,65 @@ const musicFiles = ref<any[]>([]);
 const selectedMusic = ref<string>("");
 const playMusicDuringBreak = ref<boolean>(true);
 
+const customDir = ref<string | null>(null);
+const playlistMode = ref<string>("single");
+const isLooping = ref<boolean>(false);
+
+async function loadMusicSettings() {
+  try {
+    const settings = await invoke<{ custom_dir: string | null; playlist_mode: string; loop_enabled: boolean }>("get_music_settings_cmd");
+    customDir.value = settings.custom_dir;
+    playlistMode.value = settings.playlist_mode;
+    isLooping.value = settings.loop_enabled;
+  } catch (e) {
+    console.error("Failed to load music settings:", e);
+  }
+}
+
+async function saveMusicSettings() {
+  try {
+    await invoke("set_music_settings_cmd", {
+      customDir: customDir.value,
+      playlistMode: playlistMode.value,
+      loopEnabled: isLooping.value,
+    });
+  } catch (e) {
+    console.error("Failed to save music settings:", e);
+  }
+}
+
+async function selectMusicFolder() {
+  try {
+    const selected = await openDialog({
+      directory: true,
+      multiple: false,
+    });
+    if (selected) {
+      customDir.value = selected as string;
+      await saveMusicSettings();
+      await loadMusicFiles();
+      if (musicFiles.value.length > 0) {
+        selectedMusic.value = musicFiles.value[0].filename;
+      } else {
+        selectedMusic.value = "";
+      }
+    }
+  } catch (e) {
+    console.error("Failed to select music directory:", e);
+  }
+}
+
+async function resetMusicFolder() {
+  customDir.value = null;
+  await saveMusicSettings();
+  await loadMusicFiles();
+  if (musicFiles.value.length > 0) {
+    selectedMusic.value = musicFiles.value[0].filename;
+  } else {
+    selectedMusic.value = "";
+  }
+}
+
 async function loadMusicFiles() {
   try {
     musicFiles.value = await invoke("get_music_files_cmd");
@@ -588,11 +688,14 @@ async function addMusicFile() {
 
 async function deleteMusicFile(filename: string) {
   try {
-    await invoke("delete_music_file_cmd", { filename });
-    if (selectedMusic.value === filename) {
-      selectedMusic.value = "";
+    const track = musicFiles.value.find(f => f.filename === filename);
+    if (track) {
+      await invoke("delete_music_file_cmd", { path: track.path });
+      if (selectedMusic.value === filename) {
+        selectedMusic.value = "";
+      }
+      await loadMusicFiles();
     }
-    await loadMusicFiles();
   } catch (e) {
     console.error("Error deleting music:", e);
   }
@@ -846,8 +949,12 @@ async function loadStatus() {
   }
 }
 
-async function manageAudio(_breakActive: boolean) {
-
+async function manageAudio(breakActive: boolean) {
+  if (!breakActive) {
+    try {
+      await invoke("stop_music_cmd");
+    } catch (e) {}
+  }
 }
 
 async function startTimeout() {
@@ -978,6 +1085,7 @@ function startPolling() {
 
 onMounted(async () => {
   loadStatus();
+  await loadMusicSettings();
   loadMusicFiles();
 
 
@@ -1602,9 +1710,155 @@ onUnmounted(() => {
   font-size: 0.9rem;
 }
 
-.music-option {
-  padding-top: 8px;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+.music-config-modern {
+  margin: 16px 0;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.config-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.config-text-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.config-label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #fff;
+}
+
+.folder-path-display {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-family: monospace;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 320px;
+}
+
+.folder-btn-row {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-folder-action {
+  padding: 6px 12px;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  color: #fff;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-folder-action:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.btn-folder-action svg {
+  display: flex;
+  align-items: center;
+  width: 16px;
+  height: 16px;
+}
+
+.btn-folder-reset {
+  padding: 6px 12px;
+  font-size: 13px;
+  border-radius: 8px;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #f87171;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-folder-reset:hover {
+  background: rgba(239, 68, 68, 0.25);
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+.config-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.05);
+  width: 100%;
+}
+
+.mode-options {
+  display: flex;
+  gap: 20px;
+}
+
+/* Custom Radio Buttons */
+.radio-label-modern {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.radio-label-modern input[type="radio"] {
+  display: none;
+}
+
+.radio-custom {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.radio-label-modern input[type="radio"]:checked + .radio-custom {
+  border-color: #14b8a6;
+}
+
+.radio-custom::after {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: transparent;
+  transition: all 0.2s ease;
+}
+
+.radio-label-modern input[type="radio"]:checked + .radio-custom::after {
+  background: #14b8a6;
+}
+
+.radio-text {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  transition: color 0.2s ease;
+}
+
+.radio-label-modern input[type="radio"]:checked + .radio-custom + .radio-text {
+  color: #fff;
 }
 
 .checkbox-label-modern {

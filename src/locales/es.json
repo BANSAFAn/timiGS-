@@ -303,7 +303,14 @@
     "toggleLoop": "Activar bucle",
     "selectTrackPlaceholder": "Seleccionar una pista...",
     "otherAppsBlocked": "Otras aplicaciones serán bloqueadas",
-    "enterPasswordCancel": "Introduce contraseña para cancelar..."
+    "enterPasswordCancel": "Introduce contraseña para cancelar...",
+    "musicFolder": "Carpeta de música:",
+    "defaultFolder": "Carpeta predeterminada",
+    "playbackMode": "Modo de reproducción:",
+    "playSingle": "Reproducir pista seleccionada",
+    "playAll": "Reproducir carpeta",
+    "bypassTitle": "¡MANTENTE ENFOCADO! 🎯",
+    "bypassBody": "¡TRABAJA, PARA QUÉ LAS NECESITAS, TIENES QUE TRABAJAR! ¡ENFÓCATE !!!!!!"
   },
   "timeout": {
     "title": "Time OUT",
@@ -355,7 +362,16 @@
     "breakTo": "Hasta",
     "simpleBreaks": "Descansos Simples",
     "scheduleMode": "Modo Programado",
-    "allAppsBlocked": "Todas los descansos bloquean las aplicaciones"
+    "allAppsBlocked": "Todas los descansos bloquean las aplicaciones",
+    "musicFolder": "Carpeta de música:",
+    "defaultFolder": "Carpeta predeterminada",
+    "playbackMode": "Modo de reproducción:",
+    "playSingle": "Reproducir una sola pista",
+    "playAll": "Reproducir carpeta (Todo)",
+    "timeToRest": "¡Hora de descansar!",
+    "takeBreakRelax": "Tómate un descanso, toma un té y relájate.",
+    "bypassTitle": "¡POR FAVOR, TÓMATE UN DESCANSO! ☕",
+    "bypassBody": "¡VE A TOMAR TÉ, DESCANSA, TIENES TIEMPO, POR FAVOR DESCANSA !!!!!!!!"
   },
   "common": {
     "loading": "Cargando...",
@@ -399,7 +415,8 @@
     "hours_word": "horas",
     "na": "N/D",
     "none": "—",
-    "ai": "IA"
+    "ai": "IA",
+    "reset": "Restablecer"
   },
   "team": {
     "title": "Team",

@@ -303,7 +303,14 @@
     "toggleLoop": "تكرار",
     "selectTrackPlaceholder": "اختر مسارًا...",
     "otherAppsBlocked": "سيتم حظر التطبيقات الأخرى",
-    "enterPasswordCancel": "أدخل كلمة المرور للإلغاء..."
+    "enterPasswordCancel": "أدخل كلمة المرور للإلغاء...",
+    "musicFolder": "مجلد الموسيقى:",
+    "defaultFolder": "مجلد التطبيق الافتراضي",
+    "playbackMode": "وضع التشغيل:",
+    "playSingle": "تشغيل المقطع المحدد",
+    "playAll": "تشغيل المجلد",
+    "bypassTitle": "حافظ على تركيزك! 🎯",
+    "bypassBody": "اعمل، لماذا تحتاج إليها، يجب عليك العمل! ركّز !!!!!!"
   },
   "timeout": {
     "title": "وقت الراحة",
@@ -355,7 +362,16 @@
     "breakTo": "إلى",
     "simpleBreaks": "فترات راحة بسيطة",
     "scheduleMode": "وضع الجدول الزمني",
-    "allAppsBlocked": "يتم حظر جميع التطبيقات أثناء الاستراحة"
+    "allAppsBlocked": "يتم حظر جميع التطبيقات أثناء الاستراحة",
+    "musicFolder": "مجلد الموسيقى:",
+    "defaultFolder": "مجلد التطبيق الافتراضي",
+    "playbackMode": "وضع التشغيل:",
+    "playSingle": "تشغيل مقطع واحد",
+    "playAll": "تشغيل المجلد (الكل)",
+    "timeToRest": "وقت الراحة!",
+    "takeBreakRelax": "خذ استراحة، واشرب بعض الشاي، واسترخِ.",
+    "bypassTitle": "رجاءً خذ استراحة! ☕",
+    "bypassBody": "اذهب واشرب الشاي، واسترخِ، لديك متسع من الوقت، استرخِ رجاءً !!!!!!!!"
   },
   "common": {
     "loading": "جار التحميل...",
@@ -399,7 +415,8 @@
     "hours_word": "ساعات",
     "na": "غير متوفر",
     "none": "—",
-    "ai": "ذكاء اصطناعي"
+    "ai": "ذكاء اصطناعي",
+    "reset": "إعادة ضبط"
   },
   "team": {
     "title": "Team",

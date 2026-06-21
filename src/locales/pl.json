@@ -302,7 +302,14 @@
     "toggleLoop": "Włącz pętlę",
     "selectTrackPlaceholder": "Wybierz utwór...",
     "otherAppsBlocked": "Inne aplikacje zostaną zablokowane",
-    "enterPasswordCancel": "Wpisz hasło, aby anulować..."
+    "enterPasswordCancel": "Wpisz hasło, aby anulować...",
+    "musicFolder": "Folder z muzyką:",
+    "defaultFolder": "Domyślny folder aplikacji",
+    "playbackMode": "Tryb odtwarzania:",
+    "playSingle": "Odwórz wybrany utwór",
+    "playAll": "Odtwórz folder",
+    "bypassTitle": "SKUP SIĘ! 🎯",
+    "bypassBody": "PRACUJ, PO CO CI ONE, POWINIENEŚ PRACOWAĆ! SKUP SIĘ !!!!!!"
   },
   "timeout": {
     "title": "Time OUT",
@@ -354,7 +361,16 @@
     "breakTo": "Do",
     "simpleBreaks": "Proste Przerwy",
     "scheduleMode": "Tryb Harmonogramu",
-    "allAppsBlocked": "Wszystkie aplikacje są zablokowane podczas przerwy"
+    "allAppsBlocked": "Wszystkie aplikacje są zablokowane podczas przerwy",
+    "musicFolder": "Folder z muzyką:",
+    "defaultFolder": "Domyślny folder aplikacji",
+    "playbackMode": "Tryb odtwarzania:",
+    "playSingle": "Odtwórz jeden utwór",
+    "playAll": "Odtwórz folder (Wszystko)",
+    "timeToRest": "Czas na odpoczynek!",
+    "takeBreakRelax": "Zrób sobie przerwę, napij się herbaty i zrelaksuj.",
+    "bypassTitle": "PROSZĘ ZRÓB SOBIE PRZERWĘ! ☕",
+    "bypassBody": "IDŹ NAPIJ SIĘ HERBATY, ODPOCZNIJ, MASZ CZAS, ODPOCZNIJ PROSZĘ !!!!!!!!"
   },
   "common": {
     "loading": "Ładowanie...",
@@ -398,7 +414,8 @@
     "hours_word": "godzin",
     "na": "N/D",
     "none": "—",
-    "ai": "AI"
+    "ai": "AI",
+    "reset": "Resetuj"
   },
   "team": {
     "title": "Team",

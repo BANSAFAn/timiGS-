@@ -335,7 +335,14 @@
     "toggleLoop": "Toggle loop",
     "selectTrackPlaceholder": "Select a track...",
     "otherAppsBlocked": "Other apps will be blocked",
-    "enterPasswordCancel": "Enter password to cancel..."
+    "enterPasswordCancel": "Enter password to cancel...",
+    "musicFolder": "Music Folder:",
+    "defaultFolder": "Default App Folder",
+    "playbackMode": "Playback Mode:",
+    "playSingle": "Play Selected Track",
+    "playAll": "Play Folder",
+    "bypassTitle": "STAY FOCUSED! 🎯",
+    "bypassBody": "WORK, WHY DO YOU NEED THEM, YOU MUST WORK! FOCUS !!!!!!"
   },
   "timeout": {
     "title": "Time OUT",
@@ -387,7 +394,16 @@
     "breakTo": "To",
     "simpleBreaks": "Simple Breaks",
     "scheduleMode": "Schedule Mode",
-    "allAppsBlocked": "All applications are blocked during break"
+    "allAppsBlocked": "All applications are blocked during break",
+    "musicFolder": "Music Folder:",
+    "defaultFolder": "Default App Folder",
+    "playbackMode": "Playback Mode:",
+    "playSingle": "Play Selected Track",
+    "playAll": "Play Folder (All)",
+    "timeToRest": "Time to Rest!",
+    "takeBreakRelax": "Take a break, drink some tea, and relax.",
+    "bypassTitle": "PLEASE TAKE A BREAK! ☕",
+    "bypassBody": "GO DRINK TEA, RELAX, YOU HAVE TIME, RELAX PLEASE !!!!!!!!"
   },
   "common": {
     "loading": "Loading...",
@@ -431,7 +447,8 @@
     "hours_word": "hours",
     "na": "N/A",
     "none": "—",
-    "ai": "AI"
+    "ai": "AI",
+    "reset": "Reset"
   },
   "team": {
     "title": "Team",

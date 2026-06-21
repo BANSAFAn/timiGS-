@@ -22,6 +22,14 @@ use windows::Win32::UI::WindowsAndMessaging::{
 #[cfg(target_os = "windows")]
 static MUTED_PIDS: Lazy<Mutex<Vec<u32>>> = Lazy::new(|| Mutex::new(vec![]));
 
+#[cfg(target_os = "windows")]
+use std::sync::atomic::AtomicU32;
+
+#[cfg(target_os = "windows")]
+pub static GLOBAL_APP_HANDLE: Lazy<Mutex<Option<tauri::AppHandle>>> = Lazy::new(|| Mutex::new(None));
+
+#[cfg(target_os = "windows")]
+pub static BYPASS_ATTEMPTS: AtomicU32 = AtomicU32::new(0);
 
 #[cfg(target_os = "windows")]
 static mut KBD_HOOK: HHOOK = HHOOK(std::ptr::null_mut());
@@ -48,6 +56,18 @@ unsafe extern "system" fn keyboard_hook_proc(code: i32, wparam: WPARAM, lparam: 
 
             if block {
                 println!("TimeOut Hook: Blocked VK {}!", vk_code);
+                
+                let attempts = BYPASS_ATTEMPTS.fetch_add(1, Ordering::SeqCst) + 1;
+                if attempts >= 5 {
+                    BYPASS_ATTEMPTS.store(0, Ordering::SeqCst);
+                    if let Some(app_handle) = GLOBAL_APP_HANDLE.lock().as_ref() {
+                        let app_handle_clone = app_handle.clone();
+                        thread::spawn(move || {
+                            let _ = app_handle_clone.emit("timeout-bypass-attempt", ());
+                        });
+                    }
+                }
+                
                 return LRESULT(1);
             }
         }
