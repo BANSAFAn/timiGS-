@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.10.4](https://github.com/BANSAFAn/timiGS-/compare/v1.10.3...v1.10.4) (2026-06-21)
+
+
+### Bug Fixes
+
+* delete upload report ([105cd3c](https://github.com/BANSAFAn/timiGS-/commit/105cd3c1a31b5e9401e162f4be70fda74cd1a0ca))
+
 ## [1.10.3](https://github.com/BANSAFAn/timiGS-/compare/v1.10.2...v1.10.3) (2026-06-21)
 
 
