@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.10.3](https://github.com/BANSAFAn/timiGS-/compare/v1.10.2...v1.10.3) (2026-06-21)
+
+
+### Bug Fixes
+
+* add bug ([806aab5](https://github.com/BANSAFAn/timiGS-/commit/806aab5df38510e0840f0b99b532eb474ac5fe0b))
+
 ## [1.10.2](https://github.com/BANSAFAn/timiGS-/compare/v1.10.1...v1.10.2) (2026-06-20)
 
 
