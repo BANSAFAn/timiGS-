@@ -56,17 +56,7 @@
             <p v-if="joinError" class="error-text">{{ joinError }}</p>
           </div>
 
-          <div class="join-divider">
-            <span>{{ $t('team.or') || 'OR' }}</span>
-          </div>
 
-          <div class="join-section">
-            <h4>{{ $t('team.uploadReport') || 'Load Offline Report' }}</h4>
-            <button class="btn btn-secondary" style="width: 100%; justify-content: center;" @click="triggerFileInput">
-              <span v-html="Icons.download"></span>
-              {{ $t('team.uploadReport') || 'Upload Report' }}
-            </button>
-          </div>
         </div>
       </div>
 
@@ -86,10 +76,7 @@
             </div>
           </div>
           <div class="group-actions">
-            <button class="btn btn-secondary" @click="triggerFileInput">
-              <span v-html="Icons.download"></span>
-              {{ $t('team.uploadReport') || 'Upload Report' }}
-            </button>
+
             <div class="export-dropdown-wrapper">
               <button class="btn btn-secondary" @click.stop="toggleExportDropdown" :disabled="members.length === 0">
                 <span v-html="Icons.download"></span>
@@ -613,7 +600,7 @@
         </div>
       </div>
     </div>
-    <input ref="fileInput" type="file" accept=".json,.html,.csv" @change="handleFileUpload" style="display:none" />
+
   </div>
 </template>
 
@@ -646,7 +633,7 @@ const statsMember = ref<any>(null);
 const statsMemberData = ref<any>(null);
 const activeTab = ref<'stats' | 'ranking'>('stats');
 
-const fileInput = ref<HTMLInputElement | null>(null);
+
 const showExportDropdown = ref(false);
 const showSettingsDropdown = ref(false);
 const activeMusicPopoverId = ref<string | null>(null);
@@ -870,181 +857,9 @@ function copyGroupCode() {
   setTimeout(() => { copied.value = false; }, 2000);
 }
 
-async function triggerFileInput() {
-  try {
-    const { open } = await import("@tauri-apps/plugin-dialog");
-    const { readTextFile } = await import("@tauri-apps/plugin-fs");
 
-    const selected = await open({
-      multiple: false,
-      filters: [{ name: 'Group Report', extensions: ['json', 'html', 'csv'] }]
-    });
 
-    if (selected && typeof selected === 'string') {
-      const content = await readTextFile(selected);
-      const extension = selected.split('.').pop()?.toLowerCase() || '';
-      processReportContent(content, extension);
-    }
-  } catch (err) {
-    console.error("Failed to select or read file via Tauri native dialog, falling back to HTML input:", err);
-    if (fileInput.value) {
-      fileInput.value.click();
-    }
-  }
-}
 
-function processReportContent(content: string, extension: string) {
-  try {
-    let report: any = null;
-
-    if (extension === 'json') {
-      report = JSON.parse(content);
-    } else if (extension === 'html') {
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(content, 'text/html');
-      const scriptTag = doc.getElementById('raw-report-data');
-      if (scriptTag && scriptTag.textContent) {
-        report = JSON.parse(scriptTag.textContent.trim());
-      } else {
-        alert('Could not find raw report data inside the HTML file.');
-        return;
-      }
-    } else if (extension === 'csv') {
-      report = parseCSVReport(content);
-    } else {
-      alert('Unsupported file format. Please upload a .json, .html, or .csv file.');
-      return;
-    }
-
-    if (report && report.groupCode && report.members) {
-      teamsStore.loadReportData(report);
-    } else {
-      alert('Invalid report format. Please select a valid group report file.');
-    }
-  } catch (err) {
-    console.error(err);
-    alert('Failed to parse report file. Please make sure the file is valid.');
-  }
-}
-
-function parseCSVReport(csvContent: string): any {
-  const lines: string[] = [];
-  let currentLine = "";
-  let insideQuotes = false;
-
-  for (let i = 0; i < csvContent.length; i++) {
-    const char = csvContent[i];
-    const nextChar = csvContent[i + 1];
-
-    if (char === '"') {
-      if (insideQuotes && nextChar === '"') {
-        currentLine += '"';
-        i++;
-      } else {
-        insideQuotes = !insideQuotes;
-      }
-    } else if (char === '\n' && !insideQuotes) {
-      lines.push(currentLine);
-      currentLine = "";
-    } else if (char === '\r' && !insideQuotes) {
-    } else {
-      currentLine += char;
-    }
-  }
-  if (currentLine) {
-    lines.push(currentLine);
-  }
-
-  if (lines.length < 2) {
-    throw new Error("Invalid CSV format: Too few rows");
-  }
-
-  const parseCSVRow = (line: string): string[] => {
-    const result: string[] = [];
-    let currentField = "";
-    let inQuotes = false;
-
-    for (let i = 0; i < line.length; i++) {
-      const char = line[i];
-      const nextChar = line[i + 1];
-
-      if (char === '"') {
-        if (inQuotes && nextChar === '"') {
-          currentField += '"';
-          i++;
-        } else {
-          inQuotes = !inQuotes;
-        }
-      } else if (char === ',' && !inQuotes) {
-        result.push(currentField);
-        currentField = "";
-      } else {
-        currentField += char;
-      }
-    }
-    result.push(currentField);
-    return result;
-  };
-
-  const members: any[] = [];
-  let gName = "";
-  let gCode = "";
-  let leaderId = "";
-  let createdAt = Date.now();
-  let generatedAt = Date.now();
-
-  for (let i = 1; i < lines.length; i++) {
-    const line = lines[i].trim();
-    if (!line) continue;
-    const values = parseCSVRow(lines[i]);
-    if (values.length < 14) continue;
-
-    gName = values[0];
-    gCode = values[1];
-    leaderId = values[2];
-    createdAt = parseInt(values[3]) || Date.now();
-    generatedAt = parseInt(values[4]) || Date.now();
-
-    try {
-      const member: any = {
-        memberId: values[5],
-        memberName: values[6],
-        isLeader: values[7] === "true",
-        totalOnlineSeconds: parseInt(values[8]) || 0,
-        activityHistory: JSON.parse(values[9] || "[]"),
-        stats: JSON.parse(values[10] || "{}"),
-        tasks: JSON.parse(values[11] || "[]"),
-        inTimeout: values[12] === "true",
-        focusModeActive: values[13] === "true"
-      };
-      members.push(member);
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
-  return {
-    groupName: gName,
-    groupCode: gCode,
-    leaderId,
-    createdAt,
-    generatedAt,
-    members
-  };
-}
-
-function handleFileUpload(event: Event) {
-  const input = event.target as HTMLInputElement;
-  if (!input.files || input.files.length === 0) return;
-  const file = input.files[0];
-  const extension = file.name.split('.').pop()?.toLowerCase() || '';
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    const content = e.target?.result as string;
-    processReportContent(content, extension);
-  };
-  reader.readAsText(file);
-}
 
 function startRename(member: any) {
   editingMemberId.value = member.id;
@@ -1563,35 +1378,35 @@ function generateHTMLTemplate(report: any): string {
 <body>
   <div class="container">
     <header>
-      <h1>\${report.groupName || t('team.title', 'Team')} \${t('team.activityReport', 'Activity Report')}</h1>
+      <h1>${report.groupName || t('team.title', 'Team')} ${t('team.activityReport', 'Activity Report')}</h1>
       <div class="meta">
-        \${t('team.groupCode', 'Group Code')}: <span class="group-code-badge">\${report.groupCode || '—'}</span>
+        ${t('team.groupCode', 'Group Code')}: <span class="group-code-badge">${report.groupCode || '—'}</span>
         &nbsp;&bull;&nbsp;
-        \${t('team.generated', 'Generated')}: <span>\${new Date(report.generatedAt).toLocaleString()}</span>
+        ${t('team.generated', 'Generated')}: <span>${new Date(report.generatedAt).toLocaleString()}</span>
       </div>
     </header>
 
     <div class="stats-grid">
       <div class="stat-card">
-        <div class="label">\${t('team.totalMembers', 'Total Members')}</div>
-        <div class="value">\${report.members.length}</div>
+        <div class="label">${t('team.totalMembers', 'Total Members')}</div>
+        <div class="value">${report.members.length}</div>
       </div>
       <div class="stat-card">
-        <div class="label">\${t('team.totalTime', 'Total Team Time')}</div>
+        <div class="label">${t('team.totalTime', 'Total Team Time')}</div>
         <div class="value">${formatSecs(report.members.reduce((acc: number, m: any) => acc + m.totalOnlineSeconds, 0))}</div>
       </div>
     </div>
 
-    <div class="section-title">\${t('team.membersActivitySummary', 'Members Activity Summary')}</div>
+    <div class="section-title">${t('team.membersActivitySummary', 'Members Activity Summary')}</div>
     <div class="table-container">
       <table>
         <thead>
           <tr>
-            <th>\${t('team.member', 'Member')}</th>
-            <th>\${t('projects.status', 'Status')}</th>
-            <th>\${t('team.totalTime', 'Total Time')}</th>
-            <th>\${t('team.topApp', 'Top Program')}</th>
-            <th>\${t('team.tasksTitle', 'Tasks Checklist')}</th>
+            <th>${t('team.member', 'Member')}</th>
+            <th>${t('projects.status', 'Status')}</th>
+            <th>${t('team.totalTime', 'Total Time')}</th>
+            <th>${t('team.topApp', 'Top Program')}</th>
+            <th>${t('team.tasksTitle', 'Tasks Checklist')}</th>
           </tr>
         </thead>
         <tbody>
@@ -1600,7 +1415,7 @@ function generateHTMLTemplate(report: any): string {
       </table>
     </div>
 
-    <div class="section-title">\${t('team.detailedAppsCategories', 'Detailed Applications & Categories')}</div>
+    <div class="section-title">${t('team.detailedAppsCategories', 'Detailed Applications & Categories')}</div>
     <div class="details-grid">
       ${detailsHtml}
     </div>
