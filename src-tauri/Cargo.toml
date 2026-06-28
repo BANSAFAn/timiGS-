@@ -2,7 +2,9 @@
 name = "timigs"
 version = "1.0.0"
 description = "TimiGS - Activity Tracker"
-authors = ["you"]
+authors = ["0w0 meow, baneronetwo@memeware.net"]
+license = "TPL"
+repository = "https://github.com/BANSAFAn/timiGS-"
 edition = "2021"
 
 [lib]
@@ -69,4 +71,3 @@ windows = { version = "0.58", features = [
     "Media_Control",
     "Foundation"
 ] }
-

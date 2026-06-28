@@ -1,5 +1,5 @@
 name: Upload to SourceForge
-
+# NOT WORK ЦЯ ХУЙНЯ, МЕНІ ЛІНЬ ОНОВЛЮВАТИ, ТОМУ ВОНО НЕ РОБИТЬ ТОГО ЩО МАЄ
 on:
   release:
     types: [published]

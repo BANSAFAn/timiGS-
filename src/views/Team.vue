@@ -76,6 +76,10 @@
             </div>
           </div>
           <div class="group-actions">
+            <button v-if="isLeaderUser" class="btn btn-secondary" @click="openControlModal('all', '')">
+              <span v-html="Icons.settings"></span>
+              {{ $t('team.manageModes') || 'Manage Modes' }}
+            </button>
 
             <div class="export-dropdown-wrapper">
               <button class="btn btn-secondary" @click.stop="toggleExportDropdown" :disabled="members.length === 0">
@@ -377,6 +381,9 @@
                 </div>
               </div>
               <div class="member-actions">
+                <button v-if="isLeaderUser" class="btn-icon" @click="openControlModal(member.id, member.name)" :title="$t('team.manageModes') || 'Manage Modes'">
+                  <span v-html="Icons.settings"></span>
+                </button>
                 <button v-if="isLeaderUser" class="btn-icon" @click="startRename(member)" :title="$t('team.rename') || 'Rename'">
                   <span v-html="Icons.edit"></span>
                 </button>
@@ -601,12 +608,152 @@
       </div>
     </div>
 
+    <!-- Control Modal -->
+    <div v-if="showControlModal" class="modal-overlay" @click.self="showControlModal = false">
+      <div class="modal-content control-modal animate-enter">
+        <div class="modal-header">
+          <h3>{{ $t('team.manageModes', 'Manage Modes') }}</h3>
+          <button class="close-btn" @click="showControlModal = false">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group-custom">
+            <span class="form-label-custom">{{ $t('team.targetUser', 'Target') }}:</span>
+            <div class="target-badge-display">
+              {{ controlTarget === 'all' ? $t('team.allUsers', 'All Users') : controlTargetName }}
+            </div>
+          </div>
+
+          <div class="mode-tabs">
+            <button 
+              type="button"
+              class="mode-tab-btn" 
+              :class="{ active: controlMode === 'focus' }" 
+              @click="controlMode = 'focus'"
+            >
+              <span v-html="Icons.focusTarget" style="display: flex; align-items: center; width: 16px; height: 16px;"></span>
+              {{ $t('team.forceFocusTitle', 'Focus Mode') }}
+            </button>
+            <button 
+              type="button"
+              class="mode-tab-btn" 
+              :class="{ active: controlMode === 'timeout' }" 
+              @click="controlMode = 'timeout'"
+            >
+              <span v-html="Icons.clock" style="display: flex; align-items: center; width: 16px; height: 16px;"></span>
+              {{ $t('team.forceTimeoutTitle', 'Timeout Mode') }}
+            </button>
+          </div>
+
+          <div class="action-selection">
+            <span class="form-label-custom">Action:</span>
+            <div class="action-radios">
+              <label class="radio-label-custom">
+                <input type="radio" v-model="controlAction" value="start" />
+                <span class="radio-text">Start Mode</span>
+              </label>
+              <label class="radio-label-custom">
+                <input type="radio" v-model="controlAction" value="stop" />
+                <span class="radio-text">Stop Mode</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Focus Mode Start Settings -->
+          <div v-if="controlMode === 'focus' && controlAction === 'start'" class="mode-settings-block">
+            <div class="form-group-custom">
+              <label class="form-label-custom">{{ $t('team.selectApp', 'Select App to Focus') }}</label>
+              <select v-model="controlFocusApp" class="modern-select">
+                <option :value="null" disabled>{{ $t('team.noAppPlaceholder', 'Select or type app...') }}</option>
+                <option v-for="app in controlRecentApps" :key="app.app_name" :value="app">
+                  {{ app.app_name }}
+                </option>
+                <option value="custom">-- Custom App --</option>
+              </select>
+            </div>
+
+            <div v-if="controlFocusApp === 'custom'">
+              <div class="form-group-custom">
+                <label class="form-label-custom">{{ $t('team.customApp', 'Custom App Name') }}</label>
+                <input 
+                  type="text" 
+                  v-model="controlFocusCustomName" 
+                  class="modern-input" 
+                  placeholder="e.g. Visual Studio Code"
+                />
+              </div>
+              <div class="form-group-custom">
+                <label class="form-label-custom">{{ $t('team.exePath', 'Executable Name') }}</label>
+                <input 
+                  type="text" 
+                  v-model="controlFocusExePath" 
+                  class="modern-input" 
+                  placeholder="e.g. code.exe"
+                />
+              </div>
+            </div>
+
+            <div class="form-group-custom">
+              <label class="form-label-custom">{{ $t('team.durationMinutes', 'Duration (minutes)') }}</label>
+              <input 
+                type="number" 
+                v-model.number="controlFocusDuration" 
+                class="modern-input" 
+                min="1" 
+                max="1440"
+              />
+            </div>
+          </div>
+
+          <!-- Timeout Mode Start Settings -->
+          <div v-if="controlMode === 'timeout' && controlAction === 'start'" class="mode-settings-block">
+            <div class="form-group-custom checkbox-group">
+              <input type="checkbox" id="break-immediately" v-model="controlTimeoutBreakImmediately" />
+              <label for="break-immediately" class="checkbox-label-custom">{{ $t('team.forceBreakImmediately', 'Force Break Immediately') }}</label>
+            </div>
+
+            <div v-if="!controlTimeoutBreakImmediately">
+              <div class="form-group-custom">
+                <label class="form-label-custom">{{ $t('team.workDuration', 'Work Duration (minutes)') }}</label>
+                <input 
+                  type="number" 
+                  v-model.number="controlTimeoutInterval" 
+                  class="modern-input" 
+                  min="1"
+                />
+              </div>
+            </div>
+
+            <div class="form-group-custom">
+              <label class="form-label-custom">{{ $t('team.breakDuration', 'Break Duration (minutes)') }}</label>
+              <input 
+                type="number" 
+                v-model.number="controlTimeoutBreak" 
+                class="modern-input" 
+                min="1"
+              />
+            </div>
+          </div>
+
+          <!-- Stop Message -->
+          <div v-if="controlAction === 'stop'" class="stop-warning-block">
+            This will immediately terminate the forced mode (if active) on the target client(s).
+          </div>
+        </div>
+
+        <div class="modal-footer-custom">
+          <button class="btn btn-secondary" @click="showControlModal = false">{{ $t('team.cancel', 'Cancel') }}</button>
+          <button class="btn btn-primary" @click="submitControlModal">{{ $t('team.apply', 'Apply') }}</button>
+        </div>
+      </div>
+    </div>
+
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { invoke } from '@tauri-apps/api/core';
 import { Icons } from '../components/icons/IconMap';
 import { useTeamsStore } from '../stores/teams';
 import { getConfirmDialog } from '../composables/useConfirmDialog';
@@ -678,6 +825,81 @@ function triggerExport(format: 'json' | 'html' | 'csv') {
 const editingMemberId = ref<string | null>(null);
 const editMemberName = ref('');
 const newTasksMap = ref<Record<string, string>>({});
+
+// Control Modal State
+const showControlModal = ref(false);
+const controlTarget = ref<string | 'all'>('all');
+const controlTargetName = ref<string>('');
+const controlMode = ref<'focus' | 'timeout'>('focus');
+const controlAction = ref<'start' | 'stop'>('start');
+
+// Focus Settings
+const controlFocusApp = ref<any>(null);
+const controlFocusCustomName = ref('');
+const controlFocusExePath = ref('');
+const controlFocusDuration = ref(30);
+
+// Timeout Settings
+const controlTimeoutInterval = ref(50);
+const controlTimeoutBreak = ref(10);
+const controlTimeoutBreakImmediately = ref(false);
+
+const controlRecentApps = ref<any[]>([]);
+
+async function openControlModal(targetId: string | 'all', targetName: string) {
+  controlTarget.value = targetId;
+  controlTargetName.value = targetName;
+  showControlModal.value = true;
+  controlFocusApp.value = null;
+  controlFocusCustomName.value = '';
+  controlFocusExePath.value = '';
+  
+  try {
+    const summary = await invoke<any[]>('get_today_summary');
+    controlRecentApps.value = summary.sort((a, b) => b.total_seconds - a.total_seconds);
+    if (controlRecentApps.value.length > 0) {
+      controlFocusApp.value = controlRecentApps.value[0];
+    } else {
+      controlFocusApp.value = 'custom';
+    }
+  } catch (e) {
+    console.error('Failed to load apps for control modal:', e);
+    controlFocusApp.value = 'custom';
+  }
+}
+
+async function submitControlModal() {
+  if (controlMode.value === 'focus') {
+    if (controlAction.value === 'start') {
+      let appName = '';
+      let exePath = '';
+      if (controlFocusApp.value && controlFocusApp.value !== 'custom') {
+        appName = controlFocusApp.value.app_name;
+        exePath = controlFocusApp.value.exe_path;
+      } else {
+        appName = controlFocusCustomName.value.trim();
+        exePath = controlFocusExePath.value.trim();
+      }
+      if (!appName || !exePath) {
+        alert('Please specify app name and executable name');
+        return;
+      }
+      const durationSecs = controlFocusDuration.value * 60;
+      await teamsStore.forceFocusMode(controlTarget.value, appName, exePath, durationSecs);
+    } else {
+      await teamsStore.stopFocusMode(controlTarget.value);
+    }
+  } else {
+    if (controlAction.value === 'start') {
+      const intervalSecs = controlTimeoutBreakImmediately.value ? 0 : controlTimeoutInterval.value * 60;
+      const breakSecs = controlTimeoutBreak.value * 60;
+      await teamsStore.forceTimeoutMode(controlTarget.value, intervalSecs, breakSecs);
+    } else {
+      await teamsStore.stopTimeoutMode(controlTarget.value);
+    }
+  }
+  showControlModal.value = false;
+}
 
 const myProfile = computed(() => teamsStore.myProfile);
 const members = computed(() => teamsStore.members);
@@ -3291,5 +3513,176 @@ input:checked + .slider::before {
 .btn-voice-leave:hover {
   background: #dc2626;
   color: white;
+}
+
+/* Control Modal Styles */
+.control-modal {
+  max-width: 480px !important;
+  border: 1px solid var(--border-color);
+  background: var(--bg-primary);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.4);
+}
+
+.form-group-custom {
+  margin-bottom: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-label-custom {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.target-badge-display {
+  display: inline-block;
+  align-self: flex-start;
+  background: var(--bg-secondary);
+  color: var(--text-main);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-weight: 700;
+  border: 1px solid var(--border-color);
+  font-size: 0.9rem;
+}
+
+.mode-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 15px;
+}
+
+.mode-tab-btn {
+  flex: 1;
+  padding: 10px 14px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  color: var(--text-muted);
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 0.9rem;
+}
+
+.mode-tab-btn :deep(svg) {
+  width: 16px;
+  height: 16px;
+}
+
+.mode-tab-btn:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-main);
+}
+
+.mode-tab-btn.active {
+  background: var(--btn-primary-bg, var(--primary-color, #3b82f6));
+  color: white;
+  border-color: var(--btn-primary-bg, var(--primary-color, #3b82f6));
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.3);
+}
+
+.action-selection {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.action-radios {
+  display: flex;
+  gap: 20px;
+}
+
+.radio-label-custom {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  color: var(--text-main);
+  font-size: 0.95rem;
+}
+
+.radio-label-custom input[type="radio"] {
+  accent-color: var(--btn-primary-bg, var(--primary-color, #3b82f6));
+  cursor: pointer;
+}
+
+.mode-settings-block {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.modern-select {
+  width: 100%;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  font-size: 0.95rem;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.modern-select:focus {
+  border-color: var(--btn-primary-bg, var(--primary-color, #3b82f6));
+}
+
+.checkbox-group {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.checkbox-group input[type="checkbox"] {
+  accent-color: var(--btn-primary-bg, var(--primary-color, #3b82f6));
+  cursor: pointer;
+  width: 16px;
+  height: 16px;
+}
+
+.checkbox-label-custom {
+  cursor: pointer;
+  font-size: 0.95rem;
+  color: var(--text-main);
+}
+
+.stop-warning-block {
+  padding: 12px;
+  border-radius: var(--radius-md);
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  color: #fca5a5;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  margin-bottom: 20px;
+}
+
+.modal-footer-custom {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-top: 15px;
+  border-top: 1px solid var(--border-color);
 }
 </style>

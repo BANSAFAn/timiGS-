@@ -604,6 +604,88 @@ export const useTeamsStore = defineStore("teams", () => {
          }));
          saveGroupState();
          break;
+
+      case 'FORCE_FOCUS':
+         try {
+           await invoke('start_focus_cmd', {
+             appName: data.payload.appName,
+             exePath: data.payload.exePath,
+             durationSecs: data.payload.durationSecs,
+             password: data.payload.password
+           });
+           const notificationStore = (await import('./notifications')).useNotificationStore();
+           notificationStore.add({
+               title: i18n.global.t('team.forceFocusTitle', 'Force Focus Mode') + ' 🎯',
+               message: `Focused on ${data.payload.appName} for ${Math.round(data.payload.durationSecs / 60)} minutes.`,
+               type: 'warning',
+               duration: 10000
+           });
+           await pollCurrentActivity();
+         } catch (e) {
+           console.error("Failed to start forced focus:", e);
+         }
+         break;
+
+      case 'STOP_FOCUS':
+         try {
+           await invoke('stop_focus_cmd', { password: data.payload.password });
+           const notificationStore = (await import('./notifications')).useNotificationStore();
+           notificationStore.add({
+               title: i18n.global.t('team.stopFocus', 'Stop Focus Mode') + ' 🎯',
+               message: "Focus mode has been stopped by the leader.",
+               type: 'info',
+               duration: 5000
+           });
+           await pollCurrentActivity();
+         } catch (e) {
+           console.error("Failed to stop forced focus:", e);
+         }
+         break;
+
+      case 'FORCE_TIMEOUT':
+         try {
+           await invoke("start_timeout_cmd", {
+             intervalSecs: data.payload.intervalSecs,
+             breakDurationSecs: data.payload.breakDurationSecs,
+             password: data.payload.password,
+             enableSchedule: false,
+             scheduleStartHour: null,
+             scheduleStartMinute: null,
+             scheduleEndHour: null,
+             scheduleEndMinute: null,
+             customBreaks: [],
+             selectedDays: []
+           });
+           const notificationStore = (await import('./notifications')).useNotificationStore();
+           notificationStore.add({
+               title: i18n.global.t('team.forceTimeoutTitle', 'Force Timeout Mode') + ' ☕',
+               message: data.payload.intervalSecs === 0 
+                  ? `Break started immediately for ${Math.round(data.payload.breakDurationSecs / 60)} minutes!`
+                  : `Time OUT activated. Break every ${Math.round(data.payload.intervalSecs / 60)} mins for ${Math.round(data.payload.breakDurationSecs / 60)} mins.`,
+               type: 'warning',
+               duration: 10000
+           });
+           await pollCurrentActivity();
+         } catch (e) {
+           console.error("Failed to start forced timeout:", e);
+         }
+         break;
+
+      case 'STOP_TIMEOUT':
+         try {
+           await invoke('stop_timeout_cmd', { password: data.payload.password });
+           const notificationStore = (await import('./notifications')).useNotificationStore();
+           notificationStore.add({
+               title: i18n.global.t('team.stopTimeout', 'Stop Timeout Mode') + ' ☕',
+               message: "Time OUT has been stopped by the leader.",
+               type: 'info',
+               duration: 5000
+           });
+           await pollCurrentActivity();
+         } catch (e) {
+           console.error("Failed to stop forced timeout:", e);
+         }
+         break;
     }
   }
 
@@ -1630,6 +1712,124 @@ export const useTeamsStore = defineStore("teams", () => {
     }
   }
 
+  async function forceFocusMode(memberId: string | 'all', appName: string, exePath: string, durationSecs: number, password = "") {
+    const payload = { appName, exePath, durationSecs, password };
+    if (memberId === 'all') {
+      try {
+        await invoke('start_focus_cmd', payload);
+      } catch (e) {
+        console.error("Local force focus error:", e);
+      }
+      broadcast({ type: 'FORCE_FOCUS', payload });
+    } else if (memberId === myProfile.id) {
+      try {
+        await invoke('start_focus_cmd', payload);
+      } catch (e) {
+        console.error("Local force focus error:", e);
+      }
+    } else {
+      const conn = connections.value.find(c => c.peer === memberId);
+      if (conn) {
+        conn.send({ type: 'FORCE_FOCUS', payload });
+      }
+    }
+    await pollCurrentActivity();
+  }
+
+  async function stopFocusMode(memberId: string | 'all', password = "") {
+    const payload = { password };
+    if (memberId === 'all') {
+      try {
+        await invoke('stop_focus_cmd', payload);
+      } catch (e) {
+        console.error("Local stop focus error:", e);
+      }
+      broadcast({ type: 'STOP_FOCUS', payload });
+    } else if (memberId === myProfile.id) {
+      try {
+        await invoke('stop_focus_cmd', payload);
+      } catch (e) {
+        console.error("Local stop focus error:", e);
+      }
+    } else {
+      const conn = connections.value.find(c => c.peer === memberId);
+      if (conn) {
+        conn.send({ type: 'STOP_FOCUS', payload });
+      }
+    }
+    await pollCurrentActivity();
+  }
+
+  async function forceTimeoutMode(memberId: string | 'all', intervalSecs: number, breakDurationSecs: number, password = "") {
+    const payload = { intervalSecs, breakDurationSecs, password };
+    if (memberId === 'all') {
+      try {
+        await invoke("start_timeout_cmd", {
+          intervalSecs,
+          breakDurationSecs,
+          password,
+          enableSchedule: false,
+          scheduleStartHour: null,
+          scheduleStartMinute: null,
+          scheduleEndHour: null,
+          scheduleEndMinute: null,
+          customBreaks: [],
+          selectedDays: []
+        });
+      } catch (e) {
+        console.error("Local force timeout error:", e);
+      }
+      broadcast({ type: 'FORCE_TIMEOUT', payload });
+    } else if (memberId === myProfile.id) {
+      try {
+        await invoke("start_timeout_cmd", {
+          intervalSecs,
+          breakDurationSecs,
+          password,
+          enableSchedule: false,
+          scheduleStartHour: null,
+          scheduleStartMinute: null,
+          scheduleEndHour: null,
+          scheduleEndMinute: null,
+          customBreaks: [],
+          selectedDays: []
+        });
+      } catch (e) {
+        console.error("Local force timeout error:", e);
+      }
+    } else {
+      const conn = connections.value.find(c => c.peer === memberId);
+      if (conn) {
+        conn.send({ type: 'FORCE_TIMEOUT', payload });
+      }
+    }
+    await pollCurrentActivity();
+  }
+
+  async function stopTimeoutMode(memberId: string | 'all', password = "") {
+    const payload = { password };
+    if (memberId === 'all') {
+      try {
+        await invoke('stop_timeout_cmd', payload);
+      } catch (e) {
+        console.error("Local stop timeout error:", e);
+      }
+      broadcast({ type: 'STOP_TIMEOUT', payload });
+    } else if (memberId === myProfile.id) {
+      try {
+        await invoke('stop_timeout_cmd', payload);
+      } catch (e) {
+        console.error("Local stop timeout error:", e);
+      }
+    } else {
+      const conn = connections.value.find(c => c.peer === memberId);
+      if (conn) {
+        conn.send({ type: 'STOP_TIMEOUT', payload });
+      }
+    }
+    await pollCurrentActivity();
+  }
+
   return {
     myProfile,
     members,
@@ -1695,7 +1895,11 @@ export const useTeamsStore = defineStore("teams", () => {
     isInGroup,
     startActivityPolling,
     stopActivityPolling,
-    pollCurrentActivity
+    pollCurrentActivity,
+    forceFocusMode,
+    stopFocusMode,
+    forceTimeoutMode,
+    stopTimeoutMode
   };
 });
 
