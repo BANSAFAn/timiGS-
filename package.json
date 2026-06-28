@@ -5,7 +5,7 @@
   "author": "Baneronetwo",
   "license": "nya",
   "private": true,
-  "version": "1.10.4",
+  "version": "1.11.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
