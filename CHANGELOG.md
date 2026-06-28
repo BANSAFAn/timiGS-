@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.11.0](https://github.com/BANSAFAn/timiGS-/compare/v1.10.4...v1.11.0) (2026-06-28)
+
+
+### Features
+
+* add timeout and focusmode control for room creators and fix cargo edition / app identifier ([4a65d37](https://github.com/BANSAFAn/timiGS-/commit/4a65d37763a37bf0cde446708a78c2a753629e8a))
+
+
+### Miscellaneous
+
+* fix security vulnerabilities in root and site projects ([f094687](https://github.com/BANSAFAn/timiGS-/commit/f09468794be9ff2ee54b810fcfe4f2235c4de66b))
+
 ## [1.10.4](https://github.com/BANSAFAn/timiGS-/compare/v1.10.3...v1.10.4) (2026-06-21)
 
 
