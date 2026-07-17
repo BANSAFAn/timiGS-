@@ -24,60 +24,27 @@
           <div class="active-section">
             <template v-if="isAppFocused">
               <div class="active-icon-box timigs-brand-icon animate-pop-in">
-                <svg viewBox="0 0 64 64" class="sleeping-cat-svg" width="68" height="68" xmlns="http://www.w3.org/2000/svg">
-                  <defs>
-                    <linearGradient id="catBodyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stop-color="#ffffff" />
-                      <stop offset="100%" stop-color="#cbd5e1" />
-                    </linearGradient>
-                    <linearGradient id="catTailGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stop-color="#cbd5e1" />
-                      <stop offset="100%" stop-color="#94a3b8" />
-                    </linearGradient>
-                  </defs>
-                  
-                  <!-- Main body (curled up) -->
-                  <circle cx="36" cy="36" r="18" fill="url(#catBodyGrad)" />
-                  
+                <svg viewBox="0 0 64 64" class="sleeping-cat-svg animate-pulse" width="68" height="68" xmlns="http://www.w3.org/2000/svg">
+                  <!-- Wireframe Cat Body -->
+                  <rect x="18" y="24" width="28" height="24" stroke="var(--color-primary)" stroke-width="2" fill="none" />
                   <!-- Head -->
-                  <circle cx="24" cy="28" r="11" fill="url(#catBodyGrad)" />
-                  
-                  <!-- Left Ear -->
-                  <path d="M 16 22 L 10 11 L 22 18 Z" fill="url(#catBodyGrad)" />
-                  <path d="M 17 20 L 13 13 L 21 18 Z" fill="#fda4af" />
-                  
-                  <!-- Right Ear -->
-                  <path d="M 26 18 L 32 7 L 32 20 Z" fill="url(#catBodyGrad)" />
-                  <path d="M 27 18 L 31 9 L 31 19 Z" fill="#fda4af" />
-                  
-                  <!-- Tail wrapped around -->
-                  <path d="M 48 42 C 54 40, 54 28, 48 26 C 44 25, 42 28, 44 31 Q 45 32, 47 31" 
-                        stroke="url(#catTailGrad)" stroke-width="5" stroke-linecap="round" fill="none" />
-                  
-                  <!-- Closed sleeping eyes (happy curves) -->
-                  <path d="M 16 29 Q 18.5 32 21 29" stroke="#475569" stroke-width="1.5" stroke-linecap="round" fill="none" />
-                  <path d="M 25 29 Q 27.5 32 30 29" stroke="#475569" stroke-width="1.5" stroke-linecap="round" fill="none" />
-                  
-                  <!-- Nose -->
-                  <polygon points="23,31 25,31 24,32.2" fill="#f43f5e" />
-                  
+                  <rect x="10" y="14" width="16" height="16" stroke="var(--color-primary)" stroke-width="2" fill="none" />
+                  <!-- Ears -->
+                  <polyline points="10,14 6,6 16,14" stroke="var(--color-primary)" stroke-width="2" fill="none" />
+                  <polyline points="20,14 26,6 26,14" stroke="var(--color-primary)" stroke-width="2" fill="none" />
+                  <!-- Tail -->
+                  <polyline points="46,36 54,36 54,20 50,20" stroke="var(--color-primary)" stroke-width="2" fill="none" />
+                  <!-- Closed sleeping eyes (sharp lines) -->
+                  <line x1="13" y1="22" x2="16" y2="22" stroke="var(--color-primary)" stroke-width="2" />
+                  <line x1="20" y1="22" x2="23" y2="22" stroke="var(--color-primary)" stroke-width="2" />
                   <!-- Whiskers -->
-                  <line x1="14" y1="31" x2="8" y2="31" stroke="#94a3b8" stroke-width="1" stroke-linecap="round" />
-                  <line x1="14" y1="33" x2="7" y2="34" stroke="#94a3b8" stroke-width="1" stroke-linecap="round" />
-                  
-                  <line x1="30" y1="31" x2="36" y2="31" stroke="#94a3b8" stroke-width="1" stroke-linecap="round" />
-                  <line x1="30" y1="33" x2="37" y2="34" stroke="#94a3b8" stroke-width="1" stroke-linecap="round" />
-                  
-                  <!-- Soft shadow/highlight for paws -->
-                  <circle cx="20" cy="44" r="3" fill="#cbd5e1" />
-                  <circle cx="28" cy="45" r="3" fill="#cbd5e1" />
-
-                  <!-- Floating Zzz's -->
-                  <g class="zzz-group">
-                    <text x="44" y="20" fill="#e9d5ff" font-family="Arial" font-size="8" font-weight="bold" class="zzz-1">z</text>
-                    <text x="48" y="14" fill="#d8b4fe" font-family="Arial" font-size="10" font-weight="bold" class="zzz-2">z</text>
-                    <text x="53" y="9" fill="#c084fc" font-family="Arial" font-size="12" font-weight="bold" class="zzz-3">Z</text>
-                  </g>
+                  <line x1="8" y1="24" x2="2" y2="24" stroke="var(--color-primary)" stroke-width="1.5" />
+                  <line x1="8" y1="26" x2="2" y2="28" stroke="var(--color-primary)" stroke-width="1.5" />
+                  <line x1="28" y1="24" x2="34" y2="24" stroke="var(--color-primary)" stroke-width="1.5" />
+                  <line x1="28" y1="26" x2="34" y2="28" stroke="var(--color-primary)" stroke-width="1.5" />
+                  <!-- Sleeping texts in mono font -->
+                  <text x="40" y="16" fill="var(--color-primary)" font-family="monospace" font-size="10" font-weight="bold">Z_z</text>
+                  <text x="48" y="10" fill="var(--color-primary)" font-family="monospace" font-size="12" font-weight="bold">Z</text>
                 </svg>
               </div>
 
@@ -330,12 +297,12 @@
               <Doughnut
                 v-if="selectedChartType === 'doughnut'"
                 :data="chartData"
-                :options="doughnutOptions"
+                :options="computedDoughnutOptions"
               />
               <Bar
                 v-else
                 :data="barChartData"
-                :options="barOptions"
+                :options="computedBarOptions"
               />
 
               
@@ -364,6 +331,32 @@
               <span class="legend-label">{{ label }}</span>
             </div>
           </div>
+
+          <!-- Interactive terminal status console -->
+          <div class="chart-terminal-console" v-if="chartData.labels.length && selectedAppStats">
+            <div class="console-header">
+              <span class="console-dot-green"></span>
+              <span class="console-title">APP_METRICS_LOG // {{ selectedAppStats.app_name }}</span>
+            </div>
+            <div class="console-body">
+              <div class="console-row">
+                <span class="console-label">> APP_NAME:</span>
+                <span class="console-val">{{ selectedAppStats.app_name }}</span>
+              </div>
+              <div class="console-row">
+                <span class="console-label">> DURATION:</span>
+                <span class="console-val">{{ formatDuration(selectedAppStats.total_seconds) }}</span>
+              </div>
+              <div class="console-row">
+                <span class="console-label">> RATIO:</span>
+                <span class="console-val">{{ getProgressWidth(selectedAppStats.total_seconds) }}%</span>
+              </div>
+              <div class="console-row">
+                <span class="console-label">> SESSIONS:</span>
+                <span class="console-val">{{ selectedAppStats.session_count || 1 }}</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -371,7 +364,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from "vue";
+import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { invoke } from "@tauri-apps/api/core";
 import { useActivityStore, getProgramTag } from "../stores/activity";
@@ -425,15 +418,38 @@ const currentDate = computed(() => {
 
 let intervalId: number | null = null;
 
-const chartColors = [
-  "#5b6ee1",
-  "#0ea5e9",
-  "#8b5cf6",
-  "#ec4899",
-  "#f59e0b",
-  "#10b981",
-  "#f97316",
-];
+const selectedAppStats = ref<any | null>(null);
+
+watch(() => store.topApps, (newTopApps) => {
+  if (newTopApps && newTopApps.length > 0 && !selectedAppStats.value) {
+    selectedAppStats.value = newTopApps[0];
+  }
+}, { immediate: true });
+
+const chartColors = computed(() => {
+  const isLight = store.settings.theme === 'light';
+  if (isLight) {
+    return [
+      "#ffb300", // main amber
+      "#fbbf24", // amber-400
+      "#d97706", // amber-600
+      "#f97316", // orange-500
+      "#ea580c", // orange-600
+      "#b45309", // amber-700
+      "#78350f", // amber-900
+    ];
+  } else {
+    return [
+      "#39ff14", // main neon green
+      "#4ade80", // green-400
+      "#16a34a", // green-600
+      "#22c55e", // green-500
+      "#15803d", // green-700
+      "#86efac", // green-300
+      "#14532d", // green-900
+    ];
+  }
+});
 
 function formatDuration(seconds: number): string {
   if (!seconds || seconds < 0) seconds = 0;
@@ -479,10 +495,10 @@ const chartData = computed(() => ({
   datasets: [
     {
       data: store.topApps.slice(0, 5).map((app) => app.total_seconds),
-      backgroundColor: chartColors,
+      backgroundColor: chartColors.value,
       borderWidth: 0,
       hoverOffset: 8,
-      borderRadius: 4,
+      borderRadius: 0,
     },
   ],
 }));
@@ -492,71 +508,133 @@ const barChartData = computed(() => ({
   datasets: [
     {
       data: store.topApps.slice(0, 5).map((app) => Math.round(app.total_seconds / 60)),
-      backgroundColor: chartColors,
-      borderRadius: 8,
+      backgroundColor: chartColors.value,
+      borderRadius: 0,
       borderSkipped: false,
     },
   ],
 }));
 
-const doughnutOptions = {
-  responsive: true,
-  maintainAspectRatio: false,
-  cutout: "70%",
-  plugins: {
-    legend: { display: false },
-    tooltip: {
-      backgroundColor: "rgba(20,20,40,0.95)",
-      titleColor: "#fff",
-      bodyColor: "#94a3b8",
-      padding: 12,
-      cornerRadius: 8,
-      displayColors: true,
-      callbacks: {
-        label: (ctx: any) => {
-          const seconds = ctx.raw;
-          return ` ${formatDuration(seconds)}`;
+const computedDoughnutOptions = computed(() => {
+  const isLight = store.settings.theme === 'light';
+  const primaryColor = isLight ? "#ffb300" : "#39ff14";
+  const bgColor = isLight ? "rgba(10, 6, 0, 0.98)" : "rgba(2, 5, 2, 0.98)";
+  const textColor = isLight ? "#ffb300" : "#39ff14";
+
+  return {
+    responsive: true,
+    maintainAspectRatio: false,
+    cutout: "70%",
+    onClick: (event: any, elements: any) => {
+      if (elements && elements.length > 0) {
+        const index = elements[0].index;
+        const app = store.topApps[index];
+        if (app) {
+          selectedAppStats.value = app;
+        }
+      }
+    },
+    onHover: (event: any, elements: any) => {
+      event.native.target.style.cursor = elements && elements.length > 0 ? 'pointer' : 'default';
+    },
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: bgColor,
+        titleColor: textColor,
+        titleFont: { family: "Consolas, Courier New, monospace", size: 12, weight: "bold" },
+        bodyColor: textColor,
+        bodyFont: { family: "Consolas, Courier New, monospace", size: 12 },
+        padding: 10,
+        cornerRadius: 0,
+        borderColor: primaryColor,
+        borderWidth: 1,
+        displayColors: false,
+        callbacks: {
+          label: (ctx: any) => {
+            const seconds = ctx.raw;
+            return ` DURATION: ${formatDuration(seconds)}`;
+          },
         },
       },
     },
-  },
-};
+  };
+});
 
-const barOptions = {
-  responsive: true,
-  maintainAspectRatio: false,
-  plugins: {
-    legend: { display: false },
-    tooltip: {
-      backgroundColor: "rgba(20,20,40,0.95)",
-      titleColor: "#fff",
-      bodyColor: "#94a3b8",
-      padding: 12,
-      cornerRadius: 8,
-      callbacks: {
-        label: (ctx: any) => ` ${ctx.raw} minutes`,
+const computedBarOptions = computed(() => {
+  const isLight = store.settings.theme === 'light';
+  const primaryColor = isLight ? "#ffb300" : "#39ff14";
+  const bgColor = isLight ? "rgba(10, 6, 0, 0.98)" : "rgba(2, 5, 2, 0.98)";
+  const textColor = isLight ? "#ffb300" : "#39ff14";
+
+  return {
+    responsive: true,
+    maintainAspectRatio: false,
+    onClick: (event: any, elements: any) => {
+      if (elements && elements.length > 0) {
+        const index = elements[0].index;
+        const app = store.topApps[index];
+        if (app) {
+          selectedAppStats.value = app;
+        }
+      }
+    },
+    onHover: (event: any, elements: any) => {
+      event.native.target.style.cursor = elements && elements.length > 0 ? 'pointer' : 'default';
+    },
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: bgColor,
+        titleColor: textColor,
+        titleFont: { family: "Consolas, Courier New, monospace", size: 12, weight: "bold" },
+        bodyColor: textColor,
+        bodyFont: { family: "Consolas, Courier New, monospace", size: 12 },
+        padding: 10,
+        cornerRadius: 0,
+        borderColor: primaryColor,
+        borderWidth: 1,
+        displayColors: false,
+        callbacks: {
+          label: (ctx: any) => ` DURATION: ${ctx.raw} ${t('common.m_symbol', 'm')}`,
+        },
       },
     },
-  },
-  scales: {
-    x: {
-      grid: { display: false, drawBorder: false },
-      ticks: { color: "#64748b", font: { size: 11 } },
+    scales: {
+      x: {
+        grid: { display: false, drawBorder: false },
+        ticks: { 
+          color: primaryColor, 
+          font: { family: "Consolas, Courier New, monospace", size: 9 },
+          maxRotation: 0,
+          minRotation: 0,
+          callback: function(this: any, value: any) {
+            const label = this.getLabelForValue(value);
+            return label.length > 10 ? label.slice(0, 8) + '..' : label;
+          }
+        },
+      },
+      y: {
+        display: false,
+        grid: { display: false },
+      },
     },
-    y: {
-      display: false,
-      grid: { display: false },
-    },
-  },
-};
+  };
+});
 
 
 async function loadIcon(appName: string, path: string) {
-  if (appIcons.value[appName] || !path) return;
+  if (appName in appIcons.value || !path) return;
   try {
     const base64 = await invoke<string | null>("get_app_icon", { path });
-    if (base64) appIcons.value[appName] = `data:image/png;base64,${base64}`;
-  } catch {}
+    if (base64) {
+      appIcons.value[appName] = `data:image/png;base64,${base64}`;
+    } else {
+      appIcons.value[appName] = '';
+    }
+  } catch {
+    appIcons.value[appName] = '';
+  }
 }
 
 async function refreshData() {
@@ -1307,8 +1385,9 @@ onUnmounted(() => {
   color: var(--text-muted);
   font-weight: 500;
   padding: 6px 12px;
-  border-radius: var(--radius-md);
+  border-radius: 0px;
   background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
   transition: var(--transition-fast);
 }
 
@@ -1318,9 +1397,9 @@ onUnmounted(() => {
 }
 
 .legend-dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
+  width: 10px;
+  height: 10px;
+  border-radius: 0px;
 }
 
 .legend-label {
@@ -1328,6 +1407,54 @@ onUnmounted(() => {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.chart-terminal-console {
+  margin-top: 20px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  padding: 12px;
+  font-family: var(--font-family);
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--color-primary);
+  text-align: left;
+}
+
+.console-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px dashed var(--border-color);
+  padding-bottom: 8px;
+  margin-bottom: 10px;
+}
+
+.console-dot-green {
+  width: 6px;
+  height: 6px;
+  background: var(--color-primary);
+}
+
+.console-title {
+  font-weight: bold;
+  letter-spacing: 0.5px;
+}
+
+.console-row {
+  display: flex;
+  margin-bottom: 5px;
+}
+
+.console-label {
+  width: 120px;
+  color: var(--text-muted);
+  font-weight: normal;
+}
+
+.console-val {
+  color: var(--color-primary);
+  font-weight: bold;
 }
 
 
@@ -1426,9 +1553,9 @@ onUnmounted(() => {
 
 /* TimiGS active state & Previous activity styles */
 .timigs-brand-icon {
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%) !important;
-  border-color: rgba(255, 255, 255, 0.1) !important;
-  box-shadow: 0 0 20px rgba(91, 110, 225, 0.35) !important;
+  background: var(--bg-secondary) !important;
+  border: 2px solid var(--color-primary) !important;
+  box-shadow: var(--shadow-glow) !important;
   display: flex;
   align-items: center;
   justify-content: center;

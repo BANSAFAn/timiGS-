@@ -250,15 +250,21 @@ async function includeProcess(exePath: string) {
 }
 
 async function loadIcons() {
-  for (const app of store.todaySummary) {
-    if (appIcons.value[app.app_name] || !app.exe_path) continue;
-    try {
-      const base64 = await invoke<string | null>('get_app_icon', { path: app.exe_path });
-      if (base64) {
-        appIcons.value[app.app_name] = `data:image/png;base64,${base64}`;
+  await Promise.all(
+    store.todaySummary.map(async (app) => {
+      if (app.app_name in appIcons.value || !app.exe_path) return;
+      try {
+        const base64 = await invoke<string | null>('get_app_icon', { path: app.exe_path });
+        if (base64) {
+          appIcons.value[app.app_name] = `data:image/png;base64,${base64}`;
+        } else {
+          appIcons.value[app.app_name] = '';
+        }
+      } catch {
+        appIcons.value[app.app_name] = '';
       }
-    } catch {  }
-  }
+    })
+  );
 }
 
 onMounted(async () => {
