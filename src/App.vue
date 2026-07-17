@@ -6,10 +6,9 @@
         <h1 class="brand-text">TimiGS</h1>
         <div class="compact-logo animate-fade-in" v-if="isCompact">
           <svg viewBox="0 0 24 24" width="28" height="28" class="compact-clock-svg" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="12" cy="12" r="10" stroke="var(--color-primary)" stroke-width="2" fill="none" />
-            <circle cx="12" cy="12" r="1.2" fill="var(--color-primary)" />
-            <line x1="12" y1="12" x2="12" y2="7.5" stroke="var(--color-primary)" stroke-width="2" stroke-linecap="round" class="clock-hour-hand" />
-            <line x1="12" y1="12" x2="15.5" y2="12" stroke="var(--color-primary)" stroke-width="1.5" stroke-linecap="round" class="clock-minute-hand" />
+            <rect x="2" y="2" width="20" height="20" stroke="var(--color-primary)" stroke-width="2" fill="none" />
+            <line x1="12" y1="12" x2="12" y2="6" stroke="var(--color-primary)" stroke-width="2" stroke-linecap="square" />
+            <line x1="12" y1="12" x2="17" y2="12" stroke="var(--color-primary)" stroke-width="1.5" stroke-linecap="square" />
           </svg>
         </div>
       </div>
@@ -83,8 +82,8 @@
       <div class="reminder-content">
         <div class="reminder-header">
           <div class="reminder-icon-box">
-            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter">
+              <polyline points="2,12 8,12 11,3 13,21 16,12 22,12"/>
             </svg>
           </div>
           <h4>{{ $t("settings.notificationBreakReminderTitle") || 'Ergonomic Break Reminder' }}</h4>
@@ -288,21 +287,6 @@ onUnmounted(() => {
 
 <style scoped>
 
-.page-enter-active,
-.page-leave-active {
-  transition: opacity 0.2s ease, transform 0.2s ease;
-}
-
-.page-enter-from {
-  opacity: 0;
-  transform: translateY(12px);
-}
-
-.page-leave-to {
-  opacity: 0;
-  transform: translateY(-12px);
-}
-
 
 .nav-icon {
   width: 20px;
@@ -413,11 +397,11 @@ onUnmounted(() => {
 .doctor-break-reminder-card {
   position: relative;
   width: 380px;
-  background: rgba(30, 34, 48, 0.85);
+  background: var(--bg-secondary);
   backdrop-filter: blur(16px);
-  border: 1px solid rgba(139, 92, 246, 0.25);
-  border-radius: 16px;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(139, 92, 246, 0.1);
+  border: 2px solid var(--color-primary);
+  border-radius: 0px;
+  box-shadow: var(--shadow-glow);
   overflow: hidden;
   padding: 18px;
   transition: all 0.3s ease;
@@ -430,7 +414,7 @@ onUnmounted(() => {
   left: 0;
   width: 100%;
   height: 4px;
-  background: linear-gradient(90deg, #8b5cf6, #6d28d9);
+  background: var(--color-primary);
 }
 
 .reminder-content {
@@ -448,9 +432,9 @@ onUnmounted(() => {
 .reminder-icon-box {
   width: 36px;
   height: 36px;
-  border-radius: 50%;
-  background: rgba(139, 92, 246, 0.15);
-  color: #a78bfa;
+  border-radius: 0px;
+  background: rgba(57, 255, 20, 0.1);
+  color: var(--color-primary);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -460,17 +444,17 @@ onUnmounted(() => {
   margin: 0;
   font-size: 1rem;
   font-weight: 700;
-  color: #fff;
+  color: var(--text-primary);
   flex: 1;
 }
 
 .countdown-badge {
   background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 1px solid var(--border-color);
   padding: 2px 8px;
-  border-radius: 12px;
+  border-radius: 0px;
   font-size: 0.8rem;
-  color: #a78bfa;
+  color: var(--color-primary);
   font-weight: 600;
 }
 
@@ -478,7 +462,7 @@ onUnmounted(() => {
   margin: 0;
   font-size: 0.88rem;
   line-height: 1.4;
-  color: #cbd5e1;
+  color: var(--text-main);
 }
 
 .reminder-actions {
@@ -489,21 +473,21 @@ onUnmounted(() => {
 
 .step-away-btn {
   width: 100%;
-  background: linear-gradient(135deg, #8b5cf6, #6d28d9);
-  color: #fff;
+  background: var(--color-primary);
+  color: var(--bg-main);
   font-weight: 600;
-  border: none;
-  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  border-radius: 0px;
   padding: 10px;
   cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.25);
+  transition: var(--transition-base);
+  box-shadow: none;
 }
 
 .step-away-btn:hover {
-  background: linear-gradient(135deg, #a78bfa, #7c3aed);
+  background: var(--color-primary-hover);
   transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(139, 92, 246, 0.35);
+  box-shadow: none;
 }
 
 .step-away-btn:active {
@@ -514,14 +498,14 @@ onUnmounted(() => {
   width: 100%;
   height: 4px;
   background: rgba(255, 255, 255, 0.05);
-  border-radius: 2px;
+  border-radius: 0px;
   overflow: hidden;
   margin-top: 4px;
 }
 
 .countdown-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, #8b5cf6, #ec4899);
+  background: var(--color-primary);
   transition: width 1s linear;
 }
 </style>

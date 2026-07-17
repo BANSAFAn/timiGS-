@@ -224,7 +224,7 @@ onMounted(async () => {
     loadStatus();
   });
   await listen("timeout-bypass-attempt", () => {
-    const title = t("timeout.bypassTitle", "PLEASE TAKE A BREAK! ☕");
+    const title = t("timeout.bypassTitle", "PLEASE TAKE A BREAK!");
     const body = t("timeout.bypassBody", "GO DRINK TEA, RELAX, YOU HAVE TIME, RELAX PLEASE !!!!!!!! ");
     bypassMessage.value = body;
     setTimeout(() => {

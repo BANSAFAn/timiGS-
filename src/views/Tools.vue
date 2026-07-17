@@ -419,11 +419,17 @@ function deleteNote(id: string) {
 }
 
 async function loadIcon(appName: string, path: string) {
-  if (appIcons.value[appName] || !path) return;
+  if (appName in appIcons.value || !path) return;
   try {
     const base64 = await invoke<string | null>("get_app_icon", { path });
-    if (base64) appIcons.value[appName] = `data:image/png;base64,${base64}`;
-  } catch {}
+    if (base64) {
+      appIcons.value[appName] = `data:image/png;base64,${base64}`;
+    } else {
+      appIcons.value[appName] = '';
+    }
+  } catch {
+    appIcons.value[appName] = '';
+  }
 }
 
 function insertAppToNote(appName: string) {
@@ -1099,16 +1105,16 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: linear-gradient(135deg, #fbbf24, #f59e0b);
-  color: white;
-  border: none;
+  background: var(--color-accent);
+  color: var(--bg-main);
+  border: 1px solid var(--border-color);
   padding: 10px 20px;
-  border-radius: 12px;
+  border-radius: 0px;
   font-weight: 600;
   font-size: 0.9rem;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
+  transition: var(--transition-base);
+  box-shadow: none;
 }
 
 .btn-new-note:hover {

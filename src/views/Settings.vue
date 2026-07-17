@@ -63,8 +63,7 @@
                 @click="langOpen = !langOpen"
               >
                 <div class="selected-option">
-                  <img :src="currentLangFlagImg" :alt="currentLangName" class="flag-icon-img" @error="(e: Event) => (e.target as HTMLImageElement).style.display = 'none'" />
-                  <span class="flag-emoji-fallback">{{ currentLangFlag }}</span>
+                  <span class="flag-code-badge" style="margin-right: 8px; font-weight: bold; font-family: monospace;">[{{ localSettings.language.toUpperCase() }}]</span>
                   <span class="lang-name">{{ currentLangName }}</span>
                   <span class="chevron">▼</span>
                 </div>
@@ -75,8 +74,7 @@
                     class="option-item"
                     @click.stop="changeLanguage(lang.code)"
                   >
-                    <img :src="lang.flagImg" :alt="lang.name" class="flag-icon-img" @error="(e: Event) => (e.target as HTMLImageElement).style.display = 'none'" />
-                    <span class="flag-emoji-fallback">{{ lang.flag }}</span>
+                    <span class="flag-code-badge" style="margin-right: 8px; font-family: monospace;">[{{ lang.code.toUpperCase() }}]</span>
                     {{ lang.name }}
                   </div>
                 </div>

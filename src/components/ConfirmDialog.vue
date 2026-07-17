@@ -127,25 +127,26 @@ defineExpose({ show });
 .dialog-icon {
   width: 56px;
   height: 56px;
-  border-radius: 50%;
+  border-radius: 0px;
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto 20px;
+  border: 1px solid var(--border-color);
 }
 
 .dialog-icon.warning {
-  background: rgba(245, 158, 11, 0.15);
-  color: #f59e0b;
+  background: rgba(255, 179, 0, 0.15);
+  color: var(--color-warning);
 }
 
 .dialog-icon.danger {
-  background: rgba(239, 68, 68, 0.15);
-  color: #ef4444;
+  background: rgba(255, 23, 68, 0.15);
+  color: var(--color-danger);
 }
 
 .dialog-icon.info {
-  background: rgba(91, 110, 225, 0.15);
+  background: rgba(57, 255, 20, 0.15);
   color: var(--color-primary);
 }
 

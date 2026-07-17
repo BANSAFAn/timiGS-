@@ -598,7 +598,7 @@ onMounted(async () => {
   await loadMusicFiles();
 
   await listen('focus-bypass-attempt', () => {
-    const title = t('focus.bypassTitle', 'STAY FOCUSED! 🎯');
+    const title = t('focus.bypassTitle', 'STAY FOCUSED!');
     const body = t('focus.bypassBody', 'WORK, WHY DO YOU NEED THEM, YOU MUST WORK! FOCUS !!!!!!');
     bypassMessage.value = body;
     setTimeout(() => {

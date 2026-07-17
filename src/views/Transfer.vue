@@ -239,7 +239,7 @@
 
                 <div style="margin-top: 20px; display: flex; gap: 12px;">
                   <button class="btn-connect" :class="{ 'btn-stop': ipServerRunning }" @click="toggleIpServer" style="flex: 1;">
-                    {{ ipServerRunning ? $t('transfer.stopServer', '⏹ Stop Server') : $t('transfer.startServer', '▶ Start Server') }}
+                    {{ ipServerRunning ? $t('transfer.stopServer', '[Stop Server]') : $t('transfer.startServer', '[Start Server]') }}
                   </button>
                 </div>
 

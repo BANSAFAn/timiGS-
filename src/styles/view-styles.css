@@ -2,9 +2,9 @@
 
 
 .dashboard-page {
-  --dashboard-primary: #5b6ee1;
-  --dashboard-secondary: #0ea5e9;
-  --dashboard-accent: #8b5cf6;
+  --dashboard-primary: #39ff14;
+  --dashboard-secondary: #00e5ff;
+  --dashboard-accent: #ffb300;
 }
 
 .dashboard-page .page-header {
@@ -59,8 +59,8 @@
 
 
 .timeline-page {
-  --timeline-primary: #10b981;
-  --timeline-secondary: #059669;
+  --timeline-primary: #39ff14;
+  --timeline-secondary: #00e5ff;
 }
 
 .timeline-page .page-header {
@@ -259,9 +259,9 @@
 
 
 .analytics-page {
-  --analytics-primary: #6366f1;
-  --analytics-secondary: #4f46e5;
-  --analytics-accent: #8b5cf6;
+  --analytics-primary: #39ff14;
+  --analytics-secondary: #00e5ff;
+  --analytics-accent: #ffb300;
 }
 
 .analytics-page .page-header {
@@ -1230,13 +1230,13 @@
 
 
 .tools-page {
-  --tools-primary: #f59e0b;
-  --tools-secondary: #d97706;
-  --tools-timeout: #ef4444;
-  --tools-focus: #10b981;
-  --tools-tasks: #8b5cf6;
-  --tools-timer: #f59e0b;
-  --tools-notepad: #6366f1;
+  --tools-primary: #ffb300;
+  --tools-secondary: #ff8f00;
+  --tools-timeout: #ff1744;
+  --tools-focus: #39ff14;
+  --tools-tasks: #00e5ff;
+  --tools-timer: #ffb300;
+  --tools-notepad: #39ff14;
 }
 
 .tools-page .page-header {
@@ -1451,8 +1451,8 @@
 
 
 .transfer-page {
-  --transfer-primary: #06b6d4;
-  --transfer-secondary: #0891b2;
+  --transfer-primary: #00e5ff;
+  --transfer-secondary: #00b8d4;
 }
 
 .transfer-page .page-header {
@@ -1593,8 +1593,8 @@
 
 
 .settings-page {
-  --settings-primary: #6366f1;
-  --settings-secondary: #4f46e5;
+  --settings-primary: #39ff14;
+  --settings-secondary: #00e5ff;
 }
 
 .settings-page .page-container {

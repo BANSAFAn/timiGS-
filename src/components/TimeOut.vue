@@ -406,7 +406,7 @@
 
             
             <div class="schedule-info-box">
-              <span class="info-icon">ℹ️</span>
+              <span class="info-icon">[i]</span>
               <p class="schedule-hint">
                 {{ t('timeout.scheduleHint', 'Time OUT will automatically start during working hours on selected days. Custom breaks will trigger at specified times.') }}
               </p>
