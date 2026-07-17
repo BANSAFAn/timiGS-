@@ -62,6 +62,10 @@
     "today": "Today",
     "yesterday": "Yesterday",
     "searchPlaceholder": "Search apps...",
+    "sortByTimeDesc": "Most Time",
+    "sortByTimeAsc": "Least Time",
+    "sortByNameAsc": "Name A-Z",
+    "sortByNameDesc": "Name Z-A",
     "selectDate": "Select Date",
     "duration": "Duration",
     "startTime": "Start Time",
@@ -205,10 +209,10 @@
     "notificationEmergencyTitle": "Emergency Unlock - Doctor Mode",
     "notificationEmergencyBody": "Emergency Unlock: PC unlocked manually. Please remember to take breaks for your health!",
     "notificationBreakReminderTitle": "Ergonomic Break Reminder",
-    "notificationReminder1": "🌿 Doctor Mode: You've been at your PC for {mins} minutes. Time to take a break! Go for a walk, stretch, or rest your eyes.",
-    "notificationReminder2": "💚 Health Reminder: {mins} minutes of screen time! Your body needs a break. Step away from the computer for a few minutes.",
-    "notificationReminder3": "🌸 Doctor Mode: Don't forget to take care of yourself! You've been working for {mins} minutes. Time for a short break!",
-    "notificationReminder4": "☕ Break Time: {mins} minutes passed. How about a cup of tea and some fresh air? Your health matters!",
+    "notificationReminder1": "Doctor Mode: You've been at your PC for {mins} minutes. Time to take a break! Go for a walk, stretch, or rest your eyes.",
+    "notificationReminder2": "Health Reminder: {mins} minutes of screen time! Your body needs a break. Step away from the computer for a few minutes.",
+    "notificationReminder3": "Doctor Mode: Don't forget to take care of yourself! You've been working for {mins} minutes. Time for a short break!",
+    "notificationReminder4": "Break Time: {mins} minutes passed. How about a cup of tea and some fresh air? Your health matters!",
     "notificationEnabledTitle": "Doctor Mode Enabled",
     "notificationEnabledBody": "You will be reminded to take a break every {interval} minutes. After {max} reminders, your PC will be locked for {duration} minutes.",
     "personalizeSubtitle": "Personalize your interface",
@@ -341,7 +345,7 @@
     "playbackMode": "Playback Mode:",
     "playSingle": "Play Selected Track",
     "playAll": "Play Folder",
-    "bypassTitle": "STAY FOCUSED! 🎯",
+    "bypassTitle": "STAY FOCUSED!",
     "bypassBody": "WORK, WHY DO YOU NEED THEM, YOU MUST WORK! FOCUS !!!!!!"
   },
   "timeout": {
@@ -402,7 +406,7 @@
     "playAll": "Play Folder (All)",
     "timeToRest": "Time to Rest!",
     "takeBreakRelax": "Take a break, drink some tea, and relax.",
-    "bypassTitle": "PLEASE TAKE A BREAK! ☕",
+    "bypassTitle": "PLEASE TAKE A BREAK!",
     "bypassBody": "GO DRINK TEA, RELAX, YOU HAVE TIME, RELAX PLEASE !!!!!!!!"
   },
   "common": {
