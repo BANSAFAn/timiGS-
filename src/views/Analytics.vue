@@ -100,7 +100,7 @@
             <div class="app-breakdown-content">
               
               <div class="app-breakdown-chart">
-                <Pie v-if="store.topApps.length > 0" :data="appChartData" :options="pieChartOptions" />
+                 <Pie v-if="allAppsSorted.length > 0" :data="appChartData" :options="computedPieChartOptions" />
               </div>
               
               
@@ -110,7 +110,7 @@
                   <span>{{ $t('common.time', 'Time') }}</span>
                 </div>
                 <div class="app-list-items custom-scrollbar">
-                  <div v-for="(app, i) in store.topApps" :key="app.app_name" class="app-list-item" @click="showDetailModal = true">
+                  <div v-for="(app, i) in allAppsSorted.slice(0, 5)" :key="app.app_name" class="app-list-item" @click="showDetailModal = true">
                     <div class="app-item-left">
                       <span class="app-color-dot" :style="{ background: appChartData.datasets[0].backgroundColor[i % appChartData.datasets[0].backgroundColor.length] }"></span>
                       <img v-if="appIcons[app.app_name]" :src="appIcons[app.app_name]" class="app-list-icon" :alt="app.app_name" />
@@ -122,6 +122,11 @@
                       <span class="app-list-time">{{ formatTimeReadable(app.total_seconds) }}</span>
                     </div>
                   </div>
+                </div>
+                <div class="show-all-apps-wrapper" style="margin-top: 12px; text-align: center;" v-if="allAppsSorted.length > 5">
+                  <button class="show-all-btn" @click="showDetailModal = true" style="width: 100%; border: 1px solid var(--border-color); background: var(--bg-tertiary); color: var(--color-primary); padding: 8px; font-family: var(--font-family); font-size: 0.85rem; cursor: pointer; transition: var(--transition-fast);">
+                    [ {{ $t('analytics.showAllApps', 'Show All Applications') }} ]
+                  </button>
                 </div>
               </div>
             </div>
@@ -233,17 +238,20 @@
                </span>
              </div>
              <div class="now-playing-content">
-               <div class="now-playing-icon">
-                 <img v-if="appIcons[currentMusicSession.app_name]" :src="appIcons[currentMusicSession.app_name]" class="now-playing-app-icon" :alt="currentMusicSession.app_name" />
-                 <svg v-else-if="currentMusicSession.app_name === 'YouTube Music'" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="white" style="background: #ff0000; border-radius: 8px;">
-                   <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 14.5v-9l6 4.5-6 4.5z"/>
-                 </svg>
-                 <svg v-else xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                   <path d="M9 18V5l12-2v13"></path>
-                   <circle cx="6" cy="18" r="3"></circle>
-                   <circle cx="18" cy="16" r="3"></circle>
-                 </svg>
-               </div>
+                <div class="now-playing-icon-container" style="width: 48px; height: 48px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 1px solid var(--border-color); border-radius: 0px;">
+                  <img v-if="musicCovers[currentMusicSession.window_title]" :src="musicCovers[currentMusicSession.window_title]" class="now-playing-cover" style="width: 48px; height: 48px; object-fit: cover;" />
+                  <div v-else class="now-playing-icon" style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;">
+                    <img v-if="appIcons[currentMusicSession.app_name]" :src="appIcons[currentMusicSession.app_name]" class="now-playing-app-icon" :alt="currentMusicSession.app_name" style="width: 32px; height: 32px;" />
+                    <svg v-else-if="currentMusicSession.app_name === 'YouTube Music'" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="white" style="background: #ff0000; border-radius: 0px;">
+                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 14.5v-9l6 4.5-6 4.5z"/>
+                    </svg>
+                    <svg v-else xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M9 18V5l12-2v13"></path>
+                      <circle cx="6" cy="18" r="3"></circle>
+                      <circle cx="18" cy="16" r="3"></circle>
+                    </svg>
+                  </div>
+                </div>
                <div class="now-playing-info">
                  <div class="now-playing-track" :title="currentMusicSession.window_title || $t('analytics.unknownTrack', 'Unknown Track')">{{ currentMusicSession.window_title || $t('analytics.unknownTrack', 'Unknown Track') }}</div>
                  <div class="now-playing-app">{{ currentMusicSession.app_name }}</div>
@@ -282,7 +290,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="app in store.topApps" :key="app.app_name" class="table-row">
+                <tr v-for="app in allAppsSorted" :key="app.app_name" class="table-row">
                   <td>
                     <div class="app-row">
                       <img v-if="appIcons[app.app_name]" :src="appIcons[app.app_name]" class="app-icon-mini-img" :alt="app.app_name" />
@@ -330,12 +338,15 @@
             <div v-if="musicHistorySessions.length === 0" class="empty-day">{{ t('analytics.noMusicSessions', 'No music sessions recorded') }}</div>
             <div v-else class="music-sessions-list">
               <div v-for="session in musicHistorySessions" :key="session.id" class="music-session-item">
-                <div class="music-session-icon">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M9 18V5l12-2v13"></path>
-                    <circle cx="6" cy="18" r="3"></circle>
-                    <circle cx="18" cy="16" r="3"></circle>
-                  </svg>
+                 <div class="music-session-icon-container" style="width: 40px; height: 40px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
+                  <img v-if="musicCovers[session.window_title]" :src="musicCovers[session.window_title]" class="music-session-cover" style="width: 40px; height: 40px; object-fit: cover; border: 1px solid var(--border-color); border-radius: 0px;" />
+                  <div v-else class="music-session-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M9 18V5l12-2v13"></path>
+                      <circle cx="6" cy="18" r="3"></circle>
+                      <circle cx="18" cy="16" r="3"></circle>
+                    </svg>
+                  </div>
                 </div>
                 <div class="music-session-info">
                   <div class="music-session-track">{{ session.window_title || $t('analytics.unknownTrack', 'Unknown Track') }}</div>
@@ -507,6 +518,7 @@ const currentMusicSession = computed(() => store.currentMusicSession);
 
 
 const appIcons = ref<Record<string, string>>({});
+const musicCovers = ref<Record<string, string>>({});
 
 
 const showMusicHistory = ref(false);
@@ -681,14 +693,91 @@ function handleWebsiteFaviconError(event: Event, siteName: string) {
   target.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44"><rect width="44" height="44" rx="10" fill="rgba(6,182,212,0.2)"/><text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" font-size="20" font-weight="bold" fill="%2306b6d4">' + encodeURIComponent(siteName.charAt(0).toUpperCase()) + '</text></svg>';
 }
 
+const fetchingCovers = new Set<string>();
+
+async function fetchMusicCover(trackTitle: string) {
+  if (!trackTitle || trackTitle in musicCovers.value || fetchingCovers.has(trackTitle)) return;
+  fetchingCovers.add(trackTitle);
+
+  try {
+    let query = trackTitle;
+
+    // Remove browser suffixes
+    const browserSuffixes = [
+      ' - Vivaldi',
+      ' - Google Chrome',
+      ' - Chrome',
+      ' - Microsoft Edge',
+      ' - Edge',
+      ' - Firefox',
+      ' - Opera',
+      ' - Brave'
+    ];
+    for (const suffix of browserSuffixes) {
+      if (query.endsWith(suffix)) {
+        query = query.slice(0, -suffix.length);
+      }
+    }
+
+    // Split by | or - and remove YouTube/Music info if needed
+    if (query.includes(' | ')) {
+      const parts = query.split(' | ');
+      if (parts[1] && (parts[1].toLowerCase().includes('youtube') || parts[1].toLowerCase().includes('music'))) {
+        query = parts[0];
+      }
+    }
+
+    // Remove specific known suffixes
+    query = query
+      .replace(/ - YouTube Music/gi, '')
+      .replace(/ - YouTube/gi, '')
+      .replace(/ \| YouTube Music/gi, '')
+      .replace(/ \| YouTube/gi, '')
+      .trim();
+
+    // Skip generic names
+    if (
+      !query ||
+      query.toLowerCase() === 'youtube music' ||
+      query.toLowerCase() === 'spotify' ||
+      query.toLowerCase() === 'music'
+    ) {
+      musicCovers.value[trackTitle] = '';
+      return;
+    }
+
+    const response = await fetch(
+      `https://itunes.apple.com/search?term=${encodeURIComponent(query)}&media=music&limit=1`
+    );
+    if (!response.ok) throw new Error('API error');
+    
+    const data = await response.json();
+    if (data.results && data.results.length > 0 && data.results[0].artworkUrl100) {
+      // Get higher resolution artwork
+      const highRes = data.results[0].artworkUrl100.replace('100x100bb.jpg', '200x200bb.jpg');
+      musicCovers.value[trackTitle] = highRes;
+    } else {
+      musicCovers.value[trackTitle] = '';
+    }
+  } catch (err) {
+    console.error('Failed to fetch cover for:', trackTitle, err);
+    musicCovers.value[trackTitle] = '';
+  } finally {
+    fetchingCovers.delete(trackTitle);
+  }
+}
+
 async function loadIcon(appName: string, path: string) {
-  if (appIcons.value[appName] || !path) return;
+  if (appName in appIcons.value || !path) return;
   try {
     const base64 = await invoke<string | null>('get_app_icon', { path });
     if (base64) {
       appIcons.value[appName] = `data:image/png;base64,${base64}`;
+    } else {
+      appIcons.value[appName] = '';
     }
   } catch (error) {
+    appIcons.value[appName] = '';
     console.error('Failed to load icon:', error);
   }
 }
@@ -733,6 +822,11 @@ async function openMusicHistory(appName: string) {
       .sort((a, b) => new Date(b.start_time).getTime() - new Date(a.start_time).getTime());
     
     musicHistorySessions.value = filteredSessions as MusicSession[];
+    musicHistorySessions.value.forEach(session => {
+      if (session.window_title) {
+        fetchMusicCover(session.window_title);
+      }
+    });
     musicHistoryTotalTime.value = filteredSessions.reduce((acc, s) => acc + s.duration_seconds, 0);
     showMusicHistory.value = true;
   } catch (error) {
@@ -1082,57 +1176,119 @@ const totalWeekTime = computed(() => weeklyStats.value.reduce((acc, d) => acc + 
 const dailyAverage = computed(() => weeklyStats.value.length ? Math.round(totalWeekTime.value / weeklyStats.value.length) : 0);
 
 
-const lineChartData = computed(() => ({
-  labels: weeklyStats.value.map(d => new Date(d.date).toLocaleDateString(locale.value, { month: 'short', day: 'numeric' })).reverse(),
-  datasets: [{
-    label: t('analytics.activity'),
-    data: weeklyStats.value.map(d => Number((d.total_seconds / 3600).toFixed(1))).reverse(),
-    borderColor: '#10b981',
-    borderWidth: 3,
-    backgroundColor: 'rgba(16, 185, 129, 0.1)',
-    tension: 0.4,
-    fill: true,
-    pointBackgroundColor: '#10b981',
-    pointBorderColor: '#fff',
-    pointBorderWidth: 2,
-    pointRadius: 4,
-    pointHoverRadius: 6
-  }]
-}));
+const chartColors = computed(() => {
+  const isLight = store.settings.theme === 'light';
+  if (isLight) {
+    return [
+      "#ffb300", // main amber
+      "#fbbf24", // amber-400
+      "#d97706", // amber-600
+      "#f97316", // orange-500
+      "#ea580c", // orange-600
+      "#b45309", // amber-700
+      "#78350f", // amber-900
+    ];
+  } else {
+    return [
+      "#39ff14", // main neon green
+      "#4ade80", // green-400
+      "#16a34a", // green-600
+      "#22c55e", // green-500
+      "#15803d", // green-700
+      "#86efac", // green-300
+      "#14532d", // green-900
+    ];
+  }
+});
+
+const allAppsSorted = computed(() => {
+  return [...store.todaySummary].sort((a, b) => b.total_seconds - a.total_seconds);
+});
+
+const lineChartData = computed(() => {
+  const isLight = store.settings.theme === 'light';
+  const primaryColor = isLight ? '#ffb300' : '#39ff14';
+  const bgColor = isLight ? 'rgba(255, 179, 0, 0.1)' : 'rgba(57, 255, 20, 0.1)';
+
+  return {
+    labels: weeklyStats.value.map(d => new Date(d.date).toLocaleDateString(locale.value, { month: 'short', day: 'numeric' })).reverse(),
+    datasets: [{
+      label: t('analytics.activity') || 'Activity',
+      data: weeklyStats.value.map(d => Number((d.total_seconds / 3600).toFixed(1))).reverse(),
+      borderColor: primaryColor,
+      borderWidth: 3,
+      backgroundColor: bgColor,
+      tension: 0.4,
+      fill: true,
+      pointBackgroundColor: primaryColor,
+      pointBorderColor: isLight ? '#0a0600' : '#020502',
+      pointBorderWidth: 2,
+      pointRadius: 4,
+      pointHoverRadius: 6
+    }]
+  };
+});
 
 const appChartData = computed(() => ({
-  labels: store.topApps.map(a => a.app_name),
+  labels: allAppsSorted.value.map(a => a.app_name),
   datasets: [{
-    data: store.topApps.map(a => a.total_seconds),
-    backgroundColor: ['#6366f1', '#06b6d4', '#8b5cf6', '#ec4899', '#f59e0b'],
+    data: allAppsSorted.value.map(a => a.total_seconds),
+    backgroundColor: chartColors.value,
     borderWidth: 0,
     hoverOffset: 10
   }]
 }));
 
-const commonOptions = {
-  responsive: true,
-  maintainAspectRatio: false,
-  plugins: { legend: { display: false }, tooltip: {
-    backgroundColor: 'rgba(20, 20, 30, 0.9)',
-    titleColor: '#fff',
-    bodyColor: '#ccc',
-    padding: 10,
-    cornerRadius: 8,
-    displayColors: false
-  }},
-  scales: {
-    x: { grid: { display: false }, ticks: { color: '#6b7280' } },
-    y: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#6b7280' }, beginAtZero: true }
-  }
-};
+const commonOptions = computed(() => {
+  const isLight = store.settings.theme === 'light';
+  const primaryColor = isLight ? "#ffb300" : "#39ff14";
+  const bgColor = isLight ? "rgba(10, 6, 0, 0.98)" : "rgba(2, 5, 2, 0.98)";
+  const textColor = isLight ? "#ffb300" : "#39ff14";
+
+  return {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { 
+      legend: { display: false }, 
+      tooltip: {
+        backgroundColor: bgColor,
+        titleColor: textColor,
+        titleFont: { family: "Consolas, Courier New, monospace", size: 12, weight: "bold" },
+        bodyColor: textColor,
+        bodyFont: { family: "Consolas, Courier New, monospace", size: 12 },
+        padding: 10,
+        cornerRadius: 0,
+        borderColor: primaryColor,
+        borderWidth: 1,
+        displayColors: false
+      }
+    },
+    scales: {
+      x: { 
+        grid: { display: false }, 
+        ticks: { 
+          color: primaryColor,
+          font: { family: "Consolas, Courier New, monospace", size: 10 }
+        } 
+      },
+      y: { 
+        grid: { color: isLight ? 'rgba(255, 179, 0, 0.05)' : 'rgba(57, 255, 20, 0.05)' }, 
+        ticks: { 
+          color: primaryColor,
+          font: { family: "Consolas, Courier New, monospace", size: 10 }
+        }, 
+        beginAtZero: true 
+      }
+    }
+  };
+});
 
 const lineChartOptions = computed(() => ({
-  ...commonOptions,
+  ...commonOptions.value,
   plugins: {
-    ...commonOptions.plugins,
+    ...commonOptions.value.plugins,
     tooltip: {
-      ...commonOptions.plugins.tooltip,
+      ...commonOptions.value.plugins.tooltip,
       callbacks: {
         label: (tooltipItem: any) => {
           const dataIndex = tooltipItem.dataIndex;
@@ -1147,23 +1303,40 @@ const lineChartOptions = computed(() => ({
   }
 }));
 
-const pieChartOptions = {
-  responsive: true,
-  maintainAspectRatio: false,
-  plugins: {
-    legend: { display: false },
-    tooltip: {
-      callbacks: {
-        label: (ctx: any) => ` ${formatDuration(ctx.raw)}`
+const computedPieChartOptions = computed(() => {
+  const isLight = store.settings.theme === 'light';
+  const primaryColor = isLight ? "#ffb300" : "#39ff14";
+  const bgColor = isLight ? "rgba(10, 6, 0, 0.98)" : "rgba(2, 5, 2, 0.98)";
+  const textColor = isLight ? "#ffb300" : "#39ff14";
+
+  return {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: bgColor,
+        titleColor: textColor,
+        titleFont: { family: "Consolas, Courier New, monospace", size: 12, weight: "bold" },
+        bodyColor: textColor,
+        bodyFont: { family: "Consolas, Courier New, monospace", size: 12 },
+        padding: 10,
+        cornerRadius: 0,
+        borderColor: primaryColor,
+        borderWidth: 1,
+        displayColors: false,
+        callbacks: {
+          label: (ctx: any) => ` DURATION: ${formatDuration(ctx.raw)}`
+        }
       }
     }
-  }
-};
+  };
+});
 
 onMounted(async () => {
   await fetchPeriodData();
 
-  store.topApps.forEach(app => {
+  store.todaySummary.forEach(app => {
     if (app.exe_path) {
       loadIcon(app.app_name, app.exe_path);
     }
@@ -1178,6 +1351,13 @@ onMounted(async () => {
     loadIcon(currentMusicSession.value.app_name, currentMusicSession.value.exe_path);
   }
 });
+
+
+watch(() => store.currentMusicSession, (newSession) => {
+  if (newSession?.window_title) {
+    fetchMusicCover(newSession.window_title);
+  }
+}, { immediate: true });
 
 
 watch(selectedRange, async () => {
@@ -1706,16 +1886,17 @@ watch(selectedRange, async () => {
 .app-color-dot {
   width: 12px;
   height: 12px;
-  border-radius: 4px;
+  border-radius: 0px;
   flex-shrink: 0;
 }
 
 .app-list-icon {
   width: 28px;
   height: 28px;
-  border-radius: 6px;
+  border-radius: 0px;
   object-fit: contain;
   background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-color);
   padding: 4px;
   flex-shrink: 0;
 }
@@ -1723,11 +1904,11 @@ watch(selectedRange, async () => {
 .app-list-icon-fallback {
   width: 28px;
   height: 28px;
-  border-radius: 6px;
+  border-radius: 0px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
+  color: var(--bg-main);
   font-weight: 700;
   font-size: 0.9rem;
   flex-shrink: 0;
@@ -2137,15 +2318,15 @@ watch(selectedRange, async () => {
 }
 
 .modal-content {
-  background: rgba(30, 34, 48, 0.97);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 24px; 
+  background: var(--bg-secondary);
+  border: 2px solid var(--border-color);
+  border-radius: 0px; 
   width: 650px; 
   max-width: 90%; 
   max-height: 80vh;
   display: flex; 
   flex-direction: column; 
-  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.6), 0 0 60px rgba(99,102,241,0.1);
+  box-shadow: var(--shadow-glow);
 }
 
 .modal-header {
@@ -2231,24 +2412,24 @@ watch(selectedRange, async () => {
 .app-icon-mini {
   width: 32px; 
   height: 32px; 
-  border-radius: 10px;
+  border-radius: 0px;
   display: flex; 
   align-items: center; 
   justify-content: center;
-  color: #fff; 
+  color: var(--bg-main); 
   font-size: 0.85rem; 
   font-weight: 700;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  border: 1px solid var(--border-color);
 }
 
 .app-icon-mini-img {
   width: 32px; 
   height: 32px; 
-  border-radius: 10px;
+  border-radius: 0px;
   object-fit: contain;
   background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-color);
   padding: 4px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
 
 .mono-font { 
@@ -3448,7 +3629,7 @@ watch(selectedRange, async () => {
 .music-session-icon {
   width: 40px;
   height: 40px;
-  border-radius: 10px;
+  border-radius: 0px;
   background: rgba(236, 72, 153, 0.15);
   display: flex;
   align-items: center;
@@ -3555,7 +3736,7 @@ watch(selectedRange, async () => {
 .website-session-icon {
   width: 40px;
   height: 40px;
-  border-radius: 10px;
+  border-radius: 0px;
   background: rgba(6, 182, 212, 0.15);
   display: flex;
   align-items: center;
