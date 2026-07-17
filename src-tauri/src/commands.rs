@@ -244,6 +244,11 @@ pub fn get_activity_range(from: String, to: String) -> Vec<db::ActivitySession> 
 }
 
 #[command]
+pub fn get_active_days() -> Vec<String> {
+    db::get_active_days().unwrap_or_default()
+}
+
+#[command]
 pub fn get_settings() -> db::Settings {
     db::get_settings()
 }

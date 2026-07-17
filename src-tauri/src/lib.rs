@@ -214,6 +214,7 @@ pub fn run() {
             commands::get_music_activity_range,
             commands::get_weekly_stats,
             commands::get_activity_range,
+            commands::get_active_days,
             commands::get_settings,
             commands::save_settings,
             commands::get_setting_cmd,

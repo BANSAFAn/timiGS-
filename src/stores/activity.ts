@@ -535,7 +535,8 @@ export const useActivityStore = defineStore('activity', {
     isTracking: false,
     isLoading: false,
     isMobile: false,
-    excludedProcesses: [] as string[]
+    excludedProcesses: [] as string[],
+    activeDays: [] as string[]
   }),
 
   getters: {
@@ -671,6 +672,14 @@ export const useActivityStore = defineStore('activity', {
   },
 
   actions: {
+    async fetchActiveDays() {
+      try {
+        this.activeDays = await invoke<string[]>('get_active_days');
+      } catch (error) {
+        console.error('Failed to fetch active days:', error);
+      }
+    },
+
     async fetchCurrentActivity() {
       try {
         const [currentActivity, currentSession, currentCodingSession] = await Promise.all([
@@ -829,19 +838,19 @@ export const useActivityStore = defineStore('activity', {
       const hours = Math.floor(totalTime / 3600);
       const mins = Math.floor((totalTime % 3600) / 60);
 
-      let report = `📊 TimiGS Weekly Activity Report\n`;
+      let report = `[REPORT] TimiGS Weekly Activity Report\n`;
       report += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
-      report += `📅 Period: Last 7 days\n`;
-      report += `⏱️ Total Time: ${hours}h ${mins}m\n\n`;
+      report += `Period: Last 7 days\n`;
+      report += `Total Time: ${hours}h ${mins}m\n\n`;
 
-      report += `🏆 Top Applications:\n`;
+      report += `Top Applications:\n`;
       this.todaySummary.slice(0, 5).forEach((app, i) => {
         const appHours = Math.floor(app.total_seconds / 3600);
         const appMins = Math.floor((app.total_seconds % 3600) / 60);
         report += `  ${i + 1}. ${app.app_name}: ${appHours}h ${appMins}m\n`;
       });
 
-      report += `\n📈 Daily Breakdown:\n`;
+      report += `\nDaily Breakdown:\n`;
       this.weeklyStats.forEach(day => {
         const dayHours = Math.floor(day.total_seconds / 3600);
         const dayMins = Math.floor((day.total_seconds % 3600) / 60);

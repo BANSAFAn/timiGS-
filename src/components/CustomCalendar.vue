@@ -135,7 +135,10 @@ const calendarDays = computed(() => {
     const date = new Date(startDate);
     date.setDate(startDate.getDate() + i);
 
-    const dateStr = date.toISOString().split('T')[0];
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const dayVal = String(date.getDate()).padStart(2, '0');
+    const dateStr = `${year}-${month}-${dayVal}`;
     const isCurrentMonth = date.getMonth() === currentMonth.value;
     const isToday = date.toDateString() === today.toDateString();
     const isSelected = date.toDateString() === selectedDate.toDateString();
@@ -398,7 +401,8 @@ watch(() => props.modelValue, (newDate) => {
   position: relative;
   background: transparent;
   border: 1px solid transparent;
-  color: var(--text-main);
+  color: var(--text-muted);
+  opacity: 0.5;
   width: 36px;
   height: 36px;
   border-radius: var(--radius-md);
@@ -412,31 +416,38 @@ watch(() => props.modelValue, (newDate) => {
   gap: 2px;
 }
 
+.calendar-day.has-sessions {
+  color: var(--color-primary);
+  font-weight: 700;
+  opacity: 1;
+}
+
 .calendar-day:hover {
   background: var(--bg-hover);
   border-color: var(--border-color);
+  opacity: 1;
 }
 
 .calendar-day.other-month {
   color: var(--text-muted);
-  opacity: 0.4;
+  opacity: 0.2;
 }
 
 .calendar-day.today {
-  background: var(--bg-tertiary);
   border-color: var(--color-primary);
   font-weight: 700;
 }
 
 .calendar-day.selected {
   background: var(--color-primary);
-  color: white;
+  color: var(--bg-main) !important;
   font-weight: 700;
   border-color: var(--color-primary);
+  opacity: 1;
 }
 
 .calendar-day.selected .session-dot {
-  background: white;
+  background: var(--bg-main);
 }
 
 .day-number {
