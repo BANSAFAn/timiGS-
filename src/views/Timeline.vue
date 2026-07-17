@@ -16,6 +16,15 @@
         />
       </div>
 
+      <div class="sort-box">
+        <select v-model="sortBy" class="sort-select">
+          <option value="time-desc">[ {{ $t('timeline.sortByTimeDesc') || 'Most Time' }} ]</option>
+          <option value="time-asc">[ {{ $t('timeline.sortByTimeAsc') || 'Least Time' }} ]</option>
+          <option value="name-asc">[ {{ $t('timeline.sortByNameAsc') || 'Name A-Z' }} ]</option>
+          <option value="name-desc">[ {{ $t('timeline.sortByNameDesc') || 'Name Z-A' }} ]</option>
+        </select>
+      </div>
+
       <div class="calendar-nav">
         <button class="nav-btn" @click="goToPreviousDay">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
@@ -91,7 +100,7 @@
             </div>
           </div>
 
-          <div v-show="expandedGroups.has(group.appName)" class="timeline-group-sessions">
+          <div v-if="expandedGroups.has(group.appName)" class="timeline-group-sessions">
             <div v-for="session in group.sessions" :key="session.id" class="timeline-item" @click="handleSessionClick(session)">
               <div class="timeline-time">
                 {{ formatTime(session.start_time) }} - {{ session.end_time ? formatTime(session.end_time) : t('common.now', 'Now') }}
@@ -171,6 +180,7 @@ const showCalendar = ref(false);
 const sessions = ref<ActivitySession[]>([]);
 
 const searchQuery = ref('');
+const sortBy = ref('time-desc');
 const appIcons = ref<Record<string, string>>({});
 const expandedGroups = ref<Set<string>>(new Set());
 
@@ -205,9 +215,19 @@ const groupedSessions = computed(() => {
     group.totalTime += session.duration_seconds;
   });
 
+  const list = Array.from(groups.values());
 
-  return Array.from(groups.values())
-    .sort((a, b) => b.totalTime - a.totalTime);
+  if (sortBy.value === 'time-desc') {
+    list.sort((a, b) => b.totalTime - a.totalTime);
+  } else if (sortBy.value === 'time-asc') {
+    list.sort((a, b) => a.totalTime - b.totalTime);
+  } else if (sortBy.value === 'name-asc') {
+    list.sort((a, b) => a.appName.localeCompare(b.appName));
+  } else if (sortBy.value === 'name-desc') {
+    list.sort((a, b) => b.appName.localeCompare(a.appName));
+  }
+
+  return list;
 });
 
 function toggleGroup(appName: string) {
@@ -293,9 +313,8 @@ const filteredSessions = computed(() => {
 
 const sessionsByDate = computed(() => {
   const map: Record<string, boolean> = {};
-  sessions.value.forEach(session => {
-    const dateStr = session.start_time.split('T')[0];
-    map[dateStr] = true;
+  store.activeDays.forEach(dayStr => {
+    map[dayStr] = true;
   });
   return map;
 });
@@ -413,24 +432,32 @@ async function fetchSessions() {
 
 async function loadIcons(sessionList: ActivitySession[]) {
   const paths = [...new Set(sessionList.map(s => s.exe_path).filter(Boolean))];
-  for (const exePath of paths) {
-    if (appIcons.value[exePath]) continue;
-    try {
-      const base64: string | null = await invoke('get_app_icon', { path: exePath });
-      if (base64) {
-        appIcons.value[exePath] = `data:image/png;base64,${base64}`;
+  await Promise.all(
+    paths.map(async (exePath) => {
+      if (exePath in appIcons.value) return;
+      try {
+        const base64: string | null = await invoke('get_app_icon', { path: exePath });
+        if (base64) {
+          appIcons.value[exePath] = `data:image/png;base64,${base64}`;
+        } else {
+          appIcons.value[exePath] = '';
+        }
+      } catch {
+        appIcons.value[exePath] = '';
       }
-    } catch {  }
-  }
+    })
+  );
 }
 
 watch(sessions, (newSessions) => {
   if (newSessions.length > 0) loadIcons(newSessions);
+  store.fetchActiveDays();
 });
 
 watch(selectedDate, fetchSessions);
 
 onMounted(async () => {
+  store.fetchActiveDays();
   if (isToday.value) {
     await Promise.all([
       store.fetchExcludedProcesses(),
@@ -485,12 +512,36 @@ onMounted(async () => {
   min-width: 250px;
 }
 
+.sort-box {
+  position: relative;
+  min-width: 160px;
+}
+
+.sort-select {
+  width: 100%;
+  padding: 12px 16px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 0px;
+  color: var(--color-primary);
+  font-family: var(--font-family);
+  font-size: 0.95rem;
+  cursor: pointer;
+  outline: none;
+  transition: var(--transition-fast);
+}
+
+.sort-select:focus {
+  border-color: var(--color-primary);
+  background: var(--bg-tertiary);
+}
+
 .search-input {
   width: 100%;
   padding: 12px 16px 12px 44px;
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
+  border-radius: 0px;
   color: var(--text-main);
   font-size: 0.95rem;
   transition: var(--transition-fast);
