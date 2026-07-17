@@ -595,16 +595,9 @@ pub fn start_tracking_with_app_handle(app_handle: tauri::AppHandle) {
                             last_title = active.window_title.clone();
                         }
 
-                        // Ну нахуя ви тут дивитися ?
-                        let is_browser_ai = is_browser_ai_site(&active.app_name, &active.window_title);
                         let editor_opt = detect_code_editor(&active.app_name, &active.exe_path);
 
-                        if editor_opt.is_some() || is_browser_ai {
-                            let editor_name = if is_browser_ai {
-                                "AI Web Assistant".to_string()
-                            } else {
-                                editor_opt.unwrap()
-                            };
+                        if let Some(editor_name) = editor_opt {
                             let coding_key = format!("{}|{}", active.exe_path, active.window_title);
                             if coding_key != last_coding_key {
                                 if let Some(session) = CURRENT_CODING_SESSION.lock().take() {
@@ -821,16 +814,9 @@ pub fn start_tracking() {
                             last_title = active.window_title.clone();
                         }
 
-                        // Handle coding session (independent of regular session)
-                        let is_browser_ai = is_browser_ai_site(&active.app_name, &active.window_title);
                         let editor_opt = detect_code_editor(&active.app_name, &active.exe_path);
 
-                        if editor_opt.is_some() || is_browser_ai {
-                            let editor_name = if is_browser_ai {
-                                "AI Web Assistant".to_string()
-                            } else {
-                                editor_opt.unwrap()
-                            };
+                        if let Some(editor_name) = editor_opt {
                             // Generic comment
                             let coding_key = format!("{}|{}", active.exe_path, active.window_title);
                             if coding_key != last_coding_key {
@@ -1508,26 +1494,7 @@ const AI_SERVICES: &[(&str, &str)] = &[
     ("codecompanion", "CodeCompanion"),
 ];
 
-/// Returns true if the active window is a browser on an AI website or a standalone AI app
-fn is_browser_ai_site(app_name: &str, window_title: &str) -> bool {
-    let app_lower = app_name.to_lowercase();
-    let title_lower = window_title.to_lowercase();
 
-    let is_browser = app_lower.contains("chrome") ||
-                     app_lower.contains("firefox") ||
-                     app_lower.contains("msedge") ||
-                     app_lower.contains("brave") ||
-                     app_lower.contains("safari") ||
-                     app_lower.contains("opera") ||
-                     app_lower.contains("vivaldi") ||
-                     app_lower.contains("browser");
-
-    if is_browser {
-        AI_SERVICES.iter().any(|&(key, _)| title_lower.contains(key))
-    } else {
-        AI_SERVICES.iter().any(|&(key, _)| app_lower.contains(key))
-    }
-}
 
 /// AI tools to detect (in editor name or window title).
 const AI_TOOLS: &[&str] = &[
@@ -1579,9 +1546,9 @@ const AI_TOOLS: &[&str] = &[
 fn is_ai_assisted(app_name: &str, window_title: &str, editor_name: &str) -> bool {
     let app_lower = app_name.to_lowercase();
     let title_lower = window_title.to_lowercase();
+    let editor_lower = editor_name.to_lowercase();
 
-    // НАХУЙ ЦІ ШІ
-    if editor_name == "AI Web Assistant" || AI_SERVICES.iter().any(|&(key, _)| app_lower.contains(key)) {
+    if editor_lower.contains("cursor") || editor_lower.contains("windsurf") || editor_lower.contains("devin") {
         return true;
     }
 
