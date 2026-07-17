@@ -382,17 +382,17 @@ pub fn get_today_sessions() -> Result<Vec<ActivitySession>> {
     let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
 
     let today = Local::now().date_naive();
-    let start_of_day = today.and_hms_opt(0, 0, 0).unwrap();
+    let tomorrow = today.succ_opt().unwrap();
 
     let mut stmt = conn.prepare(
         "SELECT id, app_name, window_title, exe_path, start_time, end_time, duration_seconds
          FROM activity_sessions
-         WHERE date(start_time) = date(?1)
+         WHERE start_time >= ?1 AND start_time < ?2
          ORDER BY start_time DESC",
     )?;
 
     let sessions = stmt
-        .query_map([start_of_day.to_string()], |row| {
+        .query_map(params![today.to_string(), tomorrow.to_string()], |row| {
             Ok(ActivitySession {
                 id: Some(row.get(0)?),
                 app_name: row.get(1)?,
@@ -417,15 +417,17 @@ pub fn get_sessions_range(from: NaiveDate, to: NaiveDate) -> Result<Vec<Activity
     let guard = DB.lock();
     let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
 
+    let next_day = to.succ_opt().unwrap();
+
     let mut stmt = conn.prepare(
         "SELECT id, app_name, window_title, exe_path, start_time, end_time, duration_seconds
          FROM activity_sessions
-         WHERE date(start_time) >= date(?1) AND date(start_time) <= date(?2)
+         WHERE start_time >= ?1 AND start_time < ?2
          ORDER BY start_time DESC",
     )?;
 
     let sessions = stmt
-        .query_map(params![from.to_string(), to.to_string()], |row| {
+        .query_map(params![from.to_string(), next_day.to_string()], |row| {
             Ok(ActivitySession {
                 id: Some(row.get(0)?),
                 app_name: row.get(1)?,
@@ -444,6 +446,25 @@ pub fn get_sessions_range(from: NaiveDate, to: NaiveDate) -> Result<Vec<Activity
         .collect::<Result<Vec<_>>>()?;
 
     Ok(sessions)
+}
+
+pub fn get_active_days() -> Result<Vec<String>> {
+    let guard = DB.lock();
+    let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
+
+    let mut stmt = conn.prepare(
+        "SELECT DISTINCT substr(start_time, 1, 10) as day 
+         FROM activity_sessions 
+         ORDER BY day ASC"
+    )?;
+
+    let mut rows = stmt.query([])?;
+    let mut days = Vec::new();
+    while let Some(row) = rows.next()? {
+        let day: String = row.get(0)?;
+        days.push(day);
+    }
+    Ok(days)
 }
 
 pub fn get_all_sessions() -> Result<Vec<ActivitySession>> {
@@ -483,17 +504,18 @@ pub fn get_today_summary() -> Result<Vec<AppUsageSummary>> {
     let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
 
     let today = Local::now().date_naive();
+    let tomorrow = today.succ_opt().unwrap();
 
     let mut stmt = conn.prepare(
         "SELECT app_name, exe_path, SUM(duration_seconds) as total, COUNT(*) as count
          FROM activity_sessions
-         WHERE date(start_time) = date(?1)
+         WHERE start_time >= ?1 AND start_time < ?2
          GROUP BY app_name
          ORDER BY total DESC",
     )?;
 
     let summaries = stmt
-        .query_map([today.to_string()], |row| {
+        .query_map(params![today.to_string(), tomorrow.to_string()], |row| {
             Ok(AppUsageSummary {
                 app_name: row.get(0)?,
                 exe_path: row.get(1)?,
@@ -510,16 +532,20 @@ pub fn get_summary_by_date(date_str: &str) -> Result<Vec<AppUsageSummary>> {
     let guard = DB.lock();
     let conn = guard.as_ref().ok_or(rusqlite::Error::InvalidQuery)?;
 
+    let parsed_date = NaiveDate::parse_from_str(date_str, "%Y-%m-%d")
+        .map_err(|_| rusqlite::Error::InvalidQuery)?;
+    let next_day = parsed_date.succ_opt().unwrap();
+
     let mut stmt = conn.prepare(
         "SELECT app_name, exe_path, SUM(duration_seconds) as total, COUNT(*) as count
          FROM activity_sessions
-         WHERE date(start_time) = date(?1)
+         WHERE start_time >= ?1 AND start_time < ?2
          GROUP BY app_name
          ORDER BY total DESC",
     )?;
 
     let summaries = stmt
-        .query_map([date_str.to_string()], |row| {
+        .query_map(params![date_str.to_string(), next_day.to_string()], |row| {
             Ok(AppUsageSummary {
                 app_name: row.get(0)?,
                 exe_path: row.get(1)?,
