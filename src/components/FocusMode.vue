@@ -7,12 +7,57 @@
           <span class="icon" v-html="Icons.focusTarget"></span>
           {{ t('focus.selectApp', 'Select Application') }}
         </label>
-        <select v-model="selectedApp" class="app-select">
-          <option value="" disabled>{{ t('focus.chooseAppPlaceholder', 'Choose an app to focus on...') }}</option>
-          <option v-for="app in recentApps" :key="app.app_name" :value="app">
-            {{ app.app_name }} ({{ formatDuration(app.total_seconds) }})
-          </option>
-        </select>
+        <div class="custom-app-select" ref="selectDropdownRef">
+          <div 
+            class="custom-select-trigger" 
+            :class="{ 'is-open': isDropdownOpen, 'is-selected': !!selectedApp }" 
+            @click.stop="isDropdownOpen = !isDropdownOpen"
+          >
+            <div class="trigger-left" v-if="selectedApp">
+              <img 
+                v-if="appIcons[selectedApp.app_name]" 
+                :src="appIcons[selectedApp.app_name]" 
+                class="app-option-icon" 
+                :alt="selectedApp.app_name" 
+              />
+              <span v-else class="app-option-fallback">
+                {{ selectedApp.app_name.charAt(0).toUpperCase() }}
+              </span>
+              <span class="app-option-name">{{ selectedApp.app_name }}</span>
+              <span class="app-option-duration">({{ formatDuration(selectedApp.total_seconds) }})</span>
+            </div>
+            <div class="trigger-left placeholder" v-else>
+              <span>{{ t('focus.chooseAppPlaceholder', 'Choose an app to focus on...') }}</span>
+            </div>
+            <div class="trigger-arrow">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </div>
+          </div>
+
+          <div class="custom-select-dropdown custom-scrollbar" v-if="isDropdownOpen">
+            <div 
+              v-for="app in recentApps" 
+              :key="app.app_name" 
+              class="custom-select-option"
+              :class="{ 'active': selectedApp?.app_name === app.app_name }"
+              @click="selectApplication(app)"
+            >
+              <img 
+                v-if="appIcons[app.app_name]" 
+                :src="appIcons[app.app_name]" 
+                class="app-option-icon" 
+                :alt="app.app_name" 
+              />
+              <span v-else class="app-option-fallback">
+                {{ app.app_name.charAt(0).toUpperCase() }}
+              </span>
+              <span class="app-option-name">{{ app.app_name }}</span>
+              <span class="app-option-duration">({{ formatDuration(app.total_seconds) }})</span>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="setup-section">
@@ -123,7 +168,15 @@
     
     <div v-else class="focus-active">
       <div class="focus-target">
-        <div class="target-badge" v-html="Icons.focusTarget"></div>
+        <div class="target-badge">
+          <img 
+            v-if="appIcons[status.app_name]" 
+            :src="appIcons[status.app_name]" 
+            class="active-focus-icon" 
+            :alt="status.app_name" 
+          />
+          <span v-else v-html="Icons.focusTarget"></span>
+        </div>
         <div class="target-info">
           <span class="target-name">{{ status.app_name }}</span>
           <span class="target-label">{{ t('focus.focusedApp', 'Focused Application') }}</span>
@@ -226,6 +279,38 @@ interface MusicPlaybackStatus {
 
 const recentApps = ref<AppSummary[]>([]);
 const selectedApp = ref<AppSummary | null>(null);
+const isDropdownOpen = ref(false);
+const selectDropdownRef = ref<HTMLElement | null>(null);
+const appIcons = ref<Record<string, string>>({});
+const iconCache = new Map<string, string>();
+
+async function loadIcon(appName: string, exePath: string) {
+  if (appIcons.value[appName] !== undefined) return;
+  if (iconCache.has(exePath)) {
+    appIcons.value[appName] = iconCache.get(exePath)!;
+    return;
+  }
+  try {
+    const icon = await invoke<string | null>('get_app_icon', { path: exePath });
+    const result = icon ? `data:image/png;base64,${icon}` : '';
+    iconCache.set(exePath, result);
+    appIcons.value[appName] = result;
+  } catch (e) {
+    iconCache.set(exePath, '');
+    appIcons.value[appName] = '';
+  }
+}
+
+function selectApplication(app: AppSummary) {
+  selectedApp.value = app;
+  isDropdownOpen.value = false;
+}
+
+function handleDocumentClick(e: MouseEvent) {
+  if (selectDropdownRef.value && !selectDropdownRef.value.contains(e.target as Node)) {
+    isDropdownOpen.value = false;
+  }
+}
 const hours = ref<number>(0);
 const minutes = ref<number>(30);
 const seconds = ref<number>(0);
@@ -278,6 +363,11 @@ async function loadApps() {
   try {
     const summary = await invoke<AppSummary[]>('get_today_summary');
     recentApps.value = summary.sort((a, b) => b.total_seconds - a.total_seconds);
+    recentApps.value.forEach(app => {
+      if (app.exe_path) {
+        loadIcon(app.app_name, app.exe_path);
+      }
+    });
   } catch (e) {
     console.error('Failed to load apps:', e);
   }
@@ -592,6 +682,7 @@ watch(status, async (newStatus, oldStatus) => {
 }, { immediate: true });
 
 onMounted(async () => {
+  window.addEventListener('click', handleDocumentClick);
   loadApps();
   loadStatus();
   await loadMusicSettings();
@@ -609,6 +700,7 @@ onMounted(async () => {
 });
 
 onUnmounted(() => {
+  window.removeEventListener('click', handleDocumentClick);
   if (pollInterval) clearInterval(pollInterval);
   stopMusicStatusPolling();
 
@@ -650,26 +742,135 @@ onUnmounted(() => {
   height: 100%;
 }
 
-.app-select {
+.custom-app-select {
+  position: relative;
   width: 100%;
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: white;
-  padding: 12px 14px;
-  border-radius: 12px;
+}
+
+.custom-select-trigger {
+  width: 100%;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  padding: 10px 14px;
+  border-radius: 0px;
   font-size: 0.95rem;
-  appearance: none;
+  font-family: var(--font-family);
   cursor: pointer;
-  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: var(--transition-fast);
+  user-select: none;
 }
-.app-select:focus {
-  outline: none;
-  border-color: #8b5cf6;
-  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+
+.custom-select-trigger:hover,
+.custom-select-trigger.is-open {
+  border-color: var(--color-primary);
+  background: var(--bg-tertiary);
 }
-.app-select option {
-  background: #1a1a2e;
-  color: white;
+
+.trigger-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+
+.trigger-left.placeholder {
+  color: var(--text-muted);
+}
+
+.app-option-icon {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 2px;
+  border: 1px solid var(--border-color);
+  border-radius: 0px;
+}
+
+.app-option-fallback {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  background: var(--color-primary);
+  color: var(--bg-main);
+  font-weight: 700;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0px;
+}
+
+.app-option-name {
+  font-weight: 600;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.app-option-duration {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.trigger-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  transition: transform 0.2s ease;
+  margin-left: 8px;
+  flex-shrink: 0;
+}
+
+.custom-select-trigger.is-open .trigger-arrow {
+  transform: rotate(180deg);
+  color: var(--color-primary);
+}
+
+.custom-select-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: var(--bg-secondary);
+  border: 1px solid var(--color-primary);
+  max-height: 240px;
+  overflow-y: auto;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+}
+
+.custom-select-option {
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.custom-select-option:hover,
+.custom-select-option.active {
+  background: var(--bg-tertiary);
+}
+
+.custom-select-option.active .app-option-name {
+  color: var(--color-primary);
+}
+
+.active-focus-icon {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
 }
 
 .time-inputs {
