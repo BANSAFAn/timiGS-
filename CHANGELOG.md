@@ -1,5 +1,45 @@
 # Changelog
 
+## [1.11.0](https://github.com/BANSAFAn/timiGS-/compare/v1.10.4...v1.11.0) (2026-07-18)
+
+
+### Features
+
+* add timeout and focusmode control for room creators and fix cargo edition / app identifier ([4a65d37](https://github.com/BANSAFAn/timiGS-/commit/4a65d37763a37bf0cde446708a78c2a753629e8a))
+* **calendar:** highlight days with activity and fix timezone offset mismatch ([316a71c](https://github.com/BANSAFAn/timiGS-/commit/316a71cd7f8578c1b87ba28f4a229f6ffae9978b))
+* **focus:** custom app selector dropdown with logos and base64 uri fix ([2fbb9e8](https://github.com/BANSAFAn/timiGS-/commit/2fbb9e838707c28eadba86721e6e1fd73865931c))
+* **music:** extract song cover art via iTunes Search API and clean browser suffixes ([bc06ef3](https://github.com/BANSAFAn/timiGS-/commit/bc06ef325f12e682ee02d9edacb9cf4f426bb44c))
+* **style:** hacker terminal theme styling, custom icons, and animations ([edba4d7](https://github.com/BANSAFAn/timiGS-/commit/edba4d7abf4933a24607951828b8c6eb74cbbb0e))
+* **timeline:** add sorting filters and dropdown selector to activity timeline ([9e41e2d](https://github.com/BANSAFAn/timiGS-/commit/9e41e2d128dc49387113c9a8128bcc7ab9cca983))
+* **tracker:** restrict session tracker to desktop IDEs and check for active AI tools ([a36a287](https://github.com/BANSAFAn/timiGS-/commit/a36a28744078edc096100339884db3830d674661))
+
+
+### Bug Fixes
+
+* **build:** add target_os cfg guard for tracker call in db.rs to fix macOS compilation ([a93c529](https://github.com/BANSAFAn/timiGS-/commit/a93c52940afc9deffda50a7044f106d169b39940))
+* **build:** resolve vue-tsc chart options types and null index compilation errors ([789e450](https://github.com/BANSAFAn/timiGS-/commit/789e4509197c2bc42995d787e5cac8ae3bbd1112))
+
+
+### Translations
+
+* **timeline:** add translation keys for timeline sorting options ([fabc33a](https://github.com/BANSAFAn/timiGS-/commit/fabc33a8ba8bd49d815f40ffd41d71c0a82f5438))
+
+
+### Miscellaneous
+
+* fix security vulnerabilities in root and site projects ([f094687](https://github.com/BANSAFAn/timiGS-/commit/f09468794be9ff2ee54b810fcfe4f2235c4de66b))
+
+
+### Performance
+
+* **db:** optimize SQL queries with range scans to leverage start_time index ([ac1cb03](https://github.com/BANSAFAn/timiGS-/commit/ac1cb03d89a77e952516458483387bbad15feded))
+* **icons:** concurrent icon loading and failure caching in dashboard and tools ([fc67e7e](https://github.com/BANSAFAn/timiGS-/commit/fc67e7e2fa892c064cd05956e86b505e113ace09))
+
+
+### CI/CD
+
+* fix linuxdeploy gtk plugin missing directory error on arch linux build ([80fa3a8](https://github.com/BANSAFAn/timiGS-/commit/80fa3a84f80ac7773e3e3a523b6dc1d1d46770b8))
+
 ## [1.10.4](https://github.com/BANSAFAn/timiGS-/compare/v1.10.3...v1.10.4) (2026-06-21)
 
 
