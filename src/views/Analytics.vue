@@ -239,7 +239,7 @@
              </div>
              <div class="now-playing-content">
                 <div class="now-playing-icon-container" style="width: 48px; height: 48px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 1px solid var(--border-color); border-radius: 0px;">
-                  <img v-if="musicCovers[currentMusicSession.window_title]" :src="musicCovers[currentMusicSession.window_title]" class="now-playing-cover" style="width: 48px; height: 48px; object-fit: cover;" />
+                  <img v-if="currentMusicSession?.window_title && musicCovers[currentMusicSession.window_title]" :src="musicCovers[currentMusicSession.window_title]" class="now-playing-cover" style="width: 48px; height: 48px; object-fit: cover;" />
                   <div v-else class="now-playing-icon" style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;">
                     <img v-if="appIcons[currentMusicSession.app_name]" :src="appIcons[currentMusicSession.app_name]" class="now-playing-app-icon" :alt="currentMusicSession.app_name" style="width: 32px; height: 32px;" />
                     <svg v-else-if="currentMusicSession.app_name === 'YouTube Music'" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="white" style="background: #ff0000; border-radius: 0px;">
@@ -339,7 +339,7 @@
             <div v-else class="music-sessions-list">
               <div v-for="session in musicHistorySessions" :key="session.id" class="music-session-item">
                  <div class="music-session-icon-container" style="width: 40px; height: 40px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
-                  <img v-if="musicCovers[session.window_title]" :src="musicCovers[session.window_title]" class="music-session-cover" style="width: 40px; height: 40px; object-fit: cover; border: 1px solid var(--border-color); border-radius: 0px;" />
+                  <img v-if="session.window_title && musicCovers[session.window_title]" :src="musicCovers[session.window_title]" class="music-session-cover" style="width: 40px; height: 40px; object-fit: cover; border: 1px solid var(--border-color); border-radius: 0px;" />
                   <div v-else class="music-session-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                       <path d="M9 18V5l12-2v13"></path>
@@ -1253,7 +1253,7 @@ const commonOptions = computed(() => {
       tooltip: {
         backgroundColor: bgColor,
         titleColor: textColor,
-        titleFont: { family: "Consolas, Courier New, monospace", size: 12, weight: "bold" },
+        titleFont: { family: "Consolas, Courier New, monospace", size: 12, weight: "bold" as const },
         bodyColor: textColor,
         bodyFont: { family: "Consolas, Courier New, monospace", size: 12 },
         padding: 10,
@@ -1317,7 +1317,7 @@ const computedPieChartOptions = computed(() => {
       tooltip: {
         backgroundColor: bgColor,
         titleColor: textColor,
-        titleFont: { family: "Consolas, Courier New, monospace", size: 12, weight: "bold" },
+        titleFont: { family: "Consolas, Courier New, monospace", size: 12, weight: "bold" as const },
         bodyColor: textColor,
         bodyFont: { family: "Consolas, Courier New, monospace", size: 12 },
         padding: 10,

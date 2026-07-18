@@ -525,7 +525,7 @@ const computedDoughnutOptions = computed(() => {
     responsive: true,
     maintainAspectRatio: false,
     cutout: "70%",
-    onClick: (event: any, elements: any) => {
+    onClick: (_event: any, elements: any) => {
       if (elements && elements.length > 0) {
         const index = elements[0].index;
         const app = store.topApps[index];
@@ -542,7 +542,7 @@ const computedDoughnutOptions = computed(() => {
       tooltip: {
         backgroundColor: bgColor,
         titleColor: textColor,
-        titleFont: { family: "Consolas, Courier New, monospace", size: 12, weight: "bold" },
+        titleFont: { family: "Consolas, Courier New, monospace", size: 12, weight: "bold" as const },
         bodyColor: textColor,
         bodyFont: { family: "Consolas, Courier New, monospace", size: 12 },
         padding: 10,
@@ -570,7 +570,7 @@ const computedBarOptions = computed(() => {
   return {
     responsive: true,
     maintainAspectRatio: false,
-    onClick: (event: any, elements: any) => {
+    onClick: (_event: any, elements: any) => {
       if (elements && elements.length > 0) {
         const index = elements[0].index;
         const app = store.topApps[index];
@@ -587,7 +587,7 @@ const computedBarOptions = computed(() => {
       tooltip: {
         backgroundColor: bgColor,
         titleColor: textColor,
-        titleFont: { family: "Consolas, Courier New, monospace", size: 12, weight: "bold" },
+        titleFont: { family: "Consolas, Courier New, monospace", size: 12, weight: "bold" as const },
         bodyColor: textColor,
         bodyFont: { family: "Consolas, Courier New, monospace", size: 12 },
         padding: 10,

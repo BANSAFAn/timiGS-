@@ -823,20 +823,10 @@ const availableLanguages = [
   { code: "pl", name: "Polski", flag: "🇵🇱", flagImg: "https://flagcdn.com/w40/pl.png" },
 ];
 
-const currentLangFlagImg = computed(
-  () =>
-    availableLanguages.find((l) => l.code === localSettings.language)?.flagImg ||
-    "https://flagcdn.com/w40/un.png",
-);
 const currentLangName = computed(
   () =>
     availableLanguages.find((l) => l.code === localSettings.language)?.name ||
     "Language",
-);
-const currentLangFlag = computed(
-  () =>
-    availableLanguages.find((l) => l.code === localSettings.language)?.flag ||
-    "",
 );
 
 function changeLanguage(code: string) {
