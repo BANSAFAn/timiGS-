@@ -69,6 +69,7 @@ jobs:
         if: matrix.container == 'archlinux:latest'
         run: |
           pacman -Syu --needed --noconfirm nodejs npm rust cargo git make gcc pkgconf webkit2gtk-4.1 gtk3 libappindicator-gtk3 librsvg patchelf alsa-lib clang llvm curl openssl xdg-utils file binutils fuse2 bzip2 squashfs-tools zsync desktop-file-utils gdk-pixbuf2 libxcb xcb-util xcb-util-image xcb-util-keysyms xcb-util-renderutil xcb-util-wm imagemagick
+          mkdir -p /usr/lib/gdk-pixbuf-2.0/2.10.0
           gdk-pixbuf-query-loaders --update-cache || true
 
       - name: Setup Node.js
