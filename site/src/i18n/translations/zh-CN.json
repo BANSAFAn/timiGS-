@@ -213,13 +213,27 @@
     "prerelease_badge": "预发布"
   },
   "terms": {
-    "title": "条款与隐私",
-    "privacy_title": "隐私政策",
-    "privacy_content": "TimiGS 以隐私为核心。所有活动数据均存储在您设备的本地 SQLite 数据库中。我们不会将您的个人数据传输到任何外部云服务器。",
-    "data_title": "数据所有权",
-    "data_content": "您拥有您的数据。您可以随时导出、删除或修改您的本地数据库。",
+    "title": "条款、P2P 与隐私政策",
+    "privacy_title": "隐私与零遥测政策",
+    "privacy_content": "TimiGS 采用严格的零遥测架构设计。所有活动数据、进程名称、时间日志及笔记均仅存储在您本地设备的离线 SQLite 数据库（timigs_data.db）中。绝不会收集或向外部云服务器发送任何个人数据。",
+    "data_title": "P2P 直连同步与数据所有权",
+    "data_content": "您保留 100% 的数据主权。在授权设备之间使用点对点（P2P）同步时，数据通过加密的 P2P 连接直接传输。没有任何中间云服务器存储或截获您的数据包。",
     "license_title": "许可证",
-    "license_content": "TimiGS 受 TimiGS Public License (TPL) v1.0 保护。可免费使用、修改和分发，但需正确归属 BANSAFAn。"
+    "license_content": "TimiGS 受 TimiGS Public License (TPL) v1.0 保护。可免费使用、修改和分发，但需正确归属 BANSAFAn。所有衍生作品中必须保留 \"TimiGS\" 名称。",
+    "zero_telemetry_title": "> 零遥测政策：",
+    "zero_telemetry_desc": "TimiGS 不会收集、传输、跟踪或上传任何用户指标、窗口标题、活动日志、输入的文本或个人遥测数据到外部服务器。您的数据 100% 保留在您的本地设备上。",
+    "sqlite_storage_desc": "所有数据库记录均存储在本地 SQLite 文件 (timigs_data.db) 中。您拥有完整的所有权、加密密钥以及随时查看、导出或永久擦除数据的完全控制权。",
+    "p2p_tab_title": "P2P 与本地数据保证",
+    "p2p_section_title": "点对点 (P2P) 隐私与数据直接传输",
+    "p2p_intro": "当使用 TimiGS 点对点 (P2P) 功能在您的设备之间同步数据或与他人共享报告时：",
+    "p2p_direct_transport_title": "> P2P 直连传输：",
+    "p2p_direct_transport_desc": "所有 P2P 连接均使用加密的 WebRTC / 本地套接字协议在授权设备之间直接建立。",
+    "p2p_no_cloud_title": "> 无中间云存储：",
+    "p2p_no_cloud_desc": "数据包直接从发送方传输到接收方。绝不会在任何云服务器或中间设施上缓存、存储、窥探或记录数据。",
+    "p2p_no_stolen_title": "> 无任何数据泄露或窃取：",
+    "p2p_no_stolen_desc": "BANSAFAn 和任何第三方均无法访问您的 P2P 传输流、同步密钥或会话日志。您保留 100% 的数据主权。",
+    "license_sub_title": "> TimiGS 公共许可证 (TPL) v1.0：",
+    "license_sub_desc": "可免费使用、审查、修改和分发，但须注明 BANSAFAn 的署名。商业和开源衍生作品必须保留 \"TimiGS\" 项目引用及本地隐私保证。"
   },
   "testing": {
     "title": "测试版本",

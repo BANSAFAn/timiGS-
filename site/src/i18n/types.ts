@@ -172,6 +172,20 @@ export interface Translation {
     data_content: string;
     license_title: string;
     license_content: string;
+    zero_telemetry_title?: string;
+    zero_telemetry_desc?: string;
+    sqlite_storage_desc?: string;
+    p2p_tab_title?: string;
+    p2p_section_title?: string;
+    p2p_intro?: string;
+    p2p_direct_transport_title?: string;
+    p2p_direct_transport_desc?: string;
+    p2p_no_cloud_title?: string;
+    p2p_no_cloud_desc?: string;
+    p2p_no_stolen_title?: string;
+    p2p_no_stolen_desc?: string;
+    license_sub_title?: string;
+    license_sub_desc?: string;
   };
   testing: {
     title: string;

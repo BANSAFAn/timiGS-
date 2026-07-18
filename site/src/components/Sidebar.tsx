@@ -67,14 +67,14 @@ const Sidebar: React.FC<SidebarProps> = ({ lang, t, pathname }) => {
 
   return (
     <>
-      <nav className="fixed w-full z-50 top-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-b border-gray-200 dark:border-slate-800 transition-colors notranslate">
+      <nav className="fixed w-full z-50 top-0 bg-[var(--bg-secondary)] border-b border-[var(--border)] notranslate">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <a href={`/${lang}/`} className="flex items-center gap-3 group">
-              <div className="p-2 rounded-xl bg-gradient-to-br from-brand-500 to-accent-purple text-white shadow-lg group-hover:shadow-xl group-hover:scale-105 transition-all">
+              <div className="p-2 border border-[var(--brand-primary)] bg-[var(--bg-tertiary)] text-[var(--brand-primary)] transition-all">
                 <Clock className="w-6 h-6" />
               </div>
-              <span className="text-xl font-bold text-gray-900 dark:text-white">TimiGS</span>
+              <span className="text-xl font-bold tracking-wider text-[var(--brand-primary)] font-mono">TimiGS //</span>
             </a>
 
             <div className="hidden md:flex items-center gap-1">
@@ -82,10 +82,10 @@ const Sidebar: React.FC<SidebarProps> = ({ lang, t, pathname }) => {
                 <a
                   key={link.path}
                   href={getLinkHref(link.path)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                  className={`flex items-center gap-2 px-3 py-1.5 text-sm font-medium transition-all ${
                     isActive(link.path)
-                      ? 'bg-brand-500 text-white shadow-md'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800'
+                      ? 'border border-[var(--brand-primary)] bg-[var(--bg-tertiary)] text-[var(--brand-primary)] font-bold'
+                      : 'text-[var(--text-primary)] hover:border hover:border-[var(--border)] hover:bg-[var(--bg-tertiary)]'
                   }`}
                 >
                   {link.icon}
@@ -99,27 +99,27 @@ const Sidebar: React.FC<SidebarProps> = ({ lang, t, pathname }) => {
                 href="https://github.com/BANSAFAn/timiGS-"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors"
+                className="flex items-center gap-2 px-3 py-1.5 border border-[var(--border)] bg-[var(--bg-tertiary)] text-[var(--text-primary)] hover:border-[var(--brand-primary)] hover:text-[var(--brand-primary)] transition-colors"
               >
                 <Star className="w-4 h-4" />
                 <span className="text-sm font-medium">{stars !== null ? stars : '...'}</span>
               </a>
 
               <div className="relative group">
-                <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors">
+                <button className="flex items-center gap-2 px-3 py-1.5 border border-[var(--border)] bg-[var(--bg-tertiary)] text-[var(--text-primary)] hover:border-[var(--brand-primary)] hover:text-[var(--brand-primary)] transition-colors">
                   <Globe className="w-4 h-4" />
-                  <span className="text-sm font-medium">{lang.toUpperCase()}</span>
+                  <span className="text-sm font-medium">[{lang.toUpperCase()}]</span>
                 </button>
                 
-                <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-gray-200 dark:border-slate-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all py-2">
+                <div className="absolute right-0 top-full mt-2 w-48 bg-[var(--bg-secondary)] border border-[var(--brand-primary)] shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all py-2">
                   {languages.map((l) => (
                     <button
                       key={l.code}
                       onClick={() => switchLanguage(l.code)}
                       className={`w-full text-left px-4 py-2 text-sm transition-colors ${
                         lang === l.code
-                          ? 'bg-brand-50 dark:bg-brand-900/20 text-brand-600 dark:text-brand-400 font-medium'
-                          : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700'
+                          ? 'bg-[var(--bg-tertiary)] text-[var(--brand-primary)] font-bold'
+                          : 'text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)]'
                       }`}
                     >
                       {l.label}
@@ -131,7 +131,7 @@ const Sidebar: React.FC<SidebarProps> = ({ lang, t, pathname }) => {
 
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="md:hidden p-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
+              className="md:hidden p-2 border border-[var(--border)] text-[var(--text-primary)] hover:border-[var(--brand-primary)] transition-colors"
             >
               {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -141,9 +141,9 @@ const Sidebar: React.FC<SidebarProps> = ({ lang, t, pathname }) => {
 
       {isOpen && (
         <div className="fixed inset-0 z-40 md:hidden notranslate">
-          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setIsOpen(false)} />
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-xs" onClick={() => setIsOpen(false)} />
           
-          <div className="absolute top-16 right-0 bottom-0 w-80 bg-white dark:bg-slate-900 border-l border-gray-200 dark:border-slate-800 shadow-2xl overflow-y-auto">
+          <div className="absolute top-16 right-0 bottom-0 w-80 bg-[var(--bg-secondary)] border-l border-[var(--brand-primary)] shadow-2xl overflow-y-auto">
             <div className="p-6 space-y-6">
               <div className="space-y-2">
                 {navLinks.map((link) => (
@@ -151,10 +151,10 @@ const Sidebar: React.FC<SidebarProps> = ({ lang, t, pathname }) => {
                     key={link.path}
                     href={getLinkHref(link.path)}
                     onClick={() => setIsOpen(false)}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all ${
+                    className={`flex items-center gap-3 px-4 py-3 text-sm font-medium transition-all ${
                       isActive(link.path)
-                        ? 'bg-brand-500 text-white shadow-md'
-                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800'
+                        ? 'border border-[var(--brand-primary)] bg-[var(--bg-tertiary)] text-[var(--brand-primary)] font-bold'
+                        : 'text-[var(--text-primary)] border border-[var(--border)] hover:bg-[var(--bg-tertiary)]'
                     }`}
                   >
                     {link.icon}
@@ -163,12 +163,12 @@ const Sidebar: React.FC<SidebarProps> = ({ lang, t, pathname }) => {
                 ))}
               </div>
 
-              <div className="pt-6 border-t border-gray-200 dark:border-slate-800 space-y-3">
+              <div className="pt-6 border-t border-[var(--border)] space-y-3">
                 <a
                   href="https://github.com/BANSAFAn/timiGS-"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-between px-4 py-3 rounded-lg bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-300"
+                  className="flex items-center justify-between px-4 py-3 border border-[var(--border)] bg-[var(--bg-tertiary)] text-[var(--text-primary)]"
                 >
                   <div className="flex items-center gap-2">
                     <Star className="w-4 h-4" />
@@ -178,7 +178,7 @@ const Sidebar: React.FC<SidebarProps> = ({ lang, t, pathname }) => {
                 </a>
 
                 <select
-                  className="w-full px-4 py-3 rounded-lg bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-300 text-sm font-medium border-none outline-none"
+                  className="w-full px-4 py-3 border border-[var(--border)] bg-[var(--bg-tertiary)] text-[var(--brand-primary)] text-sm font-medium outline-none"
                   onChange={(e) => { switchLanguage(e.target.value as Language); setIsOpen(false); }}
                   value={lang}
                 >

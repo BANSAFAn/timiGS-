@@ -35,31 +35,34 @@ const Home: React.FC<HomeProps> = ({ lang, t }) => {
   }, []);
 
   return (
-    <div className="min-h-screen">
-      <section className="pt-32 pb-20">
-        <div className="max-w-5xl mx-auto text-center space-y-12">
+    <div className="min-h-screen font-mono">
+      <section className="pt-24 pb-16">
+        <div className="max-w-5xl mx-auto text-center space-y-10">
           <div className="space-y-6">
-            <h1 className="text-6xl md:text-8xl font-black text-gray-900 dark:text-white tracking-tight leading-none">
+            <div className="inline-block border border-[var(--brand-primary)] bg-[var(--bg-tertiary)] px-4 py-1.5 text-sm font-bold text-[var(--brand-primary)]">
+              [ SYSTEM_STATUS: READY // V1.10.4 ]
+            </div>
+            <h1 className="text-5xl md:text-7xl font-black text-[var(--brand-primary)] tracking-tight leading-tight font-mono">
               {t.hero.tagline1}<br/>
-              <span className="text-blue-600 dark:text-blue-400">
+              <span className="text-[var(--text-secondary)]">
                 {t.hero.tagline2}
               </span>
             </h1>
             
-            <p className="text-2xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto font-light">
+            <p className="text-xl text-[var(--text-secondary)] max-w-3xl mx-auto font-mono">
               {t.hero.subtext}
             </p>
           </div>
 
-          <div className="flex flex-wrap gap-6 justify-center items-center pt-8">
+          <div className="flex flex-wrap gap-6 justify-center items-center pt-6">
             <a 
               href={`/${lang}/download`}
-              className="group relative px-10 py-5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-full font-bold text-xl hover:scale-105 transition-all shadow-2xl"
+              className="btn-primary text-lg px-8 py-4"
             >
               <span className="flex items-center gap-3">
-                <DownloadIcon className="w-7 h-7" />
-                {t.hero.cta_download}
-                <ArrowRight className="w-6 h-6 group-hover:translate-x-2 transition-transform" />
+                <DownloadIcon className="w-6 h-6" />
+                [ {t.hero.cta_download.toUpperCase()} ]
+                <ArrowRight className="w-5 h-5" />
               </span>
             </a>
             
@@ -67,59 +70,59 @@ const Home: React.FC<HomeProps> = ({ lang, t }) => {
               href="https://github.com/BANSAFAn/timiGS-"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-10 py-5 border-2 border-gray-900 dark:border-white text-gray-900 dark:text-white rounded-full font-bold text-xl hover:bg-gray-900 hover:text-white dark:hover:bg-white dark:hover:text-gray-900 transition-all"
+              className="btn-secondary text-lg px-8 py-4"
             >
               <span className="flex items-center gap-3">
-                <Star className="w-7 h-7" />
-                {ghStats.stars > 0 ? ghStats.stars.toLocaleString() : '...'} {t.hero.stats_stars}
+                <Star className="w-6 h-6" />
+                {ghStats.stars > 0 ? ghStats.stars.toLocaleString() : '...'} {t.hero.stats_stars.toUpperCase()}
               </span>
             </a>
           </div>
 
           {ghStats.downloads > 0 && (
-            <div className="pt-8 text-gray-500 dark:text-gray-500">
-              <span className="text-3xl font-bold text-gray-900 dark:text-white">{ghStats.downloads.toLocaleString()}+</span>
-              <span className="ml-2 text-lg">{t.hero.stats_downloads.toLowerCase()} {lang === 'en' ? 'worldwide' : ''}</span>
+            <div className="pt-6 text-[var(--text-tertiary)] font-mono">
+              <span className="text-2xl font-bold text-[var(--brand-primary)]">{ghStats.downloads.toLocaleString()}+</span>
+              <span className="ml-2 text-base">{t.hero.stats_downloads.toLowerCase()} {lang === 'en' ? 'downloads worldwide' : ''}</span>
             </div>
           )}
         </div>
       </section>
 
-      <section className="py-32 bg-gray-50 dark:bg-gray-900/50">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-3 gap-12">
-            <div className="text-center space-y-4">
-              <div className="w-20 h-20 mx-auto rounded-3xl bg-green-500 text-white flex items-center justify-center transform rotate-3 hover:rotate-6 transition-transform">
-                <Shield className="w-10 h-10" />
+      <section className="py-20 bg-[var(--bg-secondary)] border-y border-[var(--border)]">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="card p-8 text-center space-y-4">
+              <div className="w-16 h-16 mx-auto border border-[var(--brand-primary)] bg-[var(--bg-tertiary)] text-[var(--brand-primary)] flex items-center justify-center">
+                <Shield className="w-8 h-8" />
               </div>
-              <h3 className="text-3xl font-bold text-gray-900 dark:text-white">
+              <h3 className="text-2xl font-bold text-[var(--brand-primary)] font-mono">
                 {t.whyTimiGS.features.privacy.title}
               </h3>
-              <p className="text-lg text-gray-600 dark:text-gray-400">
+              <p className="text-base text-[var(--text-secondary)] font-mono">
                 {t.whyTimiGS.features.privacy.description}
               </p>
             </div>
 
-            <div className="text-center space-y-4">
-              <div className="w-20 h-20 mx-auto rounded-3xl bg-blue-500 text-white flex items-center justify-center transform -rotate-3 hover:-rotate-6 transition-transform">
-                <Lightning className="w-10 h-10" />
+            <div className="card p-8 text-center space-y-4">
+              <div className="w-16 h-16 mx-auto border border-[var(--brand-primary)] bg-[var(--bg-tertiary)] text-[var(--brand-primary)] flex items-center justify-center">
+                <Lightning className="w-8 h-8" />
               </div>
-              <h3 className="text-3xl font-bold text-gray-900 dark:text-white">
+              <h3 className="text-2xl font-bold text-[var(--brand-primary)] font-mono">
                 {t.whyTimiGS.features.crossplatform.title}
               </h3>
-              <p className="text-lg text-gray-600 dark:text-gray-400">
+              <p className="text-base text-[var(--text-secondary)] font-mono">
                 {t.whyTimiGS.features.crossplatform.description}
               </p>
             </div>
 
-            <div className="text-center space-y-4">
-              <div className="w-20 h-20 mx-auto rounded-3xl bg-purple-500 text-white flex items-center justify-center transform rotate-2 hover:rotate-6 transition-transform">
-                <Clock className="w-10 h-10" />
+            <div className="card p-8 text-center space-y-4">
+              <div className="w-16 h-16 mx-auto border border-[var(--brand-primary)] bg-[var(--bg-tertiary)] text-[var(--brand-primary)] flex items-center justify-center">
+                <Clock className="w-8 h-8" />
               </div>
-              <h3 className="text-3xl font-bold text-gray-900 dark:text-white">
+              <h3 className="text-2xl font-bold text-[var(--brand-primary)] font-mono">
                 {t.features.sections.tracking.title}
               </h3>
-              <p className="text-lg text-gray-600 dark:text-gray-400">
+              <p className="text-base text-[var(--text-secondary)] font-mono">
                 {t.features.sections.tracking.description}
               </p>
             </div>
@@ -127,21 +130,21 @@ const Home: React.FC<HomeProps> = ({ lang, t }) => {
         </div>
       </section>
 
-      <section className="py-32">
-        <div className="max-w-4xl mx-auto text-center space-y-12">
-          <div className="inline-block p-16 rounded-[3rem] bg-blue-600 text-white shadow-2xl transform hover:scale-105 transition-transform">
-            <h2 className="text-5xl font-black mb-6">
+      <section className="py-24">
+        <div className="max-w-4xl mx-auto text-center space-y-8">
+          <div className="p-12 border border-[var(--brand-primary)] bg-[var(--bg-tertiary)]">
+            <h2 className="text-4xl font-bold mb-4 text-[var(--brand-primary)] font-mono">
               {t.cta.title}
             </h2>
-            <p className="text-2xl opacity-90 mb-10 font-light">
+            <p className="text-xl text-[var(--text-secondary)] mb-8 font-mono">
               {t.cta.subtitle}
             </p>
             <a 
               href={`/${lang}/download`}
-              className="inline-flex items-center gap-4 px-12 py-6 bg-white text-gray-900 rounded-full font-bold text-2xl hover:scale-110 transition-transform shadow-xl"
+              className="btn-primary text-xl px-10 py-5"
             >
-              <DownloadIcon className="w-8 h-8" />
-              {t.cta.primary}
+              <DownloadIcon className="w-7 h-7" />
+              [ {t.cta.primary.toUpperCase()} ]
             </a>
           </div>
         </div>

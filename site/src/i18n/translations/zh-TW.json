@@ -191,13 +191,27 @@
     "prerelease_badge": "預發布"
   },
   "terms": {
-    "title": "條款與隱私",
-    "privacy_title": "隱私政策",
-    "privacy_content": "TimiGS 以隱私為核心。所有活動數據均存儲在您設備的本地 SQLite 數據庫中。我們不會將您的個人數據傳輸到任何外部雲服務器。",
-    "data_title": "數據所有權",
-    "data_content": "您擁有您的數據。您可以隨時導出、刪除或修改您的本地數據庫。",
+    "title": "條款、P2P 與隱私政策",
+    "privacy_title": "隱私與零遙測政策",
+    "privacy_content": "TimiGS 採用嚴格的零遙測架構設計。所有活動數據、進程名稱、時間日誌及筆記均僅存儲在您本地設備的離線 SQLite 數據庫（timigs_data.db）中。絕不會收集或向外部雲服務器發送任何個人數據。",
+    "data_title": "P2P 直連同步與數據所有權",
+    "data_content": "您保留 100% 的數據主權。在授權設備之間使用點對點（P2P）同步時，數據通過加密的 P2P 連接直接傳輸。沒有任何中間雲服務器存儲或截獲您的數據包。",
     "license_title": "許可證",
-    "license_content": "TimiGS 受 TimiGS Public License (TPL) v1.0 保護。可免費使用、修改和分發，但需正確歸屬 BANSAFAn。"
+    "license_content": "TimiGS 受 TimiGS Public License (TPL) v1.0 保護。可免費使用、修改和分發，但需正確歸屬 BANSAFAn。所有衍生作品中必須保留 \"TimiGS\" 名稱。",
+    "zero_telemetry_title": "> 零遙測政策：",
+    "zero_telemetry_desc": "TimiGS 不會收集、傳輸、跟蹤或上傳任何用戶指標、視窗標題、活動日誌、輸入的文字或個人遙測數據到外部伺服器。您的數據 100% 保留在您的本地設備上。",
+    "sqlite_storage_desc": "所有數據庫記錄均存儲在本地 SQLite 檔案 (timigs_data.db) 中。您擁有完整的所有權、加密金鑰以及隨時查看、導出或永久擦除數據的完全控制權。",
+    "p2p_tab_title": "P2P 與本地數據保證",
+    "p2p_section_title": "點對點 (P2P) 隱私與數據直接傳輸",
+    "p2p_intro": "當使用 TimiGS 點對點 (P2P) 功能在您的設備之間同步數據或與他人共享報告時：",
+    "p2p_direct_transport_title": "> P2P 直連傳輸：",
+    "p2p_direct_transport_desc": "所有 P2P 連接均使用加密的 WebRTC / 本地套接字協定在授權設備之間直接建立。",
+    "p2p_no_cloud_title": "> 無中間雲端存儲：",
+    "p2p_no_cloud_desc": "數據包直接從發送方傳輸到接收方。絕不會在任何雲端伺服器或中間設施上快取、存儲、窺探或記錄數據。",
+    "p2p_no_stolen_title": "> 無任何數據洩露或竊取：",
+    "p2p_no_stolen_desc": "BANSAFAn 和任何第三方均無法訪問您的 P2P 傳輸流、同步金鑰或會話日誌。您保留 100% 的數據主權。",
+    "license_sub_title": "> TimiGS 公共許可證 (TPL) v1.0：",
+    "license_sub_desc": "可免費使用、審查、修改和分發，但須註明 BANSAFAn 的署名。商業和開源衍生作品必須保留 \"TimiGS\" 項目引用及本地隱私保證。"
   },
   "testing": {
     "title": "測試版本",

@@ -213,13 +213,27 @@
     "prerelease_badge": "Pre-release"
   },
   "terms": {
-    "title": "Voorwaarden & Privacy",
-    "privacy_title": "Privacybeleid",
-    "privacy_content": "TimiGS is ontworpen met privacy als kernwaarde. Alle verzamelde gegevens worden lokaal op uw apparaat opgeslagen met behulp van een SQLite-database. We sturen geen persoonlijke gegevens naar externe servers.",
-    "data_title": "Gegevensbezit",
-    "data_content": "U bezit uw gegevens. U heeft volledige controle om uw lokale database op elk moment te exporteren, verwijderen of wijzigen.",
+    "title": "Voorwaarden, P2P & Privacybeleid",
+    "privacy_title": "Privacy & Nul-Telemetrie Beleid",
+    "privacy_content": "TimiGS is ontworpen met een strikte nul-telemetrie architectuur. Alle activiteitsgegevens, procesnamen en notities worden uitsluitend lokaal op uw apparaat opgeslagen in een offline SQLite-database (timigs_data.db). Geen persoonlijke gegevens worden verzameld of naar externe servers verzonden.",
+    "data_title": "Directe P2P-synchronisatie & Gegevenseigendom",
+    "data_content": "U behoudt 100% gegevenseigendom. Bij het gebruik van Peer-to-Peer (P2P) synchronisatie tussen geautoriseerde apparaten worden gegevens rechtstreeks via versleutelde P2P-verbindingen overgedragen. Geen tussenliggende cloudservers slaan uw pakketten op.",
     "license_title": "Licentie",
-    "license_content": "TimiGS is beschermd onder de TimiGS Public License (TPL) v1.0. Gratis gebruik, wijziging en distributie met juiste toeschrijving aan BANSAFAn."
+    "license_content": "TimiGS is beschermd onder de TimiGS Public License (TPL) v1.0. Gratis gebruik, wijziging en distributie met juiste toeschrijving aan BANSAFAn. De naam \"TimiGS\" moet behouden blijven in alle afgeleide werken.",
+    "zero_telemetry_title": "> BELEID ZONDER TELEMETRIE:",
+    "zero_telemetry_desc": "TimiGS verzamelt, verzendt, volgt of uploadt geen gebruikersmetriken, venstertitels, activiteitslogs, getypte tekst of persoonlijke telemetrie naar externe servers. Uw gegevens blijven 100% offline op uw apparaat.",
+    "sqlite_storage_desc": "Alle database-records worden opgeslagen in een lokaal SQLite-bestand (timigs_data.db). U behoudt het volledige eigendom, de encryptiesleutels en de volledige controle om uw gegevens op elk moment te inspecteren, te exporteren of permanent te verwijderen.",
+    "p2p_tab_title": "P2P & LOKALE GEGEVENSGARANTIE",
+    "p2p_section_title": "Peer-to-Peer (P2P) Privacy & Directe gegevensoverdracht",
+    "p2p_intro": "Bij het gebruik van de Peer-to-Peer (P2P) functies van TimiGS om gegevens tussen uw apparaten te synchroniseren of rapporten te delen:",
+    "p2p_direct_transport_title": "> DIRECTE PEER-TRANSPORT:",
+    "p2p_direct_transport_desc": "Alle P2P-verbindingen worden rechtstreeks tot stand gebracht tussen geautoriseerde apparaten via versleutelde WebRTC / lokale socketprotocollen.",
+    "p2p_no_cloud_title": "> GEEN TUSSENLIGGENDE CLOUD-OPSLAG:",
+    "p2p_no_cloud_desc": "Gegevenspakketten reizen rechtstreeks van zender naar ontvanger. Geen gegevens worden gecachet, opgeslagen of onderschept op cloudservers.",
+    "p2p_no_stolen_title": "> NIETS WORDT GESTOLEN OF GELEKT:",
+    "p2p_no_stolen_desc": "Nóch BANSAFAn nóch derden hebben toegang tot uw P2P-streams, synchronisatiesleutels of sessielogs. U behoudt 100% gegevenseigendom.",
+    "license_sub_title": "> TimiGS Public License (TPL) v1.0:",
+    "license_sub_desc": "Gratis te gebruiken, te inspecteren, te wijzigen en te distribueren met juiste toeschrijving aan BANSAFAn. Afgeleide werken moeten de projectreferentie \"TimiGS\" en lokale privacygaranties behouden."
   },
   "testing": {
     "title": "Test-builds",

@@ -213,13 +213,27 @@
     "prerelease_badge": "Vorabversion"
   },
   "terms": {
-    "title": "AGB & Datenschutz",
-    "privacy_title": "Datenschutzerklärung",
-    "privacy_content": "TimiGS wurde mit Privatsphäre als Kernwert entwickelt. Alle gesammelten Daten werden lokal auf Ihrem Gerät in einer SQLite-Datenbank gespeichert. Wir übertragen keine persönlichen Daten an externe Server.",
-    "data_title": "Datenbesitz",
-    "data_content": "Sie besitzen Ihre Daten. Sie haben die volle Kontrolle darüber, Ihre lokale Datenbank jederzeit zu exportieren, zu löschen oder zu ändern.",
+    "title": "AGB, P2P & Datenschutzrichtlinie",
+    "privacy_title": "Datenschutz & Keine-Telemetrie-Richtlinie",
+    "privacy_content": "TimiGS wurde mit einer strikten Zero-Telemetrie-Architektur entwickelt. Alle Aktivitätsdaten, Prozessnamen, Zeitprotokolle und Notizen werden ausschließlich lokal auf Ihrem Gerät in einer Offline-SQLite-Datenbank (timigs_data.db) gespeichert. Es werden keine persönlichen Daten gesammelt, analysiert oder an externe Server übertragen.",
+    "data_title": "Direkte P2P-Synchronisation & Datenbesitz",
+    "data_content": "Sie behalten die 100%ige Datensouveränität. Bei der Nutzung der Peer-to-Peer (P2P)-Synchronisation zwischen autorisierten Geräten werden die Daten ausschließlich über direkte, verschlüsselte P2P-Verbindungen übertragen. Es werden keine Zwischenserver genutzt, keine Daten zwischengespeichert und nichts abgefangen oder gestohlen.",
     "license_title": "Lizenz",
-    "license_content": "TimiGS ist durch die TimiGS Public License (TPL) v1.0 geschützt. Kostenlose Nutzung, Modifikation und Verbreitung mit korrekter Zuschreibung an BANSAFAn."
+    "license_content": "TimiGS ist durch die TimiGS Public License (TPL) v1.0 geschützt. Kostenlose Nutzung, Modifikation und Verbreitung mit korrekter Zuschreibung an BANSAFAn. Der Name \"TimiGS\" muss in allen abgeleiteten Werken erhalten bleiben.",
+    "zero_telemetry_title": "> KEINE-TELEMETRIE-RICHTLINIE:",
+    "zero_telemetry_desc": "TimiGS erfasst, überträgt, verfolgt oder lädt keine Benutzermetriken, Fenstertitel, Aktivitätsprotokolle, getippten Text oder persönliche Telemetrie auf externe Server hoch. Ihre Daten bleiben zu 100 % offline auf Ihrem Gerät.",
+    "sqlite_storage_desc": "Alle Datenbankeinträge werden in einer lokalen SQLite-Datei (timigs_data.db) gespeichert. Sie behalten das vollständige Eigentum, die Verschlüsselungsschlüssel und die volle Kontrolle, um Ihre Daten jederzeit einzusehen, zu exportieren oder dauerhaft zu löschen.",
+    "p2p_tab_title": "P2P & LOKALE DATENGARANTIE",
+    "p2p_section_title": "Peer-to-Peer (P2P) Datenschutz & direkter Datentransfer",
+    "p2p_intro": "Bei der Nutzung der Peer-to-Peer (P2P)-Funktionen von TimiGS zur Synchronisierung von Daten zwischen Ihren Geräten oder zum Teilen von Berichten mit anderen:",
+    "p2p_direct_transport_title": "> DIREKTER PEER-TRANSPORT:",
+    "p2p_direct_transport_desc": "Alle P2P-Verbindungen werden direkt zwischen autorisierten Geräten über verschlüsselte WebRTC- / lokale Socket-Protokolle hergestellt.",
+    "p2p_no_cloud_title": "> KEINE ZWISCHENSPEICHERUNG IN DER CLOUD:",
+    "p2p_no_cloud_desc": "Datenpakete werden direkt vom Sender zum Empfänger übertragen. Keine Daten werden auf Cloud-Servern oder Zwischeninfrastrukturen zwischengespeichert, gespeichert, abgehört oder protokolliert.",
+    "p2p_no_stolen_title": "> NICHTS WIRD GESTOHLEN ODER EXFILTRIERT:",
+    "p2p_no_stolen_desc": "Weder BANSAFAn noch Dritte haben Zugriff auf Ihre P2P-Streams, Synchronisierungsschlüssel oder Sitzungsprotokolle. Sie behalten die 100%ige Datensouveränität.",
+    "license_sub_title": "> TimiGS Public License (TPL) v1.0:",
+    "license_sub_desc": "Kostenlos zu nutzen, zu prüfen, zu modifizieren und zu verbreiten mit korrekter Namensnennung von BANSAFAn. Kommerzielle und quelloffene abgeleitete Werke müssen den Projektverweis \"TimiGS\" und lokale Datenschutzgarantien bewahren."
   },
   "testing": {
     "title": "Test-Builds",
