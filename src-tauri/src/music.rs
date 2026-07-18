@@ -358,7 +358,7 @@ pub fn play_music(app_handle: &AppHandle, file_path: &str) -> Result<(), String>
                             if LOOP_ENABLED.load(Ordering::SeqCst) {
                                 drop(state);
                                 let track_filename = {
-                                    let mut s = MUSIC_STATE.lock();
+                                    let s = MUSIC_STATE.lock();
                                     s.current_track.clone()
                                 };
                                 if let Some(tf) = track_filename {

@@ -592,7 +592,10 @@ pub fn get_weekly_stats() -> Result<Vec<DailyStats>> {
     use chrono::TimeZone;
     use std::collections::HashSet;
 
+    #[cfg(any(target_os = "windows", target_os = "linux"))]
     let current_session_id = crate::tracker::get_current_session().map(|s| s.id);
+    #[cfg(not(any(target_os = "windows", target_os = "linux")))]
+    let current_session_id: Option<i64> = None;
 
     let today = Local::now().date_naive();
     let mut stats = Vec::new();
