@@ -16,7 +16,7 @@
     "@astrojs/vercel": "^10.0.6",
     "@auth/core": "^0.37.4",
     "@phosphor-icons/react": "^2.1.10",
-    "astro": "^6.3.1",
+    "astro": "^7.1.0",
     "auth-astro": "^4.2.0",
     "framer-motion": "^12.38.0",
     "highlight.js": "^11.11.1",
