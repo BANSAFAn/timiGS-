@@ -46,9 +46,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Node.js
+      - name: Install Node.js & pnpm
         run: |
           apk add --no-cache nodejs npm
+          npm i -g pnpm
 
       - name: Install Rust and dependencies
         run: |
@@ -58,7 +59,7 @@ jobs:
           rustup component add clippy rustfmt
 
       - name: Install frontend dependencies
-        run: npm install
+        run: pnpm install --frozen-lockfile
 
       - name: Check Rust formatting
         working-directory: src-tauri
@@ -103,11 +104,13 @@ jobs:
         if: matrix.container == 'alpine:latest'
         run: |
           apk add --no-cache nodejs npm curl rust cargo git make musl-dev openssl-dev clang llvm webkit2gtk-4.1-dev gtk+3.0-dev libayatana-appindicator-dev librsvg-dev patchelf alsa-lib-dev
+          npm i -g pnpm
 
       - name: Install dependencies (Arch Linux)
         if: matrix.container == 'archlinux:latest'
         run: |
           pacman -Syu --needed --noconfirm nodejs npm rust cargo git make gcc pkgconf webkit2gtk-4.1 gtk3 libappindicator-gtk3 librsvg patchelf alsa-lib clang llvm curl openssl xdg-utils file binutils fuse2 bzip2 squashfs-tools zsync desktop-file-utils gdk-pixbuf2 libxcb xcb-util xcb-util-image xcb-util-keysyms xcb-util-renderutil xcb-util-wm imagemagick
+          npm i -g pnpm
           mkdir -p /usr/lib/gdk-pixbuf-2.0/2.10.0
           gdk-pixbuf-query-loaders --update-cache || true
 
@@ -117,11 +120,18 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf libasound2-dev
 
+      - name: Setup pnpm
+        if: matrix.container != 'alpine:latest' && matrix.container != 'archlinux:latest'
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
       - name: Setup Node.js
         if: matrix.container != 'alpine:latest' && matrix.container != 'archlinux:latest'
         uses: actions/setup-node@v4
         with:
           node-version: lts/*
+          cache: 'pnpm'
 
       - name: Setup Rust
         if: matrix.container != 'alpine:latest' && matrix.container != 'archlinux:latest'
@@ -136,7 +146,7 @@ jobs:
           . "$HOME/.cargo/env"
 
       - name: Install frontend dependencies
-        run: npm install
+        run: pnpm install --frozen-lockfile
 
       - name: Generate installer assets (Windows)
         if: matrix.platform == 'windows-latest'
@@ -166,9 +176,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Node.js
+      - name: Install Node.js & pnpm
         run: |
           apk add --no-cache nodejs npm
+          npm i -g pnpm
 
       - name: Install dependencies
         working-directory: site

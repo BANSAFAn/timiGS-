@@ -136,7 +136,10 @@ const hasCodingActivity = computed(() => {
   return store.totalCodingTime > 0 || store.todayCodingSessions.length > 0 || store.currentCodingSession !== null;
 });
 
+const currentTheme = computed(() => store.settings.theme || "dark");
+
 const mainNavItems = computed<NavItem[]>(() => {
+  if (currentTheme.value) { /* trigger reactivity on theme change */ }
   const items = [
     { path: "/", label: "nav.dashboard", labelShort: "nav.dashboardShort", icon: Icons.dashboard },
     { path: "/timeline", label: "nav.timeline", labelShort: "nav.timelineShort", icon: Icons.timeline },
@@ -148,14 +151,18 @@ const mainNavItems = computed<NavItem[]>(() => {
   return items;
 });
 
-const secondaryNavItems: NavItem[] = [
-  { path: "/team", label: "nav.team", labelShort: "nav.teamShort", icon: Icons.team },
-  { path: "/tools", label: "nav.tools", labelShort: "nav.toolsShort", icon: Icons.tools },
-  { path: "/transfer", label: "nav.transfer", labelShort: "nav.transferShort", icon: Icons.transfer },
-  { path: "/settings", label: "nav.settings", labelShort: "nav.settingsShort", icon: Icons.settings },
-];
+const secondaryNavItems = computed<NavItem[]>(() => {
+  if (currentTheme.value) { /* trigger reactivity on theme change */ }
+  return [
+    { path: "/team", label: "nav.team", labelShort: "nav.teamShort", icon: Icons.team },
+    { path: "/tools", label: "nav.tools", labelShort: "nav.toolsShort", icon: Icons.tools },
+    { path: "/transfer", label: "nav.transfer", labelShort: "nav.transferShort", icon: Icons.transfer },
+    { path: "/settings", label: "nav.settings", labelShort: "nav.settingsShort", icon: Icons.settings },
+  ];
+});
 
 const mobileNavItems = computed<NavItem[]>(() => {
+  if (currentTheme.value) { /* trigger reactivity on theme change */ }
   const items = [
     { path: "/", label: "nav.dashboard", labelShort: "nav.dashboardShort", icon: Icons.dashboard },
     { path: "/timeline", label: "nav.timeline", labelShort: "nav.timelineShort", icon: Icons.timeline },

@@ -256,7 +256,9 @@ pub fn open_music_folder(app_handle: &AppHandle) -> Result<(), String> {
 
     #[cfg(target_os = "windows")]
     {
+        use std::os::windows::process::CommandExt;
         std::process::Command::new("explorer")
+            .creation_flags(0x08000000)
             .arg(music_dir)
             .spawn()
             .map_err(|e| format!("Failed to open explorer: {}", e))?;

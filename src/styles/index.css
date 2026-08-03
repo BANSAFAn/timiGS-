@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600;700&family=Orbitron:wght@500;700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Roboto:ital,wght@0,400;0,500;0,700;1,400&family=Share+Tech+Mono&family=VT323&display=swap');
+
 :root {
   
   --color-primary: #39ff14;
@@ -13,8 +15,8 @@
   --color-danger-hover: #d50000;
 
   
-  --font-sans: "Consolas", "Courier New", Courier, monospace;
-  --font-mono: "Consolas", "Courier New", Courier, monospace;
+  --font-sans: "VT323", "Consolas", "Courier New", monospace;
+  --font-mono: "VT323", "Consolas", "Courier New", monospace;
 
   
   --transition-base: all 0.15s ease;
@@ -31,6 +33,9 @@
 
 
 [data-theme="dark"] {
+  --font-sans: "VT323", "Consolas", "Courier New", monospace;
+  --font-mono: "VT323", "Consolas", "Courier New", monospace;
+
   --bg-main: #020502;
   --bg-secondary: #080c08;
   --bg-tertiary: #0e140e;
@@ -54,6 +59,9 @@
 
 
 [data-theme="light"] {
+  --font-sans: "Share Tech Mono", "Consolas", monospace;
+  --font-mono: "Share Tech Mono", "Consolas", monospace;
+
   --bg-main: #0a0600;
   --bg-secondary: #130d00;
   --bg-tertiary: #1f1400;
@@ -73,6 +81,182 @@
   --shadow-md: none;
   --shadow-lg: none;
   --shadow-glow: 0 0 10px rgba(255, 179, 0, 0.2);
+}
+
+/* SIMPLE THEME */
+[data-theme="simple"] {
+  --color-primary: #3b82f6;
+  --color-primary-hover: #2563eb;
+  --color-primary-light: #60a5fa;
+  --color-secondary: #64748b;
+  --color-secondary-hover: #475569;
+  --color-accent: #f59e0b;
+  --color-success: #10b981;
+  --color-success-hover: #059669;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+  --color-danger-hover: #dc2626;
+
+  --font-sans: "Plus Jakarta Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "Fira Code", monospace;
+
+  --bg-main: #0f172a;
+  --bg-secondary: #1e293b;
+  --bg-tertiary: #334155;
+  --bg-card: #1e293b;
+  --bg-hover: #334155;
+  --bg-active: #475569;
+
+  --text-main: #f8fafc;
+  --text-primary: #e2e8f0;
+  --text-muted: #94a3b8;
+  --text-disabled: #64748b;
+
+  --border-color: #334155;
+  --border-light: #1e293b;
+
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 20px;
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+  --shadow-glow: 0 0 12px rgba(59, 130, 246, 0.25);
+}
+
+/* GLITCH THEME */
+[data-theme="glitch"] {
+  --color-primary: #00f0ff;
+  --color-primary-hover: #00c8d6;
+  --color-primary-light: #70f8ff;
+  --color-secondary: #ff0055;
+  --color-secondary-hover: #d60045;
+  --color-accent: #ffe600;
+  --color-success: #00ff66;
+  --color-success-hover: #00cc52;
+  --color-warning: #ffe600;
+  --color-danger: #ff0055;
+  --color-danger-hover: #cc0044;
+
+  --font-sans: "Orbitron", "Fira Code", monospace;
+  --font-mono: "Fira Code", "Orbitron", monospace;
+
+  --bg-main: #050508;
+  --bg-secondary: #0d0d14;
+  --bg-tertiary: #161622;
+  --bg-card: #0d0d14;
+  --bg-hover: #1a1a2b;
+  --bg-active: #26263e;
+
+  --text-main: #00f0ff;
+  --text-primary: #ffffff;
+  --text-muted: #ff0055;
+  --text-disabled: #555577;
+
+  --border-color: rgba(0, 240, 255, 0.5);
+  --border-light: rgba(255, 0, 85, 0.4);
+
+  --radius-sm: 0px;
+  --radius-md: 2px;
+  --radius-lg: 4px;
+  --radius-xl: 4px;
+  --radius-2xl: 6px;
+
+  --shadow-sm: 2px 2px 0px rgba(255, 0, 85, 0.4);
+  --shadow-md: 3px 3px 0px rgba(0, 240, 255, 0.4);
+  --shadow-lg: 4px 4px 0px rgba(255, 0, 85, 0.5);
+  --shadow-glow: 0 0 15px rgba(0, 240, 255, 0.6), -2px 0 8px rgba(255, 0, 85, 0.5);
+}
+
+/* MATERIAL DESIGNER THEME */
+[data-theme="material"] {
+  --color-primary: #d0bcff;
+  --color-primary-hover: #b69df8;
+  --color-primary-light: #e8def8;
+  --color-secondary: #ccc2dc;
+  --color-secondary-hover: #b0a6c0;
+  --color-accent: #efb8c8;
+  --color-success: #a6f4c5;
+  --color-success-hover: #80e8ab;
+  --color-warning: #ffe088;
+  --color-danger: #f2b8b5;
+  --color-danger-hover: #ec928e;
+
+  --font-sans: "Roboto", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: "Fira Code", monospace;
+
+  --bg-main: #141218;
+  --bg-secondary: #1d1b20;
+  --bg-tertiary: #2b2930;
+  --bg-card: #1d1b20;
+  --bg-hover: #36343b;
+  --bg-active: #4a4850;
+
+  --text-main: #e6e0e9;
+  --text-primary: #d0bcff;
+  --text-muted: #cad0d8;
+  --text-disabled: #49454f;
+
+  --border-color: #49454f;
+  --border-light: #36343b;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 28px;
+
+  --shadow-sm: 0 1px 3px 1px rgba(0,0,0,0.15);
+  --shadow-md: 0 2px 6px 2px rgba(0,0,0,0.15);
+  --shadow-lg: 0 4px 8px 3px rgba(0,0,0,0.25);
+  --shadow-glow: 0 0 16px rgba(208, 188, 255, 0.25);
+}
+
+/* MICROSOFT OFFICE THEME */
+[data-theme="office"] {
+  --color-primary: #0078d4;
+  --color-primary-hover: #106ebe;
+  --color-primary-light: #2b88d8;
+  --color-secondary: #005a9e;
+  --color-secondary-hover: #004578;
+  --color-accent: #d83b01;
+  --color-success: #107c41;
+  --color-success-hover: #0b5a2f;
+  --color-warning: #797775;
+  --color-danger: #a80000;
+  --color-danger-hover: #790000;
+
+  --font-sans: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: "Consolas", monospace;
+
+  --bg-main: #f3f2f1;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #faf9f8;
+  --bg-card: #ffffff;
+  --bg-hover: #edebe9;
+  --bg-active: #e1dfdd;
+
+  --text-main: #201f1e;
+  --text-primary: #0078d4;
+  --text-muted: #605e5c;
+  --text-disabled: #a19f9d;
+
+  --border-color: #e1dfdd;
+  --border-light: #f3f2f1;
+
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 6px;
+  --radius-xl: 8px;
+  --radius-2xl: 10px;
+
+  --shadow-sm: 0 1.6px 3.6px 0 rgba(0, 0, 0, 0.13), 0 0.3px 0.9px 0 rgba(0, 0, 0, 0.11);
+  --shadow-md: 0 3.2px 7.2px 0 rgba(0, 0, 0, 0.13), 0 0.6px 1.8px 0 rgba(0, 0, 0, 0.11);
+  --shadow-lg: 0 6.4px 14.4px 0 rgba(0, 0, 0, 0.13), 0 1.2px 3.6px 0 rgba(0, 0, 0, 0.11);
+  --shadow-glow: 0 0 8px rgba(0, 120, 212, 0.2);
 }
 
 
@@ -415,8 +599,8 @@ body {
 
 .page-container {
   width: 100%;
-  max-width: 1400px;
-  margin: 0 auto;
+  max-width: 100%;
+  margin: 0;
 }
 
 
@@ -880,9 +1064,10 @@ select option {
   padding: 10px;
 }
 
-[data-theme="light"] select option {
+[data-theme="light"] select option,
+[data-theme="office"] select option {
   background-color: #ffffff;
-  color: #0f172a;
+  color: #201f1e;
 }
 
 
@@ -942,23 +1127,33 @@ textarea:focus-visible {
 
 [data-theme="light"] .card-value,
 [data-theme="light"] .stat-value,
-[data-theme="light"] .big-stat-value {
+[data-theme="light"] .big-stat-value,
+[data-theme="office"] .card-value,
+[data-theme="office"] .stat-value,
+[data-theme="office"] .big-stat-value {
   color: var(--text-main) !important;
 }
 
-[data-theme="light"] .view-btn.active {
+[data-theme="light"] .view-btn.active,
+[data-theme="office"] .view-btn.active {
   color: white !important;
 }
 
 [data-theme="light"] .btn-primary,
 [data-theme="light"] .btn-success,
 [data-theme="light"] .btn-danger,
-[data-theme="light"] .btn-warning {
+[data-theme="light"] .btn-warning,
+[data-theme="office"] .btn-primary,
+[data-theme="office"] .btn-success,
+[data-theme="office"] .btn-danger,
+[data-theme="office"] .btn-warning {
   color: white !important;
 }
 
 [data-theme="light"] input::placeholder,
-[data-theme="light"] textarea::placeholder {
+[data-theme="light"] textarea::placeholder,
+[data-theme="office"] input::placeholder,
+[data-theme="office"] textarea::placeholder {
   color: var(--text-disabled) !important;
 }
 
@@ -1032,4 +1227,798 @@ html[dir="rtl"] .nav-link::before {
     opacity: 0;
     transform: translate(10px, 0);
   }
+}
+
+/* ==========================================================================
+   RADICAL THEME TRANSFORMATIONS (Layouts, Cards, Badges, Icons & Typography)
+   ========================================================================== */
+
+/* --- ⚡ GLITCH THEME RADICAL STYLING --- */
+[data-theme="glitch"] h1,
+[data-theme="glitch"] h2,
+[data-theme="glitch"] h3,
+[data-theme="glitch"] .card-title-modern {
+  text-shadow: 2px 0 #ff0055, -2px 0 #00f0ff;
+  letter-spacing: 1px;
+}
+
+[data-theme="glitch"] .modern-card,
+[data-theme="glitch"] .stat-card,
+[data-theme="glitch"] .card-header-modern {
+  border: 1px solid rgba(0, 240, 255, 0.6) !important;
+  box-shadow: 3px 3px 0px rgba(255, 0, 85, 0.7), -1px -1px 0px rgba(0, 240, 255, 0.5) !important;
+  border-radius: 2px !important;
+  position: relative;
+}
+
+[data-theme="glitch"] .card-icon,
+[data-theme="glitch"] .setting-icon {
+  background: rgba(255, 0, 85, 0.15) !important;
+  color: #00f0ff !important;
+  border: 1px solid #ff0055 !important;
+  box-shadow: 0 0 8px #ff0055 !important;
+  border-radius: 0px !important;
+}
+
+[data-theme="glitch"] .btn-primary {
+  background: #ff0055 !important;
+  color: #ffffff !important;
+  border: 1px solid #00f0ff !important;
+  box-shadow: 3px 3px 0px #00f0ff !important;
+  font-family: var(--font-mono);
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+[data-theme="glitch"] .btn-primary:hover {
+  transform: translate(-1px, -1px) skew(-2deg);
+  box-shadow: 5px 5px 0px #00f0ff !important;
+}
+
+
+/* --- 🟪 MATERIAL DESIGNER 3 RADICAL STYLING --- */
+[data-theme="material"] .modern-card,
+[data-theme="material"] .stat-card {
+  background: var(--bg-secondary) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 24px !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35) !important;
+  padding: 24px !important;
+  transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.2s cubic-bezier(0.2, 0, 0, 1) !important;
+}
+
+[data-theme="material"] .modern-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45) !important;
+}
+
+[data-theme="material"] .card-icon,
+[data-theme="material"] .setting-icon {
+  background: #e8def8 !important;
+  color: #1d192b !important;
+  border-radius: 16px !important;
+  padding: 12px !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="material"] .btn-primary,
+[data-theme="material"] .btn-success,
+[data-theme="material"] .btn-danger {
+  border-radius: 9999px !important;
+  padding: 10px 24px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.3px;
+  box-shadow: 0 4px 12px rgba(103, 80, 164, 0.3) !important;
+  transition: all 0.2s cubic-bezier(0.2, 0, 0, 1) !important;
+}
+
+[data-theme="material"] .custom-select {
+  border-radius: 9999px !important;
+  padding: 8px 18px !important;
+  border: 1px solid #49454f !important;
+}
+
+
+/* --- 🏢 MICROSOFT OFFICE 365 RADICAL STYLING --- */
+[data-theme="office"] {
+  background-color: #f3f2f1 !important;
+}
+
+[data-theme="office"] .modern-card,
+[data-theme="office"] .stat-card {
+  background: #ffffff !important;
+  border: 1px solid #e1dfdd !important;
+  border-top: 4px solid #0078d4 !important;
+  border-radius: 4px !important;
+  box-shadow: 0 1.6px 3.6px 0 rgba(0, 0, 0, 0.1), 0 0.3px 0.9px 0 rgba(0, 0, 0, 0.08) !important;
+  transition: box-shadow 0.15s ease, border-color 0.15s ease !important;
+}
+
+[data-theme="office"] .modern-card:hover {
+  box-shadow: 0 6.4px 14.4px 0 rgba(0, 0, 0, 0.13), 0 1.2px 3.6px 0 rgba(0, 0, 0, 0.11) !important;
+  border-top-color: #106ebe !important;
+}
+
+[data-theme="office"] .card-icon,
+[data-theme="office"] .setting-icon {
+  background: #eff6fc !important;
+  color: #0078d4 !important;
+  border: 1px solid #c7e0f4 !important;
+  border-radius: 4px !important;
+}
+
+[data-theme="office"] .btn-primary {
+  background: #0078d4 !important;
+  color: #ffffff !important;
+  border-radius: 2px !important;
+  font-family: "Segoe UI", sans-serif !important;
+  font-weight: 600 !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+[data-theme="office"] .btn-primary:hover {
+  background: #106ebe !important;
+}
+
+[data-theme="office"] .custom-select {
+  background: #ffffff !important;
+  border: 1px solid #8a8886 !important;
+  border-radius: 2px !important;
+  color: #201f1e !important;
+}
+
+
+/* --- 🟦 SIMPLE CLEAN SLATE RADICAL STYLING --- */
+[data-theme="simple"] .modern-card,
+[data-theme="simple"] .stat-card {
+  background: #1e293b !important;
+  border: 1px solid #334155 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+}
+
+[data-theme="simple"] .card-icon,
+[data-theme="simple"] .setting-icon {
+  background: rgba(59, 130, 246, 0.1) !important;
+  color: #3b82f6 !important;
+  border-radius: 10px !important;
+}
+
+[data-theme="simple"] .btn-primary {
+  background: #3b82f6 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2) !important;
+}
+
+
+/* ==========================================================================
+   SIDEBAR, NAV TAB & TRANSITION RADICAL THEME TRANSFORMATIONS
+   ========================================================================== */
+
+/* --- ⚡ GLITCH THEME SIDEBAR & TRANSITIONS --- */
+[data-theme="glitch"] .sidebar {
+  background: #050508 !important;
+  border-right: 1px solid rgba(0, 240, 255, 0.4) !important;
+  box-shadow: 4px 0 15px rgba(255, 0, 85, 0.15) !important;
+}
+
+[data-theme="glitch"] .brand-text {
+  text-shadow: 2px 0 #ff0055, -2px 0 #00f0ff !important;
+  font-family: var(--font-mono);
+  letter-spacing: 2px;
+}
+
+[data-theme="glitch"] .nav-link {
+  border-radius: 2px !important;
+  border: 1px solid transparent;
+  transition: all 0.1s ease !important;
+  margin: 2px 0;
+}
+
+[data-theme="glitch"] .nav-link:hover {
+  background: rgba(255, 0, 85, 0.15) !important;
+  color: #ffffff !important;
+  border-color: #ff0055 !important;
+  transform: skew(-2deg);
+}
+
+[data-theme="glitch"] .nav-link.active {
+  background: rgba(0, 240, 255, 0.2) !important;
+  color: #00f0ff !important;
+  border: 1px solid #00f0ff !important;
+  box-shadow: 3px 3px 0px rgba(255, 0, 85, 0.7) !important;
+  text-shadow: 2px 0 #ff0055 !important;
+}
+
+[data-theme="glitch"] .nav-link.active .nav-icon {
+  color: #ff0055 !important;
+  filter: drop-shadow(0 0 5px #00f0ff);
+}
+
+[data-theme="glitch"] .nav-link::before {
+  display: none !important;
+}
+
+/* Glitch Page Transition */
+[data-theme="glitch"] .page-enter-active {
+  animation: glitch-page-in 0.18s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+[data-theme="glitch"] .page-leave-active {
+  animation: glitch-page-out 0.12s cubic-bezier(0.55, 0.085, 0.68, 0.53);
+}
+
+@keyframes glitch-page-in {
+  0% {
+    opacity: 0;
+    transform: translate(-10px, 0) skewX(12deg);
+    filter: hue-rotate(90deg) contrast(1.5);
+  }
+  30% {
+    opacity: 0.8;
+    transform: translate(6px, 0) skewX(-12deg);
+    filter: hue-rotate(180deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(0, 0) skewX(0);
+    filter: none;
+  }
+}
+
+@keyframes glitch-page-out {
+  0% { opacity: 1; transform: translate(0, 0); }
+  100% { opacity: 0; transform: translate(12px, 0) skewX(-15deg); filter: hue-rotate(270deg); }
+}
+
+
+/* --- 🟪 MATERIAL DESIGNER 3 SIDEBAR & TRANSITIONS --- */
+[data-theme="material"] .sidebar {
+  background: #141218 !important;
+  border-right: 1px solid #2b2930 !important;
+  padding: 16px 12px !important;
+}
+
+[data-theme="material"] .brand-text {
+  color: #d0bcff !important;
+  font-family: var(--font-sans);
+  font-weight: 700;
+}
+
+[data-theme="material"] .nav-link {
+  border-radius: 9999px !important;
+  padding: 12px 20px !important;
+  margin: 4px 0 !important;
+  transition: all 0.2s cubic-bezier(0.2, 0, 0, 1) !important;
+}
+
+[data-theme="material"] .nav-link:hover {
+  background: rgba(208, 188, 255, 0.12) !important;
+  color: #e6e0e9 !important;
+}
+
+[data-theme="material"] .nav-link.active {
+  background: #e8def8 !important;
+  color: #1d192b !important;
+  font-weight: 700 !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2) !important;
+}
+
+[data-theme="material"] .nav-link.active .nav-icon {
+  color: #6750a4 !important;
+}
+
+[data-theme="material"] .nav-link::before {
+  display: none !important;
+}
+
+/* Material Morph Page Transition */
+[data-theme="material"] .page-enter-active {
+  animation: material-page-in 0.25s cubic-bezier(0.2, 0, 0, 1);
+}
+[data-theme="material"] .page-leave-active {
+  animation: material-page-out 0.15s cubic-bezier(0.4, 0, 1, 1);
+}
+
+@keyframes material-page-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.94) translateY(12px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes material-page-out {
+  0% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(0.97) translateY(-8px); }
+}
+
+
+/* --- 🏢 MICROSOFT OFFICE 365 SIDEBAR & TRANSITIONS --- */
+[data-theme="office"] .sidebar {
+  background: #ffffff !important;
+  border-right: 1px solid #e1dfdd !important;
+}
+
+[data-theme="office"] .brand-text {
+  color: #0078d4 !important;
+  font-family: "Segoe UI", sans-serif;
+  font-weight: 700;
+}
+
+[data-theme="office"] .nav-link {
+  border-radius: 2px !important;
+  padding: 12px 18px !important;
+  margin: 1px 0 !important;
+  color: #605e5c !important;
+}
+
+[data-theme="office"] .nav-link:hover {
+  background: #f3f2f1 !important;
+  color: #201f1e !important;
+}
+
+[data-theme="office"] .nav-link.active {
+  background: #eff6fc !important;
+  color: #0078d4 !important;
+  font-weight: 600 !important;
+  border-left: 4px solid #0078d4 !important;
+}
+
+[data-theme="office"] .nav-link.active .nav-icon {
+  color: #0078d4 !important;
+}
+
+[data-theme="office"] .nav-link::before {
+  display: none !important;
+}
+
+/* Office Slide Page Transition */
+[data-theme="office"] .page-enter-active {
+  animation: office-page-in 0.2s cubic-bezier(0, 0, 0.2, 1);
+}
+[data-theme="office"] .page-leave-active {
+  animation: office-page-out 0.15s cubic-bezier(0.4, 0, 1, 1);
+}
+
+@keyframes office-page-in {
+  0% {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes office-page-out {
+  0% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-10px); }
+}
+
+
+/* --- 🟦 SIMPLE CLEAN SLATE SIDEBAR & TRANSITIONS --- */
+[data-theme="simple"] .sidebar {
+  background: #0f172a !important;
+  border-right: 1px solid #1e293b !important;
+}
+
+[data-theme="simple"] .brand-text {
+  color: #3b82f6 !important;
+}
+
+[data-theme="simple"] .nav-link {
+  border-radius: 10px !important;
+  padding: 12px 16px !important;
+}
+
+[data-theme="simple"] .nav-link:hover {
+  background: #1e293b !important;
+  color: #f8fafc !important;
+}
+
+[data-theme="simple"] .nav-link.active {
+  background: #3b82f6 !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3) !important;
+}
+
+[data-theme="simple"] .nav-link.active .nav-icon {
+  color: #ffffff !important;
+}
+
+[data-theme="simple"] .nav-link::before {
+  display: none !important;
+}
+
+/* Simple Fade Page Transition */
+[data-theme="simple"] .page-enter-active {
+  animation: simple-page-in 0.18s ease-out;
+}
+[data-theme="simple"] .page-leave-active {
+  animation: simple-page-out 0.12s ease-in;
+}
+
+@keyframes simple-page-in {
+  0% { opacity: 0; transform: scale(0.99); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes simple-page-out {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+
+/* ==========================================================================
+   ANALYTICS & TIMELINE RADICAL THEME TRANSFORMATIONS
+   ========================================================================== */
+
+/* --- ⚡ GLITCH THEME ANALYTICS & TIMELINE --- */
+[data-theme="glitch"] .analytics-page,
+[data-theme="glitch"] .timeline-page {
+  background: #050508 !important;
+}
+
+[data-theme="glitch"] .stat-card.premium-card {
+  background: #0d0d14 !important;
+  border: 1px solid #00f0ff !important;
+  box-shadow: 4px 4px 0px #ff0055, -2px -2px 0px #00f0ff !important;
+  border-radius: 2px !important;
+}
+
+[data-theme="glitch"] .stat-card .stat-value {
+  text-shadow: 2px 0 #ff0055, -2px 0 #00f0ff !important;
+  color: #00f0ff !important;
+}
+
+[data-theme="glitch"] .chart-card {
+  background: #0d0d14 !important;
+  border: 1px solid #00f0ff !important;
+  box-shadow: 4px 4px 0px #ff0055 !important;
+  border-radius: 2px !important;
+}
+
+[data-theme="glitch"] .range-btn {
+  border-radius: 0px !important;
+  border: 1px solid #ff0055 !important;
+  font-family: var(--font-mono);
+  background: #050508;
+  color: #00f0ff;
+}
+
+[data-theme="glitch"] .range-btn.active {
+  background: #ff0055 !important;
+  color: #ffffff !important;
+  box-shadow: 2px 2px 0px #00f0ff !important;
+}
+
+[data-theme="glitch"] .timeline-group {
+  background: #0d0d14 !important;
+  border: 1px solid rgba(0, 240, 255, 0.5) !important;
+  box-shadow: 3px 3px 0px rgba(255, 0, 85, 0.4) !important;
+  border-radius: 2px !important;
+  margin-bottom: 12px;
+}
+
+[data-theme="glitch"] .timeline-group-header {
+  border-bottom: 1px solid rgba(255, 0, 85, 0.3) !important;
+}
+
+
+/* --- 🟪 MATERIAL DESIGNER 3 ANALYTICS & TIMELINE --- */
+[data-theme="material"] .analytics-page,
+[data-theme="material"] .timeline-page {
+  background: #141218 !important;
+}
+
+[data-theme="material"] .stat-card.premium-card {
+  background: #1d1b20 !important;
+  border-radius: 28px !important;
+  border: 1px solid rgba(208, 188, 255, 0.15) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4) !important;
+  padding: 22px !important;
+}
+
+[data-theme="material"] .stat-card.purple { background: linear-gradient(135deg, #2b1f3d 0%, #1d1b20 100%) !important; }
+[data-theme="material"] .stat-card.blue { background: linear-gradient(135deg, #1b2e3d 0%, #1d1b20 100%) !important; }
+[data-theme="material"] .stat-card.orange { background: linear-gradient(135deg, #3d2b1f 0%, #1d1b20 100%) !important; }
+[data-theme="material"] .stat-card.teal { background: linear-gradient(135deg, #1f3d37 0%, #1d1b20 100%) !important; }
+
+[data-theme="material"] .chart-card {
+  background: #1d1b20 !important;
+  border-radius: 28px !important;
+  border: 1px solid rgba(208, 188, 255, 0.12) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3) !important;
+  padding: 24px !important;
+}
+
+[data-theme="material"] .range-btn {
+  border-radius: 9999px !important;
+  padding: 8px 20px !important;
+  background: #2b2930;
+  color: #e6e0e9;
+}
+
+[data-theme="material"] .range-btn.active {
+  background: #e8def8 !important;
+  color: #1d192b !important;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="material"] .timeline-group {
+  background: #1d1b20 !important;
+  border-radius: 24px !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3) !important;
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+
+[data-theme="material"] .search-input,
+[data-theme="material"] .sort-select {
+  border-radius: 9999px !important;
+  background: #2b2930 !important;
+  border: 1px solid #49454f !important;
+  color: #e6e0e9 !important;
+}
+
+
+/* --- 🏢 MICROSOFT OFFICE 365 ANALYTICS & TIMELINE --- */
+[data-theme="office"] .analytics-page,
+[data-theme="office"] .timeline-page {
+  background: #f3f2f1 !important;
+  color: #201f1e !important;
+}
+
+[data-theme="office"] .stat-card.premium-card {
+  background: #ffffff !important;
+  border: 1px solid #e1dfdd !important;
+  border-top: 4px solid #0078d4 !important;
+  border-radius: 4px !important;
+  box-shadow: 0 1.6px 3.6px 0 rgba(0, 0, 0, 0.13), 0 0.3px 0.9px 0 rgba(0, 0, 0, 0.11) !important;
+}
+
+[data-theme="office"] .stat-card .stat-label {
+  color: #605e5c !important;
+}
+
+[data-theme="office"] .stat-card .stat-value {
+  color: #0078d4 !important;
+  font-weight: 700;
+}
+
+[data-theme="office"] .chart-card {
+  background: #ffffff !important;
+  border: 1px solid #e1dfdd !important;
+  border-top: 4px solid #0078d4 !important;
+  border-radius: 4px !important;
+  box-shadow: 0 1.6px 3.6px 0 rgba(0, 0, 0, 0.13) !important;
+}
+
+[data-theme="office"] .range-btn {
+  border-radius: 2px !important;
+  background: #ffffff;
+  border: 1px solid #8a8886;
+  color: #201f1e;
+}
+
+[data-theme="office"] .range-btn.active {
+  background: #0078d4 !important;
+  color: #ffffff !important;
+  border-color: #0078d4 !important;
+}
+
+[data-theme="office"] .timeline-group {
+  background: #ffffff !important;
+  border: 1px solid #e1dfdd !important;
+  border-left: 4px solid #0078d4 !important;
+  border-radius: 2px !important;
+  box-shadow: 0 1.6px 3.6px 0 rgba(0, 0, 0, 0.1) !important;
+  margin-bottom: 12px;
+}
+
+[data-theme="office"] .search-input,
+[data-theme="office"] .sort-select {
+  background: #ffffff !important;
+  border: 1px solid #8a8886 !important;
+  border-radius: 2px !important;
+  color: #201f1e !important;
+}
+
+[data-theme="office"] h1,
+[data-theme="office"] h2,
+[data-theme="office"] h3,
+[data-theme="office"] h4,
+[data-theme="office"] h5,
+[data-theme="office"] h6 {
+  color: #201f1e !important;
+}
+
+[data-theme="office"] .subtitle,
+[data-theme="office"] .card-subtitle {
+  color: #605e5c !important;
+}
+
+[data-theme="office"] .modal-content {
+  background: #ffffff !important;
+  color: #201f1e !important;
+  border: 1px solid #c8c6c4 !important;
+  border-top: 4px solid #0078d4 !important;
+  box-shadow: 0 6.4px 14.4px 0 rgba(0, 0, 0, 0.13) !important;
+}
+
+[data-theme="office"] .modal-header {
+  background: #faf9f8 !important;
+  border-bottom: 1px solid #e1dfdd !important;
+}
+
+[data-theme="office"] .modal-header h3 {
+  color: #201f1e !important;
+}
+
+[data-theme="office"] .data-table th {
+  background: #f3f2f1 !important;
+  color: #605e5c !important;
+  border-bottom: 2px solid #e1dfdd !important;
+}
+
+[data-theme="office"] .data-table td {
+  color: #201f1e !important;
+  border-bottom: 1px solid #edebe9 !important;
+}
+
+[data-theme="office"] .mono-font {
+  color: #201f1e !important;
+}
+
+[data-theme="office"] .percent-pill {
+  background: #eff6fc !important;
+  color: #0078d4 !important;
+  border: 1px solid #c7e0f4 !important;
+}
+
+
+/* ==========================================================================
+   RADICAL STRUCTURAL LAYOUT & POSITIONING TRANSFORMATIONS PER THEME
+   ========================================================================== */
+
+/* --- 🏢 MICROSOFT OFFICE 365 STRUCTURAL STYLING --- */
+[data-theme="office"] .app-shell {
+  background: #f3f2f1 !important;
+}
+
+[data-theme="office"] .sidebar {
+  background: #ffffff !important;
+  border-right: 1px solid #e1dfdd !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04) !important;
+}
+
+[data-theme="office"] .main-content {
+  background: #f3f2f1 !important;
+}
+
+[data-theme="office"] .page-container {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+}
+
+
+/* --- 🟪 MATERIAL DESIGN 3 STRUCTURAL STYLING --- */
+[data-theme="material"] .app-shell {
+  background: #0f0d13 !important;
+}
+
+[data-theme="material"] .sidebar {
+  border-radius: 0 24px 24px 0 !important;
+  background: #1d1b20 !important;
+  border-right: 1px solid rgba(208, 188, 255, 0.15) !important;
+  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3) !important;
+}
+
+[data-theme="material"] .main-content {
+  background: #141218 !important;
+}
+
+[data-theme="material"] .page-container {
+  background: #1c1b1f !important;
+  border-radius: 24px !important;
+  padding: 32px !important;
+  border: 1px solid rgba(208, 188, 255, 0.1) !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4) !important;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+
+/* --- ⚡ CYBERPUNK GLITCH HUD STRUCTURAL STYLING --- */
+[data-theme="glitch"] .app-shell {
+  background: #030305 !important;
+}
+
+[data-theme="glitch"] .sidebar {
+  background: #08080f !important;
+  border-right: 2px solid #00f0ff !important;
+  box-shadow: 6px 0 20px rgba(255, 0, 85, 0.25) !important;
+}
+
+[data-theme="glitch"] .nav-link {
+  transform: skew(-2deg) !important;
+  margin: 4px 0 !important;
+}
+
+[data-theme="glitch"] .page-container {
+  border: 1px solid rgba(0, 240, 255, 0.4) !important;
+  background: rgba(10, 10, 18, 0.8) !important;
+  padding: 28px !important;
+  clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+[data-theme="glitch"] .modern-card,
+[data-theme="glitch"] .stat-card,
+[data-theme="glitch"] .chart-card {
+  transform: rotate(-0.3deg) !important;
+  transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+}
+
+[data-theme="glitch"] .modern-card:hover,
+[data-theme="glitch"] .stat-card:hover {
+  transform: rotate(0deg) scale(1.02) !important;
+}
+
+
+/* --- 🟦 SIMPLE MINIMALIST SLATE STRUCTURAL STYLING --- */
+[data-theme="simple"] .app-shell {
+  background: #0b0f19 !important;
+}
+
+[data-theme="simple"] .sidebar {
+  background: #0f172a !important;
+  border-right: 1px solid #1e293b !important;
+}
+
+[data-theme="simple"] .page-container {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+}
+
+
+/* --- 🟦 SIMPLE CLEAN SLATE ANALYTICS & TIMELINE --- */
+[data-theme="simple"] .analytics-page,
+[data-theme="simple"] .timeline-page {
+  background: #0f172a !important;
+}
+
+[data-theme="simple"] .stat-card.premium-card {
+  background: #1e293b !important;
+  border: 1px solid #334155 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+}
+
+[data-theme="simple"] .chart-card {
+  background: #1e293b !important;
+  border: 1px solid #334155 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+}
+
+[data-theme="simple"] .timeline-group {
+  background: #1e293b !important;
+  border: 1px solid #334155 !important;
+  border-radius: 12px !important;
+  margin-bottom: 12px;
 }

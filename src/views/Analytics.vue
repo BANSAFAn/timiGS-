@@ -1176,52 +1176,100 @@ const totalWeekTime = computed(() => weeklyStats.value.reduce((acc, d) => acc + 
 const dailyAverage = computed(() => weeklyStats.value.length ? Math.round(totalWeekTime.value / weeklyStats.value.length) : 0);
 
 
-const chartColors = computed(() => {
-  const isLight = store.settings.theme === 'light';
-  if (isLight) {
-    return [
-      "#ffb300", // main amber
-      "#fbbf24", // amber-400
-      "#d97706", // amber-600
-      "#f97316", // orange-500
-      "#ea580c", // orange-600
-      "#b45309", // amber-700
-      "#78350f", // amber-900
-    ];
-  } else {
-    return [
-      "#39ff14", // main neon green
-      "#4ade80", // green-400
-      "#16a34a", // green-600
-      "#22c55e", // green-500
-      "#15803d", // green-700
-      "#86efac", // green-300
-      "#14532d", // green-900
-    ];
+function getThemeColors(themeName: string) {
+  switch (themeName) {
+    case 'light':
+      return {
+        primary: '#ffb300',
+        text: '#ffb300',
+        bg: 'rgba(10, 6, 0, 0.98)',
+        fillBg: 'rgba(255, 179, 0, 0.15)',
+        pointBorder: '#0a0600',
+        grid: 'rgba(255, 179, 0, 0.15)',
+        font: "'Share Tech Mono', 'Consolas', monospace",
+        palette: ['#ffb300', '#ffe082', '#ff8f00', '#ffc107', '#d97706', '#f97316', '#b45309']
+      };
+    case 'glitch':
+      return {
+        primary: '#00f0ff',
+        text: '#00f0ff',
+        bg: 'rgba(5, 5, 8, 0.98)',
+        fillBg: 'rgba(0, 240, 255, 0.15)',
+        pointBorder: '#0d0d14',
+        grid: 'rgba(0, 240, 255, 0.15)',
+        font: "'Orbitron', 'Fira Code', monospace",
+        palette: ['#00f0ff', '#ff0055', '#ffe600', '#00ff66', '#9900ff', '#70f8ff', '#d60045']
+      };
+    case 'material':
+      return {
+        primary: '#d0bcff',
+        text: '#e6e0e9',
+        bg: 'rgba(29, 27, 32, 0.98)',
+        fillBg: 'rgba(208, 188, 255, 0.18)',
+        pointBorder: '#141218',
+        grid: 'rgba(208, 188, 255, 0.15)',
+        font: "'Roboto', sans-serif",
+        palette: ['#d0bcff', '#e8def8', '#efb8c8', '#a6f4c5', '#ffe088', '#b69df8', '#f2b8b5']
+      };
+    case 'office':
+      return {
+        primary: '#0078d4',
+        text: '#201f1e',
+        bg: 'rgba(255, 255, 255, 0.98)',
+        fillBg: 'rgba(0, 120, 212, 0.15)',
+        pointBorder: '#ffffff',
+        grid: 'rgba(0, 120, 212, 0.12)',
+        font: "'Segoe UI', sans-serif",
+        palette: ['#0078d4', '#107c41', '#d83b01', '#005a9e', '#5c2d91', '#004578', '#106ebe']
+      };
+    case 'simple':
+      return {
+        primary: '#3b82f6',
+        text: '#f8fafc',
+        bg: 'rgba(30, 41, 59, 0.98)',
+        fillBg: 'rgba(59, 130, 246, 0.15)',
+        pointBorder: '#0f172a',
+        grid: 'rgba(59, 130, 246, 0.15)',
+        font: "'Plus Jakarta Sans', sans-serif",
+        palette: ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444', '#60a5fa', '#34d399']
+      };
+    case 'dark':
+    default:
+      return {
+        primary: '#39ff14',
+        text: '#39ff14',
+        bg: 'rgba(2, 5, 2, 0.98)',
+        fillBg: 'rgba(57, 255, 20, 0.15)',
+        pointBorder: '#020502',
+        grid: 'rgba(57, 255, 20, 0.15)',
+        font: "'VT323', 'Consolas', monospace",
+        palette: ['#39ff14', '#4ade80', '#16a34a', '#22c55e', '#15803d', '#86efac', '#00e676']
+      };
   }
-});
+}
+
+const themeConfig = computed(() => getThemeColors(store.settings.theme || 'dark'));
+
+const chartColors = computed(() => themeConfig.value.palette);
 
 const allAppsSorted = computed(() => {
   return [...store.todaySummary].sort((a, b) => b.total_seconds - a.total_seconds);
 });
 
 const lineChartData = computed(() => {
-  const isLight = store.settings.theme === 'light';
-  const primaryColor = isLight ? '#ffb300' : '#39ff14';
-  const bgColor = isLight ? 'rgba(255, 179, 0, 0.1)' : 'rgba(57, 255, 20, 0.1)';
-
+  const cfg = themeConfig.value;
   return {
     labels: weeklyStats.value.map(d => new Date(d.date).toLocaleDateString(locale.value, { month: 'short', day: 'numeric' })).reverse(),
     datasets: [{
       label: t('analytics.activity') || 'Activity',
       data: weeklyStats.value.map(d => Number((d.total_seconds / 3600).toFixed(1))).reverse(),
-      borderColor: primaryColor,
+      borderColor: cfg.primary,
       borderWidth: 3,
-      backgroundColor: bgColor,
+      backgroundColor: cfg.fillBg,
       tension: 0.4,
       fill: true,
-      pointBackgroundColor: primaryColor,
-      pointBorderColor: isLight ? '#0a0600' : '#020502',
+      pointBackgroundColor: cfg.primary,
+      pointBorderColor: cfg.pointBorder,
       pointBorderWidth: 2,
       pointRadius: 4,
       pointHoverRadius: 6
@@ -1240,25 +1288,21 @@ const appChartData = computed(() => ({
 }));
 
 const commonOptions = computed(() => {
-  const isLight = store.settings.theme === 'light';
-  const primaryColor = isLight ? "#ffb300" : "#39ff14";
-  const bgColor = isLight ? "rgba(10, 6, 0, 0.98)" : "rgba(2, 5, 2, 0.98)";
-  const textColor = isLight ? "#ffb300" : "#39ff14";
-
+  const cfg = themeConfig.value;
   return {
     responsive: true,
     maintainAspectRatio: false,
     plugins: { 
       legend: { display: false }, 
       tooltip: {
-        backgroundColor: bgColor,
-        titleColor: textColor,
-        titleFont: { family: "Consolas, Courier New, monospace", size: 12, weight: "bold" as const },
-        bodyColor: textColor,
-        bodyFont: { family: "Consolas, Courier New, monospace", size: 12 },
+        backgroundColor: cfg.bg,
+        titleColor: cfg.text,
+        titleFont: { family: cfg.font, size: 12, weight: "bold" as const },
+        bodyColor: cfg.text,
+        bodyFont: { family: cfg.font, size: 12 },
         padding: 10,
-        cornerRadius: 0,
-        borderColor: primaryColor,
+        cornerRadius: 4,
+        borderColor: cfg.primary,
         borderWidth: 1,
         displayColors: false
       }
@@ -1267,15 +1311,15 @@ const commonOptions = computed(() => {
       x: { 
         grid: { display: false }, 
         ticks: { 
-          color: primaryColor,
-          font: { family: "Consolas, Courier New, monospace", size: 10 }
+          color: cfg.primary,
+          font: { family: cfg.font, size: 11 }
         } 
       },
       y: { 
-        grid: { color: isLight ? 'rgba(255, 179, 0, 0.05)' : 'rgba(57, 255, 20, 0.05)' }, 
+        grid: { color: cfg.grid }, 
         ticks: { 
-          color: primaryColor,
-          font: { family: "Consolas, Courier New, monospace", size: 10 }
+          color: cfg.primary,
+          font: { family: cfg.font, size: 11 }
         }, 
         beginAtZero: true 
       }
@@ -1304,25 +1348,21 @@ const lineChartOptions = computed(() => ({
 }));
 
 const computedPieChartOptions = computed(() => {
-  const isLight = store.settings.theme === 'light';
-  const primaryColor = isLight ? "#ffb300" : "#39ff14";
-  const bgColor = isLight ? "rgba(10, 6, 0, 0.98)" : "rgba(2, 5, 2, 0.98)";
-  const textColor = isLight ? "#ffb300" : "#39ff14";
-
+  const cfg = themeConfig.value;
   return {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
       legend: { display: false },
       tooltip: {
-        backgroundColor: bgColor,
-        titleColor: textColor,
-        titleFont: { family: "Consolas, Courier New, monospace", size: 12, weight: "bold" as const },
-        bodyColor: textColor,
-        bodyFont: { family: "Consolas, Courier New, monospace", size: 12 },
+        backgroundColor: cfg.bg,
+        titleColor: cfg.text,
+        titleFont: { family: cfg.font, size: 12, weight: "bold" as const },
+        bodyColor: cfg.text,
+        bodyFont: { family: cfg.font, size: 12 },
         padding: 10,
-        cornerRadius: 0,
-        borderColor: primaryColor,
+        cornerRadius: 4,
+        borderColor: cfg.primary,
         borderWidth: 1,
         displayColors: false,
         callbacks: {
@@ -1934,11 +1974,12 @@ watch(selectedRange, async () => {
 
 .app-list-percent {
   font-weight: 700;
-  color: #06b6d4;
+  color: var(--color-primary);
   font-size: 0.95rem;
-  background: rgba(6, 182, 212, 0.15);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
   padding: 4px 10px;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
 }
 
 .app-list-time {
@@ -2319,50 +2360,51 @@ watch(selectedRange, async () => {
 
 .modal-content {
   background: var(--bg-secondary);
-  border: 2px solid var(--border-color);
-  border-radius: 0px; 
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg); 
   width: 650px; 
   max-width: 90%; 
   max-height: 80vh;
   display: flex; 
   flex-direction: column; 
-  box-shadow: var(--shadow-glow);
+  box-shadow: var(--shadow-lg);
+  color: var(--text-main);
 }
 
 .modal-header {
-  padding: 24px 28px; 
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 20px 24px; 
+  border-bottom: 1px solid var(--border-color);
   display: flex; 
   justify-content: space-between; 
   align-items: center;
-  background: rgba(255,255,255,0.02);
+  background: var(--bg-tertiary);
 }
 
 .modal-header h3 {
   font-size: 1.2rem;
   font-weight: 700;
-  color: #fff;
+  color: var(--text-main);
 }
 
 .close-btn {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--bg-hover);
+  border: 1px solid var(--border-color);
   font-size: 1.4rem; 
-  color: var(--text-muted); 
+  color: var(--text-main); 
   cursor: pointer;
-  width: 36px; 
-  height: 36px; 
-  border-radius: 10px;
+  width: 32px; 
+  height: 32px; 
+  border-radius: var(--radius-sm);
   display: flex; 
   align-items: center; 
   justify-content: center; 
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.2s ease;
 }
 
 .close-btn:hover { 
-  color: #fff; 
-  background: rgba(255, 255, 255, 0.12);
-  border-color: rgba(255, 255, 255, 0.2);
+  color: var(--color-primary); 
+  background: var(--bg-active);
+  border-color: var(--color-primary);
   transform: rotate(90deg);
 }
 
@@ -2378,19 +2420,19 @@ watch(selectedRange, async () => {
 
 .data-table th {
   text-align: left; 
-  padding: 18px 28px; 
+  padding: 14px 24px; 
   color: var(--text-muted);
   font-weight: 600; 
   font-size: 0.85rem; 
-  background: rgba(255, 255, 255, 0.03);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--bg-tertiary);
+  border-bottom: 1px solid var(--border-color);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 .data-table td { 
-  padding: 16px 28px; 
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  padding: 14px 24px; 
+  border-bottom: 1px solid var(--border-color);
   color: var(--text-main);
 }
 
@@ -2399,7 +2441,7 @@ watch(selectedRange, async () => {
 }
 
 .table-row:hover { 
-  background: rgba(255, 255, 255, 0.03); 
+  background: var(--bg-hover); 
   transform: translateX(4px);
 }
 
@@ -2412,11 +2454,11 @@ watch(selectedRange, async () => {
 .app-icon-mini {
   width: 32px; 
   height: 32px; 
-  border-radius: 0px;
+  border-radius: var(--radius-sm);
   display: flex; 
   align-items: center; 
   justify-content: center;
-  color: var(--bg-main); 
+  color: var(--text-main); 
   font-size: 0.85rem; 
   font-weight: 700;
   border: 1px solid var(--border-color);
@@ -2425,28 +2467,28 @@ watch(selectedRange, async () => {
 .app-icon-mini-img {
   width: 32px; 
   height: 32px; 
-  border-radius: 0px;
+  border-radius: var(--radius-sm);
   object-fit: contain;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--bg-tertiary);
   border: 1px solid var(--border-color);
   padding: 4px;
 }
 
 .mono-font { 
-  font-family: 'Consolas', monospace; 
-  color: var(--text-muted);
-  font-weight: 500;
+  font-family: var(--font-mono); 
+  color: var(--text-main);
+  font-weight: 600;
 }
 
 .percent-pill {
   display: inline-block; 
-  padding: 6px 12px;
-  background: rgba(99, 102, 241, 0.15);
-  border-radius: 14px; 
+  padding: 4px 12px;
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-xl); 
   font-size: 0.85rem; 
   font-weight: 700; 
-  color: #818cf8;
-  border: 1px solid rgba(129, 140, 248, 0.2);
+  color: var(--color-primary);
+  border: 1px solid var(--border-color);
 }
 
 .custom-scrollbar::-webkit-scrollbar { 

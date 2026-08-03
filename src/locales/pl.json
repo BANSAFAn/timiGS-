@@ -23,7 +23,8 @@
     "teamShort": "Zespół",
     "weather": "Pogoda",
     "collapse": "Zwiń",
-    "expand": "Rozwiń"
+    "expand": "Rozwiń",
+    "weatherShort": "Погода"
   },
   "dashboard": {
     "title": "Pulpit",
@@ -52,7 +53,11 @@
     "tagCreative": "Kreatywność i Projektowanie",
     "tagAI": "AI i Asystenci",
     "tagFinance": "Finanse i Biznes",
-    "tagUtilities": "Narzędzia i Narzędzia pomocnicze"
+    "tagUtilities": "Narzędzia i Narzędzia pomocnicze",
+    "timigsActive": "Головна частина TimiGS",
+    "timigsActiveDesc": "Перегляд статистики та відстеження",
+    "previousActivity": "Попередня активність:",
+    "noPreviousActivity": "Попередньої активності не виявлено"
   },
   "timeline": {
     "title": "Oś Czasu Aktywności",
@@ -69,7 +74,11 @@
     "noSearchResults": "Nie znaleziono",
     "websiteStats": "Statystyki Sieci",
     "notTracked": "Nie Śledzone",
-    "notTrackedHint": "zostało otwarte, ale nie śledzone"
+    "notTrackedHint": "zostało otwarte, ale nie śledzone",
+    "sortByTimeDesc": "Найбільше часу",
+    "sortByTimeAsc": "Найменше часу",
+    "sortByNameAsc": "По назві А-Я",
+    "sortByNameDesc": "По назві Я-А"
   },
   "analytics": {
     "title": "Analityka",
@@ -109,7 +118,13 @@
     "unknownTrack": "Nieznany utwór",
     "unknownPage": "Nieznana strona",
     "startUsingAppsHint": "Zacznij korzystać z aplikacji, aby zobaczyć statystyki.",
-    "activity": "Aktywność"
+    "activity": "Aktywność",
+    "showAllApps": "Pokaż wszystkie aplikacje",
+    "noDataAvailable": "Brak dostępnych danych",
+    "noMusicSessions": "Brak sesji słuchania muzyki",
+    "searchPlaceholder": "Szukaj w analityce...",
+    "noBrowsingSessions": "Brak sesji przeglądania stron",
+    "clickToCopy": "Kliknij, aby skopiować"
   },
   "settings": {
     "title": "Ustawienia",
@@ -117,7 +132,7 @@
     "language": "Język",
     "theme": "Motyw",
     "themeDark": "Ciemny",
-    "themeLight": "Jasny",
+    "themeLight": "Bursztynowy Retro",
     "autostart": "Autostart",
     "minimizeToTray": "Minimalizuj do zasobnika systemowego",
     "tracking": "Śledzenie",
@@ -206,14 +221,53 @@
     "resumeTracking": "Wznów śledzenie",
     "themeDesc": "Przełączaj między trybem ciemnym i jasnym",
     "autostartDesc": "Uruchamiaj TimiGS przy starcie systemu",
-    "minimizeToTrayDesc": "Kontynuuj działanie w tle"
+    "minimizeToTrayDesc": "Kontynuuj działanie w tle",
+    "themeSimple": "Prosty",
+    "themeGlitch": "Glitch",
+    "themeMaterial": "Material Designer",
+    "themeOffice": "Microsoft Office",
+    "doctorModeActiveSession": "Активна сесія",
+    "doctorModeElapsedTime": "Пройшло часу",
+    "doctorModeReminders": "Надіслано нагадувань",
+    "doctorModeTimeUntilLock": "Час до блокування",
+    "lockScreenTitle": "Комп'ютер заблоковано",
+    "lockScreenSubtitle": "Для вашого здоров'я",
+    "lockScreenMessage1": "Ви працювали за ПК занадто довго без перерв.",
+    "lockScreenMessage2": "Будь ласка, пройдіться, випийте чаю або дайте очам відпочити.",
+    "lockScreenMessage3": "Ваше здоров'я важливіше за будь-яку роботу!",
+    "lockScreenTimeRemaining": "Часу залишилося",
+    "lockScreenTipsTitle": "Ідеї для корисної перерви:",
+    "lockScreenTip1": "Прогуляйтеся 10 хвилин на вулиці",
+    "lockScreenTip2": "Зробіть кілька вправ для розминки",
+    "lockScreenTip3": "Дайте відпочити очам — подивіться на віддалені предмети",
+    "lockScreenTip4": "Випийте склянку води або чаю",
+    "lockScreenTip5": "Провітріть кімнату",
+    "lockScreenEmergencyUnlock": "Аварійне розблокування",
+    "lockScreenEmergencyConfirm": "Ви впевнені, що хочете розблокувати? Це слід використовувати лише в екстрених випадках.",
+    "notificationUnlockTitle": "ПК розблоковано - Режим лікаря",
+    "notificationUnlockBody": "З поверненням! Не забувайте робити регулярні перерви. Ваше здоров'я — найбільша цінність!",
+    "notificationLockTitle": "ПК заблоковано - Режим лікаря",
+    "notificationLockBody": "Ви проігнорували {count} нагадувань про перерву. Ваш комп'ютер заблоковано на {mins} хвилин. Будь ласка, відпочиньте!",
+    "notificationEmergencyTitle": "Аварійне розблокування - Режим лікаря",
+    "notificationEmergencyBody": "Аварійне розблокування: ПК розблоковано вручну. Будь ласка, пам'ятайте про перерви для вашого здоров'я!",
+    "notificationBreakReminderTitle": "Нагадування про перерву",
+    "notificationReminder1": "Режим лікаря: Ви працюєте за ПК вже {mins} хвилин. Час зробити перерву! Прогуляйтеся, розімніться або дайте очам відпочити.",
+    "notificationReminder2": "Нагадування про здоров'я: {mins} хвилин екранного часу! Вашому тілу потрібна перерва. Відійдіть від комп'ютера на кілька хвилин.",
+    "notificationReminder3": "Режим лікаря: Не забувайте піклуватися про себе! Ви працюєте вже {mins} хвилин. Час для короткого відпочинку!",
+    "notificationReminder4": "Час перерви: Минуло {mins} хвилин. Як щодо чашки чаю та свіжого повітря? Ваше здоров'я важливе!",
+    "notificationEnabledTitle": "Режим лікаря увімкнено",
+    "notificationEnabledBody": "Вам будуть надходити нагадування про перерву кожні {interval} хвилин. Після {max} нагадувань комп'ютер буде заблоковано на {duration} хвилин.",
+    "clearData": "Очистити всі дані"
   },
   "tools": {
     "title": "Narzędzia",
     "timer": "Licznik Wyłączania",
     "shutdownTimer": {
       "title": "Licznik Wyłączania Komputera",
-      "start": "Uruchom Licznik"
+      "start": "Uruchom Licznik",
+      "pcWillShutdown": "Komputer wyłączy się za:",
+      "cancel": "Anuluj",
+      "shutdownNow": "Wyłącz teraz"
     },
     "notepad": "Notatnik",
     "notepadPlaceholder": "Wpisz swoje notatki tutaj...",
@@ -247,7 +301,12 @@
     "optional": "Opcjonalnie",
     "statusActive": "Aktywny",
     "statusCompleted": "Ukończono",
-    "statusFailed": "Nie powiodło się"
+    "statusFailed": "Nie powiodło się",
+    "id": "ID",
+    "targetAppSite": "Aplikacja / Strona docelowa",
+    "goalHours": "Docelowe godziny",
+    "createdAt": "Utworzono",
+    "status": "Status"
   },
   "weather": {
     "title": "Pogoda i Aktywność"
@@ -492,7 +551,25 @@
     "onlineBadge": "● W sieci",
     "sessions": "Sesje",
     "na": "N/D",
-    "none": "—"
+    "none": "—",
+    "manageModes": "Керування режимами",
+    "forceFocusTitle": "Встановити режим фокусу",
+    "forceTimeoutTitle": "Встановити режим перерви (Timeout)",
+    "stopFocus": "Зупинити режим фокусу",
+    "stopTimeout": "Зупинити режим перерви",
+    "targetUser": "Ціль",
+    "allUsers": "Усі учасники",
+    "selectApp": "Оберіть додаток для фокусування",
+    "customApp": "Інший додаток (назва)",
+    "exePath": "Назва exe-файлу (наприклад, code.exe)",
+    "durationMinutes": "Тривалість (хвилин)",
+    "workDuration": "Час роботи (хвилин)",
+    "breakDuration": "Час перерви (хвилин)",
+    "forceBreakImmediately": "Почати перерву негайно",
+    "apply": "Застосувати",
+    "cancel": "Скасувати",
+    "noAppPlaceholder": "Оберіть або введіть додаток...",
+    "noData": "Brak danych zespołu"
   },
   "excludeProcesses": {
     "title": "Zarządzaj Śledzeniem Procesów",
@@ -606,7 +683,8 @@
     "timeline_title": "Sessions & File Activity",
     "workspaceGeneral": "Obszar roboczy / Ogólne",
     "unknownCoding": "Nieznany(Programowanie)",
-    "noProject": "Brak projektu"
+    "noProject": "Brak projektu",
+    "unknown": "Nieznany"
   },
   "calendar": {
     "clear": "Wyczyść",

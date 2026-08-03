@@ -23,30 +23,7 @@
         <div class="hero-content">
           <div class="active-section">
             <template v-if="isAppFocused">
-              <div class="active-icon-box timigs-brand-icon animate-pop-in">
-                <svg viewBox="0 0 64 64" class="sleeping-cat-svg animate-pulse" width="68" height="68" xmlns="http://www.w3.org/2000/svg">
-                  <!-- Wireframe Cat Body -->
-                  <rect x="18" y="24" width="28" height="24" stroke="var(--color-primary)" stroke-width="2" fill="none" />
-                  <!-- Head -->
-                  <rect x="10" y="14" width="16" height="16" stroke="var(--color-primary)" stroke-width="2" fill="none" />
-                  <!-- Ears -->
-                  <polyline points="10,14 6,6 16,14" stroke="var(--color-primary)" stroke-width="2" fill="none" />
-                  <polyline points="20,14 26,6 26,14" stroke="var(--color-primary)" stroke-width="2" fill="none" />
-                  <!-- Tail -->
-                  <polyline points="46,36 54,36 54,20 50,20" stroke="var(--color-primary)" stroke-width="2" fill="none" />
-                  <!-- Closed sleeping eyes (sharp lines) -->
-                  <line x1="13" y1="22" x2="16" y2="22" stroke="var(--color-primary)" stroke-width="2" />
-                  <line x1="20" y1="22" x2="23" y2="22" stroke="var(--color-primary)" stroke-width="2" />
-                  <!-- Whiskers -->
-                  <line x1="8" y1="24" x2="2" y2="24" stroke="var(--color-primary)" stroke-width="1.5" />
-                  <line x1="8" y1="26" x2="2" y2="28" stroke="var(--color-primary)" stroke-width="1.5" />
-                  <line x1="28" y1="24" x2="34" y2="24" stroke="var(--color-primary)" stroke-width="1.5" />
-                  <line x1="28" y1="26" x2="34" y2="28" stroke="var(--color-primary)" stroke-width="1.5" />
-                  <!-- Sleeping texts in mono font -->
-                  <text x="40" y="16" fill="var(--color-primary)" font-family="monospace" font-size="10" font-weight="bold">Z_z</text>
-                  <text x="48" y="10" fill="var(--color-primary)" font-family="monospace" font-size="12" font-weight="bold">Z</text>
-                </svg>
-              </div>
+              <div class="active-icon-box timigs-brand-icon animate-pop-in" v-html="catSvgContent"></div>
 
               <div class="active-info">
                 <div class="status-row">
@@ -384,6 +361,87 @@ ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarEle
 
 const { t, locale } = useI18n();
 const store = useActivityStore();
+const currentTheme = computed(() => store.settings.theme || "dark");
+
+const darkCatSvg = `<svg viewBox="0 0 64 64" class="sleeping-cat-svg animate-pulse" width="68" height="68" xmlns="http://www.w3.org/2000/svg">
+  <rect x="18" y="24" width="28" height="24" stroke="#39ff14" stroke-width="2" fill="none" />
+  <rect x="10" y="14" width="16" height="16" stroke="#39ff14" stroke-width="2" fill="none" />
+  <polyline points="10,14 6,6 16,14" stroke="#39ff14" stroke-width="2" fill="none" />
+  <polyline points="20,14 26,6 26,14" stroke="#39ff14" stroke-width="2" fill="none" />
+  <polyline points="46,36 54,36 54,20 50,20" stroke="#39ff14" stroke-width="2" fill="none" />
+  <line x1="13" y1="22" x2="16" y2="22" stroke="#39ff14" stroke-width="2" />
+  <line x1="20" y1="22" x2="23" y2="22" stroke="#39ff14" stroke-width="2" />
+  <text x="40" y="16" fill="#39ff14" font-family="monospace" font-size="10" font-weight="bold">Z_z</text>
+  <text x="48" y="10" fill="#39ff14" font-family="monospace" font-size="12" font-weight="bold">Z</text>
+</svg>`;
+
+const lightCatSvg = `<svg viewBox="0 0 64 64" class="sleeping-cat-svg animate-pulse" width="68" height="68" xmlns="http://www.w3.org/2000/svg">
+  <rect x="18" y="24" width="28" height="24" stroke="#ffb300" stroke-width="2" fill="none" />
+  <rect x="10" y="14" width="16" height="16" stroke="#ffb300" stroke-width="2" fill="none" />
+  <polyline points="10,14 6,6 16,14" stroke="#ffb300" stroke-width="2" fill="none" />
+  <polyline points="20,14 26,6 26,14" stroke="#ffb300" stroke-width="2" fill="none" />
+  <polyline points="46,36 54,36 54,20 50,20" stroke="#ffb300" stroke-width="2" fill="none" />
+  <line x1="13" y1="22" x2="16" y2="22" stroke="#ffb300" stroke-width="2" />
+  <line x1="20" y1="22" x2="23" y2="22" stroke="#ffb300" stroke-width="2" />
+  <text x="40" y="16" fill="#ffb300" font-family="monospace" font-size="10" font-weight="bold">Z_z</text>
+  <text x="48" y="10" fill="#ffb300" font-family="monospace" font-size="12" font-weight="bold">Z</text>
+</svg>`;
+
+const glitchCatSvg = `<svg viewBox="0 0 64 64" class="sleeping-cat-svg animate-pulse" width="68" height="68" xmlns="http://www.w3.org/2000/svg">
+  <polygon points="16,24 46,24 46,48 16,48" stroke="#00f0ff" stroke-width="2" fill="rgba(0,240,255,0.05)" />
+  <polygon points="8,14 26,14 26,30 8,30" stroke="#00f0ff" stroke-width="2" fill="rgba(255,0,85,0.1)" />
+  <rect x="10" y="18" width="14" height="6" fill="#ff0055" />
+  <polygon points="8,14 4,4 14,14" stroke="#ff0055" stroke-width="2" fill="#00f0ff" />
+  <polygon points="20,14 26,4 26,14" stroke="#ff0055" stroke-width="2" fill="#ff0055" />
+  <polyline points="46,36 56,36 56,18 50,18" stroke="#00f0ff" stroke-width="2.5" />
+  <text x="36" y="16" fill="#00f0ff" font-family="monospace" font-size="10" font-weight="bold">>_Z</text>
+  <text x="46" y="10" fill="#ff0055" font-family="monospace" font-size="11" font-weight="bold">ERR</text>
+</svg>`;
+
+const materialCatSvg = `<svg viewBox="0 0 64 64" class="sleeping-cat-svg animate-pulse" width="68" height="68" xmlns="http://www.w3.org/2000/svg">
+  <path d="M 18 24 C 18 24, 48 24, 48 36 C 48 44, 40 48, 30 48 C 20 48, 18 40, 18 36 Z" fill="#36343b" stroke="#d0bcff" stroke-width="2.5" />
+  <circle cx="18" cy="22" r="10" fill="#2b2930" stroke="#d0bcff" stroke-width="2.5" />
+  <path d="M 10 16 Q 6 6 15 13 Z" fill="#e8def8" stroke="#d0bcff" stroke-width="2" />
+  <path d="M 21 13 Q 28 6 25 16 Z" fill="#e8def8" stroke="#d0bcff" stroke-width="2" />
+  <path d="M 12 21 Q 14 18 16 21" stroke="#d0bcff" stroke-width="2" fill="none" stroke-linecap="round" />
+  <path d="M 18 21 Q 20 18 22 21" stroke="#d0bcff" stroke-width="2" fill="none" stroke-linecap="round" />
+  <circle cx="44" cy="18" r="6" fill="#e8def8" opacity="0.8" />
+  <text x="41" y="21" fill="#1d192b" font-family="sans-serif" font-size="9" font-weight="bold">z</text>
+  <circle cx="52" cy="10" r="8" fill="#d0bcff" opacity="0.9" />
+  <text x="48" y="14" fill="#1d192b" font-family="sans-serif" font-size="11" font-weight="bold">Z</text>
+</svg>`;
+
+const officeCatSvg = `<svg viewBox="0 0 64 64" class="sleeping-cat-svg animate-pulse" width="68" height="68" xmlns="http://www.w3.org/2000/svg">
+  <rect x="18" y="24" width="28" height="24" rx="2" stroke="#0078d4" stroke-width="2.5" fill="#ffffff" />
+  <rect x="10" y="14" width="16" height="16" rx="2" stroke="#0078d4" stroke-width="2.5" fill="#ffffff" />
+  <polygon points="17,30 21,30 19,42" fill="#0078d4" />
+  <polygon points="10,14 6,6 16,14" fill="#0078d4" />
+  <polygon points="20,14 26,6 26,14" fill="#0078d4" />
+  <rect x="11" y="19" width="6" height="4" stroke="#106ebe" stroke-width="1.5" fill="none" />
+  <rect x="19" y="19" width="6" height="4" stroke="#106ebe" stroke-width="1.5" fill="none" />
+  <text x="40" y="18" fill="#0078d4" font-family="Segoe UI, sans-serif" font-size="11" font-weight="bold">z_z</text>
+  <text x="48" y="11" fill="#106ebe" font-family="Segoe UI, sans-serif" font-size="13" font-weight="bold">Z</text>
+</svg>`;
+
+const simpleCatSvg = `<svg viewBox="0 0 64 64" class="sleeping-cat-svg animate-pulse" width="68" height="68" xmlns="http://www.w3.org/2000/svg">
+  <rect x="18" y="24" width="28" height="24" rx="8" stroke="#3b82f6" stroke-width="2.5" fill="none" stroke-linecap="round" />
+  <rect x="8" y="14" width="18" height="18" rx="6" stroke="#3b82f6" stroke-width="2.5" fill="none" stroke-linecap="round" />
+  <path d="M 10 14 L 6 6 L 15 12" stroke="#3b82f6" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M 21 12 L 26 6 L 24 14" stroke="#3b82f6" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M 12 23 Q 15 26 18 23" stroke="#3b82f6" stroke-width="2" fill="none" stroke-linecap="round" />
+  <text x="40" y="16" fill="#3b82f6" font-family="sans-serif" font-size="11" font-weight="600">z</text>
+  <text x="48" y="10" fill="#60a5fa" font-family="sans-serif" font-size="13" font-weight="700">Z</text>
+</svg>`;
+
+const catSvgContent = computed(() => {
+  const theme = currentTheme.value;
+  if (theme === 'glitch') return glitchCatSvg;
+  if (theme === 'material') return materialCatSvg;
+  if (theme === 'office') return officeCatSvg;
+  if (theme === 'simple') return simpleCatSvg;
+  if (theme === 'light') return lightCatSvg;
+  return darkCatSvg;
+});
 const currentActivity = computed(() => store.currentActivity);
 const previousSession = computed(() => {
   if (store.currentSession) {

@@ -22,7 +22,9 @@
     "team": "Team",
     "teamShort": "Team",
     "collapse": "Collapse",
-    "expand": "Expand"
+    "expand": "Expand",
+    "weather": "Погода",
+    "weatherShort": "Погода"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -116,7 +118,13 @@
     "unknownTrack": "Unknown Track",
     "unknownPage": "Unknown Page",
     "startUsingAppsHint": "Start using your applications to see analytics here.",
-    "activity": "Activity"
+    "activity": "Activity",
+    "showAllApps": "Show All Applications",
+    "noDataAvailable": "No data available",
+    "noMusicSessions": "No music listening sessions",
+    "searchPlaceholder": "Search analytics...",
+    "noBrowsingSessions": "No web browsing sessions",
+    "clickToCopy": "Click to copy"
   },
   "settings": {
     "title": "Settings",
@@ -124,7 +132,11 @@
     "language": "Language",
     "theme": "Theme",
     "themeDark": "Dark",
-    "themeLight": "Light",
+    "themeLight": "Retro Amber",
+    "themeSimple": "Simple",
+    "themeGlitch": "Glitch",
+    "themeMaterial": "Material Designer",
+    "themeOffice": "Microsoft Office",
     "autostart": "Auto-start",
     "minimizeToTray": "Minimize to system tray",
     "tracking": "Tracking",
@@ -243,14 +255,19 @@
     "resumeTracking": "Resume Tracking",
     "themeDesc": "Switch between dark and light mode",
     "autostartDesc": "Launch TimiGS on system startup",
-    "minimizeToTrayDesc": "Keep running in background"
+    "minimizeToTrayDesc": "Keep running in background",
+    "clearData": "Очистити всі дані",
+    "noUpdates": "У вас найновіша версія."
   },
   "tools": {
     "title": "Tools",
     "timer": "Shutdown Timer",
     "shutdownTimer": {
       "title": "PC Shutdown Timer",
-      "start": "Start Timer"
+      "start": "Start Timer",
+      "pcWillShutdown": "PC will shut down in:",
+      "cancel": "Cancel",
+      "shutdownNow": "Shut down now"
     },
     "notepad": "Notepad",
     "notepadPlaceholder": "Type your notes here...",
@@ -284,7 +301,12 @@
     "optional": "Optional",
     "statusActive": "Active",
     "statusCompleted": "Completed",
-    "statusFailed": "Failed"
+    "statusFailed": "Failed",
+    "id": "ID",
+    "targetAppSite": "Target App / Site",
+    "goalHours": "Goal Hours",
+    "createdAt": "Created At",
+    "status": "Status"
   },
   "weather": {
     "title": "Weather & Activity"
@@ -546,7 +568,8 @@
     "forceBreakImmediately": "Force Break Immediately",
     "apply": "Apply",
     "cancel": "Cancel",
-    "noAppPlaceholder": "Select or type app..."
+    "noAppPlaceholder": "Select or type app...",
+    "noData": "No team data available"
   },
   "excludeProcesses": {
     "title": "Manage Process Tracking",
@@ -660,7 +683,8 @@
     "timeline_title": "Sessions & File Activity",
     "workspaceGeneral": "Workspace / General",
     "unknownCoding": "Unknown(Coding)",
-    "noProject": "No Project"
+    "noProject": "No Project",
+    "unknown": "Unknown"
   },
   "calendar": {
     "clear": "Clear",

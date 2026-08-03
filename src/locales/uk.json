@@ -118,7 +118,13 @@
     "unknownTrack": "Невідомий трек",
     "unknownPage": "Невідома сторінка",
     "startUsingAppsHint": "Почніть користуватися додатками, щоб побачити аналітику тут.",
-    "activity": "Активність"
+    "activity": "Активність",
+    "showAllApps": "Показати всі програми",
+    "noDataAvailable": "Дані відсутні",
+    "noMusicSessions": "Сесії прослуховування музики відсутні",
+    "searchPlaceholder": "Пошук в аналітиці...",
+    "noBrowsingSessions": "Сесії перегляду веб-сторінок відсутні",
+    "clickToCopy": "Клацніть, щоб скопіювати"
   },
   "settings": {
     "title": "Налаштування",
@@ -126,7 +132,11 @@
     "language": "Мова",
     "theme": "Тема",
     "themeDark": "Темна",
-    "themeLight": "Світла",
+    "themeLight": "Ретро Бурштин",
+    "themeSimple": "Просто",
+    "themeGlitch": "Глітч",
+    "themeMaterial": "Material Designer",
+    "themeOffice": "Microsoft Office",
     "autostart": "Запускати з Windows",
     "minimizeToTray": "Згортати в системний трей",
     "tracking": "Відстеження",
@@ -254,7 +264,10 @@
     "timer": "Таймер вимкнення",
     "shutdownTimer": {
       "title": "Таймер вимкнення ПК",
-      "start": "Запустити таймер"
+      "start": "Запустити таймер",
+      "pcWillShutdown": "Комп'ютер вимкнеться через:",
+      "cancel": "Скасувати",
+      "shutdownNow": "Вимкнути зараз"
     },
     "notepad": "Нотатки",
     "notepadPlaceholder": "Введіть текст...",
@@ -288,7 +301,12 @@
     "optional": "Необов'язково",
     "statusActive": "Активно",
     "statusCompleted": "Виконано",
-    "statusFailed": "Не вдалося"
+    "statusFailed": "Не вдалося",
+    "id": "ID",
+    "targetAppSite": "Цільовий додаток / сайт",
+    "goalHours": "Цільові години",
+    "createdAt": "Створено",
+    "status": "Статус"
   },
   "weather": {
     "title": "Погода та активність"
@@ -550,7 +568,8 @@
     "forceBreakImmediately": "Почати перерву негайно",
     "apply": "Застосувати",
     "cancel": "Скасувати",
-    "noAppPlaceholder": "Оберіть або введіть додаток..."
+    "noAppPlaceholder": "Оберіть або введіть додаток...",
+    "noData": "Дані команди відсутні"
   },
   "excludeProcesses": {
     "title": "Керування відстеженням процесів",
@@ -664,7 +683,8 @@
     "timeline_title": "Сесії та активність у файлах",
     "workspaceGeneral": "Робочий простір / Загальне",
     "unknownCoding": "Невідомо(Програмування)",
-    "noProject": "Без проєкту"
+    "noProject": "Без проєкту",
+    "unknown": "Невідомо"
   },
   "calendar": {
     "clear": "Очистити",

@@ -23,7 +23,8 @@
     "teamShort": "الفريق",
     "weather": "الطقس",
     "collapse": "طي",
-    "expand": "توسيع"
+    "expand": "توسيع",
+    "weatherShort": "Погода"
   },
   "dashboard": {
     "title": "لوحة القيادة",
@@ -52,7 +53,11 @@
     "tagCreative": "الإبداع والتصميم",
     "tagAI": "الذكاء الاصطناعي والمساعدون",
     "tagFinance": "المال والأعمال",
-    "tagUtilities": "الأدوات والمرافق"
+    "tagUtilities": "الأدوات والمرافق",
+    "timigsActive": "Головна частина TimiGS",
+    "timigsActiveDesc": "Перегляд статистики та відстеження",
+    "previousActivity": "Попередня активність:",
+    "noPreviousActivity": "Попередньої активності не виявлено"
   },
   "timeline": {
     "title": "الجدول الزمني للنشاط",
@@ -69,7 +74,11 @@
     "noSearchResults": "لم يتم العثور على نتائج",
     "websiteStats": "إحصائيات الويب",
     "notTracked": "غير متتبع",
-    "notTrackedHint": "مفتوح ولكنه غير متتبع"
+    "notTrackedHint": "مفتوح ولكنه غير متتبع",
+    "sortByTimeDesc": "Найбільше часу",
+    "sortByTimeAsc": "Найменше часу",
+    "sortByNameAsc": "По назві А-Я",
+    "sortByNameDesc": "По назві Я-А"
   },
   "analytics": {
     "title": "التحليلات",
@@ -109,7 +118,13 @@
     "unknownTrack": "مسار غير معروف",
     "unknownPage": "صفحة غير معروفة",
     "startUsingAppsHint": "ابدأ في استخدام تطبيقاتك لرؤية التحليلات هنا.",
-    "activity": "النشاط"
+    "activity": "النشاط",
+    "showAllApps": "عرض جميع التطبيقات",
+    "noDataAvailable": "لا تتوفر بيانات",
+    "noMusicSessions": "لا توجد جلسات استماع للموسيقى",
+    "searchPlaceholder": "البحث في التحليلات...",
+    "noBrowsingSessions": "لا توجد جلسات تصفح ويب",
+    "clickToCopy": "انقر للنسخ"
   },
   "settings": {
     "title": "الإعدادات",
@@ -117,7 +132,7 @@
     "language": "اللغة",
     "theme": "السمة",
     "themeDark": "داكن",
-    "themeLight": "فاتح",
+    "themeLight": "عنبر ريترو",
     "autostart": "ابدأ مع Windows",
     "minimizeToTray": "تصغير إلى علبة النظام",
     "tracking": "التتبع",
@@ -207,14 +222,52 @@
     "resumeTracking": "استئناف التتبع",
     "themeDesc": "التبديل بين الوضعين الداكن والفاتح",
     "autostartDesc": "تشغيل TimiGS عند بدء تشغيل النظام",
-    "minimizeToTrayDesc": "الاستمرار في التشغيل في الخلفية"
+    "minimizeToTrayDesc": "الاستمرار في التشغيل في الخلفية",
+    "themeSimple": "بسيط",
+    "themeGlitch": "جليتش",
+    "themeMaterial": "ماتيريال ديزاينر",
+    "themeOffice": "مايكروسوفت أوفيس",
+    "doctorModeActiveSession": "Активна сесія",
+    "doctorModeElapsedTime": "Пройшло часу",
+    "doctorModeReminders": "Надіслано нагадувань",
+    "doctorModeTimeUntilLock": "Час до блокування",
+    "lockScreenTitle": "Комп'ютер заблоковано",
+    "lockScreenSubtitle": "Для вашого здоров'я",
+    "lockScreenMessage1": "Ви працювали за ПК занадто довго без перерв.",
+    "lockScreenMessage2": "Будь ласка, пройдіться, випийте чаю або дайте очам відпочити.",
+    "lockScreenMessage3": "Ваше здоров'я важливіше за будь-яку роботу!",
+    "lockScreenTimeRemaining": "Часу залишилося",
+    "lockScreenTipsTitle": "Ідеї для корисної перерви:",
+    "lockScreenTip1": "Прогуляйтеся 10 хвилин на вулиці",
+    "lockScreenTip2": "Зробіть кілька вправ для розминки",
+    "lockScreenTip3": "Дайте відпочити очам — подивіться на віддалені предмети",
+    "lockScreenTip4": "Випийте склянку води або чаю",
+    "lockScreenTip5": "Провітріть кімнату",
+    "lockScreenEmergencyUnlock": "Аварійне розблокування",
+    "lockScreenEmergencyConfirm": "Ви впевнені, що хочете розблокувати? Це слід використовувати лише в екстрених випадках.",
+    "notificationUnlockTitle": "ПК розблоковано - Режим лікаря",
+    "notificationUnlockBody": "З поверненням! Не забувайте робити регулярні перерви. Ваше здоров'я — найбільша цінність!",
+    "notificationLockTitle": "ПК заблоковано - Режим лікаря",
+    "notificationLockBody": "Ви проігнорували {count} нагадувань про перерву. Ваш комп'ютер заблоковано на {mins} хвилин. Будь ласка, відпочиньте!",
+    "notificationEmergencyTitle": "Аварійне розблокування - Режим лікаря",
+    "notificationEmergencyBody": "Аварійне розблокування: ПК розблоковано вручну. Будь ласка, пам'ятайте про перерви для вашого здоров'я!",
+    "notificationBreakReminderTitle": "Нагадування про перерву",
+    "notificationReminder1": "Режим лікаря: Ви працюєте за ПК вже {mins} хвилин. Час зробити перерву! Прогуляйтеся, розімніться або дайте очам відпочити.",
+    "notificationReminder2": "Нагадування про здоров'я: {mins} хвилин екранного часу! Вашому тілу потрібна перерва. Відійдіть від комп'ютера на кілька хвилин.",
+    "notificationReminder3": "Режим лікаря: Не забувайте піклуватися про себе! Ви працюєте вже {mins} хвилин. Час для короткого відпочинку!",
+    "notificationReminder4": "Час перерви: Минуло {mins} хвилин. Як щодо чашки чаю та свіжого повітря? Ваше здоров'я важливе!",
+    "notificationEnabledTitle": "Режим лікаря увімкнено",
+    "notificationEnabledBody": "Вам будуть надходити нагадування про перерву кожні {interval} хвилин. Після {max} нагадувань комп'ютер буде заблоковано на {duration} хвилин."
   },
   "tools": {
     "title": "الأدوات",
     "timer": "مؤقت الإغلاق",
     "shutdownTimer": {
       "title": "مؤقت إيقاف الكمبيوتر",
-      "start": "بدء المؤقت"
+      "start": "بدء المؤقت",
+      "pcWillShutdown": "سيتم إيقاف تشغيل الكمبيوتر خلال:",
+      "cancel": "إلغاء",
+      "shutdownNow": "إيقاف التشغيل الآن"
     },
     "notepad": "المفكرة",
     "notepadPlaceholder": "اكتب ملاحظاتك هنا...",
@@ -248,7 +301,12 @@
     "optional": "اختياري",
     "statusActive": "نشط",
     "statusCompleted": "مكتمل",
-    "statusFailed": "فشل"
+    "statusFailed": "فشل",
+    "id": "المعرف",
+    "targetAppSite": "التطبيق / الموقع المستهدف",
+    "goalHours": "ساعات الهدف",
+    "createdAt": "تم الإنشاء في",
+    "status": "الحالة"
   },
   "weather": {
     "title": "الطقس والنشاط"
@@ -493,7 +551,25 @@
     "onlineBadge": "● متصل",
     "sessions": "الجلسات",
     "na": "غير متوفر",
-    "none": "—"
+    "none": "—",
+    "manageModes": "Керування режимами",
+    "forceFocusTitle": "Встановити режим фокусу",
+    "forceTimeoutTitle": "Встановити режим перерви (Timeout)",
+    "stopFocus": "Зупинити режим фокусу",
+    "stopTimeout": "Зупинити режим перерви",
+    "targetUser": "Ціль",
+    "allUsers": "Усі учасники",
+    "selectApp": "Оберіть додаток для фокусування",
+    "customApp": "Інший додаток (назва)",
+    "exePath": "Назва exe-файлу (наприклад, code.exe)",
+    "durationMinutes": "Тривалість (хвилин)",
+    "workDuration": "Час роботи (хвилин)",
+    "breakDuration": "Час перерви (хвилин)",
+    "forceBreakImmediately": "Почати перерву негайно",
+    "apply": "Застосувати",
+    "cancel": "Скасувати",
+    "noAppPlaceholder": "Оберіть або введіть додаток...",
+    "noData": "لا تتوفر بيانات الفريق"
   },
   "excludeProcesses": {
     "title": "Manage Process Tracking",
@@ -607,7 +683,8 @@
     "timeline_title": "Sessions & File Activity",
     "workspaceGeneral": "مساحة العمل / عام",
     "unknownCoding": "غير معروف (برمجة)",
-    "noProject": "بدون مشروع"
+    "noProject": "بدون مشروع",
+    "unknown": "غير معروف"
   },
   "calendar": {
     "clear": "مسح",
