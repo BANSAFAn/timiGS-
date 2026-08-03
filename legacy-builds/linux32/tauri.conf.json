@@ -52,10 +52,10 @@
     "publisher": "Baneronetwo",
     "linux": {
       "deb": {
-        "depends": ["libgtk-3-0", "libwebkit2gtk-4.0-37", "libappindicator3-1"]
+        "depends": ["libgtk-3-0", "libwebkit2gtk-4.1-0", "libappindicator3-1"]
       },
       "rpm": {
-        "depends": ["gtk3", "webkit2gtk3", "libappindicator"]
+        "depends": ["gtk3", "webkit2gtk4.1", "libappindicator"]
       }
     }
   },
