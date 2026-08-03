@@ -53,7 +53,11 @@ pub fn start_timer(duration_secs: u64, app_handle: tauri::AppHandle) {
                 #[cfg(target_os = "windows")]
                 {
                     use std::process::Command;
-                    let _ = Command::new("shutdown").args(["/s", "/t", "0"]).spawn();
+                    use std::os::windows::process::CommandExt;
+                    let _ = Command::new("shutdown")
+                        .creation_flags(0x08000000)
+                        .args(["/s", "/t", "0"])
+                        .spawn();
                 }
 
                 // Notify frontend

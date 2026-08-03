@@ -17,12 +17,28 @@
       </div>
 
       <div class="sort-box">
-        <select v-model="sortBy" class="sort-select">
-          <option value="time-desc">[ {{ $t('timeline.sortByTimeDesc') || 'Most Time' }} ]</option>
-          <option value="time-asc">[ {{ $t('timeline.sortByTimeAsc') || 'Least Time' }} ]</option>
-          <option value="name-asc">[ {{ $t('timeline.sortByNameAsc') || 'Name A-Z' }} ]</option>
-          <option value="name-desc">[ {{ $t('timeline.sortByNameDesc') || 'Name Z-A' }} ]</option>
-        </select>
+        <div
+          class="custom-select modern-select"
+          :class="{ open: sortOpen }"
+          @click.stop="sortOpen = !sortOpen"
+        >
+          <div class="selected-option">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="sort-icon"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>
+            <span class="sort-label">{{ currentSortLabel }}</span>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="options-list" v-show="sortOpen">
+            <div
+              v-for="option in sortOptions"
+              :key="option.code"
+              class="option-item"
+              :class="{ active: sortBy === option.code }"
+              @click.stop="setSort(option.code)"
+            >
+              {{ option.label }}
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="calendar-nav">
@@ -181,8 +197,40 @@ const sessions = ref<ActivitySession[]>([]);
 
 const searchQuery = ref('');
 const sortBy = ref('time-desc');
+const sortOpen = ref(false);
 const appIcons = ref<Record<string, string>>({});
 const expandedGroups = ref<Set<string>>(new Set());
+
+const sortOptions = computed(() => [
+  { code: 'time-desc', label: t('timeline.sortByTimeDesc', 'Most Time') },
+  { code: 'time-asc', label: t('timeline.sortByTimeAsc', 'Least Time') },
+  { code: 'name-asc', label: t('timeline.sortByNameAsc', 'Name A-Z') },
+  { code: 'name-desc', label: t('timeline.sortByNameDesc', 'Name Z-A') },
+]);
+
+const currentSortLabel = computed(() => {
+  return sortOptions.value.find(o => o.code === sortBy.value)?.label || sortOptions.value[0].label;
+});
+
+function setSort(code: string) {
+  sortBy.value = code;
+  sortOpen.value = false;
+}
+
+function handleOutsideClick(e: MouseEvent) {
+  const target = e.target as HTMLElement;
+  if (!target.closest('.sort-box')) {
+    sortOpen.value = false;
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('click', handleOutsideClick);
+});
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleOutsideClick);
+});
 
 
 interface SessionGroup {
@@ -514,26 +562,91 @@ onMounted(async () => {
 
 .sort-box {
   position: relative;
-  min-width: 160px;
+  min-width: 180px;
+  z-index: 1;
 }
 
-.sort-select {
-  width: 100%;
-  padding: 12px 16px;
+.sort-box:has(.custom-select.open) {
+  z-index: 100 !important;
+}
+
+.sort-box .custom-select {
+  position: relative;
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
-  border-radius: 0px;
-  color: var(--color-primary);
-  font-family: var(--font-family);
-  font-size: 0.95rem;
+  border-radius: var(--radius-md);
   cursor: pointer;
-  outline: none;
+  user-select: none;
+  min-width: 180px;
   transition: var(--transition-fast);
 }
 
-.sort-select:focus {
+.sort-box .custom-select.open {
+  z-index: 101 !important;
   border-color: var(--color-primary);
-  background: var(--bg-tertiary);
+  box-shadow: var(--shadow-md);
+}
+
+.sort-box .selected-option {
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-main);
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.sort-box .sort-icon {
+  opacity: 0.8;
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.sort-box .chevron {
+  margin-left: auto;
+  font-size: 0.8rem;
+  opacity: 0.7;
+  transition: transform 0.2s;
+}
+
+.sort-box .custom-select.open .chevron {
+  transform: rotate(180deg);
+}
+
+.sort-box .options-list {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  overflow-y: auto;
+  max-height: 240px;
+  z-index: 99999 !important;
+  box-shadow: var(--shadow-lg);
+  padding: 6px;
+}
+
+.sort-box .option-item {
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: var(--transition-fast);
+  border-radius: var(--radius-sm);
+  margin-bottom: 2px;
+  font-weight: 500;
+  color: var(--text-main);
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.sort-box .option-item:hover,
+.sort-box .option-item.active {
+  background: var(--bg-hover);
+  color: var(--color-primary);
 }
 
 .search-input {

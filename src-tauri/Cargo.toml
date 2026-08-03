@@ -49,6 +49,7 @@ tauri = { version = "2.1", features = ["tray-icon", "image-png"] }
 tauri-plugin-autostart = "2.1"
 tauri-plugin-cli = "2.1"
 tauri-plugin-updater = "2.1"
+tauri-plugin-notification = "2.1"
 
 
 [target.'cfg(target_os = "linux")'.dependencies]

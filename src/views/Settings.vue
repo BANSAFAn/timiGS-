@@ -1,6 +1,6 @@
 <template>
   <div class="page page-shell settings-page">
-    <div class="page-container settings-page" style="max-width: 1200px">
+    <div class="page-container settings-page">
       <div class="page-header modern-header">
         <div class="header-content">
           <div class="header-icon" v-html="Icons.settings"></div>
@@ -60,7 +60,7 @@
               <div
                 class="custom-select modern-select"
                 :class="{ open: langOpen }"
-                @click="langOpen = !langOpen"
+                @click.stop="toggleLang"
               >
                 <div class="selected-option">
                   <span class="flag-code-badge" style="margin-right: 8px; font-weight: bold; font-family: monospace;">[{{ localSettings.language.toUpperCase() }}]</span>
@@ -93,23 +93,28 @@
                   </p>
                 </div>
               </div>
-              <div class="theme-switcher-modern">
-                <button
-                  class="theme-btn-modern"
-                  :class="{ active: localSettings.theme === 'dark' }"
-                  @click="setTheme('dark')"
-                >
-                  <span class="theme-icon" v-html="Icons.theme"></span>
-                  <span class="theme-label">Dark</span>
-                </button>
-                <button
-                  class="theme-btn-modern"
-                  :class="{ active: localSettings.theme === 'light' }"
-                  @click="setTheme('light')"
-                >
-                  <span class="theme-icon" v-html="Icons.themeLight"></span>
-                  <span class="theme-label">Light</span>
-                </button>
+              <div
+                class="custom-select modern-select"
+                :class="{ open: themeOpen }"
+                @click.stop="toggleTheme"
+              >
+                <div class="selected-option">
+                  <span class="theme-icon" v-html="currentThemeObj.icon" style="margin-right: 8px;"></span>
+                  <span class="theme-name">{{ currentThemeObj.name }}</span>
+                  <span class="chevron">▼</span>
+                </div>
+                <div class="options-list" v-show="themeOpen">
+                  <div
+                    v-for="t in availableThemes"
+                    :key="t.code"
+                    class="option-item"
+                    :class="{ active: localSettings.theme === t.code }"
+                    @click.stop="setTheme(t.code)"
+                  >
+                    <span class="theme-icon" v-html="t.icon" style="margin-right: 8px;"></span>
+                    {{ t.name }}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -811,6 +816,40 @@ function formatElapsedDuration(seconds: number): string {
 
 
 const langOpen = ref(false);
+const themeOpen = ref(false);
+
+function toggleLang(e?: Event) {
+  if (e) e.stopPropagation();
+  langOpen.value = !langOpen.value;
+  if (langOpen.value) {
+    themeOpen.value = false;
+  }
+}
+
+function toggleTheme(e?: Event) {
+  if (e) e.stopPropagation();
+  themeOpen.value = !themeOpen.value;
+  if (themeOpen.value) {
+    langOpen.value = false;
+  }
+}
+
+function handleOutsideClick(e: MouseEvent) {
+  const target = e.target as HTMLElement;
+  if (!target.closest('.custom-select')) {
+    langOpen.value = false;
+    themeOpen.value = false;
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('click', handleOutsideClick);
+});
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleOutsideClick);
+});
+
 const availableLanguages = [
   { code: "en", name: "English", flag: "🇬🇧", flagImg: "https://flagcdn.com/w40/gb.png" },
   { code: "uk", name: "Українська", flag: "🇺🇦", flagImg: "https://flagcdn.com/w40/ua.png" },
@@ -822,6 +861,19 @@ const availableLanguages = [
   { code: "pt", name: "Português", flag: "🇵🇹", flagImg: "https://flagcdn.com/w40/pt.png" },
   { code: "pl", name: "Polski", flag: "🇵🇱", flagImg: "https://flagcdn.com/w40/pl.png" },
 ];
+
+const availableThemes = computed(() => [
+  { code: "dark", name: t("settings.themeDark", "Dark"), icon: Icons.theme },
+  { code: "light", name: t("settings.themeLight", "Retro Amber"), icon: Icons.themeLight },
+  { code: "simple", name: t("settings.themeSimple", "Simple"), icon: Icons.appearance },
+  { code: "glitch", name: t("settings.themeGlitch", "Glitch"), icon: Icons.coding },
+  { code: "material", name: t("settings.themeMaterial", "Material Designer"), icon: Icons.tools },
+  { code: "office", name: t("settings.themeOffice", "Microsoft Office"), icon: Icons.system },
+]);
+
+const currentThemeObj = computed(
+  () => availableThemes.value.find((t) => t.code === localSettings.theme) || availableThemes.value[0]
+);
 
 const currentLangName = computed(
   () =>
@@ -838,6 +890,7 @@ function changeLanguage(code: string) {
 function setTheme(theme: string) {
   localSettings.theme = theme;
   saveSettings();
+  themeOpen.value = false;
 }
 
 const isReady = ref(false);
@@ -1446,6 +1499,21 @@ async function confirmResetData() {
   box-shadow: 0 0 0 2px rgba(91, 110, 225, 0.2);
 }
 
+.setting-item {
+  position: relative;
+  z-index: 1;
+}
+
+.setting-item:has(.custom-select.open) {
+  z-index: 100 !important;
+}
+
+.setting-card:has(.custom-select.open),
+.modern-card:has(.custom-select.open) {
+  z-index: 100 !important;
+  overflow: visible !important;
+}
+
 .custom-select {
   position: relative;
   background: var(--bg-secondary);
@@ -1454,6 +1522,12 @@ async function confirmResetData() {
   cursor: pointer;
   min-width: 200px;
   user-select: none;
+}
+
+.custom-select.open {
+  z-index: 101 !important;
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-md);
 }
 
 .selected-option {
@@ -1482,8 +1556,9 @@ async function confirmResetData() {
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
-  overflow: hidden;
-  z-index: 9999;
+  overflow-y: auto;
+  max-height: 280px;
+  z-index: 99999 !important;
   box-shadow: var(--shadow-lg);
   padding: 6px;
 }
@@ -1603,8 +1678,9 @@ async function confirmResetData() {
 
 
 .settings-page {
-  max-width: 1000px;
-  margin: 0 auto;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
 }
 
 .modern-header {
@@ -1766,12 +1842,14 @@ async function confirmResetData() {
 
 .theme-switcher-modern {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
   background: var(--bg-tertiary);
-  padding: 4px;
+  padding: 6px;
   border-radius: var(--radius-md);
   border: 1px solid var(--border-color);
   align-self: flex-start;
+  max-width: 100%;
 }
 
 .theme-btn-modern {

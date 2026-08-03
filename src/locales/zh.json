@@ -23,7 +23,8 @@
     "teamShort": "团队",
     "weather": "天气",
     "collapse": "折叠",
-    "expand": "展开"
+    "expand": "展开",
+    "weatherShort": "Погода"
   },
   "dashboard": {
     "title": "仪表板",
@@ -52,7 +53,11 @@
     "tagCreative": "创意与设计",
     "tagAI": "人工智能与助手",
     "tagFinance": "财务与商业",
-    "tagUtilities": "实用工具与百宝箱"
+    "tagUtilities": "实用工具与百宝箱",
+    "timigsActive": "Головна частина TimiGS",
+    "timigsActiveDesc": "Перегляд статистики та відстеження",
+    "previousActivity": "Попередня активність:",
+    "noPreviousActivity": "Попередньої активності не виявлено"
   },
   "timeline": {
     "title": "活动时间轴",
@@ -69,7 +74,11 @@
     "noSearchResults": "未找到应用",
     "websiteStats": "浏览器统计",
     "notTracked": "未监控",
-    "notTrackedHint": "已打开但未被监控"
+    "notTrackedHint": "已打开但未被监控",
+    "sortByTimeDesc": "Найбільше часу",
+    "sortByTimeAsc": "Найменше часу",
+    "sortByNameAsc": "По назві А-Я",
+    "sortByNameDesc": "По назві Я-А"
   },
   "analytics": {
     "title": "分析",
@@ -109,7 +118,13 @@
     "unknownTrack": "未知曲目",
     "unknownPage": "未知页面",
     "startUsingAppsHint": "开始使用您的应用以在此处查看分析。",
-    "activity": "活动"
+    "activity": "活动",
+    "showAllApps": "显示所有应用程序",
+    "noDataAvailable": "暂无数据",
+    "noMusicSessions": "无音乐播放记录",
+    "searchPlaceholder": "搜索分析...",
+    "noBrowsingSessions": "无网页浏览记录",
+    "clickToCopy": "点击复制"
   },
   "settings": {
     "title": "设置",
@@ -117,7 +132,7 @@
     "language": "语言",
     "theme": "主题",
     "themeDark": "深色",
-    "themeLight": "浅色",
+    "themeLight": "复古琥珀",
     "autostart": "随 Windows 启动",
     "minimizeToTray": "最小化到系统托盘",
     "tracking": "追踪",
@@ -207,14 +222,52 @@
     "resumeTracking": "恢复追踪",
     "themeDesc": "在深色和浅色模式之间切换",
     "autostartDesc": "系统启动时启动 TimiGS",
-    "minimizeToTrayDesc": "在后台继续运行"
+    "minimizeToTrayDesc": "在后台继续运行",
+    "themeSimple": "简约",
+    "themeGlitch": "故障风",
+    "themeMaterial": "Material 材质",
+    "themeOffice": "微软 Office",
+    "doctorModeActiveSession": "Активна сесія",
+    "doctorModeElapsedTime": "Пройшло часу",
+    "doctorModeReminders": "Надіслано нагадувань",
+    "doctorModeTimeUntilLock": "Час до блокування",
+    "lockScreenTitle": "Комп'ютер заблоковано",
+    "lockScreenSubtitle": "Для вашого здоров'я",
+    "lockScreenMessage1": "Ви працювали за ПК занадто довго без перерв.",
+    "lockScreenMessage2": "Будь ласка, пройдіться, випийте чаю або дайте очам відпочити.",
+    "lockScreenMessage3": "Ваше здоров'я важливіше за будь-яку роботу!",
+    "lockScreenTimeRemaining": "Часу залишилося",
+    "lockScreenTipsTitle": "Ідеї для корисної перерви:",
+    "lockScreenTip1": "Прогуляйтеся 10 хвилин на вулиці",
+    "lockScreenTip2": "Зробіть кілька вправ для розминки",
+    "lockScreenTip3": "Дайте відпочити очам — подивіться на віддалені предмети",
+    "lockScreenTip4": "Випийте склянку води або чаю",
+    "lockScreenTip5": "Провітріть кімнату",
+    "lockScreenEmergencyUnlock": "Аварійне розблокування",
+    "lockScreenEmergencyConfirm": "Ви впевнені, що хочете розблокувати? Це слід використовувати лише в екстрених випадках.",
+    "notificationUnlockTitle": "ПК розблоковано - Режим лікаря",
+    "notificationUnlockBody": "З поверненням! Не забувайте робити регулярні перерви. Ваше здоров'я — найбільша цінність!",
+    "notificationLockTitle": "ПК заблоковано - Режим лікаря",
+    "notificationLockBody": "Ви проігнорували {count} нагадувань про перерву. Ваш комп'ютер заблоковано на {mins} хвилин. Будь ласка, відпочиньте!",
+    "notificationEmergencyTitle": "Аварійне розблокування - Режим лікаря",
+    "notificationEmergencyBody": "Аварійне розблокування: ПК розблоковано вручну. Будь ласка, пам'ятайте про перерви для вашого здоров'я!",
+    "notificationBreakReminderTitle": "Нагадування про перерву",
+    "notificationReminder1": "Режим лікаря: Ви працюєте за ПК вже {mins} хвилин. Час зробити перерву! Прогуляйтеся, розімніться або дайте очам відпочити.",
+    "notificationReminder2": "Нагадування про здоров'я: {mins} хвилин екранного часу! Вашому тілу потрібна перерва. Відійдіть від комп'ютера на кілька хвилин.",
+    "notificationReminder3": "Режим лікаря: Не забувайте піклуватися про себе! Ви працюєте вже {mins} хвилин. Час для короткого відпочинку!",
+    "notificationReminder4": "Час перерви: Минуло {mins} хвилин. Як щодо чашки чаю та свіжого повітря? Ваше здоров'я важливе!",
+    "notificationEnabledTitle": "Режим лікаря увімкнено",
+    "notificationEnabledBody": "Вам будуть надходити нагадування про перерву кожні {interval} хвилин. Після {max} нагадувань комп'ютер буде заблоковано на {duration} хвилин."
   },
   "tools": {
     "title": "工具",
     "timer": "关机定时器",
     "shutdownTimer": {
       "title": "电脑关机定时器",
-      "start": "启动定时器"
+      "start": "启动定时器",
+      "pcWillShutdown": "电脑将于以下时间后关机：",
+      "cancel": "取消",
+      "shutdownNow": "立即关机"
     },
     "notepad": "记事本",
     "notepadPlaceholder": "在此输入您的笔记...",
@@ -248,7 +301,12 @@
     "optional": "可选",
     "statusActive": "活跃",
     "statusCompleted": "已完成",
-    "statusFailed": "失败"
+    "statusFailed": "失败",
+    "id": "ID",
+    "targetAppSite": "目标应用/网站",
+    "goalHours": "目标小时",
+    "createdAt": "创建时间",
+    "status": "状态"
   },
   "weather": {
     "title": "天气与活动"
@@ -493,7 +551,25 @@
     "onlineBadge": "● 在线",
     "sessions": "会话",
     "na": "无",
-    "none": "—"
+    "none": "—",
+    "manageModes": "Керування режимами",
+    "forceFocusTitle": "Встановити режим фокусу",
+    "forceTimeoutTitle": "Встановити режим перерви (Timeout)",
+    "stopFocus": "Зупинити режим фокусу",
+    "stopTimeout": "Зупинити режим перерви",
+    "targetUser": "Ціль",
+    "allUsers": "Усі учасники",
+    "selectApp": "Оберіть додаток для фокусування",
+    "customApp": "Інший додаток (назва)",
+    "exePath": "Назва exe-файлу (наприклад, code.exe)",
+    "durationMinutes": "Тривалість (хвилин)",
+    "workDuration": "Час роботи (хвилин)",
+    "breakDuration": "Час перерви (хвилин)",
+    "forceBreakImmediately": "Почати перерву негайно",
+    "apply": "Застосувати",
+    "cancel": "Скасувати",
+    "noAppPlaceholder": "Оберіть або введіть додаток...",
+    "noData": "暂无团队数据"
   },
   "excludeProcesses": {
     "title": "Manage Process Tracking",
@@ -607,7 +683,8 @@
     "timeline_title": "Sessions & File Activity",
     "workspaceGeneral": "工作区 / 常规",
     "unknownCoding": "未知(编程)",
-    "noProject": "无项目"
+    "noProject": "无项目",
+    "unknown": "未知"
   },
   "calendar": {
     "clear": "清除",

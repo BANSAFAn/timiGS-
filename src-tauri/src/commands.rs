@@ -266,10 +266,12 @@ pub fn save_settings(app: tauri::AppHandle, settings: db::Settings) -> Result<()
             #[cfg(target_os = "windows")]
             {
                 use std::process::Command;
+                use std::os::windows::process::CommandExt;
                 if let Ok(exe_path) = std::env::current_exe() {
                     let exe_str = exe_path.to_string_lossy();
-                    // Update registry entry with --minimized flag
+                    // Update registry entry with --minimized flag (CREATE_NO_WINDOW flag prevents console pop-up)
                     let _ = Command::new("reg")
+                        .creation_flags(0x08000000)
                         .args(&[
                             "add",
                             "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run",
@@ -364,7 +366,9 @@ pub fn shutdown_pc() -> Result<(), String> {
     #[cfg(target_os = "windows")]
     {
         use std::process::Command;
+        use std::os::windows::process::CommandExt;
         Command::new("shutdown")
+            .creation_flags(0x08000000)
             .args(["/s", "/t", "0"])
             .spawn()
             .map_err(|e| e.to_string())?;
