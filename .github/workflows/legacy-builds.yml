@@ -1,6 +1,24 @@
 name: Legacy Builds
 
 on:
+  push:
+    branches: [ main, master ]
+    paths:
+      - 'src/**'
+      - 'src-tauri/**'
+      - 'legacy-builds/**'
+      - '.github/workflows/legacy-builds.yml'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+  pull_request:
+    branches: [ main, master ]
+    paths:
+      - 'src/**'
+      - 'src-tauri/**'
+      - 'legacy-builds/**'
+      - '.github/workflows/legacy-builds.yml'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
   release:
     types: [published]
   workflow_dispatch:
@@ -48,20 +66,10 @@ jobs:
 
       - name: Build Win32 version
         run: |
-          # Backup original config
-          Copy-Item src-tauri\tauri.conf.json src-tauri\tauri.conf.json.backup
+          Copy-Item legacy-builds\win32\tauri.conf.json src-tauri\tauri.conf.json -Force
           
-          # Use legacy config
-          Copy-Item legacy-builds\win32\tauri.conf.json src-tauri\tauri.conf.json
-          
-          # Build for 32-bit
           cd src-tauri
           cargo tauri build --target i686-pc-windows-msvc
-          
-          # Restore original config
-          cd ..
-          Copy-Item src-tauri\tauri.conf.json.backup src-tauri\tauri.conf.json
-          Remove-Item src-tauri\tauri.conf.json.backup
 
       - name: Upload Win32 artifacts
         uses: actions/upload-artifact@v4
@@ -118,27 +126,13 @@ jobs:
 
       - name: Build WinXP version
         run: |
-          # Backup original files
-          Copy-Item src-tauri\tauri.conf.json src-tauri\tauri.conf.json.backup
-          Copy-Item src-tauri\Cargo.toml src-tauri\Cargo.toml.backup
+          Copy-Item legacy-builds\winxp\tauri.conf.json src-tauri\tauri.conf.json -Force
+          Copy-Item legacy-builds\winxp\Cargo.toml src-tauri\Cargo.toml -Force
           
-          # Use legacy config
-          Copy-Item legacy-builds\winxp\tauri.conf.json src-tauri\tauri.conf.json
-          Copy-Item legacy-builds\winxp\Cargo.toml src-tauri\Cargo.toml
-          
-          # Set XP compatibility flags
           $env:RUSTFLAGS = "-C target-feature=+crt-static"
           
-          # Build for 32-bit XP
           cd src-tauri
           cargo tauri build --target i686-pc-windows-msvc
-          
-          # Restore original files
-          cd ..
-          Copy-Item src-tauri\tauri.conf.json.backup src-tauri\tauri.conf.json
-          Copy-Item src-tauri\Cargo.toml.backup src-tauri\Cargo.toml
-          Remove-Item src-tauri\tauri.conf.json.backup
-          Remove-Item src-tauri\Cargo.toml.backup
 
       - name: Upload WinXP artifacts
         uses: actions/upload-artifact@v4
@@ -206,24 +200,11 @@ jobs:
 
       - name: Build Linux 32-bit version
         run: |
-          # Backup original files
-          cp src-tauri/tauri.conf.json src-tauri/tauri.conf.json.backup
-          cp src-tauri/Cargo.toml src-tauri/Cargo.toml.backup
-          
-          # Use legacy config
           cp legacy-builds/linux32/tauri.conf.json src-tauri/tauri.conf.json
           cp legacy-builds/linux32/Cargo.toml src-tauri/Cargo.toml
           
-          # Build for 32-bit Linux
           cd src-tauri
           cargo tauri build --target i686-unknown-linux-gnu
-          
-          # Restore original files
-          cd ..
-          cp src-tauri/tauri.conf.json.backup src-tauri/tauri.conf.json
-          cp src-tauri/Cargo.toml.backup src-tauri/Cargo.toml
-          rm src-tauri/tauri.conf.json.backup
-          rm src-tauri/Cargo.toml.backup
 
       - name: Upload Linux 32-bit artifacts
         uses: actions/upload-artifact@v4
@@ -282,24 +263,11 @@ jobs:
 
       - name: Build macOS x64 version
         run: |
-          # Backup original files
-          cp src-tauri/tauri.conf.json src-tauri/tauri.conf.json.backup
-          cp src-tauri/Cargo.toml src-tauri/Cargo.toml.backup
-          
-          # Use legacy config
           cp legacy-builds/macos-x64/tauri.conf.json src-tauri/tauri.conf.json
           cp legacy-builds/macos-x64/Cargo.toml src-tauri/Cargo.toml
           
-          # Build for Intel Mac
           cd src-tauri
           cargo tauri build --target x86_64-apple-darwin
-          
-          # Restore original files
-          cd ..
-          cp src-tauri/tauri.conf.json.backup src-tauri/tauri.conf.json
-          cp src-tauri/Cargo.toml.backup src-tauri/Cargo.toml
-          rm src-tauri/tauri.conf.json.backup
-          rm src-tauri/Cargo.toml.backup
 
       - name: Upload macOS x64 artifacts
         uses: actions/upload-artifact@v4

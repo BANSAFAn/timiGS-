@@ -1,43 +1,45 @@
 ```
 # Build artifacts
-target/
 dist/
 build/
+*.exe
+*.dll
+*.so
+*.a
+*.obj
+*.out
 
 # Dependencies
 node_modules/
-vendor/
+.venv/
+venv/
+__pycache__/
+.mypy_cache/
+.pytest_cache/
+target/
+.gradle/
+
+# Editors/IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*.tmp
+
+# Logs
+*.log
 
 # Environment
 .env
 .env.local
 *.env.*
 
-# Editors
-.vscode/
-.idea/
+# Coverage
+coverage/
+htmlcov/
+.coverage
 
 # OS
 .DS_Store
 Thumbs.db
-
-# Logs
-*.log
-
-# Python
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-.Python
-env/
-venv/
-.venv/
-
-# Rust (Cargo)
-Cargo.lock
-target/
-
-# Tauri
-**/tauri.conf.json
 ```
