@@ -37,6 +37,10 @@ jobs:
             args: "--target universal-apple-darwin"
             name: macOS
           - platform: ubuntu-latest
+            container: alpine:latest
+            args: "--bundles deb,rpm"
+            name: Linux (Alpine)
+          - platform: ubuntu-latest
             container: archlinux:latest
             args: "--bundles appimage --verbose"
             name: Linux (Arch)
@@ -49,7 +53,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-
+      - name: Install dependencies (Alpine)
+        if: matrix.container == 'alpine:latest'
+        run: |
+          apk add --no-cache nodejs npm curl rust cargo git make musl-dev openssl-dev clang llvm webkit2gtk-4.1-dev gtk+3.0-dev libayatana-appindicator-dev librsvg-dev patchelf alsa-lib-dev
+          npm i -g pnpm
 
       - name: Install dependencies (Arch Linux)
         if: matrix.container == 'archlinux:latest'
@@ -66,23 +74,29 @@ jobs:
           sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf libasound2-dev
 
       - name: Setup pnpm
-        if: matrix.container != 'archlinux:latest'
+        if: matrix.container != 'alpine:latest' && matrix.container != 'archlinux:latest'
         uses: pnpm/action-setup@v4
         with:
           version: 10
 
       - name: Setup Node.js
-        if: matrix.container != 'archlinux:latest'
+        if: matrix.container != 'alpine:latest' && matrix.container != 'archlinux:latest'
         uses: actions/setup-node@v4
         with:
           node-version: lts/*
           cache: 'pnpm'
 
       - name: Setup Rust
-        if: matrix.container != 'archlinux:latest'
+        if: matrix.container != 'alpine:latest' && matrix.container != 'archlinux:latest'
         uses: dtolnay/rust-toolchain@stable
         with:
           targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+
+      - name: Install Rust (Alpine)
+        if: matrix.container == 'alpine:latest'
+        run: |
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+          . "$HOME/.cargo/env"
 
       - name: Install frontend dependencies
         run: pnpm install --frozen-lockfile
@@ -95,7 +109,7 @@ jobs:
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RUSTFLAGS: ""
+          RUSTFLAGS: ${{ matrix.container == 'alpine:latest' && '-C target-feature=-crt-static' || '' }}
           APPIMAGE_EXTRACT_AND_RUN: "1"
           NO_STRIP: true
           LINUXDEPLOY_PLUGIN_GTK_SKIP_GLIB_SCHEMAS: "1"
