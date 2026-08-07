@@ -84,7 +84,7 @@
               <h3>{{ $t('analytics.trend') }}</h3>
             </div>
             <div class="chart-container">
-              <Line v-if="weeklyStats.length > 0" :data="lineChartData" :options="lineChartOptions" />
+              <Line v-if="weeklyStats.length > 0" :key="store.settings.theme" :data="lineChartData" :options="lineChartOptions" />
             </div>
           </div>
 
@@ -100,7 +100,7 @@
             <div class="app-breakdown-content">
               
               <div class="app-breakdown-chart">
-                 <Pie v-if="allAppsSorted.length > 0" :data="appChartData" :options="computedPieChartOptions" />
+                 <Pie v-if="allAppsSorted.length > 0" :key="store.settings.theme" :data="appChartData" :options="computedPieChartOptions" />
               </div>
               
               

@@ -273,11 +273,13 @@
             <div class="chart-wrapper" v-if="chartData.labels.length">
               <Doughnut
                 v-if="selectedChartType === 'doughnut'"
+                :key="store.settings.theme"
                 :data="chartData"
                 :options="computedDoughnutOptions"
               />
               <Bar
                 v-else
+                :key="store.settings.theme"
                 :data="barChartData"
                 :options="computedBarOptions"
               />
@@ -484,30 +486,80 @@ watch(() => store.topApps, (newTopApps) => {
   }
 }, { immediate: true });
 
-const chartColors = computed(() => {
-  const isLight = store.settings.theme === 'light';
-  if (isLight) {
-    return [
-      "#ffb300", // main amber
-      "#fbbf24", // amber-400
-      "#d97706", // amber-600
-      "#f97316", // orange-500
-      "#ea580c", // orange-600
-      "#b45309", // amber-700
-      "#78350f", // amber-900
-    ];
-  } else {
-    return [
-      "#39ff14", // main neon green
-      "#4ade80", // green-400
-      "#16a34a", // green-600
-      "#22c55e", // green-500
-      "#15803d", // green-700
-      "#86efac", // green-300
-      "#14532d", // green-900
-    ];
+function getThemeColors(themeName: string) {
+  switch (themeName) {
+    case 'light':
+      return {
+        primary: '#ffb300',
+        text: '#ffb300',
+        bg: 'rgba(10, 6, 0, 0.98)',
+        fillBg: 'rgba(255, 179, 0, 0.15)',
+        pointBorder: '#0a0600',
+        grid: 'rgba(255, 179, 0, 0.15)',
+        font: "'Share Tech Mono', 'Consolas', monospace",
+        palette: ['#ffb300', '#ffe082', '#ff8f00', '#ffc107', '#d97706', '#f97316', '#b45309']
+      };
+    case 'glitch':
+      return {
+        primary: '#00f0ff',
+        text: '#00f0ff',
+        bg: 'rgba(5, 5, 8, 0.98)',
+        fillBg: 'rgba(0, 240, 255, 0.15)',
+        pointBorder: '#0d0d14',
+        grid: 'rgba(0, 240, 255, 0.15)',
+        font: "'Orbitron', 'Fira Code', monospace",
+        palette: ['#00f0ff', '#ff0055', '#ffe600', '#00ff66', '#9900ff', '#70f8ff', '#d60045']
+      };
+    case 'material':
+      return {
+        primary: '#d0bcff',
+        text: '#e6e0e9',
+        bg: 'rgba(29, 27, 32, 0.98)',
+        fillBg: 'rgba(208, 188, 255, 0.18)',
+        pointBorder: '#141218',
+        grid: 'rgba(208, 188, 255, 0.15)',
+        font: "'Roboto', sans-serif",
+        palette: ['#d0bcff', '#e8def8', '#efb8c8', '#a6f4c5', '#ffe088', '#b69df8', '#f2b8b5']
+      };
+    case 'office':
+      return {
+        primary: '#0078d4',
+        text: '#201f1e',
+        bg: 'rgba(255, 255, 255, 0.98)',
+        fillBg: 'rgba(0, 120, 212, 0.15)',
+        pointBorder: '#ffffff',
+        grid: 'rgba(0, 120, 212, 0.12)',
+        font: "'Segoe UI', sans-serif",
+        palette: ['#0078d4', '#107c41', '#d83b01', '#005a9e', '#5c2d91', '#004578', '#106ebe']
+      };
+    case 'simple':
+      return {
+        primary: '#3b82f6',
+        text: '#f8fafc',
+        bg: 'rgba(30, 41, 59, 0.98)',
+        fillBg: 'rgba(59, 130, 246, 0.15)',
+        pointBorder: '#0f172a',
+        grid: 'rgba(59, 130, 246, 0.15)',
+        font: "'Plus Jakarta Sans', sans-serif",
+        palette: ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444', '#60a5fa', '#34d399']
+      };
+    case 'dark':
+    default:
+      return {
+        primary: '#39ff14',
+        text: '#39ff14',
+        bg: 'rgba(2, 5, 2, 0.98)',
+        fillBg: 'rgba(57, 255, 20, 0.15)',
+        pointBorder: '#020502',
+        grid: 'rgba(57, 255, 20, 0.15)',
+        font: "'VT323', 'Consolas', monospace",
+        palette: ['#39ff14', '#4ade80', '#16a34a', '#22c55e', '#15803d', '#86efac', '#00e676']
+      };
   }
-});
+}
+
+const themeConfig = computed(() => getThemeColors(store.settings.theme || 'dark'));
+const chartColors = computed(() => themeConfig.value.palette);
 
 function formatDuration(seconds: number): string {
   if (!seconds || seconds < 0) seconds = 0;
@@ -565,7 +617,7 @@ const barChartData = computed(() => ({
   labels: store.topApps.slice(0, 5).map((app) => app.app_name),
   datasets: [
     {
-      data: store.topApps.slice(0, 5).map((app) => Math.round(app.total_seconds / 60)),
+      data: store.topApps.slice(0, 5).map((app) => app.total_seconds),
       backgroundColor: chartColors.value,
       borderRadius: 0,
       borderSkipped: false,
@@ -574,11 +626,7 @@ const barChartData = computed(() => ({
 }));
 
 const computedDoughnutOptions = computed(() => {
-  const isLight = store.settings.theme === 'light';
-  const primaryColor = isLight ? "#ffb300" : "#39ff14";
-  const bgColor = isLight ? "rgba(10, 6, 0, 0.98)" : "rgba(2, 5, 2, 0.98)";
-  const textColor = isLight ? "#ffb300" : "#39ff14";
-
+  const cfg = themeConfig.value;
   return {
     responsive: true,
     maintainAspectRatio: false,
@@ -598,14 +646,14 @@ const computedDoughnutOptions = computed(() => {
     plugins: {
       legend: { display: false },
       tooltip: {
-        backgroundColor: bgColor,
-        titleColor: textColor,
-        titleFont: { family: "Consolas, Courier New, monospace", size: 12, weight: "bold" as const },
-        bodyColor: textColor,
-        bodyFont: { family: "Consolas, Courier New, monospace", size: 12 },
+        backgroundColor: cfg.bg,
+        titleColor: cfg.text,
+        titleFont: { family: cfg.font, size: 12, weight: "bold" as const },
+        bodyColor: cfg.text,
+        bodyFont: { family: cfg.font, size: 12 },
         padding: 10,
         cornerRadius: 0,
-        borderColor: primaryColor,
+        borderColor: cfg.primary,
         borderWidth: 1,
         displayColors: false,
         callbacks: {
@@ -620,11 +668,7 @@ const computedDoughnutOptions = computed(() => {
 });
 
 const computedBarOptions = computed(() => {
-  const isLight = store.settings.theme === 'light';
-  const primaryColor = isLight ? "#ffb300" : "#39ff14";
-  const bgColor = isLight ? "rgba(10, 6, 0, 0.98)" : "rgba(2, 5, 2, 0.98)";
-  const textColor = isLight ? "#ffb300" : "#39ff14";
-
+  const cfg = themeConfig.value;
   return {
     responsive: true,
     maintainAspectRatio: false,
@@ -643,18 +687,18 @@ const computedBarOptions = computed(() => {
     plugins: {
       legend: { display: false },
       tooltip: {
-        backgroundColor: bgColor,
-        titleColor: textColor,
-        titleFont: { family: "Consolas, Courier New, monospace", size: 12, weight: "bold" as const },
-        bodyColor: textColor,
-        bodyFont: { family: "Consolas, Courier New, monospace", size: 12 },
+        backgroundColor: cfg.bg,
+        titleColor: cfg.text,
+        titleFont: { family: cfg.font, size: 12, weight: "bold" as const },
+        bodyColor: cfg.text,
+        bodyFont: { family: cfg.font, size: 12 },
         padding: 10,
         cornerRadius: 0,
-        borderColor: primaryColor,
+        borderColor: cfg.primary,
         borderWidth: 1,
         displayColors: false,
         callbacks: {
-          label: (ctx: any) => ` DURATION: ${ctx.raw} ${t('common.m_symbol', 'm')}`,
+          label: (ctx: any) => ` DURATION: ${formatDuration(ctx.raw)}`,
         },
       },
     },
@@ -662,8 +706,8 @@ const computedBarOptions = computed(() => {
       x: {
         grid: { display: false, drawBorder: false },
         ticks: { 
-          color: primaryColor, 
-          font: { family: "Consolas, Courier New, monospace", size: 9 },
+          color: cfg.primary, 
+          font: { family: cfg.font, size: 9 },
           maxRotation: 0,
           minRotation: 0,
           callback: function(this: any, value: any) {
