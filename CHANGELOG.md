@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.12.0](https://github.com/BANSAFAn/timiGS-/compare/v1.11.0...v1.12.0) (2026-08-09)
+
+
+### Features
+
+* radical theme transformations, pnpm migration, console window fix, and full locale sync ([52087b1](https://github.com/BANSAFAn/timiGS-/commit/52087b1945ff988781fa33f9b627384b4b992766))
+
+
+### Bug Fixes
+
+* **charts:** dynamic theme rendering and small durations visibility ([3197c3e](https://github.com/BANSAFAn/timiGS-/commit/3197c3e656b27e27284bd060d74cc29fc0e6ef3f))
+
+
+### CI/CD
+
+* allow esbuild scripts in pnpm configurations ([94ee2c4](https://github.com/BANSAFAn/timiGS-/commit/94ee2c434b68b156b995895963c3ea725b68c2b2))
+* move pnpm onlyBuiltDependencies to allowBuilds in pnpm-workspace.yaml ([4807729](https://github.com/BANSAFAn/timiGS-/commit/4807729c1ff6e082eec076608a618e169e3b0ce3))
+
 ## [1.11.0](https://github.com/BANSAFAn/timiGS-/compare/v1.10.4...v1.11.0) (2026-07-18)
 
 
