@@ -74,10 +74,10 @@
 
     <div class="timeline-container">
       <div v-if="groupedSessions.length > 0" class="timeline">
-        <div v-for="group in groupedSessions" :key="group.appName" class="timeline-group">
-          <div class="timeline-group-header" @click="toggleGroup(group.appName)">
+        <div v-for="group in groupedSessions" :key="group.key" class="timeline-group">
+          <div class="timeline-group-header" @click="toggleGroup(group.key)">
             <div class="group-toggle">
-              <svg :class="{ 'rotated': expandedGroups.has(group.appName) }" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              <svg :class="{ 'rotated': expandedGroups.has(group.key) }" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
             </div>
             <img v-if="appIcons[group.exePath]" :src="appIcons[group.exePath]" class="app-icon-img" :alt="group.appName" />
             <div v-else class="app-icon-small" :style="{ background: getAppColor(group.appName) }">
@@ -116,7 +116,7 @@
             </div>
           </div>
 
-          <div v-if="expandedGroups.has(group.appName)" class="timeline-group-sessions">
+          <div v-if="expandedGroups.has(group.key)" class="timeline-group-sessions">
             <div v-for="session in group.sessions" :key="session.id" class="timeline-item" @click="handleSessionClick(session)">
               <div class="timeline-time">
                 {{ formatTime(session.start_time) }} - {{ session.end_time ? formatTime(session.end_time) : t('common.now', 'Now') }}
@@ -234,6 +234,7 @@ onUnmounted(() => {
 
 
 interface SessionGroup {
+  key: string;
   appName: string;
   exePath: string;
   sessions: ActivitySession[];
@@ -243,7 +244,6 @@ interface SessionGroup {
 const groupedSessions = computed(() => {
   const sessionList = searchQuery.value ? filteredSessions.value : sessions.value;
 
-
   const groups: Map<string, SessionGroup> = new Map();
 
   sessionList.forEach(session => {
@@ -251,6 +251,7 @@ const groupedSessions = computed(() => {
 
     if (!groups.has(key)) {
       groups.set(key, {
+        key,
         appName: session.app_name,
         exePath: session.exe_path,
         sessions: [],
@@ -278,12 +279,12 @@ const groupedSessions = computed(() => {
   return list;
 });
 
-function toggleGroup(appName: string) {
+function toggleGroup(key: string) {
   const newSet = new Set(expandedGroups.value);
-  if (newSet.has(appName)) {
-    newSet.delete(appName);
+  if (newSet.has(key)) {
+    newSet.delete(key);
   } else {
-    newSet.add(appName);
+    newSet.add(key);
   }
   expandedGroups.value = newSet;
 }

@@ -72,9 +72,8 @@ router.onError((error, to) => {
   console.error('[Router Error]', error, 'Navigating to:', to.path);
 });
 
-router.beforeEach((to, from, next) => {
+router.beforeEach((to, from) => {
   console.log('[Router] Before navigation from:', from.path, 'to:', to.path);
-  next();
 });
 
 router.afterEach((to, from, failure) => {

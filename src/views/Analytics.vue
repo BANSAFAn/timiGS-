@@ -401,11 +401,11 @@
                 <div class="website-session-info">
                   <div class="website-session-title">{{ session.window_title || $t('analytics.unknownPage', 'Unknown Page') }}</div>
                   <div 
-                    v-if="isValidUrl(extractUrl(session.window_title))"
+                    v-if="isValidUrl(extractUrl(session.window_title, websiteHistoryName))"
                     class="website-session-url" 
                     :class="{ 'copied': copiedSessions[session.id] }"
-                    :title="copiedSessions[session.id] ? t('team.copied', 'Copied!') : t('analytics.clickToCopy', 'Click to copy link')" 
-                    @click="copyLink(extractUrl(session.window_title), session.id)"
+                    :title="copiedSessions[session.id] ? t('team.copied', 'Copied!') : (formatDisplayUrl(extractUrl(session.window_title, websiteHistoryName)) + ' — ' + t('analytics.clickToCopy', 'Click to copy link'))" 
+                    @click="copyLink(extractUrl(session.window_title, websiteHistoryName), session.id)"
                     style="cursor:pointer;"
                   >
                     <svg v-if="copiedSessions[session.id]" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;vertical-align:middle;margin-right:4px;">
@@ -415,7 +415,7 @@
                       <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
                       <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
                     </svg>
-                    {{ copiedSessions[session.id] ? t('team.copied', 'Copied!') : extractUrl(session.window_title) }}
+                    {{ copiedSessions[session.id] ? t('team.copied', 'Copied!') : formatDisplayUrl(extractUrl(session.window_title, websiteHistoryName)) }}
                   </div>
                 </div>
                 <div class="website-session-time">
@@ -540,7 +540,7 @@ const filteredWebsiteHistorySessions = computed(() => {
   if (!query) return websiteHistorySessions.value;
   return websiteHistorySessions.value.filter(session => {
     const title = (session.window_title || '').toLowerCase();
-    const url = extractUrl(session.window_title).toLowerCase();
+    const url = extractUrl(session.window_title, websiteHistoryName.value).toLowerCase();
     return title.includes(query) || url.includes(query);
   });
 });
@@ -638,9 +638,8 @@ async function loadFavicon(siteName: string) {
 }
 
 function extractDomain(siteName: string): string | null {
-
+  if (!siteName) return null;
   const cleanName = siteName.trim();
-
 
   const domainPatterns = [
     { pattern: /youtube/i, domain: 'youtube.com' },
@@ -662,6 +661,26 @@ function extractDomain(siteName: string): string | null {
     { pattern: /linkedin/i, domain: 'linkedin.com' },
     { pattern: /medium/i, domain: 'medium.com' },
     { pattern: /vivaldi/i, domain: 'vivaldi.com' },
+    { pattern: /github/i, domain: 'github.com' },
+    { pattern: /gitlab/i, domain: 'gitlab.com' },
+    { pattern: /wikipedia|вікіпедія|википедия/i, domain: 'wikipedia.org' },
+    { pattern: /twitch/i, domain: 'twitch.tv' },
+    { pattern: /steam/i, domain: 'store.steampowered.com' },
+    { pattern: /rozetka/i, domain: 'rozetka.com.ua' },
+    { pattern: /aliexpress/i, domain: 'aliexpress.com' },
+    { pattern: /ebay/i, domain: 'ebay.com' },
+    { pattern: /habr|хабр/i, domain: 'habr.com' },
+    { pattern: /dou\.ua|dou/i, domain: 'dou.ua' },
+    { pattern: /chatgpt/i, domain: 'chatgpt.com' },
+    { pattern: /claude/i, domain: 'claude.ai' },
+    { pattern: /deepseek/i, domain: 'deepseek.com' },
+    { pattern: /gemini/i, domain: 'gemini.google.com' },
+    { pattern: /notion/i, domain: 'notion.so' },
+    { pattern: /figma/i, domain: 'figma.com' },
+    { pattern: /archlinux|archwiki/i, domain: 'archlinux.org' },
+    { pattern: /npm|npmjs/i, domain: 'npmjs.com' },
+    { pattern: /crates\.io/i, domain: 'crates.io' },
+    { pattern: /mdn/i, domain: 'developer.mozilla.org' },
   ];
 
   for (const { pattern, domain } of domainPatterns) {
@@ -670,8 +689,7 @@ function extractDomain(siteName: string): string | null {
     }
   }
 
-
-  const urlPattern = /(?:https?:\/\/)?(?:www\.)?([a-zA-Z0-9-]+\.[a-zA-Z]{2,})/i;
+  const urlPattern = /(?:https?:\/\/)?(?:www\.)?([a-zA-Z0-9-]+\.[a-zA-Z]{2,}(?:\.[a-zA-Z]{2,})?)/i;
   const match = cleanName.match(urlPattern);
   if (match) {
     return `https://${match[1]}`;
@@ -842,7 +860,7 @@ async function openWebsiteHistory(siteName: string) {
     const sessions = await store.getActivityRange(today, today);
     
 
-    const BROWSERS = ['chrome', 'msedge', 'firefox', 'opera', 'brave', 'vivaldi'];
+    const BROWSERS = ['chrome', 'msedge', 'edge', 'firefox', 'opera', 'brave', 'vivaldi', 'arc', 'chromium', 'yandex', 'zen', 'floorp', 'waterfox', 'librewolf'];
     const websiteSessions = sessions
       .filter(s => {
         const appNameLower = s.app_name.toLowerCase();
@@ -863,77 +881,268 @@ async function openWebsiteHistory(siteName: string) {
   }
 }
 
-function extractUrl(windowTitle: string): string {
+function formatDisplayUrl(url: string): string {
+  if (!url) return '';
+  try {
+    return decodeURI(url);
+  } catch {
+    return url;
+  }
+}
+
+function extractUrl(windowTitle: string, contextSiteName?: string): string {
   if (!windowTitle) return '';
-  
 
   let cleanTitle = windowTitle
-    .replace(/ - Google Chrome$/i, '')
-    .replace(/ - Microsoft Edge$/i, '')
-    .replace(/ - Mozilla Firefox$/i, '')
-    .replace(/ - Opera$/i, '')
-    .replace(/ - Brave$/i, '')
-    .replace(/ - Vivaldi$/i, '')
-    .replace(/^\(\d+\)\s*/i, ''); // Remove notification counts like "(1)"
-  
-
-  
+    .replace(/ - (?:Google Chrome|Microsoft Edge|Mozilla Firefox|Opera|Brave|Vivaldi|Arc|Chromium|Yandex Browser|Waterfox|LibreWolf|Tor Browser|Floorp|Zen Browser)$/i, '')
+    .replace(/^\(\d+\+?\)\s*/i, '')
+    .trim();
 
   const fullUrlPattern = /(https?:\/\/[^\s<>"{}|\\^`\[\]]+)/i;
   const fullUrlMatch = cleanTitle.match(fullUrlPattern);
-  if (fullUrlMatch) {
-    return fullUrlMatch[1];
-  }
-  
+  if (fullUrlMatch) return fullUrlMatch[1];
 
-  const domainPattern = /\b([a-zA-Z0-9-]+\.(?:com|org|net|io|co|edu|gov|mil|biz|info|me|tv|fm|ly|app|dev|ai|ru|ua|de|fr|es|it|jp|cn|in|br|mx|nl|se|no|dk|fi|pl|cz|sk|hu|ro|bg|hr|si|rs|ua|by|kz|az|ge|am|md|lt|lv|ee)\b(?:\/[^\s<>"{}|\\^`\[\]]*)?)/i;
-  const domainMatch = cleanTitle.match(domainPattern);
-  if (domainMatch) {
-    return 'https://' + domainMatch[1];
-  }
-  
+  const directPathMatch = cleanTitle.match(/\b([a-zA-Z0-9-]+\.[a-zA-Z]{2,}(?:\.[a-zA-Z]{2,})?\/(?:[^\s<>"{}|\\^`\[\]]*[a-zA-Z0-9_/-])?)/i);
+  if (directPathMatch) return 'https://' + directPathMatch[1];
 
-  if (/youtube/i.test(cleanTitle)) {
+  const titleLower = cleanTitle.toLowerCase();
+  const contextLower = (contextSiteName || '').toLowerCase();
+  const parts = cleanTitle.split(/\s+[-|·—–/]\s+/).map(p => p.trim()).filter(Boolean);
+
+  function getContentTitle(sitePatterns: RegExp[]): string {
+    const filtered = parts.filter(p => !sitePatterns.some(rx => rx.test(p.toLowerCase())));
+    if (filtered.length > 0) return filtered.join(' - ').trim();
+    let res = cleanTitle;
+    for (const rx of sitePatterns) res = res.replace(rx, '');
+    return res.replace(/^[-|·—–/\s]+|[-|·—–/\s]+$/g, '').trim();
+  }
+
+  if (titleLower.includes('youtube') || contextLower.includes('youtube') || titleLower.includes('студія') || titleLower.includes('studio')) {
+    if (
+      titleLower.includes('youtube studio') || 
+      titleLower.includes('youtube студія') || 
+      titleLower.includes('youtube творческая студия') ||
+      titleLower.includes('студія youtube') ||
+      titleLower.includes('творческая студия youtube') ||
+      titleLower.endsWith('studio')
+    ) {
+      return 'https://studio.youtube.com';
+    }
+    if (titleLower.includes('youtube music') || contextLower.includes('music')) {
+      const musicQ = getContentTitle([/youtube music/i, /music/i]);
+      return musicQ && musicQ.toLowerCase() !== 'youtube music'
+        ? `https://music.youtube.com/search?q=${encodeURIComponent(musicQ)}`
+        : 'https://music.youtube.com';
+    }
     const videoIdMatch = cleanTitle.match(/watch\?v=([a-zA-Z0-9_-]+)/i);
-    if (videoIdMatch) {
-      return `https://youtube.com/watch?v=${videoIdMatch[1]}`;
-    }
-    return 'https://youtube.com';
-  }
-  
+    if (videoIdMatch) return `https://www.youtube.com/watch?v=${videoIdMatch[1]}`;
 
-  const commonSites: Record<string, string> = {
-    'youtube studio': 'https://studio.youtube.com',
-    'youtube творческая студия': 'https://studio.youtube.com',
-    'gemini.google': 'https://gemini.google.com',
-    'gemini': 'https://gemini.google.com',
-    'chatgpt': 'https://chatgpt.com',
-    'claude': 'https://claude.ai',
-    'deepseek': 'https://chat.deepseek.com',
-    'google': 'https://google.com',
-    'facebook': 'https://facebook.com',
-    'twitter': 'https://twitter.com',
-    'instagram': 'https://instagram.com',
-    'reddit': 'https://reddit.com',
-    'stackoverflow': 'https://stackoverflow.com',
-    'netflix': 'https://netflix.com',
-    'spotify': 'https://spotify.com',
-    'discord': 'https://discord.com',
-    'telegram': 'https://telegram.org',
-    'tiktok': 'https://tiktok.com',
-    'pinterest': 'https://pinterest.com',
-    'linkedin': 'https://linkedin.com',
-    'medium': 'https://medium.com',
-    'vivaldi': 'https://vivaldi.com',
+    const ytQ = getContentTitle([/youtube/i]);
+    const handleMatch = ytQ.match(/@([a-zA-Z0-9_.-]+)/);
+    if (handleMatch) return `https://www.youtube.com/@${handleMatch[1]}`;
+
+    const genericYt = ['youtube', 'home', 'головна', 'главная', 'trending', 'subscriptions', 'підписки', 'подписки'];
+    if (!ytQ || genericYt.includes(ytQ.toLowerCase())) return 'https://www.youtube.com';
+    return `https://www.youtube.com/results?search_query=${encodeURIComponent(ytQ)}`;
+  }
+
+  if (titleLower.includes('google') || contextLower.includes('google')) {
+    if (titleLower.includes('maps') || titleLower.includes('карти') || titleLower.includes('карты')) {
+      const q = getContentTitle([/google maps/i, /google карти/i, /google карты/i, /google/i, /карти/i, /maps/i]);
+      return q ? `https://www.google.com/maps/search/${encodeURIComponent(q)}` : 'https://www.google.com/maps';
+    }
+    if (titleLower.includes('drive') || titleLower.includes('диск')) return 'https://drive.google.com';
+    if (titleLower.includes('docs') || titleLower.includes('документ')) return 'https://docs.google.com';
+    if (titleLower.includes('gmail') || titleLower.includes('пошта')) return 'https://mail.google.com';
+    if (titleLower.includes('translate') || titleLower.includes('перекладач')) return 'https://translate.google.com';
+
+    const q = getContentTitle([/google search/i, /пошук google/i, /поиск в google/i, /google/i]);
+    return q ? `https://www.google.com/search?q=${encodeURIComponent(q)}` : 'https://www.google.com';
+  }
+
+  if (titleLower.includes('github') || contextLower.includes('github')) {
+    const repoMatch = cleanTitle.match(/([a-zA-Z0-9_.-]+\/[a-zA-Z0-9_.-]+)/);
+    if (repoMatch) {
+      const repo = repoMatch[1].replace(/[:.,]+$/, '');
+      const issueMatch = cleanTitle.match(/#(\d+)/);
+      if (issueMatch) {
+        const type = /pull request|pr/i.test(cleanTitle) ? 'pull' : 'issues';
+        return `https://github.com/${repo}/${type}/${issueMatch[1]}`;
+      }
+      return `https://github.com/${repo}`;
+    }
+    const q = getContentTitle([/github/i]);
+    return q ? `https://github.com/search?q=${encodeURIComponent(q)}` : 'https://github.com';
+  }
+
+  if (titleLower.includes('gitlab') || contextLower.includes('gitlab')) {
+    const repoMatch = cleanTitle.match(/([a-zA-Z0-9_.-]+\/[a-zA-Z0-9_.-]+)/);
+    return repoMatch ? `https://gitlab.com/${repoMatch[1]}` : 'https://gitlab.com';
+  }
+
+  if (/(?:wikipedia|вікіпедія|википедия)/i.test(titleLower) || /(?:wikipedia|вікіпедія|википедия)/i.test(contextLower)) {
+    const article = getContentTitle([/wikipedia/i, /вікіпедія/i, /википедия/i]);
+    if (article) {
+      const lang = /вікіпедія/i.test(cleanTitle) ? 'uk' : /википедия/i.test(cleanTitle) ? 'ru' : 'en';
+      return `https://${lang}.wikipedia.org/wiki/${encodeURIComponent(article.replace(/ /g, '_'))}`;
+    }
+    return 'https://wikipedia.org';
+  }
+
+  if (titleLower.includes('stack overflow') || titleLower.includes('stack exchange') || contextLower.includes('stack overflow')) {
+    const q = getContentTitle([/stack overflow/i, /stack exchange/i]);
+    return q ? `https://stackoverflow.com/search?q=${encodeURIComponent(q)}` : 'https://stackoverflow.com';
+  }
+
+  if (titleLower.includes('reddit') || contextLower.includes('reddit') || /r\/[a-zA-Z0-9_]+/i.test(cleanTitle)) {
+    const subMatch = cleanTitle.match(/r\/([a-zA-Z0-9_]+)/i);
+    const postQ = getContentTitle([/reddit/i, /r\/[a-zA-Z0-9_]+/i]);
+    if (subMatch && postQ) return `https://www.reddit.com/r/${subMatch[1]}/search/?q=${encodeURIComponent(postQ)}`;
+    if (subMatch) return `https://www.reddit.com/r/${subMatch[1]}`;
+    if (postQ) return `https://www.reddit.com/search/?q=${encodeURIComponent(postQ)}`;
+    return 'https://www.reddit.com';
+  }
+
+  if (/\s*\/\s*(?:x|twitter)$/i.test(cleanTitle) || contextLower.includes('twitter') || contextLower === 'x' || /twitter\.com|x\.com/i.test(titleLower)) {
+    const handleMatch = cleanTitle.match(/\(@([a-zA-Z0-9_]+)\)/) || cleanTitle.match(/@([a-zA-Z0-9_]+)/);
+    if (handleMatch) return `https://x.com/${handleMatch[1]}`;
+    const q = getContentTitle([/\bx\b/i, /twitter/i]);
+    return q ? `https://x.com/search?q=${encodeURIComponent(q)}` : 'https://x.com';
+  }
+
+  if (titleLower.includes('rozetka') || contextLower.includes('rozetka')) {
+    const q = getContentTitle([/rozetka/i, /інтернет-магазин/i, /интернет-магазин/i]);
+    return q ? `https://rozetka.com.ua/search/?text=${encodeURIComponent(q)}` : 'https://rozetka.com.ua';
+  }
+
+  if (titleLower.includes('amazon') || contextLower.includes('amazon')) {
+    const q = getContentTitle([/amazon\.com/i, /amazon/i]);
+    return q ? `https://www.amazon.com/s?k=${encodeURIComponent(q)}` : 'https://www.amazon.com';
+  }
+
+  if (titleLower.includes('aliexpress') || contextLower.includes('aliexpress')) {
+    const q = getContentTitle([/aliexpress/i]);
+    return q ? `https://www.aliexpress.com/wholesale?SearchText=${encodeURIComponent(q)}` : 'https://www.aliexpress.com';
+  }
+
+  if (titleLower.includes('steam') || contextLower.includes('steam')) {
+    const q = getContentTitle([/on steam/i, /в steam/i, /steam/i]);
+    return q ? `https://store.steampowered.com/search/?term=${encodeURIComponent(q)}` : 'https://store.steampowered.com';
+  }
+
+  if (titleLower.includes('twitch') || contextLower.includes('twitch')) {
+    const streamer = getContentTitle([/twitch/i]);
+    return streamer ? `https://www.twitch.tv/${encodeURIComponent(streamer.toLowerCase().replace(/\s+/g, ''))}` : 'https://www.twitch.tv';
+  }
+
+  if (titleLower.includes('habr') || titleLower.includes('хабр') || contextLower.includes('habr')) {
+    const q = getContentTitle([/habr/i, /хабр/i]);
+    return q ? `https://habr.com/ru/search/?q=${encodeURIComponent(q)}` : 'https://habr.com';
+  }
+
+  if (titleLower.includes('medium') || contextLower.includes('medium')) {
+    const q = getContentTitle([/medium/i]);
+    return q ? `https://medium.com/search?q=${encodeURIComponent(q)}` : 'https://medium.com';
+  }
+
+  if (titleLower.includes('dou') || contextLower.includes('dou')) {
+    const q = getContentTitle([/dou\.ua/i, /dou/i]);
+    return q ? `https://dou.ua/search/?q=${encodeURIComponent(q)}` : 'https://dou.ua';
+  }
+
+  if (titleLower.includes('npm') || contextLower.includes('npm')) {
+    const q = getContentTitle([/npm/i]);
+    return q ? `https://www.npmjs.com/package/${encodeURIComponent(q)}` : 'https://www.npmjs.com';
+  }
+  if (titleLower.includes('crates.io') || contextLower.includes('crates')) {
+    const q = getContentTitle([/crates\.io/i, /crates/i]);
+    return q ? `https://crates.io/crates/${encodeURIComponent(q)}` : 'https://crates.io';
+  }
+
+  if (titleLower.includes('mdn') || contextLower.includes('mdn')) {
+    const q = getContentTitle([/mdn web docs/i, /mdn/i]);
+    return q ? `https://developer.mozilla.org/en-US/search?q=${encodeURIComponent(q)}` : 'https://developer.mozilla.org';
+  }
+
+  if (titleLower.includes('netflix') || contextLower.includes('netflix')) {
+    const q = getContentTitle([/netflix/i]);
+    return q ? `https://www.netflix.com/search?q=${encodeURIComponent(q)}` : 'https://www.netflix.com';
+  }
+  if (titleLower.includes('spotify') || contextLower.includes('spotify')) {
+    const q = getContentTitle([/spotify/i]);
+    return q ? `https://open.spotify.com/search/${encodeURIComponent(q)}` : 'https://open.spotify.com';
+  }
+
+  const directApps: Record<string, string> = {
+    chatgpt: 'https://chatgpt.com',
+    claude: 'https://claude.ai',
+    deepseek: 'https://chat.deepseek.com',
+    gemini: 'https://gemini.google.com',
+    discord: 'https://discord.com/app',
+    telegram: 'https://web.telegram.org',
+    whatsapp: 'https://web.whatsapp.com',
+    notion: 'https://notion.so',
+    figma: 'https://figma.com',
+    trello: 'https://trello.com',
+    slack: 'https://app.slack.com',
+    facebook: 'https://facebook.com',
+    instagram: 'https://instagram.com',
+    pinterest: 'https://pinterest.com',
+    linkedin: 'https://linkedin.com',
+    ebay: 'https://ebay.com',
+    vivaldi: 'https://vivaldi.com',
   };
-  
-  const cleanTitleLower = cleanTitle.toLowerCase();
-  for (const [key, url] of Object.entries(commonSites)) {
-    if (cleanTitleLower.includes(key)) {
-      return url;
+
+  for (const [key, url] of Object.entries(directApps)) {
+    if (titleLower.includes(key) || contextLower.includes(key)) return url;
+  }
+
+  let detectedDomain: string | null = null;
+  const domainPattern = /(?:https?:\/\/)?(?:www\.)?([a-zA-Z0-9-]+\.[a-zA-Z]{2,}(?:\.[a-zA-Z]{2,})?)/i;
+
+  if (contextSiteName) {
+    const m = contextSiteName.match(domainPattern);
+    if (m) {
+      detectedDomain = m[1].toLowerCase();
+    } else {
+      const fromSite = extractDomain(contextSiteName);
+      if (fromSite) {
+        const m2 = fromSite.match(domainPattern);
+        if (m2) detectedDomain = m2[1].toLowerCase();
+      }
     }
   }
-  
+
+  if (!detectedDomain && parts.length > 1) {
+    for (const p of parts) {
+      const m = p.match(domainPattern);
+      if (m) {
+        detectedDomain = m[1].toLowerCase();
+        break;
+      }
+    }
+  }
+
+  if (!detectedDomain) {
+    const m = cleanTitle.match(domainPattern);
+    if (m) detectedDomain = m[1].toLowerCase();
+  }
+
+  if (detectedDomain) {
+    const pageTitle = parts.filter(p => !p.toLowerCase().includes(detectedDomain!)).join(' - ').trim();
+    if (pageTitle && pageTitle.toLowerCase() !== detectedDomain) {
+      return `https://www.google.com/search?q=site:${detectedDomain}+${encodeURIComponent(pageTitle)}`;
+    }
+    return `https://${detectedDomain}`;
+  }
+
+  if (contextSiteName) {
+    const pageTitle = parts.filter(p => !p.toLowerCase().includes(contextLower)).join(' - ').trim();
+    if (pageTitle && pageTitle.toLowerCase() !== contextLower) {
+      return `https://www.google.com/search?q=${encodeURIComponent(contextSiteName + ' ' + pageTitle)}`;
+    }
+    return `https://www.google.com/search?q=${encodeURIComponent(contextSiteName)}`;
+  }
 
   return cleanTitle.trim();
 }
