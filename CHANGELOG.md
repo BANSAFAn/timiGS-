@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.12.1](https://github.com/BANSAFAn/timiGS-/compare/v1.12.0...v1.12.1) (2026-09-04)
+
+
+### Bug Fixes
+
+* improve website history url resolution, fix router guard deprecation and timeline duplicate keys ([24b1909](https://github.com/BANSAFAn/timiGS-/commit/24b1909424892f78fa72f7ef15f9a878bc6a8d5b))
+* **music:** allow iTunes API and Apple CDN in CSP for release builds ([8b54448](https://github.com/BANSAFAn/timiGS-/commit/8b544487b322112b4ace610202ca0f4c4cfaa23e))
+
 ## [1.12.0](https://github.com/BANSAFAn/timiGS-/compare/v1.11.0...v1.12.0) (2026-08-09)
 
 
